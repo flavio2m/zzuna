@@ -1,60 +1,105 @@
-# 📚 Skills do Projeto - Índice Geral
+# SKILLS_INDEX
 
-## 🎯 Objetivo
+## Objetivo
 
-Este diretório contém skills modulares que definem os padrões arquiteturais do projeto.
+Utilizar apenas as skills necessárias para a tarefa.
 
-Consulte apenas as skills necessárias para a tarefa atual.
-
----
-
-# 📋 Índice de Skills
-
-## 🏗️ Arquitetura
-
-* **@01_ESTRUTURA_PROJETO.md** — Organização do projeto, responsabilidades das camadas e localização dos arquivos.
+Não duplicar regras já definidas em outras skills.
 
 ---
 
-## 📦 Domain
+# Arquitetura
 
-* **@03_DOMAIN_DTOS.md** — Criação de DTOs.
-* **@04_DOMAIN_VALIDATORS.md** — Criação de Validators.
-* **@05_DOMAIN_ENTITIES.md** — Criação de Entities.
+```text
+@01_ESTRUTURA_PROJETO.md
+```
 
----
-
-## 💾 Data
-
-* **@06_DATA_REPOSITORIES.md** — Criação de Repositories.
-* **@07_DATA_SERVICES.md** — Criação de Services.
+Estrutura do projeto, responsabilidades das camadas e organização dos arquivos.
 
 ---
 
-## 🎨 UI
+# Domain
 
-* **@08_UI_VIEWMODELS.md** — Criação de ViewModels.
-* **@09_UI.md** — Criação de Pages e Widgets.
+```text
+@02_DOMAIN_DTOS.md
+```
+
+Criar DTOs.
+
+```text
+@03_DOMAIN_VALIDATORS.md
+```
+
+Criar Validators.
+
+```text
+@04_DOMAIN_ENTITIES.md
+```
+
+Criar Entities e EntityDetails.
+
+```text
+@05_DOMAIN_USECASE.md
+```
+
+Criar UseCases.
 
 ---
 
-## 🔧 Configuração
+# Data
 
-* **@10_PROVIDERS.md** — Registro e uso de Providers.
+```text
+@06_DATA_REPOSITORIES.md
+```
+
+Criar Repositories.
+
+```text
+@07_DATA_SERVICES.md
+```
+
+Criar Services.
 
 ---
 
-# 🚀 Guias Rápidos
+# UI
 
-## Criar uma Feature
+```text
+@08_UI_VIEWMODELS.md
+```
+
+Criar ViewModels.
+
+```text
+@09_UI.md
+```
+
+Criar Pages, Widgets e componentes visuais.
+
+---
+
+# Configuração
+
+```text
+@10_PROVIDERS.md
+```
+
+Criar e registrar Providers.
+
+---
+
+# Fluxos Comuns
+
+## Nova Feature
 
 Consultar:
 
 ```text
 @01_ESTRUTURA_PROJETO.md
-@03_DOMAIN_DTOS.md
-@04_DOMAIN_VALIDATORS.md
-@05_DOMAIN_ENTITIES.md
+@02_DOMAIN_DTOS.md
+@03_DOMAIN_VALIDATORS.md
+@04_DOMAIN_ENTITIES.md
+@05_DOMAIN_USECASE.md
 @06_DATA_REPOSITORIES.md
 @08_UI_VIEWMODELS.md
 @09_UI.md
@@ -63,31 +108,39 @@ Consultar:
 
 ---
 
-## Criar um DTO
+## DTO
 
 ```text
-@03_DOMAIN_DTOS.md
+@02_DOMAIN_DTOS.md
 ```
 
 ---
 
-## Criar um Validator
+## Validator
 
 ```text
-@04_DOMAIN_VALIDATORS.md
+@03_DOMAIN_VALIDATORS.md
 ```
 
 ---
 
-## Criar uma Entity
+## Entity
 
 ```text
-@05_DOMAIN_ENTITIES.md
+@04_DOMAIN_ENTITIES.md
 ```
 
 ---
 
-## Criar um Repository
+## UseCase
+
+```text
+@05_DOMAIN_USECASE.md
+```
+
+---
+
+## Repository
 
 ```text
 @06_DATA_REPOSITORIES.md
@@ -95,7 +148,7 @@ Consultar:
 
 ---
 
-## Criar um Service
+## Service
 
 ```text
 @07_DATA_SERVICES.md
@@ -103,7 +156,7 @@ Consultar:
 
 ---
 
-## Criar um ViewModel
+## ViewModel
 
 ```text
 @08_UI_VIEWMODELS.md
@@ -111,7 +164,7 @@ Consultar:
 
 ---
 
-## Criar uma Page ou Widget
+## UI
 
 ```text
 @09_UI.md
@@ -119,7 +172,7 @@ Consultar:
 
 ---
 
-## Criar ou atualizar Providers
+## Provider
 
 ```text
 @10_PROVIDERS.md
@@ -127,14 +180,14 @@ Consultar:
 
 ---
 
-# 💡 Regras Gerais
+# Regras Gerais
 
 * Consultar apenas as skills necessárias.
-* Seguir a estrutura definida em `@01_ESTRUTURA_PROJETO.md`.
+* Seguir `@01_ESTRUTURA_PROJETO.md`.
 * Reutilizar componentes existentes antes de criar novos.
-* Ao criar Pages ou Widgets, verificar primeiro `ui/shared/`.
-* Não duplicar padrões já definidos nas skills.
+* Antes de criar componentes UI, verificar `ui/shared/`.
+* Não duplicar padrões definidos nas skills.
 
 ---
 
-**Projeto:** app_architecture3
+Projeto: `zzuna`

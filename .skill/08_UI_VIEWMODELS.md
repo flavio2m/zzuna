@@ -6,6 +6,8 @@
 * Expor ações para a View
 * Gerenciar estados assíncronos com Commands
 
+---
+
 ## Regras
 
 * Nome termina com `ViewModel`
@@ -15,6 +17,41 @@
 * Método do Command deve ser privado (`_`)
 * Retornar `AsyncResult<T>`
 * Criar em `ui/[feature]/viewmodels`
+
+---
+
+## Uso de UseCases
+
+Antes de criar um UseCase, verificar:
+
+```text
+05_DOMAIN_USECASE.md
+```
+
+Criar UseCase obrigatoriamente quando:
+
+* Consumir mais de um Repository
+* Existir regra de negócio relevante
+* Existir processamento complexo
+* Existir método grande (aproximadamente 30 linhas ou mais)
+* Existir necessidade de montar objetos ricos complexos (`EntityDetails`)
+
+Não criar UseCase quando:
+
+* Consumir apenas um Repository
+* O processamento for simples
+* O enriquecimento utilizar apenas dados locais ou catálogos estáticos
+
+Nestes casos, a conversão para `EntityDetails` pode ser realizada diretamente na ViewModel.
+
+Exemplo:
+
+```text
+Conta -> ContaDetails
+Cartao -> CartaoDetails
+```
+
+---
 
 ## Commands
 
@@ -39,6 +76,8 @@ late final updateCommand =
     Command2(_update);
 ```
 
+---
+
 ## Não fazer
 
 * Widgets
@@ -48,6 +87,8 @@ late final updateCommand =
 * Estado visual
 * HTTP direto
 * Acesso direto a Services
+
+---
 
 ## Template
 
@@ -70,6 +111,8 @@ class ExampleViewModel {
   }
 }
 ```
+
+---
 
 ## Exemplo
 

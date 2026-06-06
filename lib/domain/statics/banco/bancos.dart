@@ -1,5 +1,5 @@
 import 'package:result_dart/result_dart.dart';
-import 'package:zzuna/domain/statics/banks/banco.dart';
+import 'package:zzuna/domain/statics/banco/banco.dart';
 
 abstract final class Bancos {
   static const items = [
