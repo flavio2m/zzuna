@@ -2,14 +2,12 @@ class ContaDto {
   String? id;
 
   String descricao;
-  double saldoInicial;
   String bancoSigla;
   bool ativo;
 
   ContaDto({
     this.id,
     this.descricao = '',
-    this.saldoInicial = 0,
     this.bancoSigla = '',
     this.ativo = true, //
   });
@@ -22,10 +20,6 @@ class ContaDto {
     this.descricao = descricao;
   }
 
-  void setSaldoInicial(double saldoInicial) {
-    this.saldoInicial = saldoInicial;
-  }
-
   void setBancoSigla(String bancoSigla) {
     this.bancoSigla = bancoSigla;
   }
@@ -35,18 +29,13 @@ class ContaDto {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'descricao': descricao,
-    'saldoInicial': saldoInicial,
-    'bancoSigla': bancoSigla,
-    'ativo': ativo,
+    'id': id, 'descricao': descricao, 'bancoSigla': bancoSigla, 'ativo': ativo, //
   };
 
   factory ContaDto.fromJson(Map<String, dynamic> json) {
     return ContaDto(
       id: json['id'],
       descricao: json['descricao'] ?? '',
-      saldoInicial: (json['saldoInicial'] ?? 0).toDouble(),
       bancoSigla: json['bancoSigla'] ?? '',
       ativo: json['ativo'] ?? true,
     );

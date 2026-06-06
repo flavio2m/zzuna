@@ -4,85 +4,161 @@
 
 * Acessar APIs
 * Acessar Storage
+* Persistir entidades
+* Consultar entidades
 * Orquestrar dados
 * Emitir eventos para reatividade
+
+---
 
 ## Regras
 
 * Nome termina com `Repository`
-* Retornar `AsyncResult<T>`
-* Chamar Services/Clients
-* Validar DTOs quando necessário
-* Emitir eventos com `StreamController.broadcast()`
-* Expor `observer()`
-* Implementar `dispose()`
 * Criar em `data/repositories`
+* Implementar `BaseRepository<T>`
+* Retornar `AsyncResult<T>`
+* Utilizar Services ou Storages
+* Nunca acessar HTTP diretamente
+* Pode possuir consultas específicas além do CRUD
+* Pode realizar validações relacionadas à persistência
+* Deve emitir eventos através de `StreamController.broadcast()`
+* Deve implementar `observer()`
+* Deve implementar `dispose()`
 
-## Padrão
+---
 
-```dart
-final _streamController = StreamController<Event>.broadcast();
+## Eventos
 
-Stream<Event> observer() {
-  return _streamController.stream;
-}
-
-void dispose() {
-  _streamController.close();
-}
-```
-
-Para operações com sucesso:
-
-```dart
-result.onSuccess(_streamController.add);
-```
-
-Para validação:
+Todo Repository deve emitir eventos utilizando:
 
 ```dart
-validator
-    .validateResult(dto)
-    .flatMap(client.method);
+final _streamController =
+    StreamController<RepositoryEvent<T>>.broadcast();
 ```
+
+Para criação:
+
+```dart
+.onSuccess((model) {
+  _streamController.add(
+    RepositoryCreated(model),
+  );
+});
+```
+
+Para atualização:
+
+```dart
+.onSuccess((model) {
+  _streamController.add(
+    RepositoryUpdated(model),
+  );
+});
+```
+
+Para remoção:
+
+```dart
+.onSuccess((_) {
+  _streamController.add(
+    RepositoryDeleted(id),
+  );
+});
+```
+
+---
+
+## Storage
+
+Repositories devem utilizar uma abstração de Storage.
+
+Exemplo:
+
+```dart
+final BaseStorage<Conta> _storage;
+```
+
+Injeção:
+
+```dart
+ContaRepository(
+  LocalStorage<Conta> storage,
+) : _storage = storage;
+```
+
+---
+
+## Consultas específicas
+
+Repositories podem expor métodos específicos.
+
+Exemplo:
+
+```dart
+AsyncResult<User> findUserByEmail(
+  String email,
+)
+```
+
+Utilizando:
+
+```dart
+_storage.searchByFields(...)
+```
+
+---
 
 ## Não fazer
 
-* HTTP direto na ViewModel
-* HTTP direto na UI
 * Widgets
-* Estado de UI
+* Providers
+* ViewModels
 * Navegação
+* Estado de UI
 * Regras de apresentação
+* HTTP direto
+
+---
 
 ## Template
 
 ```dart
-import 'dart:async';
-import 'package:result_dart/result_dart.dart';
+class ExampleRepository
+    implements BaseRepository<Example> {
 
-class ExampleRepository {
-  final ExampleClient _client;
+  final BaseStorage<Example> _storage;
 
   final _streamController =
-      StreamController<ExampleEvent>.broadcast();
+      StreamController<
+        RepositoryEvent<Example>
+      >.broadcast();
 
-  ExampleRepository(this._client);
+  ExampleRepository(
+    LocalStorage<Example> storage,
+  ) : _storage = storage;
 
-  AsyncResult<Example> execute(
-    ExampleDto dto,
-  ) {
-    return _client
-        .execute(dto)
-        .onSuccess(_streamController.add);
+  @override
+  AsyncResult<Example> create(
+    Example model,
+  ) async {
+    return _storage
+        .create(model)
+        .onSuccess((result) {
+      _streamController.add(
+        RepositoryCreated(result),
+      );
+    });
   }
 
-  Stream<ExampleEvent> observer() {
+  @override
+  Stream<RepositoryEvent<Example>>
+      observer() {
     return _streamController.stream;
   }
 
+  @override
   void dispose() {
     _streamController.close();
   }
 }
-```
+
