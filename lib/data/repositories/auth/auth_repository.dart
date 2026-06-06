@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/auth/auth_client_base.dart';
-import 'package:zzuna/domain/dtos/credentials.dart';
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
-import 'package:zzuna/domain/dtos/update_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/credentials.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/update_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/domain/validators/credentials_validator.dart';
 import 'package:zzuna/utils/extensions/lucid_validator_extencion.dart';

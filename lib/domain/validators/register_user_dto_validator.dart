@@ -1,4 +1,4 @@
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:lucid_validation/lucid_validation.dart';
 
 class RegisterUserDtoValidator extends LucidValidator<RegisterUserDto> {
@@ -7,9 +7,12 @@ class RegisterUserDtoValidator extends LucidValidator<RegisterUserDto> {
 
     ruleFor((dto) => dto.email, key: 'email').notEmpty().validEmail();
 
-    ruleFor(
-      (dto) => dto.password,
-      key: 'password',
-    ).notEmpty().minLength(6).mustHaveLowercase().mustHaveUppercase().mustHaveNumber().mustHaveSpecialCharacter();
+    ruleFor((dto) => dto.password, key: 'password')
+        .notEmpty() //
+        .minLength(6)
+        .mustHaveLowercase()
+        .mustHaveUppercase()
+        .mustHaveNumber()
+        .mustHaveSpecialCharacter();
   }
 }

@@ -1,5 +1,5 @@
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/dtos/credentials.dart';
+import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:zzuna/domain/validators/credentials_validator.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/widgets/register_modal.dart';

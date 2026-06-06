@@ -1,7 +1,7 @@
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
-import 'package:zzuna/domain/dtos/credentials.dart';
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
-import 'package:zzuna/domain/dtos/update_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/credentials.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/update_user_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

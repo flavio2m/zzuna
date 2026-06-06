@@ -13,10 +13,14 @@
 * Sem regras de negócio
 * Sem validações
 * Campos mutáveis para formulários
-* Sempre definr set para todos os atributos
+* Sempre definir métodos `set` para todos os atributos
 * Implementar `toJson()` para requests
 * Implementar `fromJson()` para responses
-* Criar Validator correspondente
+* DTO é utilizado em formulários de criação e edição
+* DTO não representa persistência
+* DTO pode conter `id` opcional quando utilizado para edição
+* Todo DTO deve possuir um Validator correspondente
+* DTOs devem ser criados em `domain/dtos`
 
 ## Não fazer
 

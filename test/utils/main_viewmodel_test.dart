@@ -1,5 +1,5 @@
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

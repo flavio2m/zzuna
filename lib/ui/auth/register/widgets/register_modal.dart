@@ -1,5 +1,5 @@
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/validators/register_user_dto_validator.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';

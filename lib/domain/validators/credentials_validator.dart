@@ -1,4 +1,4 @@
-import 'package:zzuna/domain/dtos/credentials.dart';
+import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:lucid_validation/lucid_validation.dart';
 
 class CredentialsValidator extends LucidValidator<Credentials> {
