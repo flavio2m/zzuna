@@ -1,3 +1,4 @@
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// Enum para definir os tipos de mensagem do SnackBar
@@ -28,10 +29,13 @@ class AppSnackBar {
     final snackBar = SnackBar(
       content: Row(
         children: [
-          Icon(_getIcon(type), color: Colors.white, size: 20),
+          Icon(_getIcon(type), color: AppColors.surface, size: 20),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(message, style: const TextStyle(color: Colors.white, fontSize: 14)),
+            child: Text(
+              message,
+              style: const TextStyle(color: AppColors.surface, fontSize: 14),
+            ),
           ),
         ],
       ),
@@ -48,32 +52,68 @@ class AppSnackBar {
   }
 
   /// Atalho para exibir mensagem de erro
-  static void showError(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
-    show(context: context, message: message, type: SnackBarType.error, duration: duration);
+  static void showError(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    show(
+      context: context,
+      message: message,
+      type: SnackBarType.error,
+      duration: duration,
+    );
   }
 
   /// Atalho para exibir mensagem de sucesso
-  static void showSuccess(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
-    show(context: context, message: message, type: SnackBarType.success, duration: duration);
+  static void showSuccess(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    show(
+      context: context,
+      message: message,
+      type: SnackBarType.success,
+      duration: duration,
+    );
   }
 
   /// Atalho para exibir mensagem de aviso
-  static void showWarning(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
-    show(context: context, message: message, type: SnackBarType.warning, duration: duration);
+  static void showWarning(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    show(
+      context: context,
+      message: message,
+      type: SnackBarType.warning,
+      duration: duration,
+    );
   }
 
   /// Atalho para exibir mensagem informativa
-  static void showInfo(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
-    show(context: context, message: message, type: SnackBarType.info, duration: duration);
+  static void showInfo(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    show(
+      context: context,
+      message: message,
+      type: SnackBarType.info,
+      duration: duration,
+    );
   }
 
   /// Retorna a cor baseada no tipo de mensagem
   static Color _getColor(SnackBarType type) {
     return switch (type) {
-      SnackBarType.error => const Color(0xFFD32F2F), // Vermelho
-      SnackBarType.success => const Color(0xFF388E3C), // Verde
-      SnackBarType.warning => const Color(0xFFF57C00), // Laranja
-      SnackBarType.info => const Color(0xFF1976D2), // Azul
+      SnackBarType.error => AppColors.danger,
+      SnackBarType.success => AppColors.primary,
+      SnackBarType.warning => AppColors.warning,
+      SnackBarType.info => AppColors.indigo600,
     };
   }
 

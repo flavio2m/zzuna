@@ -1,3 +1,4 @@
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 enum AppCardVariant { flat, outlined, elevated }
@@ -58,7 +59,7 @@ class AppCard extends StatelessWidget {
     switch (variant) {
       case AppCardVariant.outlined:
         return BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+          border: const Border(bottom: BorderSide(color: AppColors.border)),
         );
 
       default:

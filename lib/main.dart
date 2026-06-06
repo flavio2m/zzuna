@@ -1,5 +1,6 @@
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
+import 'package:zzuna/ui/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routefly/routefly.dart';
@@ -28,6 +29,7 @@ class MainApp extends ConsumerWidget {
     });
 
     return MaterialApp.router(
+      theme: AppTheme.light(),
       routerConfig: Routefly.routerConfig(
         routes: routes,
         initialPath: routePaths.auth.login, //

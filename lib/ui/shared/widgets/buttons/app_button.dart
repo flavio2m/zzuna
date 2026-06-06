@@ -1,3 +1,4 @@
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 enum AppButtonType { elevated, filled }
@@ -33,9 +34,13 @@ class AppButton extends StatelessWidget {
     final isDisabled = onPressed == null;
 
     final style = TextButton.styleFrom(
-      backgroundColor: buttonType == AppButtonType.elevated ? Theme.of(context).colorScheme.onPrimary : null,
+      backgroundColor: buttonType == AppButtonType.elevated
+          ? Theme.of(context).colorScheme.onPrimary
+          : null,
       minimumSize: full ? const Size(double.infinity, 48) : const Size(0, 48),
-      side: BorderSide(color: isDisabled ? Colors.grey : Colors.transparent),
+      side: BorderSide(
+        color: isDisabled ? AppColors.slate300 : Colors.transparent,
+      ),
     );
 
     final button = switch (buttonType) {
@@ -65,17 +70,24 @@ class AppButton extends StatelessWidget {
   Widget _buildLabel(bool disabled) {
     if (small) return const SizedBox.shrink();
 
-    return Text(label, style: disabled ? TextStyle(color: Colors.grey[700]) : textStyle);
+    return Text(
+      label,
+      style: disabled ? const TextStyle(color: AppColors.slate700) : textStyle,
+    );
   }
 
   Widget _buildIcon(BuildContext context, bool disabled) {
     if (loading) {
-      return const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2));
+      return const SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
     }
     if (!disabled) {
       return icon ?? const Icon(Icons.add);
     }
 
-    return Icon(icon?.icon ?? Icons.add, color: Colors.grey[700]);
+    return Icon(icon?.icon ?? Icons.add, color: AppColors.slate700);
   }
 }
