@@ -58,10 +58,14 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 // ============================================================================
 
 /// Provider para LoginViewModel
-final loginViewModelProvider = Provider<LoginViewModel>((ref) => LoginViewModel(ref.watch(authRepositoryProvider)));
+final loginViewModelProvider = Provider<LoginViewModel>(
+  (ref) => LoginViewModel(ref.watch(authRepositoryProvider)), //
+);
 
 /// Provider para LogoutViewModel
-final logoutViewModelProvider = Provider<LogoutViewModel>((ref) => LogoutViewModel(ref.watch(authRepositoryProvider)));
+final logoutViewModelProvider = Provider<LogoutViewModel>(
+  (ref) => LogoutViewModel(ref.watch(authRepositoryProvider)), //
+);
 
 /// Provider para RegisterViewModel
 final registerViewModelProvider = Provider<RegisterViewModel>(

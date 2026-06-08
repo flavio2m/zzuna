@@ -1,9 +1,12 @@
 class RegisterUserDto {
+  String? id; // Pode ter um ID, necessário para gear o ID no repositório
+
   String name;
   String email;
   String password;
 
   RegisterUserDto({
+    this.id,
     required this.name,
     required this.email,
     required this.password, //

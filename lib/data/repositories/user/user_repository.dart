@@ -1,31 +1,45 @@
 import 'dart:async';
 
+import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
+import 'package:zzuna/data/exception/repository_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
-class UserRepository implements BaseRepository<LoadedUser> {
+class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, LoadedUserDto> {
   final BaseStorage<LoadedUser> _storage;
   final _streamController = StreamController<RepositoryEvent<LoadedUser>>.broadcast();
 
   UserRepository(LocalStorage<LoadedUser> storage) : _storage = storage;
 
   @override
-  AsyncResult<LoadedUser> create(LoadedUser model) async {
-    final exists = await findUserByEmail(model.email).then(
+  AsyncResult<LoadedUser> create(RegisterUserDto dto) async {
+    final exists = await findUserByEmail(dto.email).then(
       (result) => result.isSuccess(), //
     );
 
     if (exists) {
       return Failure(
-        LocalStorageException('Usuário já existe com o e-mail: ${model.email}'), //
+        RepositoryException('Usuário já existe com o e-mail: ${dto.email}'), //
       );
     }
 
-    return _storage.create(model).onSuccess((user) {
+    // É necessário vim com o ID gerado pela authRepository
+    if (dto.id == null) {
+      return Failure(RepositoryException('ID do usuário não informado.'));
+    }
+
+    final user = LoadedUser(
+      id: dto.id!,
+      email: dto.email,
+      name: dto.name, //
+    );
+    return _storage.create(user).onSuccess((user) {
       _streamController.add(RepositoryCreated(user));
     });
   }
@@ -36,8 +50,9 @@ class UserRepository implements BaseRepository<LoadedUser> {
   }
 
   @override
-  AsyncResult<LoadedUser> update(LoadedUser model) async {
-    return _storage.update(model).onSuccess((user) {
+  AsyncResult<LoadedUser> update(LoadedUserDto dto) async {
+    final loadedUser = LoadedUser(id: dto.id, email: dto.email, name: dto.name);
+    return _storage.update(loadedUser).onSuccess((user) {
       _streamController.add(RepositoryUpdated(user));
     });
   }
@@ -69,14 +84,14 @@ class UserRepository implements BaseRepository<LoadedUser> {
       (users) {
         if (users.isEmpty) {
           return Failure(
-            LocalStorageException('Usuário não encontrado com o e-mail: $email'), //
+            RepositoryException('Usuário não encontrado com o e-mail: $email'), //
           );
         }
         return Success(users.first);
       },
       (error) {
         return Failure(
-          LocalStorageException('Erro ao buscar usuário por e-mail: $email'), //
+          RepositoryException('Erro ao buscar usuário por e-mail: $email'), //
         );
       },
     );

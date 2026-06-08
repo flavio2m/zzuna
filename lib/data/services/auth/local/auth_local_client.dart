@@ -1,9 +1,10 @@
+import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_auth_exception.dart';
 import 'package:zzuna/data/services/auth/auth_client_base.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
-import 'package:zzuna/domain/dtos/credentials.dart';
-import 'package:zzuna/domain/dtos/register_user_dto.dart';
-import 'package:zzuna/domain/dtos/update_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/credentials.dart';
+import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -17,7 +18,7 @@ class AuthLocalClient implements AuthClientBase {
     final usersResult = await _userStorage.getAll();
 
     // aguarda 5 segundos para simular processo lento
-    await Future.delayed(const Duration(seconds: 5));
+    // await Future.delayed(const Duration(seconds: 5));
 
     return usersResult.fold((users) {
       final matches = users.where((user) => user.email == credentials.email);
@@ -41,13 +42,14 @@ class AuthLocalClient implements AuthClientBase {
 
   @override
   AsyncResult<LoggedUser> registerUser(RegisterUserDto dto) async {
-    // aguarda 5 segundos para simular processo lento
-    await Future.delayed(const Duration(seconds: 5));
-    return Success(_createLoggedUser(id: _createFakeId(), name: dto.name, email: dto.email));
+    // await Future.delayed(const Duration(seconds: 5));
+    final id = dto.id ?? Uuid().v4();
+
+    return Success(_createLoggedUser(id: id, name: dto.name, email: dto.email));
   }
 
   @override
-  AsyncResult<LoggedUser> updateUser(UpdateUserDto dto) async {
+  AsyncResult<LoggedUser> updateUser(LoadedUserDto dto) async {
     return Success(
       _createLoggedUser(id: dto.id, name: dto.name, email: dto.email), //
     );
@@ -69,9 +71,5 @@ class AuthLocalClient implements AuthClientBase {
       token: 'local_token_$id',
       refreshToken: 'local_refresh_token_$id',
     );
-  }
-
-  String _createFakeId() {
-    return 'local_${DateTime.now().microsecondsSinceEpoch}';
   }
 }

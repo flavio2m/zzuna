@@ -49,14 +49,14 @@ void main() {
     test('update replaces the existing item', () async {
       final storage = createTestUserStorage(collectionName: nextCollectionName());
       final user = createTestUser();
-      final updatedUser = user.copyWith(name: 'Updated User');
+      final loadedUserDto = user.copyWith(name: 'Updated User');
 
       await storage.create(user);
-      final updateResult = await storage.update(updatedUser);
+      final updateResult = await storage.update(loadedUserDto);
       final savedResult = await storage.getById(user.id);
 
       expect(updateResult.isSuccess(), isTrue);
-      expect(savedResult.getOrThrow(), updatedUser);
+      expect(savedResult.getOrThrow(), loadedUserDto);
     });
 
     test('update returns failure when id does not exist', () async {

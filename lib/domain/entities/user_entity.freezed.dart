@@ -15,7 +15,11 @@ User _$UserFromJson(
   Map<String, dynamic> json
 ) {
         switch (json['runtimeType']) {
-                  case 'default':
+                  case 'newUser':
+          return NewUser.fromJson(
+            json
+          );
+                case 'default':
           return LoadedUser.fromJson(
             json
           );
@@ -85,10 +89,11 @@ extension UserPatterns on User {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( LoadedUser value)?  $default,{TResult Function( NotLoggedUser value)?  notLogged,TResult Function( LoggedUser value)?  logged,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( LoadedUser value)?  $default,{TResult Function( NewUser value)?  newUser,TResult Function( NotLoggedUser value)?  notLogged,TResult Function( LoggedUser value)?  logged,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case LoadedUser() when $default != null:
+case NewUser() when newUser != null:
+return newUser(_that);case LoadedUser() when $default != null:
 return $default(_that);case NotLoggedUser() when notLogged != null:
 return notLogged(_that);case LoggedUser() when logged != null:
 return logged(_that);case _:
@@ -109,10 +114,11 @@ return logged(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( LoadedUser value)  $default,{required TResult Function( NotLoggedUser value)  notLogged,required TResult Function( LoggedUser value)  logged,}){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( LoadedUser value)  $default,{required TResult Function( NewUser value)  newUser,required TResult Function( NotLoggedUser value)  notLogged,required TResult Function( LoggedUser value)  logged,}){
 final _that = this;
 switch (_that) {
-case LoadedUser():
+case NewUser():
+return newUser(_that);case LoadedUser():
 return $default(_that);case NotLoggedUser():
 return notLogged(_that);case LoggedUser():
 return logged(_that);}
@@ -129,10 +135,11 @@ return logged(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( LoadedUser value)?  $default,{TResult? Function( NotLoggedUser value)?  notLogged,TResult? Function( LoggedUser value)?  logged,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( LoadedUser value)?  $default,{TResult? Function( NewUser value)?  newUser,TResult? Function( NotLoggedUser value)?  notLogged,TResult? Function( LoggedUser value)?  logged,}){
 final _that = this;
 switch (_that) {
-case LoadedUser() when $default != null:
+case NewUser() when newUser != null:
+return newUser(_that);case LoadedUser() when $default != null:
 return $default(_that);case NotLoggedUser() when notLogged != null:
 return notLogged(_that);case LoggedUser() when logged != null:
 return logged(_that);case _:
@@ -152,9 +159,10 @@ return logged(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email)?  $default,{TResult Function()?  notLogged,TResult Function( String id,  String name,  String email,  String token,  String refreshToken)?  logged,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email)?  $default,{TResult Function( String name,  String email)?  newUser,TResult Function()?  notLogged,TResult Function( String id,  String name,  String email,  String token,  String refreshToken)?  logged,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case LoadedUser() when $default != null:
+case NewUser() when newUser != null:
+return newUser(_that.name,_that.email);case LoadedUser() when $default != null:
 return $default(_that.id,_that.name,_that.email);case NotLoggedUser() when notLogged != null:
 return notLogged();case LoggedUser() when logged != null:
 return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);case _:
@@ -175,9 +183,10 @@ return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email)  $default,{required TResult Function()  notLogged,required TResult Function( String id,  String name,  String email,  String token,  String refreshToken)  logged,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email)  $default,{required TResult Function( String name,  String email)  newUser,required TResult Function()  notLogged,required TResult Function( String id,  String name,  String email,  String token,  String refreshToken)  logged,}) {final _that = this;
 switch (_that) {
-case LoadedUser():
+case NewUser():
+return newUser(_that.name,_that.email);case LoadedUser():
 return $default(_that.id,_that.name,_that.email);case NotLoggedUser():
 return notLogged();case LoggedUser():
 return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);}
@@ -194,9 +203,10 @@ return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email)?  $default,{TResult? Function()?  notLogged,TResult? Function( String id,  String name,  String email,  String token,  String refreshToken)?  logged,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email)?  $default,{TResult? Function( String name,  String email)?  newUser,TResult? Function()?  notLogged,TResult? Function( String id,  String name,  String email,  String token,  String refreshToken)?  logged,}) {final _that = this;
 switch (_that) {
-case LoadedUser() when $default != null:
+case NewUser() when newUser != null:
+return newUser(_that.name,_that.email);case LoadedUser() when $default != null:
 return $default(_that.id,_that.name,_that.email);case NotLoggedUser() when notLogged != null:
 return notLogged();case LoggedUser() when logged != null:
 return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);case _:
@@ -204,6 +214,81 @@ return logged(_that.id,_that.name,_that.email,_that.token,_that.refreshToken);ca
 
 }
 }
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class NewUser implements User {
+  const NewUser({required this.name, required this.email, final  String? $type}): $type = $type ?? 'newUser';
+  factory NewUser.fromJson(Map<String, dynamic> json) => _$NewUserFromJson(json);
+
+ final  String name;
+ final  String email;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of User
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$NewUserCopyWith<NewUser> get copyWith => _$NewUserCopyWithImpl<NewUser>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$NewUserToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NewUser&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,email);
+
+@override
+String toString() {
+  return 'User.newUser(name: $name, email: $email)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $NewUserCopyWith<$Res> implements $UserCopyWith<$Res> {
+  factory $NewUserCopyWith(NewUser value, $Res Function(NewUser) _then) = _$NewUserCopyWithImpl;
+@useResult
+$Res call({
+ String name, String email
+});
+
+
+
+
+}
+/// @nodoc
+class _$NewUserCopyWithImpl<$Res>
+    implements $NewUserCopyWith<$Res> {
+  _$NewUserCopyWithImpl(this._self, this._then);
+
+  final NewUser _self;
+  final $Res Function(NewUser) _then;
+
+/// Create a copy of User
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? name = null,Object? email = null,}) {
+  return _then(NewUser(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
 
 }
 

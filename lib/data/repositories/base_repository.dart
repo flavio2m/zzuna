@@ -20,12 +20,12 @@ class RepositoryDeleted<T extends Object> extends RepositoryEvent<T> {
   RepositoryDeleted(this.id);
 }
 
-abstract class BaseRepository<T extends Object> {
-  AsyncResult<T> create(T model);
-  AsyncResult<T> update(T model);
+abstract class BaseRepository<TEntity extends Object, TCreateDto, TUpdateDto> {
+  AsyncResult<TEntity> create(TCreateDto dto);
+  AsyncResult<TEntity> update(TUpdateDto dto);
   AsyncResult<Unit> delete(String id);
-  AsyncResult<List<T>> getAll();
-  AsyncResult<T> getById(String id);
-  Stream<RepositoryEvent<T>> observer();
+  AsyncResult<List<TEntity>> getAll();
+  AsyncResult<TEntity> getById(String id);
+  Stream<RepositoryEvent<TEntity>> observer();
   void dispose();
 }

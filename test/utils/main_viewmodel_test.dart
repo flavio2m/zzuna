@@ -12,7 +12,9 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+
     final storage = createTestUserStorage();
+
     container = ProviderContainer(overrides: [userStorageProvider.overrideWithValue(storage)]);
   });
 
@@ -23,8 +25,10 @@ void main() {
   group('userProvider', () {
     test('starts with NotLoggedUser', () async {
       final users = <User>[];
+
       container.listen(userProvider, (_, next) {
         final user = next.valueOrNull;
+
         if (user != null) {
           users.add(user);
         }
@@ -37,9 +41,12 @@ void main() {
 
     test('updates user when auth stream emits LoggedUser', () async {
       final users = <User>[];
+
       final authRepository = container.read(authRepositoryProvider);
+
       container.listen(userProvider, (_, next) {
         final user = next.valueOrNull;
+
         if (user != null) {
           users.add(user);
         }
@@ -50,28 +57,39 @@ void main() {
       );
 
       expect(result.isSuccess(), isTrue);
-      await Future<void>.delayed(Duration.zero);
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
       expect(users, [isA<NotLoggedUser>(), isA<LoggedUser>().having((user) => user.email, 'email', 'new@example.com')]);
     });
 
     test('updates user to NotLoggedUser on logout', () async {
       final users = <User>[];
+
       final authRepository = container.read(authRepositoryProvider);
+
       container.listen(userProvider, (_, next) {
         final user = next.valueOrNull;
+
         if (user != null) {
           users.add(user);
         }
       }, fireImmediately: true);
 
-      await authRepository.registerUser(
+      final registerResult = await authRepository.registerUser(
         RegisterUserDto(name: 'New User', email: 'new@example.com', password: 'Aa123456!'),
       );
 
-      final result = await authRepository.logout();
+      expect(registerResult.isSuccess(), isTrue);
 
-      expect(result.isSuccess(), isTrue);
-      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      final logoutResult = await authRepository.logout();
+
+      expect(logoutResult.isSuccess(), isTrue);
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
       expect(users, [isA<NotLoggedUser>(), isA<LoggedUser>(), isA<NotLoggedUser>()]);
     });
   });

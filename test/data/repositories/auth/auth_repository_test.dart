@@ -4,7 +4,7 @@ import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
-import 'package:zzuna/domain/dtos/user/update_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,13 +30,21 @@ void main() {
   group('AuthRepository', () {
     test('login emits LoggedUser when credentials are valid', () async {
       final user = createTestUser(email: 'test@example.com');
-      await userRepository.create(user);
+      final dto = RegisterUserDto(
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: 'Aa123456!', //
+      );
+      await userRepository.create(dto);
       final eventExpectation = expectLater(
         authRepository.userObserver(),
         emits(isA<LoggedUser>().having((event) => event.id, 'id', user.id)),
       );
 
-      final result = await authRepository.login(Credentials(email: user.email, password: 'Aa123456!'));
+      final result = await authRepository.login(
+        Credentials(email: user.email, password: 'Aa123456!'), //
+      );
 
       expect(result.isSuccess(), isTrue);
       await eventExpectation;
@@ -85,7 +93,8 @@ void main() {
 
     test('updateUser updates user, preserves email, and emits events', () async {
       final user = createTestUser(id: 'user-1', name: 'Original User', email: 'original@example.com');
-      await userRepository.create(user);
+      final dto = RegisterUserDto(id: user.id, name: user.name, email: user.email, password: 'Aa123456!');
+      await userRepository.create(dto);
       final userEventExpectation = expectLater(
         userRepository.observer(),
         emits(isA<RepositoryUpdated<LoadedUser>>().having((event) => event.model.email, 'email', user.email)),
@@ -100,7 +109,7 @@ void main() {
       );
 
       final result = await authRepository.updateUser(
-        UpdateUserDto(id: user.id, name: 'Updated User', email: 'ignored@example.com'),
+        LoadedUserDto(id: user.id, name: 'Updated User', email: 'ignored@example.com'),
       );
       final savedUser = await userRepository.getById(user.id);
 

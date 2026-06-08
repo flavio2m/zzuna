@@ -4,7 +4,7 @@ import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/auth/auth_client_base.dart';
 import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
-import 'package:zzuna/domain/dtos/user/update_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/domain/validators/credentials_validator.dart';
 import 'package:zzuna/utils/extensions/lucid_validator_extencion.dart';
@@ -30,16 +30,21 @@ class AuthRepository {
     final validator = CredentialsValidator();
     final credentials = Credentials(email: dto.email, password: dto.password);
 
-    final authResult = await validator.validateResult(credentials).flatMap((_) => _authClient.registerUser(dto));
+    final authResult =
+        await validator //
+            .validateResult(credentials)
+            .flatMap((_) => _authClient.registerUser(dto));
 
     if (authResult.isError()) {
       return Failure(authResult.exceptionOrNull()!);
     }
 
     final loggedUser = authResult.getOrThrow();
-    final user = LoadedUser(id: loggedUser.id, name: loggedUser.name, email: loggedUser.email);
 
-    final createResult = await _userRepository.create(user);
+    // Retorna o ID gerado pela authRepository
+    dto.id = loggedUser.id;
+
+    final createResult = await _userRepository.create(dto);
 
     return createResult.fold((_) {
       _streamController.add(loggedUser);
@@ -47,7 +52,7 @@ class AuthRepository {
     }, Failure.new);
   }
 
-  AsyncResult<LoggedUser> updateUser(UpdateUserDto dto) async {
+  AsyncResult<LoggedUser> updateUser(LoadedUserDto dto) async {
     final authResult = await _authClient.updateUser(dto);
 
     if (authResult.isError()) {
@@ -61,9 +66,7 @@ class AuthRepository {
       return Failure(userResult.exceptionOrNull()!);
     }
 
-    final currentUser = userResult.getOrThrow();
-    final updatedUser = LoadedUser(id: currentUser.id, name: dto.name, email: currentUser.email);
-    final updateResult = await _userRepository.update(updatedUser);
+    final updateResult = await _userRepository.update(dto);
 
     return updateResult.fold((savedUser) {
       final updatedLoggedUser = LoggedUser(
