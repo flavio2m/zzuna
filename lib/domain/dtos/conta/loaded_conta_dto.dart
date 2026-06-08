@@ -1,18 +1,17 @@
-class ContaDto {
-  String? id;
-
+class LoadedContaDto {
+  String id;
   String descricao;
   String bancoSigla;
   bool ativo;
 
-  ContaDto({
-    this.id,
+  LoadedContaDto({
+    this.id = '',
     this.descricao = '',
     this.bancoSigla = '',
     this.ativo = true, //
   });
 
-  void setId(String? id) {
+  void setId(String id) {
     this.id = id;
   }
 
@@ -32,8 +31,8 @@ class ContaDto {
     'id': id, 'descricao': descricao, 'bancoSigla': bancoSigla, 'ativo': ativo, //
   };
 
-  factory ContaDto.fromJson(Map<String, dynamic> json) {
-    return ContaDto(
+  factory LoadedContaDto.fromJson(Map<String, dynamic> json) {
+    return LoadedContaDto(
       id: json['id'],
       descricao: json['descricao'] ?? '',
       bancoSigla: json['bancoSigla'] ?? '',

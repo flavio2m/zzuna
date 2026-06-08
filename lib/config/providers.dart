@@ -1,8 +1,11 @@
 import 'package:zzuna/data/repositories/auth/auth_repository.dart';
+import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/shared_preferences_service.dart';
+import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/data/services/storage/local/user_storage_provider.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
@@ -17,19 +20,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Provider para instância do Dio (HTTP Client)
 // final dioProvider = Provider<Dio>((ref) => Dio());
 
-/// Provider para LocalStorage de usuários
-final userStorageProvider = Provider<LocalStorage<LoadedUser>>(
-  (ref) => LocalStorage<LoadedUser>(
-    collectionName: 'users',
-    fromJson: (json) => LoadedUser.fromJson(json),
-    toJson: (user) => user.toJson(),
-    prefsService: SharedPreferencesService(),
-  ),
-);
-
 /// Provider para cliente de autenticação local
 final authLocalClientProvider = Provider<AuthLocalClient>(
-  (ref) => AuthLocalClient(ref.watch(userStorageProvider)), //
+  (ref) => AuthLocalClient(ref.watch(userLocalStorageProvider)), //
 );
 
 // ============================================================================
@@ -38,8 +31,10 @@ final authLocalClientProvider = Provider<AuthLocalClient>(
 
 /// Provider para UserRepository com lifecycle gerenciado
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final repository = UserRepository(ref.watch(userStorageProvider));
+  final repository = UserRepository(ref.watch(userLocalStorageProvider));
+
   ref.onDispose(repository.dispose);
+
   return repository;
 });
 
@@ -49,7 +44,17 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
     ref.watch(authLocalClientProvider),
     ref.watch(userRepositoryProvider), //
   );
+
   ref.onDispose(repository.dispose);
+
+  return repository;
+});
+
+final contaRepositoryProvider = Provider<ContaRepository>((ref) {
+  final repository = ContaRepository(ref.watch(contaStorageProvider));
+
+  ref.onDispose(repository.dispose);
+
   return repository;
 });
 

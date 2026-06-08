@@ -11,12 +11,13 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
   final T Function(Map<String, dynamic> json) fromJson;
   final Map<String, dynamic> Function(T model) toJson;
 
+  // _prefsService será opicional
   LocalStorage({
-    required SharedPreferencesService prefsService,
     required this.collectionName,
     required this.fromJson,
     required this.toJson,
-  }) : _prefsService = prefsService;
+    SharedPreferencesService? prefsService,
+  }) : _prefsService = prefsService ?? SharedPreferencesService();
 
   @override
   AsyncResult<T> create(T model) async {

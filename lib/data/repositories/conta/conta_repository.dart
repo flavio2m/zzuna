@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:result_dart/result_dart.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
+import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 
-class ContaRepository implements BaseRepository<Conta> {
+class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto> {
   final BaseStorage<Conta> _storage;
 
   final _streamController = StreamController<RepositoryEvent<Conta>>.broadcast();
@@ -15,27 +18,40 @@ class ContaRepository implements BaseRepository<Conta> {
   ContaRepository(LocalStorage<Conta> storage) : _storage = storage;
 
   @override
-  AsyncResult<Conta> create(Conta model) async {
-    final exists = await findByDescricao(model.descricao).then(
+  AsyncResult<Conta> create(CreateContaDto dto) async {
+    final exists = await findByDescricao(dto.descricao).then(
       (result) => result.isSuccess(), //
     );
 
     if (exists) {
       return Failure(
         LocalStorageException(
-          'Já existe uma conta com a descrição: ${model.descricao}', //
+          'Já existe uma conta com a descrição: ${dto.descricao}', //
         ),
       );
     }
 
-    return _storage.create(model).onSuccess((conta) {
+    final conta = Conta(
+      id: const Uuid().v4(),
+      descricao: dto.descricao,
+      ativo: dto.ativo,
+      bancoSigla: dto.bancoSigla, //
+    );
+
+    return _storage.create(conta).onSuccess((conta) {
       _streamController.add(RepositoryCreated(conta));
     });
   }
 
   @override
-  AsyncResult<Conta> update(Conta model) async {
-    return _storage.update(model).onSuccess((conta) {
+  AsyncResult<Conta> update(LoadedContaDto dto) async {
+    final conta = Conta(
+      id: dto.id,
+      descricao: dto.descricao,
+      ativo: dto.ativo,
+      bancoSigla: dto.bancoSigla, //
+    );
+    return _storage.update(conta).onSuccess((conta) {
       _streamController.add(RepositoryUpdated(conta));
     });
   }

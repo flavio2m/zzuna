@@ -1,5 +1,5 @@
 class RegisterUserDto {
-  String? id; // Pode ter um ID, necessário para gear o ID no repositório
+  String? id; // Pode ter um ID, necessário para gerar o ID no repositório
 
   String name;
   String email;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zzuna/domain/statics/banks/banco.dart';
+import 'package:zzuna/domain/statics/banco/banco.dart';
 
 class BankIconMapper {
   static IconData byIcon(BancoIcon icon) {

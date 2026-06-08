@@ -2,6 +2,7 @@ import 'package:zzuna/data/services/shared_preferences_service.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
+import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 
 LocalStorage<LoadedUser> createTestUserStorage({String collectionName = 'users'}) {
@@ -42,4 +43,13 @@ RegisterUserDto createTestRegisterUserDto(LoadedUser user) {
 // Cria LoadedUserDto baseado em um LoadedUser
 LoadedUserDto createTestLoadedUserDto(LoadedUser user) {
   return LoadedUserDto(id: user.id, name: user.name, email: user.email);
+}
+
+LocalStorage<Conta> createTestContaStorage({String collectionName = 'contas'}) {
+  return LocalStorage<Conta>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: Conta.fromJson,
+    toJson: (conta) => conta.toJson(),
+  );
 }

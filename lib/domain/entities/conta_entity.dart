@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:zzuna/domain/statics/banks/banco.dart';
+import 'package:zzuna/domain/statics/banco/banco.dart';
 
 part 'conta_entity.freezed.dart';
 part 'conta_entity.g.dart';

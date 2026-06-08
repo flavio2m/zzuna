@@ -1,4 +1,5 @@
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/data/services/storage/local/user_storage_provider.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,7 @@ void main() {
 
     final storage = createTestUserStorage();
 
-    container = ProviderContainer(overrides: [userStorageProvider.overrideWithValue(storage)]);
+    container = ProviderContainer(overrides: [userLocalStorageProvider.overrideWithValue(storage)]);
   });
 
   tearDown(() {

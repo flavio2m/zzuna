@@ -8,7 +8,14 @@
 ## Regras
 
 * Nome termina com `Validator`
-* Um Validator para cada DTO
+* Preferencialmente um Validator para cada DTO
+* Quando múltiplos DTOs possuírem exatamente as mesmas regras de validação, é permitido reutilizar um único Validator compartilhado
+* Validators compartilhados devem utilizar o nome da entidade:
+  * `ContaValidator`
+  * `CartaoValidator`
+* Validators específicos devem utilizar o nome do DTO:
+  * `CreateContaDtoValidator`
+  * `LoadedContaDtoValidator`
 * Estende `LucidValidator<T>`
 * Todo `ruleFor()` deve possuir `key`
 * Encadear validações do mesmo campo

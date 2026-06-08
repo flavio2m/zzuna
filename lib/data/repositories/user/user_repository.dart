@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:uuid/uuid.dart';
-import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/exception/repository_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';

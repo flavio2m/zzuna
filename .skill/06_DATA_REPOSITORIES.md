@@ -18,6 +18,7 @@
 * Implementar `BaseRepository<T>`
 * Retornar `AsyncResult<T>`
 * Utilizar Services ou Storages
+* Deve utilizar a exception RepositoryException
 * Nunca acessar HTTP diretamente
 * Pode possuir consultas específicas além do CRUD
 * Pode realizar validações relacionadas à persistência
