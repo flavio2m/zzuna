@@ -22,21 +22,18 @@ class AppTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: TextFormField(
-        style: const TextStyle(fontSize: 14),
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        onChanged: onChanged,
-        validator: validator,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        initialValue: initialValue,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          prefixIcon: icon != null ? Icon(icon) : null,
-        ),
+    return TextFormField(
+      style: const TextStyle(fontSize: 14),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: onChanged,
+      validator: validator,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        prefixIcon: icon != null ? Icon(icon) : null,
       ),
     );
   }

@@ -15,29 +15,42 @@ class AuthLocalClient implements AuthClientBase {
 
   @override
   AsyncResult<LoggedUser> login(Credentials credentials) async {
-    final usersResult = await _userStorage.getAll();
+    var usersResult = await _userStorage.getAll();
 
-    // aguarda 5 segundos para simular processo lento
-    // await Future.delayed(const Duration(seconds: 5));
+    if (usersResult.isError()) {
+      return Failure(usersResult.exceptionOrNull()!);
+    }
 
-    return usersResult.fold((users) {
-      if (users.isEmpty) {
-        // Se não tem usuários cadastrados, gera um usuário temporário para teste
-        final testUser = _createTestUser();
+    var users = usersResult.getOrThrow();
+
+    // Se não houver usuários, cria o usuário de teste
+    if (users.isEmpty) {
+      final createResult = await _createTestUser();
+
+      if (createResult.isError()) {
+        return Failure(createResult.exceptionOrNull()!);
       }
 
-      final matches = users.where((user) => user.email == credentials.email);
+      usersResult = await _userStorage.getAll();
 
-      if (matches.isEmpty) {
-        return Failure(
-          LocalAuthException(
-            'Usuário não encontrado com o e-mail ${credentials.email}.', //
-          ),
-        );
+      if (usersResult.isError()) {
+        return Failure(usersResult.exceptionOrNull()!);
       }
 
-      return Success(_toLoggedUser(matches.first));
-    }, (error) => Failure(error));
+      users = usersResult.getOrThrow();
+    }
+
+    final matches = users.where((user) => user.email == credentials.email);
+
+    if (matches.isEmpty) {
+      return Failure(
+        LocalAuthException(
+          'Usuário não encontrado com o e-mail ${credentials.email}.', //
+        ),
+      );
+    }
+
+    return Success(_toLoggedUser(matches.first));
   }
 
   @override
@@ -79,19 +92,13 @@ class AuthLocalClient implements AuthClientBase {
   }
 
   // Função que cria um usuário temporário para teste
-  AsyncResult<LoggedUser> _createTestUser() async {
-    // Se não tem usuários cadastrados, gera um usuário com e-mail flavio2m@gmail.com
-    final registerUserDto = RegisterUserDto(
-      name: 'Flávio',
-      email: 'flavio2m@gmail.com',
-      password: 'senha123', //
+  Future<Result<LoadedUser>> _createTestUser() {
+    return _userStorage.create(
+      LoadedUser(
+        id: const Uuid().v4(),
+        name: 'Flávio',
+        email: 'flavio2m@gmail.com', //
+      ),
     );
-    final resultUser = _createLoggedUser(
-      id: Uuid().v4(),
-      name: registerUserDto.name,
-      email: registerUserDto.email, //
-    );
-
-    return Success(resultUser);
   }
 }
