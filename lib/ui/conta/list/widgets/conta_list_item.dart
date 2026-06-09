@@ -6,6 +6,7 @@ import 'package:zzuna/ui/conta/delete/widgets/conta_delete_button.dart';
 import 'package:zzuna/ui/conta/update/widgets/conta_update_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
+import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
 class ContaListItem extends ConsumerWidget {
@@ -44,7 +45,7 @@ class ContaListItem extends ConsumerWidget {
       height: 38,
       child: Row(
         children: [
-          const SizedBox(width: 16),
+          const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
 
           Icon(
             contaDetails.ativo ? Icons.check_circle : Icons.cancel,
@@ -52,7 +53,7 @@ class ContaListItem extends ConsumerWidget {
             color: contaDetails.ativo ? AppColors.primary : AppColors.slate400,
           ),
 
-          const SizedBox(width: 4),
+          const AppSpacing(size: AppSpacingSize.xs, axis: Axis.horizontal),
 
           Expanded(
             flex: 4,
@@ -75,7 +76,7 @@ class ContaListItem extends ConsumerWidget {
             descricao: contaDetails.descricao, //
           ),
 
-          const SizedBox(width: 8),
+          const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
         ],
       ),
     );

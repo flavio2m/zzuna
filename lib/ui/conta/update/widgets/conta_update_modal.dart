@@ -10,6 +10,8 @@ import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
@@ -112,14 +114,11 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
             validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          DropdownButtonFormField<String>(
+          AppDropdownFormField<String>(
             value: dto.bancoSigla,
-            decoration: const InputDecoration(
-              labelText: 'Banco',
-              border: OutlineInputBorder(), //
-            ),
+            label: 'Banco',
             items: Bancos.items.map((b) {
-              return DropdownMenuItem(value: b.sigla, child: AppText(b.descricao));
+              return AppDropdownMenuItem(value: b.sigla, label: b.descricao);
             }).toList(),
             onChanged: (value) {
               dto.setBancoSigla(value ?? '');

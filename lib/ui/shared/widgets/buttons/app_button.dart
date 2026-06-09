@@ -34,9 +34,16 @@ class AppButton extends StatelessWidget {
     final isDisabled = onPressed == null;
 
     final style = TextButton.styleFrom(
-      backgroundColor: buttonType == AppButtonType.elevated ? Theme.of(context).colorScheme.onPrimary : null,
-      minimumSize: full ? const Size(double.infinity, 48) : const Size(0, 48),
-      side: BorderSide(color: isDisabled ? AppColors.slate300 : Colors.transparent),
+      backgroundColor:
+          buttonType ==
+              AppButtonType
+                  .elevated //
+          ? Theme.of(context).colorScheme.onPrimary
+          : null,
+      minimumSize: full ? const Size(double.infinity, 54) : const Size(0, 54),
+      side: BorderSide(
+        color: isDisabled ? AppColors.slate300 : AppColors.border, //
+      ),
     );
 
     final button = switch (buttonType) {

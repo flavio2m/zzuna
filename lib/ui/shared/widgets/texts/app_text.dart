@@ -35,7 +35,11 @@ class AppText extends StatelessWidget {
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,
-      style: TextStyle(fontSize: _fontSize, fontWeight: fontWeight ?? _defaultWeight, color: color),
+      style: TextStyle(
+        fontSize: _fontSize,
+        fontWeight: fontWeight ?? _defaultWeight,
+        color: color, //
+      ),
     );
   }
 

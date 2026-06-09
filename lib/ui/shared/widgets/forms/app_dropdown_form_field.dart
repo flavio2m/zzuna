@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class AppDropdownFormField<T> extends StatelessWidget {
   final String label;
@@ -20,13 +21,22 @@ class AppDropdownFormField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<T>(
-      value: value,
-      items: items,
-      onChanged: enabled ? onChanged : null,
-      validator: validator,
-      decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-      isExpanded: true,
+    return SizedBox(
+      height: 48,
+      child: DropdownButtonFormField<T>(
+        value: value,
+        items: items,
+        onChanged: enabled ? onChanged : null,
+        validator: validator,
+        isExpanded: true,
+        isDense: true,
+        style: const TextStyle(fontSize: 14, color: AppColors.slate900),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        ),
+      ),
     );
   }
 }

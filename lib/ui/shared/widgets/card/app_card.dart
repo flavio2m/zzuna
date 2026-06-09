@@ -36,6 +36,7 @@ class AppCard extends StatelessWidget {
             ),
       child: Card(
         color: Theme.of(context).cardColor,
+        margin: EdgeInsets.zero,
         elevation: _elevation(),
         child: Padding(padding: padding, child: child),
       ),
