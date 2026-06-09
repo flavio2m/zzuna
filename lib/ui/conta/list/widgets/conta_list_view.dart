@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_list_item.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
+import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ContaListView extends ConsumerWidget {
   const ContaListView({super.key});
@@ -21,7 +22,11 @@ class ContaListView extends ConsumerWidget {
         }
 
         if (state.isFailure) {
-          return Center(child: Text('Erro ao carregar contas: ${state.getExceptionOrNull()}'));
+          return Center(
+            child: Text(
+              'Erro ao carregar contas: ${state.getExceptionOrNull()}', //
+            ),
+          );
         }
 
         final contas = state.getValueOrNull() ?? [];

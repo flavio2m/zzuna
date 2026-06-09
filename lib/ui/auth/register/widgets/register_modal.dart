@@ -39,12 +39,15 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
     // Tratar sucesso - fecha o modal
     commandValue.onSuccess((user) {
       Navigator.of(context).pop(); // Fecha o modal
-      AppSnackBar.showSuccess(context, 'Cadastro realizado com sucesso! Bem-vindo, ${user.name}!');
+      AppSnackBar.showSuccess(
+        context,
+        'Cadastro realizado com sucesso! Bem-vindo, ${user.name}!', //
+      );
     });
 
     // Tratar erro
     commandValue.onFailure((exception) {
-      AppSnackBar.showError(context, exception?.toString() ?? 'Erro ao realizar cadastro.');
+      AppSnackBar.showError(context, exception.toString());
     });
   }
 

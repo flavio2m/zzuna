@@ -1,15 +1,17 @@
-class LoadedContaDto {
+import 'package:zzuna/domain/dtos/conta/conta_dto.dart';
+
+class LoadedContaDto implements ContaDto {
   String id;
+
+  @override
   String descricao;
+
+  @override
   String bancoSigla;
+
   bool ativo;
 
-  LoadedContaDto({
-    this.id = '',
-    this.descricao = '',
-    this.bancoSigla = '',
-    this.ativo = true, //
-  });
+  LoadedContaDto({this.id = '', this.descricao = '', this.bancoSigla = '', this.ativo = true});
 
   void setId(String id) {
     this.id = id;

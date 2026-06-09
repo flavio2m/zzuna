@@ -3,8 +3,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:routefly/routefly.dart';
 
-import 'ui/auth/login/login_page.dart' as a2;
-import 'ui/home/home_page.dart' as a3;
+import 'ui/auth/login/login_page.dart' as a3;
+import 'ui/conta/list/conta_list_page.dart' as a2;
+import 'ui/home/home_page.dart' as a4;
 import 'ui/lancamentos/lancamentos_page.dart' as a1;
 import 'ui/relatorios/relatorios_page.dart' as a0;
 
@@ -13,6 +14,8 @@ Route b0Builder(BuildContext ctx, RouteSettings settings) =>
 Route b1Builder(BuildContext ctx, RouteSettings settings) =>
     Routefly.defaultRouteBuilder(ctx, settings, const a1.LancamentosPage());
 Route b2Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a2.LoginPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a2.ContaListPage());
 Route b3Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a3.MyWidget());
+    Routefly.defaultRouteBuilder(ctx, settings, const a3.LoginPage());
+Route b4Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a4.MyWidget());

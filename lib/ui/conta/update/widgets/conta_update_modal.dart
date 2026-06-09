@@ -19,7 +19,7 @@ class ContaUpdateModal extends ConsumerStatefulWidget {
 
   static void show(BuildContext context, LoadedContaDto conta) {
     AppDialog.show(
-      context,
+      context: context,
       child: ContaUpdateModal(conta: conta),
     );
   }
@@ -41,22 +41,22 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
       bancoSigla: widget.conta.bancoSigla,
       ativo: widget.conta.ativo,
     );
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaUpdateViewModelProvider);
     final commandValue = viewModel.updateCommand.value;
 
-    commandValue.onSuccess((_) {
+    commandValue.onSuccess((Conta) {
       AppSnackBar.showSuccess(context, 'Conta atualizada com sucesso');
       Navigator.pop(context);
     });
@@ -72,13 +72,13 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
 
   void _handleSubmit() {
     if (_canSubmit) {
-      ref.read(contaListViewModelProvider).updateCommand.execute(dto);
+      ref.read(contaUpdateViewModelProvider).updateCommand.execute(dto);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = ref.watch(contaListViewModelProvider);
+    final viewModel = ref.watch(contaUpdateViewModelProvider);
 
     return AppForm(
       title: 'Editar Conta',
@@ -88,7 +88,10 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           listenable: viewModel.updateCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
+              onPressed: //
+              viewModel.updateCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
             );
           },
         ),
@@ -103,14 +106,14 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
               dto.setDescricao(value);
               setState(() {});
             },
-            validator: (value) => validator.byField(dto, 'descricao'),
+            validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
           DropdownButtonFormField<String>(
             value: dto.bancoSigla,
             decoration: const InputDecoration(
               labelText: 'Banco',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(), //
             ),
             items: Bancos.items.map((b) {
               return DropdownMenuItem(value: b.sigla, child: Text(b.descricao));
@@ -119,7 +122,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
               dto.setBancoSigla(value ?? '');
               setState(() {});
             },
-            validator: (value) => validator.byField(dto, 'bancoSigla'),
+            validator: validator.byField(dto, 'bancoSigla'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
           SwitchListTile(

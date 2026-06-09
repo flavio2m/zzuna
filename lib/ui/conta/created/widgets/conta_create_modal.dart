@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
+import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/validators/conta_validator.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
@@ -16,10 +17,7 @@ class ContaCreateModal extends ConsumerStatefulWidget {
   const ContaCreateModal({super.key});
 
   static void show(BuildContext context) {
-    AppDialog.show(
-      context,
-      child: const ContaCreateModal(),
-    );
+    AppDialog.show(context: context, child: const ContaCreateModal());
   }
 
   @override
@@ -33,24 +31,24 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
   @override
   void initState() {
     super.initState();
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaCreateViewModelProvider);
     viewModel.createCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final viewModel = ref.read(contaListViewModelProvider);
+    final viewModel = ref.read(contaCreateViewModelProvider);
     final commandValue = viewModel.createCommand.value;
 
-    commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Conta criada com sucesso');
-      Navigator.pop(context);
+    commandValue.onSuccess((Conta) {
+      AppSnackBar.showSuccess(context, 'Conta criada com sucesso.');
+      Navigator.of(context).pop();
     });
 
     commandValue.onFailure((exception) {
@@ -64,13 +62,13 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
 
   void _handleSubmit() {
     if (_canSubmit) {
-      ref.read(contaListViewModelProvider).createCommand.execute(dto);
+      ref.read(contaCreateViewModelProvider).createCommand.execute(dto);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = ref.watch(contaListViewModelProvider);
+    final viewModel = ref.watch(contaCreateViewModelProvider);
 
     return AppForm(
       title: 'Nova Conta',
@@ -80,7 +78,10 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           listenable: viewModel.createCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
+              onPressed: //
+              viewModel.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
             );
           },
         ),
@@ -94,13 +95,13 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
               dto.setDescricao(value);
               setState(() {});
             },
-            validator: (value) => validator.byField(dto, 'descricao'),
+            validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
           DropdownButtonFormField<String>(
             decoration: const InputDecoration(
               labelText: 'Banco',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(), //
             ),
             items: Bancos.items.map((b) {
               return DropdownMenuItem(value: b.sigla, child: Text(b.descricao));
@@ -109,7 +110,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
               dto.setBancoSigla(value ?? '');
               setState(() {});
             },
-            validator: (value) => validator.byField(dto, 'bancoSigla'),
+            validator: validator.byField(dto, 'bancoSigla'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
           SwitchListTile(

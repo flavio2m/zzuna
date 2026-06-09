@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
-import 'package:zzuna/ui/conta/list/widgets/conta_create_modal.dart';
+import 'package:zzuna/ui/conta/created/widgets/conta_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
@@ -25,18 +25,18 @@ class ContaFilterBar extends ConsumerWidget {
               onChanged: (value) => viewModel.filterCommand.execute(value),
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, isHorizontal: true),
+          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
           Expanded(
             flex: 2,
             child: DropdownButtonFormField<String>(
               decoration: const InputDecoration(
                 labelText: 'Banco',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(), //
               ),
               items: [
                 const DropdownMenuItem(value: '', child: Text('Todos os Bancos')),
                 ...Bancos.items.map(
-                  (b) => DropdownMenuItem(value: b.sigla, child: Text(b.descricao)),
+                  (b) => DropdownMenuItem(value: b.sigla, child: Text(b.descricao)), //
                 ),
               ],
               onChanged: (value) {
@@ -44,13 +44,13 @@ class ContaFilterBar extends ConsumerWidget {
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, isHorizontal: true),
+          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
           Expanded(
             flex: 1,
             child: DropdownButtonFormField<bool?>(
               decoration: const InputDecoration(
                 labelText: 'Status',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(), //
               ),
               items: const [
                 DropdownMenuItem(value: null, child: Text('Todos')),
@@ -62,10 +62,8 @@ class ContaFilterBar extends ConsumerWidget {
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, isHorizontal: true),
-          ButtonAdd(
-            onPressed: () => ContaCreateModal.show(context),
-          ),
+          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+          ButtonAdd(onPressed: () => ContaCreateModal.show(context)),
         ],
       ),
     );
