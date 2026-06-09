@@ -126,7 +126,6 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     final searchFields = <SearchField>[];
 
     if (filter.descricao.isNotEmpty) {
-      print('Adicionando filtro por descrição: ${filter.descricao}');
       searchFields.add(
         SearchField(
           fieldName: 'descricao',
@@ -137,7 +136,6 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     }
 
     if (filter.bancoSigla != null && filter.bancoSigla!.isNotEmpty) {
-      print('Adicionando filtro por banco: ${filter.bancoSigla}');
       searchFields.add(
         SearchField(
           fieldName: 'bancoSigla',
@@ -148,7 +146,6 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     }
 
     if (filter.ativo != null) {
-      print('Adicionando filtro por status: ${filter.ativo}');
       searchFields.add(
         SearchField(
           fieldName: 'ativo',

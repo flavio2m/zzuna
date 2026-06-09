@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/dtos/cartao_dto.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
@@ -17,10 +17,7 @@ class CartaoCreateModal extends ConsumerStatefulWidget {
   const CartaoCreateModal({super.key});
 
   static void show(BuildContext context) {
-    AppDialog.show(
-      context: context,
-      child: const CartaoCreateModal(),
-    );
+    AppDialog.show(context: context, child: const CartaoCreateModal());
   }
 
   @override
@@ -79,9 +76,7 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
         ListenableBuilder(
           listenable: viewModel.createCommand,
           builder: (context, _) {
-            return ButtonSave(
-              onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
-            );
+            return ButtonSave(onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
           },
         ),
       ],

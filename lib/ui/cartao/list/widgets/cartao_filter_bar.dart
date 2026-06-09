@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/ui/cartao/create/widgets/cartao_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
-import 'package:zzuna/ui/shared/widgets/forms/app_banco_dropdown.dart';
+import 'package:zzuna/ui/shared/widgets/card/app_filter_card.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
-import 'package:zzuna/ui/shared/widgets/card/app_filter_card.dart';
-import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 
 class CartaoFilterBar extends ConsumerWidget {
   const CartaoFilterBar({super.key});
@@ -17,39 +18,41 @@ class CartaoFilterBar extends ConsumerWidget {
     final viewModel = ref.watch(cartaoListViewModelProvider);
 
     return AppFilterCard(
-      title: 'Filtros',
-      child: Row(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
         children: [
-          Expanded(
-            flex: 3,
-            child: AppTextFormField(
-              label: 'Buscar por descrição',
-              onChanged: (value) => viewModel.filterCommand.execute(value),
-            ),
+          SizedBox(
+            width: 300,
+            child: AppTextFormField(label: 'Buscar por descrição', onChanged: (value) => viewModel.setDescricao(value)),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
-          Expanded(
-            flex: 2,
-            child: AppBancoDropdown(
-              showAllOption: true,
+
+          SizedBox(
+            width: 220,
+            child: AppDropdownFormField<String>(
+              label: 'Banco',
+              value: viewModel.bancoSelecionado,
+              items: [
+                AppDropdownMenuItem(value: '', label: 'Todos'),
+                ...Bancos.items.map((banco) => AppDropdownMenuItem(value: banco.sigla, label: banco.descricao)),
+              ],
               onChanged: (value) {
-                // Filtro por banco
+                viewModel.setBanco(value);
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
-          Expanded(
-            flex: 1,
+
+          SizedBox(
+            width: 160,
             child: AppStatusDropdown(
+              value: viewModel.statusSelecionado,
               onChanged: (value) {
-                // Filtro por status
+                viewModel.setStatus(value);
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
-          ButtonAdd(
-            onPressed: () => CartaoCreateModal.show(context),
-          ),
+
+          ButtonAdd(onPressed: () => CartaoCreateModal.show(context)),
         ],
       ),
     );

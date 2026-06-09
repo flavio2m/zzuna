@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/dtos/cartao_dto.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
@@ -89,9 +89,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
         ListenableBuilder(
           listenable: viewModel.updateCommand,
           builder: (context, _) {
-            return ButtonSave(
-              onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
-            );
+            return ButtonSave(onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
           },
         ),
       ],

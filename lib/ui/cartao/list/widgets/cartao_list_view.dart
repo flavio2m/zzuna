@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
@@ -24,7 +25,10 @@ class CartaoListView extends ConsumerWidget {
 
         if (state.isFailure) {
           return Center(
-            child: AppText('Erro ao carregar cartões: ${state.getExceptionOrNull()}', color: Colors.red),
+            child: AppText(
+              'Erro ao carregar cartões: ${state.getExceptionOrNull()}',
+              color: AppColors.danger, //
+            ),
           );
         }
 
@@ -34,12 +38,18 @@ class CartaoListView extends ConsumerWidget {
           return const Center(child: AppText('Nenhum cartão encontrado.'));
         }
 
-        return ListView.separated(
-          itemCount: cartoes.length,
-          separatorBuilder: (context, index) => const AppDivider(),
-          itemBuilder: (context, index) {
-            return CartaoListItem(cartao: cartoes[index]);
-          },
+        return Stack(
+          children: [
+            ListView.separated(
+              itemCount: cartoes.length,
+              separatorBuilder: (context, index) => const AppDivider(),
+              itemBuilder: (context, index) {
+                return CartaoListItem(cartaoDetails: cartoes[index]);
+              },
+            ),
+
+            if (state.isRunning) const Positioned(top: 0, left: 0, right: 0, child: LinearProgressIndicator()),
+          ],
         );
       },
     );

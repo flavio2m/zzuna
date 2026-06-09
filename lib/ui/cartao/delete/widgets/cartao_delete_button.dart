@@ -8,11 +8,7 @@ class CartaoDeleteButton extends ConsumerWidget {
   final String cartaoId;
   final String cartaoDescricao;
 
-  const CartaoDeleteButton({
-    super.key,
-    required this.cartaoId,
-    required this.cartaoDescricao,
-  });
+  const CartaoDeleteButton({super.key, required this.cartaoId, required this.cartaoDescricao});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,7 +17,7 @@ class CartaoDeleteButton extends ConsumerWidget {
     return ButtonDelete(
       onPressed: () async {
         final confirm = await AppConfirmationDialog.show(
-          context,
+          context: context,
           title: 'Excluir Cartão',
           message: 'Deseja realmente excluir o cartão "$cartaoDescricao"?',
         );

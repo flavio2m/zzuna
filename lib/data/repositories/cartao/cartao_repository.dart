@@ -6,7 +6,8 @@ import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
-import 'package:zzuna/domain/dtos/cartao_dto.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_filter_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 
 class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
@@ -18,16 +19,10 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
 
   @override
   AsyncResult<Cartao> create(CartaoDto dto) async {
-    final exists = await findByDescricao(dto.descricao).then(
-      (result) => result.isSuccess(),
-    );
+    final exists = await findByDescricao(dto.descricao).then((result) => result.isSuccess());
 
     if (exists) {
-      return Failure(
-        LocalStorageException(
-          'Já existe um cartão com a descrição: ${dto.descricao}',
-        ),
-      );
+      return Failure(LocalStorageException('Já existe um cartão com a descrição: ${dto.descricao}'));
     }
 
     final cartao = Cartao(
@@ -77,31 +72,66 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
   }
 
   AsyncResult<Cartao> findByDescricao(String descricao) async {
-    final searchFields = [
-      SearchField(
-        fieldName: 'descricao',
-        value: descricao,
-        type: SearchFieldType.string,
-      ),
-    ];
+    final searchFields = [SearchField(fieldName: 'descricao', value: descricao, type: SearchFieldType.string)];
 
     final cartoesResult = await _storage.searchByFields(searchFields);
 
     return cartoesResult.fold(
       (cartoes) {
         if (cartoes.isEmpty) {
-          return Failure(
-            LocalStorageException('Cartão não encontrado: $descricao'),
-          );
+          return Failure(LocalStorageException('Cartão não encontrado: $descricao'));
         }
 
         return Success(cartoes.first);
       },
       (error) {
-        return Failure(
-          LocalStorageException('Erro ao buscar cartão: $descricao'),
-        );
+        return Failure(LocalStorageException('Erro ao buscar cartão: $descricao'));
       },
+    );
+  }
+
+  AsyncResult<List<Cartao>> search(CartaoFilterDto filter) async {
+    final searchFields = <SearchField>[];
+
+    if (filter.descricao.isNotEmpty) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'descricao',
+          value: filter.descricao,
+          type: SearchFieldType.string, //
+        ),
+      );
+    }
+
+    if (filter.bancoSigla != null && filter.bancoSigla!.isNotEmpty) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'bancoSigla',
+          value: filter.bancoSigla,
+          type: SearchFieldType.string, //
+        ),
+      );
+    }
+
+    if (filter.ativo != null) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'ativo',
+          value: filter.ativo,
+          type: SearchFieldType.boolean, //
+        ),
+      );
+    }
+
+    final cartoesResult = await _storage.searchByFields(searchFields);
+
+    return cartoesResult.fold(
+      Success.new,
+      (error) => Failure(
+        LocalStorageException(
+          'Erro ao buscar cartões', //
+        ),
+      ),
     );
   }
 
