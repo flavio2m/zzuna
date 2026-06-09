@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/cartao/list/widgets/cartao_filter_bar.dart';
@@ -25,7 +26,7 @@ class _CartaoListPageState extends ConsumerState<CartaoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerenciamento de Cartões'),
+        title: const AppText('Gerenciamento de Cartões', variant: AppTextVariant.title),
       ),
       body: const Column(
         children: [

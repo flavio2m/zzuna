@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/cartao/list/widgets/cartao_list_item.dart';
@@ -22,13 +23,15 @@ class CartaoListView extends ConsumerWidget {
         }
 
         if (state.isFailure) {
-          return Center(child: Text('Erro ao carregar cartões: ${state.getExceptionOrNull()}'));
+          return Center(
+            child: AppText('Erro ao carregar cartões: ${state.getExceptionOrNull()}', color: Colors.red),
+          );
         }
 
         final cartoes = state.getValueOrNull() ?? [];
 
         if (cartoes.isEmpty) {
-          return const Center(child: Text('Nenhum cartão encontrado.'));
+          return const Center(child: AppText('Nenhum cartão encontrado.'));
         }
 
         return ListView.separated(

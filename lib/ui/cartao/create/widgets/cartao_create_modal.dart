@@ -10,6 +10,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class CartaoCreateModal extends ConsumerStatefulWidget {
@@ -17,7 +18,7 @@ class CartaoCreateModal extends ConsumerStatefulWidget {
 
   static void show(BuildContext context) {
     AppDialog.show(
-      context,
+      context: context,
       child: const CartaoCreateModal(),
     );
   }
@@ -107,7 +108,7 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
                   },
                 ),
               ),
-              const AppSpacing(size: AppSpacingSize.md, isHorizontal: true),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
               Expanded(
                 child: AppTextFormField(
                   label: 'Dia Fechamento',

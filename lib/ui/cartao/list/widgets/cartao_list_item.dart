@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/domain/dtos/cartao_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/ui/cartao/delete/widgets/cartao_delete_button.dart';
@@ -16,8 +17,11 @@ class CartaoListItem extends StatelessWidget {
         backgroundColor: cartao.ativo ? Colors.blue : Colors.grey,
         child: const Icon(Icons.credit_card, color: Colors.white),
       ),
-      title: Text(cartao.descricao),
-      subtitle: Text('${cartao.bancoSigla} - Limite: R$ ${cartao.limite.toStringAsFixed(2)} - Fecha dia: ${cartao.diaFechamento}'),
+      title: AppText(cartao.descricao, variant: AppTextVariant.subtitle),
+      subtitle: AppText(
+        '${cartao.bancoSigla} - Limite: R$ ${cartao.limite.toStringAsFixed(2)} - Fecha dia: ${cartao.diaFechamento}',
+        variant: AppTextVariant.caption,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
