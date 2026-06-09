@@ -6,9 +6,11 @@ import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/dtos/conta/conta_filter_dto.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
+import 'package:zzuna/domain/statics/banco/bancos.dart';
 
 class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto> {
   final BaseStorage<Conta> _storage;
@@ -65,7 +67,25 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
 
   @override
   AsyncResult<List<Conta>> getAll() async {
-    return _storage.getAll();
+    // return _storage.getAll();
+
+    /// REFATORAR: Somente para testes: popula storage
+    final result = await _storage.getAll();
+
+    if (result.isError()) {
+      return Failure(result.exceptionOrNull()!);
+    }
+
+    final contas = result.getOrThrow();
+
+    if (contas.isEmpty) {
+      await _seedContas();
+      return _storage.getAll();
+    }
+
+    return Success(contas);
+
+    /// Fim do código de teste
   }
 
   @override
@@ -102,6 +122,54 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     );
   }
 
+  AsyncResult<List<Conta>> search(ContaFilterDto filter) async {
+    final searchFields = <SearchField>[];
+
+    if (filter.descricao.isNotEmpty) {
+      print('Adicionando filtro por descrição: ${filter.descricao}');
+      searchFields.add(
+        SearchField(
+          fieldName: 'descricao',
+          value: filter.descricao,
+          type: SearchFieldType.string, //
+        ),
+      );
+    }
+
+    if (filter.bancoSigla != null && filter.bancoSigla!.isNotEmpty) {
+      print('Adicionando filtro por banco: ${filter.bancoSigla}');
+      searchFields.add(
+        SearchField(
+          fieldName: 'bancoSigla',
+          value: filter.bancoSigla,
+          type: SearchFieldType.string, //
+        ), //
+      );
+    }
+
+    if (filter.ativo != null) {
+      print('Adicionando filtro por status: ${filter.ativo}');
+      searchFields.add(
+        SearchField(
+          fieldName: 'ativo',
+          value: filter.ativo,
+          type: SearchFieldType.boolean, //
+        ),
+      );
+    }
+
+    final contasResult = await _storage.searchByFields(searchFields);
+
+    return contasResult.fold(
+      Success.new,
+      (error) => Failure(
+        LocalStorageException(
+          'Erro ao buscar contas', //
+        ),
+      ),
+    );
+  }
+
   @override
   Stream<RepositoryEvent<Conta>> observer() {
     return _streamController.stream;
@@ -110,5 +178,21 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
   @override
   void dispose() {
     _streamController.close();
+  }
+
+  // Para testes
+  Future<void> _seedContas() async {
+    final bancos = Bancos.items.take(10).toList();
+
+    for (var i = 0; i < bancos.length; i++) {
+      await _storage.create(
+        Conta(
+          id: const Uuid().v4(),
+          descricao: 'Conta ${bancos[i].descricao}',
+          bancoSigla: bancos[i].sigla,
+          ativo: i != 9,
+        ),
+      );
+    }
   }
 }

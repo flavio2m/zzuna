@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
-import 'package:zzuna/ui/conta/created/widgets/conta_create_modal.dart';
+import 'package:zzuna/ui/conta/create/widgets/conta_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
+import 'package:zzuna/ui/shared/widgets/card/app_filter_card.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
-import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 
 class ContaFilterBar extends ConsumerWidget {
   const ContaFilterBar({super.key});
@@ -14,55 +17,48 @@ class ContaFilterBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.watch(contaListViewModelProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
+    return AppFilterCard(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
         children: [
-          Expanded(
-            flex: 3,
+          SizedBox(
+            width: 300,
             child: AppTextFormField(
               label: 'Buscar por descrição',
-              onChanged: (value) => viewModel.filterCommand.execute(value),
+              onChanged: (value) => viewModel.setDescricao(value), //
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
-          Expanded(
-            flex: 2,
-            child: DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Banco',
-                border: OutlineInputBorder(), //
-              ),
+          SizedBox(
+            width: 220,
+            child: AppDropdownFormField<String>(
+              label: 'Banco',
+              value: viewModel.bancoSelecionado,
               items: [
-                const DropdownMenuItem(value: '', child: Text('Todos os Bancos')),
+                AppDropdownMenuItem(value: '', label: 'Todos'),
                 ...Bancos.items.map(
-                  (b) => DropdownMenuItem(value: b.sigla, child: Text(b.descricao)), //
+                  (banco) => AppDropdownMenuItem(
+                    value: banco.sigla,
+                    label: banco.descricao, //
+                  ),
                 ),
               ],
               onChanged: (value) {
-                // Filtro por banco poderia ser adicionado ao filterCommand se necessário
+                viewModel.setBanco(value);
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
-          Expanded(
-            flex: 1,
-            child: DropdownButtonFormField<bool?>(
-              decoration: const InputDecoration(
-                labelText: 'Status',
-                border: OutlineInputBorder(), //
-              ),
-              items: const [
-                DropdownMenuItem(value: null, child: Text('Todos')),
-                DropdownMenuItem(value: true, child: Text('Ativos')),
-                DropdownMenuItem(value: false, child: Text('Inativos')),
-              ],
+
+          SizedBox(
+            width: 160,
+            child: AppStatusDropdown(
+              value: viewModel.statusSelecionado,
               onChanged: (value) {
-                // Filtro por status
+                viewModel.setStatus(value);
               },
             ),
           ),
-          const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+
           ButtonAdd(onPressed: () => ContaCreateModal.show(context)),
         ],
       ),

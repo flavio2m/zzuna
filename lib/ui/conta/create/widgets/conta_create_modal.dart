@@ -7,10 +7,12 @@ import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/validators/conta_validator.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ContaCreateModal extends ConsumerStatefulWidget {
@@ -74,6 +76,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
       title: 'Nova Conta',
       type: AppFormType.modal,
       actions: [
+        ButtonCancel(onPressed: () => Navigator.of(context).pop()),
         ListenableBuilder(
           listenable: viewModel.createCommand,
           builder: (context, _) {
@@ -104,7 +107,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
               border: OutlineInputBorder(), //
             ),
             items: Bancos.items.map((b) {
-              return DropdownMenuItem(value: b.sigla, child: Text(b.descricao));
+              return DropdownMenuItem(value: b.sigla, child: AppText(b.descricao));
             }).toList(),
             onChanged: (value) {
               dto.setBancoSigla(value ?? '');
@@ -114,7 +117,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           ),
           const AppSpacing(size: AppSpacingSize.md),
           SwitchListTile(
-            title: const Text('Ativo'),
+            title: const AppText('Ativo'),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

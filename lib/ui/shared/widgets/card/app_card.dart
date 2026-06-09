@@ -1,7 +1,7 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-enum AppCardVariant { flat, outlined, elevated }
+enum AppCardVariant { flat, outlined, elevated, filter }
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -49,6 +49,9 @@ class AppCard extends StatelessWidget {
 
       case AppCardVariant.outlined:
         return 0;
+
+      case AppCardVariant.filter:
+        return 4;
 
       case AppCardVariant.elevated:
         return 8;

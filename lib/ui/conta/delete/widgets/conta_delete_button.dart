@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/shared/feedback/app_confirmation_dialog.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_delete.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_excluir_button.dart';
 
 class ContaDeleteButton extends ConsumerWidget {
   final String contaId;
@@ -33,7 +34,7 @@ class ContaDeleteButton extends ConsumerWidget {
     return ListenableBuilder(
       listenable: viewModel.deleteCommand,
       builder: (_, __) {
-        return ButtonDelete(
+        return IconExcluirButton(
           onPressed: //
           viewModel.deleteCommand.value.isRunning
               ? null

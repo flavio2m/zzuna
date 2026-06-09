@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_filter_bar.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_list_view.dart';
-import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
+import 'package:zzuna/ui/shared/widgets/card/app_card.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
 class ContaListPage extends ConsumerStatefulWidget {
   const ContaListPage({super.key});
@@ -25,15 +26,12 @@ class _ContaListPageState extends ConsumerState<ContaListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerenciamento de Contas'),
+        title: const AppText('Gerenciamento de Contas', variant: AppTextVariant.subtitle), //
       ),
       body: const Column(
         children: [
-          ContaFilterBar(),
-          AppDivider(),
-          Expanded(
-            child: ContaListView(),
-          ),
+          AppCard(variant: AppCardVariant.filter, child: ContaFilterBar()),
+          Expanded(child: AppCard(child: ContaListView())),
         ],
       ),
     );

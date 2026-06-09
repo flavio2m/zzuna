@@ -39,7 +39,7 @@ class ContaListView extends ConsumerWidget {
           itemCount: contas.length,
           separatorBuilder: (context, index) => const AppDivider(),
           itemBuilder: (context, index) {
-            return ContaListItem(conta: contas[index]);
+            return ContaListItem(contaDetails: contas[index]);
           },
         );
       },
