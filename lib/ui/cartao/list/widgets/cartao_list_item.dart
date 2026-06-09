@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/dtos/cartao_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
-import 'package:zzuna/ui/cartao/list/widgets/cartao_delete_button.dart';
-import 'package:zzuna/ui/cartao/list/widgets/cartao_update_modal.dart';
+import 'package:zzuna/ui/cartao/delete/widgets/cartao_delete_button.dart';
+import 'package:zzuna/ui/cartao/update/widgets/cartao_update_modal.dart';
 
 class CartaoListItem extends StatelessWidget {
   final Cartao cartao;

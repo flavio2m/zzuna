@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/ui/cartao/list/widgets/cartao_create_modal.dart';
+import 'package:zzuna/ui/cartao/create/widgets/cartao_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_banco_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
