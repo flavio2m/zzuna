@@ -29,6 +29,8 @@ abstract final class AppTheme {
           horizontal: 12,
           vertical: 10,
         ),
+        labelStyle: const TextStyle(fontSize: 14, color: AppColors.slate500),
+        floatingLabelStyle: const TextStyle(fontSize: 12, color: AppColors.primary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.border),

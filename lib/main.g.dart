@@ -14,17 +14,26 @@ List<RouteEntity> get routes => [
     routeBuilder: b1Builder,
   ),
   RouteEntity(
-    key: 'auth/login',
-    uri: Uri.parse('auth/login'),
+    key: 'conta/list/conta_list',
+    uri: Uri.parse('conta/list/conta_list'),
     routeBuilder: b2Builder,
   ),
-  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b3Builder),
+  RouteEntity(
+    key: 'auth/login',
+    uri: Uri.parse('auth/login'),
+    routeBuilder: b3Builder,
+  ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b4Builder),
 ];
 
 const routePaths = (
   path: '/',
   relatorios: '/relatorios',
   lancamentos: '/lancamentos',
+  conta: (
+    path: '/conta',
+    list: (path: '/conta/list', contaList: '/conta/list/conta_list'),
+  ),
   auth: (path: '/auth', login: '/auth/login'),
   home: '/home',
 );

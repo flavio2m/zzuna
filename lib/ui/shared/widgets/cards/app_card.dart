@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AppCardVariant { flat, standard, emphasized }
+enum AppCardVariant { flat, standard, emphasized, filter }
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -40,6 +40,8 @@ class AppCard extends StatelessWidget {
         return 0;
       case AppCardVariant.standard:
         return 2;
+      case AppCardVariant.filter:
+        return 4;
       case AppCardVariant.emphasized:
         return 8;
     }

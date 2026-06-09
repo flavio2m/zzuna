@@ -21,6 +21,11 @@ class AuthLocalClient implements AuthClientBase {
     // await Future.delayed(const Duration(seconds: 5));
 
     return usersResult.fold((users) {
+      if (users.isEmpty) {
+        // Se não tem usuários cadastrados, gera um usuário temporário para teste
+        return _createTestUser();
+      }
+
       final matches = users.where((user) => user.email == credentials.email);
 
       if (matches.isEmpty) {
@@ -71,5 +76,22 @@ class AuthLocalClient implements AuthClientBase {
       token: 'local_token_$id',
       refreshToken: 'local_refresh_token_$id',
     );
+  }
+
+  // Função que cria um usuário temporário para teste
+  AsyncResult<LoggedUser> _createTestUser() async {
+    // Se não tem usuários cadastrados, gera um usuário com e-mail flavio2m@gmail.com
+    final registerUserDto = RegisterUserDto(
+      name: 'Flávio',
+      email: 'flavio2m@gmail.com',
+      password: 'senha123', //
+    );
+    final resultUser = _createLoggedUser(
+      id: Uuid().v4(),
+      name: registerUserDto.name,
+      email: registerUserDto.email, //
+    );
+
+    return Success(resultUser);
   }
 }

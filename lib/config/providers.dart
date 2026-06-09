@@ -10,8 +10,12 @@ import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
+import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
+import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
+import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -75,6 +79,23 @@ final logoutViewModelProvider = Provider<LogoutViewModel>(
 /// Provider para RegisterViewModel
 final registerViewModelProvider = Provider<RegisterViewModel>(
   (ref) => RegisterViewModel(ref.watch(authRepositoryProvider)),
+);
+
+/// Provider para ContaListViewModel
+final contaListViewModelProvider = ChangeNotifierProvider<ContaListViewModel>(
+  (ref) => ContaListViewModel(ref.watch(contaRepositoryProvider)),
+);
+
+final contaCreateViewModelProvider = Provider<ContaCreateViewModel>(
+  (ref) => ContaCreateViewModel(ref.watch(contaRepositoryProvider)),
+);
+
+final contaUpdateViewModelProvider = Provider<ContaUpdateViewModel>(
+  (ref) => ContaUpdateViewModel(ref.watch(contaRepositoryProvider)),
+);
+
+final contaDeleteViewModelProvider = Provider<ContaDeleteViewModel>(
+  (ref) => ContaDeleteViewModel(ref.watch(contaRepositoryProvider)),
 );
 
 // ============================================================================

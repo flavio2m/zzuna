@@ -1,7 +1,7 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-enum HomePageTab { lancamentos, relatorios }
+enum HomePageTab { lancamentos, relatorios, contas }
 // enum _HomeMenuAction { logout }
 
 class HomeTopBar extends StatelessWidget {
@@ -57,6 +57,12 @@ class HomeTopBar extends StatelessWidget {
                     label: 'Relatorios',
                     selected: selectedTab == HomePageTab.relatorios,
                     onPressed: () => onTabSelected(HomePageTab.relatorios),
+                  ),
+                  _TopTabButton(
+                    icon: Icons.bar_chart_outlined,
+                    label: 'Contas',
+                    selected: selectedTab == HomePageTab.contas,
+                    onPressed: () => onTabSelected(HomePageTab.contas),
                   ),
                 ],
               ),

@@ -34,12 +34,15 @@ class AppButton extends StatelessWidget {
     final isDisabled = onPressed == null;
 
     final style = TextButton.styleFrom(
-      backgroundColor: buttonType == AppButtonType.elevated
+      backgroundColor:
+          buttonType ==
+              AppButtonType
+                  .elevated //
           ? Theme.of(context).colorScheme.onPrimary
           : null,
-      minimumSize: full ? const Size(double.infinity, 48) : const Size(0, 48),
+      minimumSize: full ? const Size(double.infinity, 54) : const Size(0, 54),
       side: BorderSide(
-        color: isDisabled ? AppColors.slate300 : Colors.transparent,
+        color: isDisabled ? AppColors.slate300 : AppColors.border, //
       ),
     );
 
@@ -72,7 +75,7 @@ class AppButton extends StatelessWidget {
 
     return Text(
       label,
-      style: disabled ? const TextStyle(color: AppColors.slate700) : textStyle,
+      style: disabled ? const TextStyle(color: AppColors.slate400) : textStyle, //
     );
   }
 
@@ -81,13 +84,13 @@ class AppButton extends StatelessWidget {
       return const SizedBox(
         width: 18,
         height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: CircularProgressIndicator(strokeWidth: 2), //
       );
     }
     if (!disabled) {
       return icon ?? const Icon(Icons.add);
     }
 
-    return Icon(icon?.icon ?? Icons.add, color: AppColors.slate700);
+    return Icon(icon?.icon ?? Icons.add, color: AppColors.slate400);
   }
 }

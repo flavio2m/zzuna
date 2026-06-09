@@ -1,11 +1,17 @@
-class CreateContaDto {
-  String? id; // Pode ter um ID, necessário para gerar o ID no repositório
+import 'package:zzuna/domain/dtos/conta/conta_dto.dart';
 
+class CreateContaDto implements ContaDto {
+  String? id;
+
+  @override
   String descricao;
-  String bancoSigla;
-  bool ativo = true; //
 
-  CreateContaDto({this.id, this.descricao = '', this.bancoSigla = ''});
+  @override
+  String bancoSigla;
+
+  bool ativo;
+
+  CreateContaDto({this.id, this.descricao = '', this.bancoSigla = '', this.ativo = true});
 
   void setDescricao(String descricao) {
     this.descricao = descricao;

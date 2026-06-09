@@ -297,12 +297,12 @@ $CartaoDetailsCopyWith<CartaoDetails> get copyWith => _$CartaoDetailsCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&const DeepCollectionEquality().equals(other.banco, banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,const DeepCollectionEquality().hash(banco),ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento);
 
 @override
 String toString() {
@@ -334,12 +334,12 @@ class _$CartaoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = freezed,Object? ativo = null,Object? diaFechamento = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullable_to_non_nullable
-as double,banco: freezed == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
+as double,banco: null == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
 as Banco,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
 as int,
@@ -497,12 +497,12 @@ _$CartaoDetailsCopyWith<_CartaoDetails> get copyWith => __$CartaoDetailsCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&const DeepCollectionEquality().equals(other.banco, banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,const DeepCollectionEquality().hash(banco),ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento);
 
 @override
 String toString() {
@@ -534,12 +534,12 @@ class __$CartaoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = freezed,Object? ativo = null,Object? diaFechamento = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,}) {
   return _then(_CartaoDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullable_to_non_nullable
-as double,banco: freezed == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
+as double,banco: null == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
 as Banco,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
 as int,

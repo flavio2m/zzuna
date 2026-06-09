@@ -1,9 +1,5 @@
 import 'package:lucid_validation/lucid_validation.dart';
-
-abstract interface class ContaDto {
-  String get descricao;
-  String get bancoSigla;
-}
+import 'package:zzuna/domain/dtos/conta/conta_dto.dart';
 
 class ContaValidator<T extends ContaDto> extends LucidValidator<T> {
   ContaValidator() {
