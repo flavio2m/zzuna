@@ -10,6 +10,7 @@ import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
+import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -75,6 +76,10 @@ final logoutViewModelProvider = Provider<LogoutViewModel>(
 /// Provider para RegisterViewModel
 final registerViewModelProvider = Provider<RegisterViewModel>(
   (ref) => RegisterViewModel(ref.watch(authRepositoryProvider)),
+);
+
+final contaListViewModelProvider = ChangeNotifierProvider<ContaListViewModel>(
+  (ref) => ContaListViewModel(ref.watch(contaRepositoryProvider)),
 );
 
 // ============================================================================
