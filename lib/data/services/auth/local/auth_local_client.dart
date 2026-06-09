@@ -23,7 +23,7 @@ class AuthLocalClient implements AuthClientBase {
     return usersResult.fold((users) {
       if (users.isEmpty) {
         // Se não tem usuários cadastrados, gera um usuário temporário para teste
-        return _createTestUser();
+        final testUser = _createTestUser();
       }
 
       final matches = users.where((user) => user.email == credentials.email);
