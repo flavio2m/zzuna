@@ -16,8 +16,9 @@ class ContaListView extends ConsumerWidget {
       listenable: viewModel.loadCommand,
       builder: (context, _) {
         final state = viewModel.loadCommand.value;
+        final contas = viewModel.contas;
 
-        if (state.isRunning) {
+        if (state.isRunning && contas.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -29,18 +30,27 @@ class ContaListView extends ConsumerWidget {
           );
         }
 
-        final contas = state.getValueOrNull() ?? [];
-
         if (contas.isEmpty) {
           return const Center(child: Text('Nenhuma conta encontrada.'));
         }
 
-        return ListView.separated(
-          itemCount: contas.length,
-          separatorBuilder: (context, index) => const AppDivider(),
-          itemBuilder: (context, index) {
-            return ContaListItem(contaDetails: contas[index]);
-          },
+        return Stack(
+          children: [
+            ListView.separated(
+              itemCount: contas.length,
+              separatorBuilder: (context, index) => const AppDivider(),
+              itemBuilder: (context, index) {
+                return ContaListItem(contaDetails: contas[index]);
+              },
+            ),
+            if (state.isRunning)
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LinearProgressIndicator(),
+              ),
+          ],
         );
       },
     );

@@ -17,6 +17,8 @@ class ContaListViewModel extends ChangeNotifier {
   String? bancoSelecionado;
   bool? statusSelecionado;
 
+  List<ContaDetails> contas = [];
+
   ContaListViewModel(this._repository) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
@@ -24,14 +26,11 @@ class ContaListViewModel extends ChangeNotifier {
   }
 
   late final loadCommand = Command0(_load);
-  late final filterCommand = Command0(_filter);
 
   AsyncResult<List<ContaDetails>> _load() async {
-    final result = await _repository.getAll();
-    return result.map(_toDetailsList);
-  }
+    // Garante que o banco está populado com dados iniciais (se for a primeira execução)
+    await _repository.getAll();
 
-  AsyncResult<List<ContaDetails>> _filter() async {
     final filter = ContaFilterDto(
       descricao: descricaoQuery ?? '',
       bancoSigla: bancoSelecionado,
@@ -40,7 +39,10 @@ class ContaListViewModel extends ChangeNotifier {
 
     final result = await _repository.search(filter);
 
-    return result.map(_toDetailsList);
+    return result.map((list) {
+      contas = _toDetailsList(list);
+      return contas;
+    });
   }
 
   List<ContaDetails> _toDetailsList(List<Conta> contas) {
@@ -60,19 +62,19 @@ class ContaListViewModel extends ChangeNotifier {
 
   void setDescricao(String value) {
     descricaoQuery = value;
-    _filter;
+    loadCommand.execute();
     notifyListeners();
   }
 
   void setBanco(String? value) {
     bancoSelecionado = value;
-    _filter();
+    loadCommand.execute();
     notifyListeners();
   }
 
   void setStatus(bool? value) {
     statusSelecionado = value;
-    _filter;
+    loadCommand.execute();
     notifyListeners();
   }
 
