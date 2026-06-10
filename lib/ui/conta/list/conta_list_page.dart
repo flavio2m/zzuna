@@ -4,7 +4,8 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_filter_bar.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_list_view.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
-import 'package:zzuna/ui/shared/widgets/card/app_card.dart';
+import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
+import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
 class ContaListPage extends ConsumerStatefulWidget {
@@ -35,14 +36,16 @@ class _ContaListPageState extends ConsumerState<ContaListPage> {
       ),
       body: const Column(
         children: [
+          AppDivider(),
           AppCard(
             variant: AppCardVariant.filter,
-            margin: EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
+            margin: EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
             child: ContaFilterBar(),
           ),
+          AppDivider(),
           Expanded(
             child: AppCard(
-              margin: EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 16),
+              margin: EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 8),
               child: ContaListView(), //
             ),
           ),

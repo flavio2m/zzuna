@@ -4,16 +4,17 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/validators/conta_validator.dart';
+import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
-import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ContaCreateModal extends ConsumerStatefulWidget {
@@ -28,25 +29,24 @@ class ContaCreateModal extends ConsumerStatefulWidget {
 }
 
 class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
+  late final ContaCreateViewModel viewModel;
   final dto = CreateContaDto();
   final validator = ContaValidator<CreateContaDto>();
 
   @override
   void initState() {
     super.initState();
-    final viewModel = ref.read(contaCreateViewModelProvider);
+    viewModel = ref.read(contaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    final viewModel = ref.read(contaCreateViewModelProvider);
     viewModel.createCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final viewModel = ref.read(contaCreateViewModelProvider);
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((Conta) {
@@ -114,8 +114,8 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
             validator: validator.byField(dto, 'bancoSigla'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          SwitchListTile(
-            title: const AppText('Ativo'),
+          AppSwitchField(
+            label: 'Ativo',
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

@@ -4,7 +4,8 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/ui/conta/create/widgets/conta_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
-import 'package:zzuna/ui/shared/widgets/card/app_filter_card.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
+import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
@@ -16,6 +17,8 @@ class ContaFilterBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.watch(contaListViewModelProvider);
+    TextEditingController? descricaoController = TextEditingController();
+    final descricaoFocusNode = FocusNode();
 
     return AppFilterCard(
       child: Wrap(
@@ -25,8 +28,16 @@ class ContaFilterBar extends ConsumerWidget {
           SizedBox(
             width: 300,
             child: AppTextFormField(
-              label: 'Buscar por descrição',
-              onChanged: (value) => viewModel.setDescricao(value), //
+              controller: descricaoController,
+              focusNode: descricaoFocusNode,
+              textInputAction: TextInputAction.search,
+              label: 'Descrição',
+              onChanged: (value) {
+                viewModel.setDescricao(value);
+              },
+              onFieldSubmitted: (_) {
+                viewModel.pesquisar();
+              },
             ),
           ),
           SizedBox(
@@ -57,6 +68,12 @@ class ContaFilterBar extends ConsumerWidget {
                 viewModel.setStatus(value);
               },
             ),
+          ),
+
+          ButtonFind(
+            onPressed: () {
+              viewModel.pesquisar();
+            },
           ),
 
           ButtonAdd(onPressed: () => ContaCreateModal.show(context)),

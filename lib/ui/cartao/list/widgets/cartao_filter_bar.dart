@@ -4,7 +4,8 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/ui/cartao/create/widgets/cartao_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
-import 'package:zzuna/ui/shared/widgets/card/app_filter_card.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
+import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
@@ -16,6 +17,8 @@ class CartaoFilterBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.watch(cartaoListViewModelProvider);
+    TextEditingController? descricaoController = TextEditingController();
+    final descricaoFocusNode = FocusNode();
 
     return AppFilterCard(
       child: Wrap(
@@ -24,7 +27,18 @@ class CartaoFilterBar extends ConsumerWidget {
         children: [
           SizedBox(
             width: 300,
-            child: AppTextFormField(label: 'Buscar por descrição', onChanged: (value) => viewModel.setDescricao(value)),
+            child: AppTextFormField(
+              controller: descricaoController,
+              focusNode: descricaoFocusNode,
+              textInputAction: TextInputAction.search,
+              label: 'Descrição',
+              onChanged: (value) {
+                viewModel.setDescricao(value);
+              },
+              onFieldSubmitted: (_) {
+                viewModel.pesquisar();
+              },
+            ),
           ),
 
           SizedBox(
@@ -34,7 +48,12 @@ class CartaoFilterBar extends ConsumerWidget {
               value: viewModel.bancoSelecionado,
               items: [
                 AppDropdownMenuItem(value: '', label: 'Todos'),
-                ...Bancos.items.map((banco) => AppDropdownMenuItem(value: banco.sigla, label: banco.descricao)),
+                ...Bancos.items.map(
+                  (banco) => AppDropdownMenuItem(
+                    value: banco.sigla,
+                    label: banco.descricao, //
+                  ),
+                ),
               ],
               onChanged: (value) {
                 viewModel.setBanco(value);
@@ -50,6 +69,12 @@ class CartaoFilterBar extends ConsumerWidget {
                 viewModel.setStatus(value);
               },
             ),
+          ),
+
+          ButtonFind(
+            onPressed: () {
+              viewModel.pesquisar();
+            },
           ),
 
           ButtonAdd(onPressed: () => CartaoCreateModal.show(context)),

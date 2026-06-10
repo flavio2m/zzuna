@@ -28,7 +28,7 @@ class ContaListViewModel extends ChangeNotifier {
   late final loadCommand = Command0(_load);
 
   AsyncResult<List<ContaDetails>> _load() async {
-    // Garante que o banco está populado com dados iniciais (se for a primeira execução)
+    // Garante que o banco está populado com dados iniciais
     await _repository.getAll();
 
     final filter = ContaFilterDto(
@@ -62,20 +62,20 @@ class ContaListViewModel extends ChangeNotifier {
 
   void setDescricao(String value) {
     descricaoQuery = value;
-    loadCommand.execute();
-    notifyListeners();
   }
 
   void setBanco(String? value) {
     bancoSelecionado = value;
     loadCommand.execute();
-    notifyListeners();
   }
 
   void setStatus(bool? value) {
     statusSelecionado = value;
     loadCommand.execute();
-    notifyListeners();
+  }
+
+  void pesquisar() {
+    loadCommand.execute();
   }
 
   @override

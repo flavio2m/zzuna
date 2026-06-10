@@ -4,6 +4,7 @@ import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/ui/conta/delete/widgets/conta_delete_button.dart';
 import 'package:zzuna/ui/conta/update/widgets/conta_update_modal.dart';
+import 'package:zzuna/ui/shared/widgets/tags/app_tag.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
@@ -13,20 +14,6 @@ class ContaListItem extends ConsumerWidget {
   final ContaDetails contaDetails;
 
   const ContaListItem({super.key, required this.contaDetails});
-
-  Widget get _bancoWidget {
-    return Container(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.slate100,
-          borderRadius: BorderRadius.circular(6), //
-        ),
-        child: AppText(contaDetails.banco.descricao),
-      ),
-    );
-  }
 
   void _editarConta(BuildContext context) {
     final dto = LoadedContaDto(
@@ -64,7 +51,7 @@ class ContaListItem extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis, //
                 ),
                 AppText(' - '),
-                _bancoWidget,
+                AppTag(contaDetails.banco.descricao),
               ],
             ),
           ),

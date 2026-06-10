@@ -48,7 +48,13 @@ class CartaoListView extends ConsumerWidget {
               },
             ),
 
-            if (state.isRunning) const Positioned(top: 0, left: 0, right: 0, child: LinearProgressIndicator()),
+            if (state.isRunning)
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LinearProgressIndicator(), //
+              ),
           ],
         );
       },

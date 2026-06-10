@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/conta/list/widgets/conta_list_item.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ContaListView extends ConsumerWidget {
@@ -24,14 +26,15 @@ class ContaListView extends ConsumerWidget {
 
         if (state.isFailure) {
           return Center(
-            child: Text(
-              'Erro ao carregar contas: ${state.getExceptionOrNull()}', //
+            child: AppText(
+              'Erro ao carregar contas: ${state.getExceptionOrNull()}',
+              color: AppColors.danger, //
             ),
           );
         }
 
         if (contas.isEmpty) {
-          return const Center(child: Text('Nenhuma conta encontrada.'));
+          return const Center(child: AppText('Nenhuma conta encontrada.'));
         }
 
         return Stack(
@@ -48,7 +51,7 @@ class ContaListView extends ConsumerWidget {
                 top: 0,
                 left: 0,
                 right: 0,
-                child: LinearProgressIndicator(),
+                child: LinearProgressIndicator(), //
               ),
           ],
         );

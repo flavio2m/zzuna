@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
+import 'package:zzuna/domain/validators/cartao_validator.dart';
+import 'package:zzuna/ui/cartao/create/viewModels/cartao_create_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_banco_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
-import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
-import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class CartaoCreateModal extends ConsumerStatefulWidget {
@@ -27,26 +30,32 @@ class CartaoCreateModal extends ConsumerStatefulWidget {
 class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
   final dto = CartaoDto();
 
+  final validator = CartaoValidator<CartaoDto>();
+
+  late final CartaoCreateViewModel viewModel;
+
   @override
   void initState() {
     super.initState();
-    final viewModel = ref.read(cartaoCreateViewModelProvider);
+
+    viewModel = ref.read(cartaoCreateViewModelProvider);
+
     viewModel.createCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    final viewModel = ref.read(cartaoCreateViewModelProvider);
     viewModel.createCommand.removeListener(_commandListener);
+
     super.dispose();
   }
 
   void _commandListener() {
-    final viewModel = ref.read(cartaoCreateViewModelProvider);
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((_) {
       AppSnackBar.showSuccess(context, 'Cartão criado com sucesso');
+
       Navigator.pop(context);
     });
 
@@ -56,12 +65,12 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
   }
 
   bool get _canSubmit {
-    return dto.descricao.isNotEmpty && dto.bancoSigla.isNotEmpty;
+    return validator.validate(dto).isValid;
   }
 
   void _handleSubmit() {
     if (_canSubmit) {
-      ref.read(cartaoCreateViewModelProvider).createCommand.execute(dto);
+      viewModel.createCommand.execute(dto);
     }
   }
 
@@ -70,12 +79,14 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
     final viewModel = ref.watch(cartaoCreateViewModelProvider);
 
     return AppForm(
-      title: 'Novo Cartão',
+      title: 'Novo Cartão de Crédito',
       type: AppFormType.modal,
       actions: [
+        ButtonCancel(onPressed: () => Navigator.of(context).pop()),
+
         ListenableBuilder(
           listenable: viewModel.createCommand,
-          builder: (context, _) {
+          builder: (_, __) {
             return ButtonSave(onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
           },
         ),
@@ -89,8 +100,11 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
               dto.setDescricao(value);
               setState(() {});
             },
+            validator: validator.byField(dto, 'descricao'),
           ),
+
           const AppSpacing(size: AppSpacingSize.md),
+
           Row(
             children: [
               Expanded(
@@ -99,36 +113,50 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     dto.setLimite(double.tryParse(value) ?? 0);
+
                     setState(() {});
                   },
+                  validator: validator.byField(dto, 'limite'),
                 ),
               ),
+
               const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+
               Expanded(
                 child: AppTextFormField(
                   label: 'Dia Fechamento',
                   keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (value) {
-                    dto.setDiaFechamento(int.tryParse(value) ?? 1);
+                    dto.setDiaFechamento(int.tryParse(value) ?? 0);
+
                     setState(() {});
                   },
+                  validator: validator.byField(dto, 'diaFechamento'),
                 ),
               ),
             ],
           ),
+
           const AppSpacing(size: AppSpacingSize.md),
+
           AppBancoDropdown(
             value: dto.bancoSigla.isEmpty ? null : dto.bancoSigla,
             onChanged: (value) {
               dto.setBancoSigla(value ?? '');
+
               setState(() {});
             },
           ),
+
           const AppSpacing(size: AppSpacingSize.md),
-          AppStatusDropdown(
+
+          AppSwitchField(
+            label: 'Ativo',
             value: dto.ativo,
             onChanged: (value) {
-              dto.setAtivo(value ?? true);
+              dto.setAtivo(value);
+
               setState(() {});
             },
           ),

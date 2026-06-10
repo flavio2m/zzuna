@@ -64,20 +64,20 @@ class CartaoListViewModel extends ChangeNotifier {
 
   void setDescricao(String value) {
     descricaoQuery = value;
-    loadCommand.execute();
-    notifyListeners();
   }
 
   void setBanco(String? value) {
     bancoSelecionado = value;
     loadCommand.execute();
-    notifyListeners();
   }
 
   void setStatus(bool? value) {
     statusSelecionado = value;
     loadCommand.execute();
-    notifyListeners();
+  }
+
+  void pesquisar() {
+    loadCommand.execute();
   }
 
   @override
