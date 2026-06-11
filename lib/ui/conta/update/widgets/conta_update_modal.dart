@@ -60,7 +60,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
   void _commandListener() {
     final commandValue = viewModel.updateCommand.value;
 
-    commandValue.onSuccess((Conta) {
+    commandValue.onSuccess((_) {
       AppSnackBar.showSuccess(context, 'Conta atualizada com sucesso');
       Navigator.pop(context);
     });

@@ -7,7 +7,13 @@ class ButtonSave extends StatelessWidget {
   final bool small;
   final String label;
 
-  const ButtonSave({super.key, this.onPressed, this.focusNode, this.small = false, this.label = 'Salvar'});
+  const ButtonSave({
+    super.key,
+    this.onPressed,
+    this.focusNode,
+    this.small = false,
+    this.label = 'Salvar', //
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,10 @@ class ButtonSave extends StatelessWidget {
       small: small,
       label: label,
       icon: Icon(Icons.save, color: Theme.of(context).colorScheme.primary),
-      textStyle: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+      textStyle: TextStyle(
+        color: Theme.of(context).colorScheme.primary,
+        fontWeight: FontWeight.bold, //
+      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
-import 'package:zzuna/ui/shared/theme/app_theme.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/app_icon_button.dart';
 
 class IconExcluirButton extends AppIconButton {

@@ -1,5 +1,5 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
@@ -10,9 +10,11 @@ import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_banco_dropdown.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_currency_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -100,7 +102,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
 
         ListenableBuilder(
           listenable: viewModel.updateCommand,
-          builder: (_, __) {
+          builder: (_, _) {
             return ButtonSave(onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
           },
         ),
@@ -123,13 +125,16 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
           Row(
             children: [
               Expanded(
-                child: AppTextFormField(
+                child: AppCurrencyFormField(
                   label: 'Limite',
-                  initialValue: dto.limite.toString(),
-                  keyboardType: TextInputType.number,
+                  initialValue: UtilBrasilFields.obterReal(dto.limite, moeda: true),
                   onChanged: (value) {
-                    dto.setLimite(double.tryParse(value) ?? 0);
-
+                    if (value.isNotEmpty) {
+                      final valor = UtilBrasilFields.converterMoedaParaDouble(value);
+                      dto.setLimite(valor);
+                    } else {
+                      dto.setLimite(0);
+                    }
                     setState(() {});
                   },
                   validator: validator.byField(dto, 'limite'),
@@ -139,14 +144,11 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
               const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
 
               Expanded(
-                child: AppTextFormField(
+                child: AppIntegerFormField(
                   label: 'Dia Fechamento',
                   initialValue: dto.diaFechamento.toString(),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (value) {
                     dto.setDiaFechamento(int.tryParse(value) ?? 0);
-
                     setState(() {});
                   },
                   validator: validator.byField(dto, 'diaFechamento'),
