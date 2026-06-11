@@ -90,7 +90,7 @@ void main() {
 
       final result = await repository.delete(created.getOrThrow().id);
 
-      final contas = await repository.getAll();
+      // final contas = await repository.getAll();
 
       expect(result.isSuccess(), isTrue);
       // expect(contas.getOrThrow(), isEmpty);

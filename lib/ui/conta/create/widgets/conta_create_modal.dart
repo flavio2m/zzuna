@@ -49,7 +49,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
   void _commandListener() {
     final commandValue = viewModel.createCommand.value;
 
-    commandValue.onSuccess((Conta) {
+    commandValue.onSuccess((_) {
       AppSnackBar.showSuccess(context, 'Conta criada com sucesso.');
       Navigator.of(context).pop();
     });

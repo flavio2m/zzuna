@@ -81,7 +81,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
         ButtonCancel(onPressed: () => Navigator.of(context).pop()),
         ListenableBuilder(
           listenable: viewModel.registerCommand,
-          builder: (_, __) {
+          builder: (_, _) {
             final isLoading = viewModel.registerCommand.value.isRunning;
 
             return AppButton(
@@ -106,16 +106,6 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
           ),
 
           _divider(),
-
-          AppTextFormField(
-            label: 'Email',
-            icon: Icons.email,
-            onChanged: (value) {
-              dto.setEmail(value);
-              setState(() {});
-            },
-            validator: validator.byField(dto, 'email'),
-          ),
 
           _divider(),
 

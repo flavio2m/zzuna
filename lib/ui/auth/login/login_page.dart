@@ -10,6 +10,7 @@ import 'package:zzuna/ui/shared/widgets/buttons/app_textbutton.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_email_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               actions: [
                 ListenableBuilder(
                   listenable: viewModel.loginCommand,
-                  builder: (_, __) {
+                  builder: (_, _) {
                     final isLoading = viewModel.loginCommand.value.isRunning;
 
                     return AppButton(
@@ -81,6 +82,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       icon: const Icon(Icons.login),
                       onPressed: isLoading || !_canSubmit ? null : _handleRegister,
                       loading: isLoading,
+                      textStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold, //
+                      ),
                     );
                   },
                 ),
@@ -94,10 +99,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 children: [
                   const FlutterLogo(size: 100),
 
-                  AppSpacing(size: AppSpacingSize.lg),
+                  AppSpacing(size: AppSpacingSize.md),
 
-                  AppTextFormField(
-                    label: 'Email',
+                  AppEmailFormField(
+                    label: 'E-mail',
                     icon: Icons.email,
                     onChanged: (value) {
                       credentials.setEmail(value);

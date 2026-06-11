@@ -15,6 +15,8 @@ class AppTextFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final TextInputAction? textInputAction;
   final bool autofocus;
+  final VoidCallback? onTap;
+  final bool readOnly;
 
   const AppTextFormField({
     super.key,
@@ -31,6 +33,8 @@ class AppTextFormField extends StatelessWidget {
     this.focusNode,
     this.textInputAction,
     this.autofocus = false,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
@@ -40,6 +44,8 @@ class AppTextFormField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       textInputAction: textInputAction,
+      onTap: onTap,
+      readOnly: readOnly,
       style: const TextStyle(fontSize: 14),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: validator,
@@ -59,7 +65,6 @@ class AppTextFormField extends StatelessWidget {
         // Mantém o foco no campo após Enter
         if (focusNode != null) {
           Future.microtask(() => focusNode!.requestFocus());
-          print('Requesting focus for ${focusNode!.debugLabel}');
         }
       },
     );

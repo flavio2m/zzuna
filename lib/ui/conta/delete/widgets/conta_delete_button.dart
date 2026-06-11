@@ -32,7 +32,7 @@ class ContaDeleteButton extends ConsumerWidget {
 
     return ListenableBuilder(
       listenable: viewModel.deleteCommand,
-      builder: (_, __) {
+      builder: (_, _) {
         return IconExcluirButton(
           onPressed: //
           viewModel.deleteCommand.value.isRunning
