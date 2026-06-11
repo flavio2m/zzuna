@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
-import 'package:zzuna/ui/conta/create/widgets/conta_create_modal.dart';
+import 'package:zzuna/ui/cartao/create/widgets/cartao_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -11,12 +11,12 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 
-class ContaFilterBar extends ConsumerWidget {
-  const ContaFilterBar({super.key});
+class CartaoFilterBar extends ConsumerWidget {
+  const CartaoFilterBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(contaListViewModelProvider);
+    final viewModel = ref.watch(cartaoListViewModelProvider);
     TextEditingController? descricaoController = TextEditingController();
     final descricaoFocusNode = FocusNode();
 
@@ -40,6 +40,7 @@ class ContaFilterBar extends ConsumerWidget {
               },
             ),
           ),
+
           SizedBox(
             width: 220,
             child: AppDropdownFormField<String>(
@@ -76,7 +77,7 @@ class ContaFilterBar extends ConsumerWidget {
             },
           ),
 
-          ButtonAdd(onPressed: () => ContaCreateModal.show(context)),
+          ButtonAdd(onPressed: () => CartaoCreateModal.show(context)),
         ],
       ),
     );

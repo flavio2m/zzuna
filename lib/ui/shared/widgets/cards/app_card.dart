@@ -1,49 +1,73 @@
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-enum AppCardVariant { flat, standard, emphasized, filter }
+enum AppCardVariant { flat, outlined, elevated, filter }
 
 class AppCard extends StatelessWidget {
   final Widget child;
+
   final AppCardVariant variant;
-  final double? minHeight;
+
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+
   final double? height;
-  final double margin;
-  final double padding;
+  final double? minHeight;
 
   const AppCard({
     super.key,
     required this.child,
-    this.variant = AppCardVariant.standard,
-    this.minHeight,
+    this.variant = AppCardVariant.elevated,
+    this.padding = const EdgeInsets.all(12),
+    this.margin = const EdgeInsets.all(4),
     this.height,
-    this.margin = 8,
-    this.padding = 8,
+    this.minHeight,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      margin: EdgeInsets.all(margin),
-      constraints: BoxConstraints(minHeight: minHeight ?? 0),
+      margin: margin,
+      decoration: _containerDecoration(),
+      constraints: height != null
+          ? BoxConstraints.tightFor(height: height)
+          : BoxConstraints(
+              minHeight: minHeight ?? 0, //
+            ),
       child: Card(
-        elevation: _elevation,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(padding: EdgeInsets.all(padding), child: child),
+        color: Theme.of(context).cardColor,
+        margin: EdgeInsets.zero,
+        elevation: _elevation(),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }
 
-  double get _elevation {
+  double _elevation() {
     switch (variant) {
       case AppCardVariant.flat:
         return 0;
-      case AppCardVariant.standard:
-        return 2;
+
+      case AppCardVariant.outlined:
+        return 0;
+
       case AppCardVariant.filter:
         return 4;
-      case AppCardVariant.emphasized:
+
+      case AppCardVariant.elevated:
         return 8;
+    }
+  }
+
+  BoxDecoration? _containerDecoration() {
+    switch (variant) {
+      case AppCardVariant.outlined:
+        return BoxDecoration(
+          border: const Border(bottom: BorderSide(color: AppColors.border)),
+        );
+
+      default:
+        return null;
     }
   }
 }

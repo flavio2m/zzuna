@@ -67,7 +67,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: SizedBox(
           width: 400,
           child: AppCard(
-            variant: AppCardVariant.emphasized,
+            variant: AppCardVariant.flat,
             child: AppForm(
               actionsLayout: AppFormActionsLayout.column,
               actions: [

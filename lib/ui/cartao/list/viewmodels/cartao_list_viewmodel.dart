@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
-import 'package:zzuna/data/repositories/conta/conta_repository.dart';
-import 'package:zzuna/domain/dtos/conta/conta_filter_dto.dart';
-import 'package:zzuna/domain/entities/conta_entity.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_filter_dto.dart';
+import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 
-class ContaListViewModel extends ChangeNotifier {
-  final ContaRepository _repository;
+class CartaoListViewModel extends ChangeNotifier {
+  final CartaoRepository _repository;
   StreamSubscription? _repositorySubscription;
 
   // Itens da barra de filtro
@@ -17,9 +17,9 @@ class ContaListViewModel extends ChangeNotifier {
   String? bancoSelecionado;
   bool? statusSelecionado;
 
-  List<ContaDetails> contas = [];
+  List<CartaoDetails> cartoes = [];
 
-  ContaListViewModel(this._repository) {
+  CartaoListViewModel(this._repository) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
     });
@@ -27,11 +27,11 @@ class ContaListViewModel extends ChangeNotifier {
 
   late final loadCommand = Command0(_load);
 
-  AsyncResult<List<ContaDetails>> _load() async {
+  AsyncResult<List<CartaoDetails>> _load() async {
     // Garante que o banco está populado com dados iniciais
     await _repository.getAll();
 
-    final filter = ContaFilterDto(
+    final filter = CartaoFilterDto(
       descricao: descricaoQuery ?? '',
       bancoSigla: bancoSelecionado,
       ativo: statusSelecionado,
@@ -40,23 +40,25 @@ class ContaListViewModel extends ChangeNotifier {
     final result = await _repository.search(filter);
 
     return result.map((list) {
-      contas = _toDetailsList(list);
-      return contas;
+      cartoes = _toDetailsList(list);
+      return cartoes;
     });
   }
 
-  List<ContaDetails> _toDetailsList(List<Conta> contas) {
-    return contas.map(_toDetails).toList();
+  List<CartaoDetails> _toDetailsList(List<Cartao> cartoes) {
+    return cartoes.map(_toDetails).toList();
   }
 
-  ContaDetails _toDetails(Conta conta) {
-    final banco = Bancos.bySigla(conta.bancoSigla).getOrThrow();
+  CartaoDetails _toDetails(Cartao cartao) {
+    final banco = Bancos.bySigla(cartao.bancoSigla).getOrThrow();
 
-    return ContaDetails(
-      id: conta.id,
-      descricao: conta.descricao,
+    return CartaoDetails(
+      id: cartao.id,
+      descricao: cartao.descricao,
+      limite: cartao.limite,
       banco: banco,
-      ativo: conta.ativo, //
+      ativo: cartao.ativo,
+      diaFechamento: cartao.diaFechamento,
     );
   }
 

@@ -1,8 +1,10 @@
 import 'package:zzuna/data/repositories/auth/auth_repository.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/shared_preferences_service.dart';
+import 'package:zzuna/data/services/storage/local/cartao_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/data/services/storage/local/user_storage_provider.dart';
@@ -12,6 +14,10 @@ import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
+import 'package:zzuna/ui/cartao/create/viewModels/cartao_create_viewmodel.dart';
+import 'package:zzuna/ui/cartao/delete/viewModel/cartao_delete_viewmodel.dart';
+import 'package:zzuna/ui/cartao/list/viewmodels/cartao_list_viewmodel.dart';
+import 'package:zzuna/ui/cartao/update/viewmodels/cartao_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,6 +68,14 @@ final contaRepositoryProvider = Provider<ContaRepository>((ref) {
   return repository;
 });
 
+final cartaoRepositoryProvider = Provider<CartaoRepository>((ref) {
+  final repository = CartaoRepository(ref.watch(cartaoStorageProvider));
+
+  ref.onDispose(repository.dispose);
+
+  return repository;
+});
+
 // ============================================================================
 // VIEWMODELS - Camada de Apresentação
 // ============================================================================
@@ -84,6 +98,22 @@ final registerViewModelProvider = Provider<RegisterViewModel>(
 /// Provider para ContaListViewModel
 final contaListViewModelProvider = ChangeNotifierProvider<ContaListViewModel>(
   (ref) => ContaListViewModel(ref.watch(contaRepositoryProvider)),
+);
+
+final cartaoListViewModelProvider = ChangeNotifierProvider<CartaoListViewModel>(
+  (ref) => CartaoListViewModel(ref.watch(cartaoRepositoryProvider)),
+);
+
+final cartaoCreateViewModelProvider = Provider<CartaoCreateViewModel>(
+  (ref) => CartaoCreateViewModel(ref.watch(cartaoRepositoryProvider)),
+);
+
+final cartaoUpdateViewModelProvider = Provider<CartaoUpdateViewModel>(
+  (ref) => CartaoUpdateViewModel(ref.watch(cartaoRepositoryProvider)),
+);
+
+final cartaoDeleteViewModelProvider = Provider<CartaoDeleteViewModel>(
+  (ref) => CartaoDeleteViewModel(ref.watch(cartaoRepositoryProvider)),
 );
 
 final contaCreateViewModelProvider = Provider<ContaCreateViewModel>(

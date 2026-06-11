@@ -4,16 +4,17 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/validators/conta_validator.dart';
+import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
-import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ContaUpdateModal extends ConsumerStatefulWidget {
@@ -33,6 +34,7 @@ class ContaUpdateModal extends ConsumerStatefulWidget {
 }
 
 class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
+  late final ContaUpdateViewModel viewModel;
   late final LoadedContaDto dto;
   final validator = ContaValidator<LoadedContaDto>();
 
@@ -45,19 +47,17 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
       bancoSigla: widget.conta.bancoSigla,
       ativo: widget.conta.ativo,
     );
-    final viewModel = ref.read(contaUpdateViewModelProvider);
+    viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    final viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final viewModel = ref.read(contaUpdateViewModelProvider);
     final commandValue = viewModel.updateCommand.value;
 
     commandValue.onSuccess((Conta) {
@@ -127,8 +127,8 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
             validator: validator.byField(dto, 'bancoSigla'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          SwitchListTile(
-            title: const AppText('Ativo'),
+          AppSwitchField(
+            label: 'Ativo',
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);
