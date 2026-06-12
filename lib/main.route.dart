@@ -3,19 +3,25 @@
 import 'package:flutter/widgets.dart';
 import 'package:routefly/routefly.dart';
 
-import 'ui/auth/login/login_page.dart' as a3;
-import 'ui/conta/list/conta_list_page.dart' as a2;
-import 'ui/home/home_page.dart' as a4;
-import 'ui/lancamentos/lancamentos_page.dart' as a1;
-import 'ui/relatorios/relatorios_page.dart' as a0;
+import 'ui/auth/login/login_page.dart' as a4;
+import 'ui/cartao/list/cartao_list_page.dart' as a5;
+import 'ui/centro_custo/list/centro_custo_list_page.dart' as a0;
+import 'ui/conta/list/conta_list_page.dart' as a3;
+import 'ui/home/home_page.dart' as a6;
+import 'ui/lancamentos/lancamentos_page.dart' as a2;
+import 'ui/relatorios/relatorios_page.dart' as a1;
 
 Route b0Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a0.RelatoriosPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a0.CentroCustoListPage());
 Route b1Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a1.LancamentosPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a1.RelatoriosPage());
 Route b2Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a2.ContaListPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a2.LancamentosPage());
 Route b3Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a3.LoginPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a3.ContaListPage());
 Route b4Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a4.MyWidget());
+    Routefly.defaultRouteBuilder(ctx, settings, const a4.LoginPage());
+Route b5Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a5.CartaoListPage());
+Route b6Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a6.MyWidget());

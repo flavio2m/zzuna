@@ -11,7 +11,7 @@ ViewModel
 ↓
 Repository
 ↓
-Service
+Storage / Service
 ↓
 Fonte de Dados
 ```
@@ -25,7 +25,7 @@ Validator
 ↓
 Repository
 ↓
-Service
+Storage
 ```
 
 ---
@@ -43,7 +43,7 @@ lib/
 
 ---
 
-## config/
+# config/
 
 Configuração global da aplicação.
 
@@ -56,153 +56,400 @@ Responsável por:
 
 * Providers Riverpod
 * Injeção de dependência
-* Registro de Services
+* Registro de Storages
 * Registro de Repositories
 * Registro de ViewModels
 
 ---
 
-## domain/
+# domain/
 
-Contém regras e modelos de domínio.
+Contém modelos e contratos do domínio.
 
 ```text
 domain/
 ├── dtos/
 ├── entities/
+├── statics/
 └── validators/
 ```
 
-### dtos/
+---
 
-Objetos de transferência de dados.
+## domain/dtos
 
-Exemplos:
+DTOs organizados por entidade.
+
+Exemplo:
 
 ```text
-credentials.dart
-register_user_dto.dart
-update_user_dto.dart
+domain/dtos/
+├── cartao/
+├── conta/
+├── centro_custo/
+└── user/
 ```
 
-### entities/
-
-Modelos de domínio.
-
 Exemplos:
 
 ```text
+cartao_dto.dart
+cartao_filter_dto.dart
+
+conta_dto.dart
+conta_filter_dto.dart
+```
+
+---
+
+## domain/entities
+
+Entidades de domínio.
+
+Exemplo:
+
+```text
+cartao_entity.dart
+conta_entity.dart
 user_entity.dart
 ```
 
-### validators/
+Quando necessário, a Entity pode possuir uma versão Details.
 
-Validação de DTOs.
+Exemplo:
 
-Exemplos:
-
-```text
-credentials_validator.dart
-register_user_dto_validator.dart
+```dart
+Conta
+ContaDetails
 ```
 
 ---
 
-## data/
+## domain/statics
 
-Contém acesso a dados e integrações.
+Dados estáticos compartilhados pelo sistema.
+
+Exemplo:
+
+```text
+domain/statics/
+└── banco/
+```
+
+---
+
+## domain/validators
+
+Validators baseados em LucidValidation.
+
+Exemplos:
+
+```text
+cartao_validator.dart
+conta_validator.dart
+credentials_validator.dart
+```
+
+---
+
+# data/
+
+Responsável pelo acesso aos dados.
 
 ```text
 data/
+├── exception/
 ├── repositories/
-├── services/
-└── exception/
+└── services/
 ```
-
-### repositories/
-
-Orquestram acesso aos dados.
-
-Exemplos:
-
-```text
-auth_repository.dart
-user_repository.dart
-```
-
-### services/
-
-Integrações externas.
-
-Exemplos:
-
-```text
-auth/
-storage/
-shared_preferences_service.dart
-```
-
-### exception/
-
-Exceções específicas da camada de dados.
 
 ---
 
-## ui/
+## data/repositories
+
+Organizados por entidade.
+
+Exemplo:
+
+```text
+repositories/
+├── auth/
+├── cartao/
+├── conta/
+├── centro_custo/
+└── user/
+```
+
+Responsabilidades:
+
+* CRUD
+* Pesquisa
+* Conversão DTO → Entity
+* Emissão de eventos
+* Orquestração de persistência
+
+---
+
+## data/services
+
+Serviços de infraestrutura.
+
+```text
+services/
+├── auth/
+└── storage/
+```
+
+Exemplo:
+
+```text
+services/auth/local
+services/storage/local
+```
+
+---
+
+## data/exception
+
+Exceções da camada de dados.
+
+Exemplos:
+
+```text
+repository_exception.dart
+local_storage_exception.dart
+local_auth_exception.dart
+```
+
+---
+
+# ui/
 
 Camada de apresentação.
 
 Organizada por feature.
 
-```text
-ui/
-├── auth/
-├── home/
-└── shared/
-```
-
-### Estrutura de Feature
-
-Página:
-
-```text
-feature/
-├── feature_page.dart
-└── viewmodels/
-    └── feature_viewmodel.dart
-```
-
-Widget reutilizável:
-
-```text
-feature/
-├── viewmodels/
-│   └── feature_viewmodel.dart
-└── widgets/
-    └── feature_widget.dart
-```
-
-Exemplos:
-
-```text
-auth/login/
-auth/logout/
-auth/register/
-```
-
-### shared/
-
-Componentes compartilhados.
-
 Exemplo:
 
 ```text
-snackbar_base.dart
+ui/
+├── auth/
+├── cartao/
+├── conta/
+├── centro_custo/
+├── home/
+├── lancamentos/
+├── relatorios/
+└── shared/
 ```
 
 ---
 
-## utils/
+## Estrutura padrão de CRUD
+
+Toda entidade deve seguir preferencialmente:
+
+```text
+feature/
+├── create/
+│   ├── viewmodels/
+│   └── widgets/
+├── update/
+│   ├── viewmodels/
+│   └── widgets/
+├── delete/
+│   ├── viewmodels/
+│   └── widgets/
+└── list/
+    ├── viewmodels/
+    └── widgets/
+```
+
+Exemplo:
+
+```text
+cartao/
+conta/
+centro_custo/
+```
+
+---
+
+## ViewModels
+
+Sempre dentro da feature correspondente.
+
+Exemplo:
+
+```text
+ui/cartao/list/viewmodels/
+ui/cartao/create/viewmodels/
+ui/cartao/update/viewmodels/
+```
+
+---
+
+## Widgets
+
+Sempre dentro da feature correspondente.
+
+Exemplo:
+
+```text
+ui/cartao/list/widgets/
+ui/cartao/create/widgets/
+```
+
+---
+
+# ui/shared
+
+Componentes reutilizáveis.
+
+```text
+shared/
+├── feedback/
+├── mappers/
+├── theme/
+└── widgets/
+```
+
+---
+
+## shared/feedback
+
+Componentes de feedback.
+
+Exemplo:
+
+```text
+app_dialog.dart
+app_snackbar.dart
+```
+
+---
+
+## shared/mappers
+
+Conversões de apresentação.
+
+Exemplo:
+
+```text
+status_mapper.dart
+```
+
+---
+
+## shared/theme
+
+Tema e cores da aplicação.
+
+Exemplo:
+
+```text
+app_colors.dart
+```
+
+---
+
+## shared/widgets
+
+Componentes visuais reutilizáveis.
+
+```text
+widgets/
+├── buttons/
+│   └── icons_buttons/
+├── cards/
+├── forms/
+├── layout/
+├── tags/
+└── texts/
+```
+
+### buttons
+
+Botões reutilizáveis.
+
+Exemplo:
+
+```text
+button_add.dart
+button_find.dart
+button_save.dart
+button_cancel.dart
+```
+
+### buttons/icons_buttons
+
+Botões de ação baseados em ícones.
+
+Exemplo:
+
+```text
+icon_editar_button.dart
+icon_delete_button.dart
+```
+
+### cards
+
+Cards reutilizáveis.
+
+Exemplo:
+
+```text
+app_filter_card.dart
+```
+
+### forms
+
+Campos e componentes de formulário.
+
+Exemplo:
+
+```text
+app_text_form_field.dart
+app_currency_form_field.dart
+app_integer_form_field.dart
+app_status_dropdown.dart
+app_banco_dropdown.dart
+app_switch_field.dart
+```
+
+### layout
+
+Componentes de layout.
+
+Exemplo:
+
+```text
+app_spacing.dart
+```
+
+### tags
+
+Etiquetas visuais.
+
+Exemplo:
+
+```text
+app_tag.dart
+```
+
+### texts
+
+Componentes de texto.
+
+Exemplo:
+
+```text
+app_text.dart
+```
+
+---
+
+# utils/
 
 Utilitários compartilhados.
 
@@ -212,7 +459,13 @@ utils/
 └── extensions/
 ```
 
-Exemplos:
+---
+
+## extensions
+
+Extensões utilitárias.
+
+Exemplo:
 
 ```text
 command_state_extension.dart
@@ -221,40 +474,28 @@ lucid_validator_extension.dart
 
 ---
 
-## test/
-
-Testes seguem a mesma estrutura da aplicação.
-
-```text
-test/
-├── data/
-├── helpers/
-└── utils/
-```
-
----
-
-## Regras
+# Regras
 
 Ao criar novos arquivos:
 
-* DTO → `domain/dtos`
+* DTO → `domain/dtos/[feature]`
 * Entity → `domain/entities`
 * Validator → `domain/validators`
-* Service → `data/services`
-* Repository → `data/repositories`
-* ViewModel → `ui/[feature]/viewmodels`
-* Widget → `ui/[feature]/widgets`
-* Page → `ui/[feature]`
+* Repository → `data/repositories/[feature]`
+* Storage → `data/services/storage`
+* ViewModel → `ui/[feature]/[acao]/viewmodels`
+* Widget → `ui/[feature]/[acao]/widgets`
+* Shared Widget → `ui/shared/widgets`
 * Provider → `config/providers.dart`
 
 ---
 
-## Não fazer
+# Não fazer
 
 * Criar lógica de negócio na UI
-* Acessar Services diretamente da UI
-* Acessar Services diretamente do ViewModel
+* Acessar Storage diretamente da UI
+* Acessar Storage diretamente do ViewModel
 * Criar Providers fora de `config/providers.dart`
+* Criar widgets compartilhados dentro de features
+* Duplicar componentes já existentes em `shared`
 * Misturar responsabilidades entre camadas
-

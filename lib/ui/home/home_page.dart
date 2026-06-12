@@ -1,5 +1,6 @@
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/cartao/list/cartao_list_page.dart';
+import 'package:zzuna/ui/centro_custo/list/centro_custo_list_page.dart';
 import 'package:zzuna/ui/conta/list/conta_list_page.dart';
 import 'package:zzuna/ui/home/widgets/home_top_bar.dart';
 import 'package:zzuna/ui/lancamentos/lancamentos_page.dart';
@@ -40,6 +41,7 @@ class _MyWidgetState extends ConsumerState<MyWidget> {
                 HomePageTab.relatorios => const RelatoriosPage(),
                 HomePageTab.contas => const ContaListPage(),
                 HomePageTab.cartoes => const CartaoListPage(),
+                HomePageTab.centroCustos => const CentroCustoListPage(),
               },
             ),
           ],

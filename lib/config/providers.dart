@@ -1,7 +1,11 @@
 import 'package:zzuna/data/repositories/auth/auth_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/user/user_repository.dart';
+import 'package:zzuna/data/services/storage/local/centro_custo_storage_provider.dart';
+import 'package:zzuna/ui/centro_custo/delete/viewmodel/centro_custo_delete_viewmodel.dart';
+import 'package:zzuna/ui/centro_custo/list/viewmodels/centro_custo_list_viewmodel.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/storage/local/cartao_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
@@ -12,10 +16,12 @@ import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
+import 'package:zzuna/ui/centro_custo/create/viewmodels/centro_custo_create_viewmodel.dart';
 import 'package:zzuna/ui/cartao/create/viewModels/cartao_create_viewmodel.dart';
 import 'package:zzuna/ui/cartao/delete/viewModel/cartao_delete_viewmodel.dart';
 import 'package:zzuna/ui/cartao/list/viewmodels/cartao_list_viewmodel.dart';
 import 'package:zzuna/ui/cartao/update/viewmodels/cartao_update_viewmodel.dart';
+import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -124,6 +130,29 @@ final contaUpdateViewModelProvider = Provider<ContaUpdateViewModel>(
 
 final contaDeleteViewModelProvider = Provider<ContaDeleteViewModel>(
   (ref) => ContaDeleteViewModel(ref.watch(contaRepositoryProvider)),
+);
+
+// Centro de Custo
+final centroCustoRepositoryProvider = Provider<CentroCustoRepository>((ref) {
+  final repository = CentroCustoRepository(ref.watch(centroCustoStorageProvider));
+  ref.onDispose(repository.dispose);
+  return repository;
+});
+
+final centroCustoListViewModelProvider = ChangeNotifierProvider<CentroCustoListViewModel>(
+  (ref) => CentroCustoListViewModel(ref.watch(centroCustoRepositoryProvider)),
+);
+
+final centroCustoCreateViewModelProvider = Provider<CentroCustoCreateViewModel>(
+  (ref) => CentroCustoCreateViewModel(ref.watch(centroCustoRepositoryProvider)),
+);
+
+final centroCustoUpdateViewModelProvider = Provider<CentroCustoUpdateViewModel>(
+  (ref) => CentroCustoUpdateViewModel(ref.watch(centroCustoRepositoryProvider)),
+);
+
+final centroCustoDeleteViewModelProvider = Provider<CentroCustoDeleteViewModel>(
+  (ref) => CentroCustoDeleteViewModel(ref.watch(centroCustoRepositoryProvider)),
 );
 
 // ============================================================================
