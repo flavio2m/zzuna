@@ -6,10 +6,11 @@ import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
+import 'package:zzuna/domain/dtos/user/user_filter_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
-class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, LoadedUserDto> {
+class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, LoadedUserDto, UserFilterDto> {
   final BaseStorage<LoadedUser> _storage;
   final _streamController = StreamController<RepositoryEvent<LoadedUser>>.broadcast();
 
@@ -93,6 +94,12 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
         );
       },
     );
+  }
+
+  @override
+  AsyncResult<List<LoadedUser>> search(UserFilterDto filter) async {
+    // Implementar lógica de busca com base no filtro, se necessário
+    return _storage.getAll();
   }
 
   @override

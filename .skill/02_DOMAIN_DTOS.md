@@ -16,21 +16,89 @@
 * Sempre definir métodos `set` para todos os atributos
 * Implementar `toJson()` para requests
 * Implementar `fromJson()` para responses
-* DTO é utilizado em formulários de criação e edição
-* DTO não representa persistência
-* DTO pode conter `id` opcional quando utilizado para edição
-* Todo DTO deve possuir um Validator correspondente
 * DTOs devem ser criados em `domain/dtos`
-* Toda Entity deve possuir no mínimo dois DTOs:
-  * `Create<Entity>Dto`
-  * `Loaded<Entity>Dto`
-* `CreateDto` representa dados para criação de registros
-* `LoadedDto` representa registros já existentes
-* `CreateDto` pode possuir `id` opcional
-* `LoadedDto` deve possuir `id`
-* Não utilizar herança entre DTOs
-* DTOs devem ser independentes, mesmo quando possuírem os mesmos campos
-* Duplicação de campos entre DTOs é aceitável para manter clareza e simplicidade
+* Todo DTO deve possuir um Validator correspondente
+* DTO não representa persistência
+
+## Estratégia de modelagem
+
+Antes de criar DTOs, analisar a diferença entre os contratos de criação e edição.
+
+### Caso 1 - Contratos equivalentes
+
+Quando criação e edição possuem os mesmos campos e a única diferença é a presença do `id`, utilizar apenas um DTO.
+
+Exemplo:
+
+```dart
+class ContaDto {
+  String? id;
+  String descricao;
+  String bancoSigla;
+  bool ativo;
+}
+```
+
+Neste caso:
+
+* `id == null` → criação
+* `id != null` → edição
+
+Evitar criar DTOs separados quando a única diferença for o campo `id`.
+
+### Caso 2 - Contratos diferentes
+
+Quando criação e edição possuem campos distintos, regras distintas ou representam operações diferentes, criar DTOs específicos.
+
+Exemplo:
+
+```text
+CreateUserDto
+LoadedUserDto
+```
+
+ou
+
+```text
+RegisterUserDto
+LoginDto
+ChangePasswordDto
+```
+
+### Critério
+
+Criar `Create<Entity>Dto` e `Loaded<Entity>Dto` somente quando existir diferença real entre os contratos.
+
+Não criar DTOs separados apenas para acomodar a presença do `id`.
+
+## DTO único
+
+Preferir:
+
+```text
+ContaDto
+ContaFilterDto
+```
+
+em vez de:
+
+```text
+CreateContaDto
+LoadedContaDto
+```
+
+quando os campos forem equivalentes.
+
+## DTOs separados
+
+Utilizar:
+
+```text
+Create<Entity>Dto
+Loaded<Entity>Dto
+```
+
+somente quando necessário.
 
 ## Não fazer
 
@@ -45,9 +113,12 @@
 
 ```dart
 class ExampleDto {
+  String? id;
+
   String field;
 
   ExampleDto({
+    this.id,
     this.field = '',
   });
 
@@ -56,6 +127,7 @@ class ExampleDto {
   }
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'field': field,
       };
 
@@ -63,6 +135,7 @@ class ExampleDto {
     Map<String, dynamic> json,
   ) {
     return ExampleDto(
+      id: json['id'],
       field: json['field'] ?? '',
     );
   }

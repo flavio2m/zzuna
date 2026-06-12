@@ -9,8 +9,9 @@ import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_filter_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
+import 'package:zzuna/domain/statics/banco/bancos.dart';
 
-class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
+class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, CartaoFilterDto> {
   final BaseStorage<Cartao> _storage;
 
   final _streamController = StreamController<RepositoryEvent<Cartao>>.broadcast();
@@ -63,7 +64,25 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
 
   @override
   AsyncResult<List<Cartao>> getAll() async {
-    return _storage.getAll();
+    // return _storage.getAll();
+
+    /// REFATORAR: Somente para testes: popula storage
+    final result = await _storage.getAll();
+
+    if (result.isError()) {
+      return Failure(result.exceptionOrNull()!);
+    }
+
+    final contas = result.getOrThrow();
+
+    if (contas.isEmpty) {
+      await _seedCartoes();
+      return _storage.getAll();
+    }
+
+    return Success(contas);
+
+    /// Fim do código de teste
   }
 
   @override
@@ -90,6 +109,7 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
     );
   }
 
+  @override
   AsyncResult<List<Cartao>> search(CartaoFilterDto filter) async {
     final searchFields = <SearchField>[];
 
@@ -143,5 +163,23 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto> {
   @override
   void dispose() {
     _streamController.close();
+  }
+
+  // Para testes
+  Future<void> _seedCartoes() async {
+    final bancos = Bancos.items.take(10).toList();
+
+    for (var i = 0; i < bancos.length; i++) {
+      await _storage.create(
+        Cartao(
+          id: const Uuid().v4(),
+          descricao: 'Cartão ${bancos[i].descricao}',
+          limite: (i + 1) * 1000.0,
+          bancoSigla: bancos[i].sigla,
+          ativo: i != 9,
+          diaFechamento: 5 + i,
+        ),
+      );
+    }
   }
 }

@@ -15,16 +15,79 @@
 
 * Nome termina com `Repository`
 * Criar em `data/repositories`
-* Implementar `BaseRepository<T>`
+* Implementar `BaseRepository`
 * Retornar `AsyncResult<T>`
 * Utilizar Services ou Storages
-* Deve utilizar a exception RepositoryException
+* Deve utilizar Exceptions da camada de dados
 * Nunca acessar HTTP diretamente
 * Pode possuir consultas específicas além do CRUD
 * Pode realizar validações relacionadas à persistência
 * Deve emitir eventos através de `StreamController.broadcast()`
 * Deve implementar `observer()`
 * Deve implementar `dispose()`
+* DTOs são convertidos para Entities dentro do Repository
+* Repositories persistem Entities, nunca DTOs
+
+---
+
+## Interface
+
+A assinatura da interface deve refletir a necessidade real da entidade.
+
+### DTO único
+
+Quando a entidade utiliza um único DTO:
+
+```dart
+BaseRepository<
+  Conta,
+  ContaDto,
+  ContaFilterDto
+>
+```
+
+Exemplo:
+
+```dart
+AsyncResult<Conta> create(
+  ContaDto dto,
+)
+
+AsyncResult<Conta> update(
+  ContaDto dto,
+)
+
+AsyncResult<List<Conta>> search(
+  ContaFilterDto filter,
+)
+```
+
+### DTOs distintos
+
+Quando criação e edição possuem contratos diferentes:
+
+```dart
+BaseRepository<
+  User,
+  CreateUserDto,
+  LoadedUserDto,
+  UserFilterDto
+>
+```
+
+Exemplo:
+
+```dart
+AsyncResult<User> create(
+  CreateUserDto dto,
+)
+
+AsyncResult<User> update(
+  LoadedUserDto dto,
+)
+```
+
+Criar DTOs distintos somente quando houver diferença real entre os contratos.
 
 ---
 
@@ -34,10 +97,12 @@ Todo Repository deve emitir eventos utilizando:
 
 ```dart
 final _streamController =
-    StreamController<RepositoryEvent<T>>.broadcast();
+    StreamController<
+      RepositoryEvent<T>
+    >.broadcast();
 ```
 
-Para criação:
+### Criação
 
 ```dart
 .onSuccess((model) {
@@ -47,7 +112,7 @@ Para criação:
 });
 ```
 
-Para atualização:
+### Atualização
 
 ```dart
 .onSuccess((model) {
@@ -57,7 +122,7 @@ Para atualização:
 });
 ```
 
-Para remoção:
+### Remoção
 
 ```dart
 .onSuccess((_) {
@@ -89,6 +154,25 @@ ContaRepository(
 
 ---
 
+## Conversão DTO → Entity
+
+O Repository é responsável por converter DTOs para Entities.
+
+Exemplo:
+
+```dart
+final conta = Conta(
+  id: dto.id ?? const Uuid().v4(),
+  descricao: dto.descricao,
+  bancoSigla: dto.bancoSigla,
+  ativo: dto.ativo,
+);
+```
+
+Persistir sempre a Entity.
+
+---
+
 ## Consultas específicas
 
 Repositories podem expor métodos específicos.
@@ -96,7 +180,7 @@ Repositories podem expor métodos específicos.
 Exemplo:
 
 ```dart
-AsyncResult<User> findUserByEmail(
+AsyncResult<User> findByEmail(
   String email,
 )
 ```
@@ -106,6 +190,20 @@ Utilizando:
 ```dart
 _storage.searchByFields(...)
 ```
+
+---
+
+## Seed de dados
+
+Quando necessário para desenvolvimento local, é permitido criar métodos privados de seed.
+
+Exemplo:
+
+```dart
+Future<void> _seedContas()
+```
+
+Esses métodos devem ser temporários e marcados com comentário indicando uso apenas para testes.
 
 ---
 
@@ -125,7 +223,11 @@ _storage.searchByFields(...)
 
 ```dart
 class ExampleRepository
-    implements BaseRepository<Example> {
+    implements BaseRepository<
+      Example,
+      ExampleDto,
+      ExampleFilterDto
+    > {
 
   final BaseStorage<Example> _storage;
 
@@ -140,10 +242,14 @@ class ExampleRepository
 
   @override
   AsyncResult<Example> create(
-    Example model,
+    ExampleDto dto,
   ) async {
+    final entity = Example(
+      id: dto.id ?? const Uuid().v4(),
+    );
+
     return _storage
-        .create(model)
+        .create(entity)
         .onSuccess((result) {
       _streamController.add(
         RepositoryCreated(result),
@@ -162,4 +268,4 @@ class ExampleRepository
     _streamController.close();
   }
 }
-
+```

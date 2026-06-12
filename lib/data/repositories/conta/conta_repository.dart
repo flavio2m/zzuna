@@ -12,7 +12,7 @@ import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 
-class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto> {
+class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto, ContaFilterDto> {
   final BaseStorage<Conta> _storage;
 
   final _streamController = StreamController<RepositoryEvent<Conta>>.broadcast();
@@ -122,6 +122,7 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     );
   }
 
+  @override
   AsyncResult<List<Conta>> search(ContaFilterDto filter) async {
     final searchFields = <SearchField>[];
 
