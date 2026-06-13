@@ -4,30 +4,47 @@ part of 'main.dart';
 
 List<RouteEntity> get routes => [
   RouteEntity(
+    key: 'centro_custo/list/centro_custo_list',
+    uri: Uri.parse('centro_custo/list/centro_custo_list'),
+    routeBuilder: b0Builder,
+  ),
+  RouteEntity(
     key: 'relatorios',
     uri: Uri.parse('relatorios'),
-    routeBuilder: b0Builder,
+    routeBuilder: b1Builder,
   ),
   RouteEntity(
     key: 'lancamentos',
     uri: Uri.parse('lancamentos'),
-    routeBuilder: b1Builder,
+    routeBuilder: b2Builder,
   ),
   RouteEntity(
     key: 'conta/list/conta_list',
     uri: Uri.parse('conta/list/conta_list'),
-    routeBuilder: b2Builder,
+    routeBuilder: b3Builder,
   ),
   RouteEntity(
     key: 'auth/login',
     uri: Uri.parse('auth/login'),
-    routeBuilder: b3Builder,
+    routeBuilder: b4Builder,
   ),
-  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b4Builder),
+  RouteEntity(
+    key: 'cartao/list/cartao_list',
+    uri: Uri.parse('cartao/list/cartao_list'),
+    routeBuilder: b5Builder,
+  ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b6Builder),
 ];
 
 const routePaths = (
   path: '/',
+  centroCusto: (
+    path: '/centro_custo',
+    list: (
+      path: '/centro_custo/list',
+      centroCustoList: '/centro_custo/list/centro_custo_list',
+    ),
+  ),
   relatorios: '/relatorios',
   lancamentos: '/lancamentos',
   conta: (
@@ -35,5 +52,9 @@ const routePaths = (
     list: (path: '/conta/list', contaList: '/conta/list/conta_list'),
   ),
   auth: (path: '/auth', login: '/auth/login'),
+  cartao: (
+    path: '/cartao',
+    list: (path: '/cartao/list', cartaoList: '/cartao/list/cartao_list'),
+  ),
   home: '/home',
 );

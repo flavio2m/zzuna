@@ -1,7 +1,7 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-enum HomePageTab { lancamentos, relatorios, contas, cartoes }
+enum HomePageTab { lancamentos, relatorios, contas, cartoes, centroCustos }
 // enum _HomeMenuAction { logout }
 
 class HomeTopBar extends StatelessWidget {
@@ -69,6 +69,12 @@ class HomeTopBar extends StatelessWidget {
                     label: 'Cartões',
                     selected: selectedTab == HomePageTab.cartoes,
                     onPressed: () => onTabSelected(HomePageTab.cartoes),
+                  ),
+                  _TopTabButton(
+                    icon: Icons.account_balance_outlined,
+                    label: 'Centro de Custos',
+                    selected: selectedTab == HomePageTab.centroCustos,
+                    onPressed: () => onTabSelected(HomePageTab.centroCustos),
                   ),
                 ],
               ),

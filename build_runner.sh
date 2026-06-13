@@ -13,13 +13,13 @@ fi
 case $opcao in
   1)
     echo "Executando build..."
-    dart run routefly
     dart run build_runner build --delete-conflicting-outputs
+    dart run routefly
     ;;
   2)
     echo "Executando watch..."
-    dart run routefly
     dart run build_runner watch --delete-conflicting-outputs
+    dart run routefly
     ;;
   *)
     echo "Opção inválida. Use 1 para build ou 2 para watch."
