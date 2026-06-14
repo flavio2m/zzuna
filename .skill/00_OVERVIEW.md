@@ -190,4 +190,9 @@ Consultar:
 
 ---
 
+@10_CRUD.md
+```
+POssui o fluxo e estrutura de um CRUD
+---
+
 Projeto: `zzuna`

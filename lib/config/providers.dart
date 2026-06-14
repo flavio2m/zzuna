@@ -1,5 +1,6 @@
 import 'package:zzuna/data/repositories/auth/auth_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/user/user_repository.dart';
@@ -8,12 +9,17 @@ import 'package:zzuna/ui/centro_custo/delete/viewmodel/centro_custo_delete_viewm
 import 'package:zzuna/ui/centro_custo/list/viewmodels/centro_custo_list_viewmodel.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/storage/local/cartao_storage_provider.dart';
+import 'package:zzuna/data/services/storage/local/categoria_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/user_storage_provider.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
 import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
+import 'package:zzuna/ui/categoria/create/viewModels/categoria_create_viewmodel.dart';
+import 'package:zzuna/ui/categoria/delete/viewModel/categoria_delete_viewmodel.dart';
+import 'package:zzuna/ui/categoria/list/viewmodels/categoria_list_viewmodel.dart';
+import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/create/viewmodels/centro_custo_create_viewmodel.dart';
@@ -77,6 +83,12 @@ final cartaoRepositoryProvider = Provider<CartaoRepository>((ref) {
 
   ref.onDispose(repository.dispose);
 
+  return repository;
+});
+
+final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
+  final repository = CategoriaRepository(ref.watch(categoriaStorageProvider));
+  ref.onDispose(repository.dispose);
   return repository;
 });
 
@@ -153,6 +165,23 @@ final centroCustoUpdateViewModelProvider = Provider<CentroCustoUpdateViewModel>(
 
 final centroCustoDeleteViewModelProvider = Provider<CentroCustoDeleteViewModel>(
   (ref) => CentroCustoDeleteViewModel(ref.watch(centroCustoRepositoryProvider)),
+);
+
+// Categoria
+final categoriaListViewModelProvider = ChangeNotifierProvider<CategoriaListViewModel>(
+  (ref) => CategoriaListViewModel(ref.watch(categoriaRepositoryProvider)),
+);
+
+final categoriaCreateViewModelProvider = Provider<CategoriaCreateViewModel>(
+  (ref) => CategoriaCreateViewModel(ref.watch(categoriaRepositoryProvider)),
+);
+
+final categoriaUpdateViewModelProvider = Provider<CategoriaUpdateViewModel>(
+  (ref) => CategoriaUpdateViewModel(ref.watch(categoriaRepositoryProvider)),
+);
+
+final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
+  (ref) => CategoriaDeleteViewModel(ref.watch(categoriaRepositoryProvider)),
 );
 
 // ============================================================================

@@ -33,7 +33,12 @@ List<RouteEntity> get routes => [
     uri: Uri.parse('cartao/list/cartao_list'),
     routeBuilder: b5Builder,
   ),
-  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b6Builder),
+  RouteEntity(
+    key: 'categoria/list/categoria_list',
+    uri: Uri.parse('categoria/list/categoria_list'),
+    routeBuilder: b6Builder,
+  ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b7Builder),
 ];
 
 const routePaths = (
@@ -55,6 +60,13 @@ const routePaths = (
   cartao: (
     path: '/cartao',
     list: (path: '/cartao/list', cartaoList: '/cartao/list/cartao_list'),
+  ),
+  categoria: (
+    path: '/categoria',
+    list: (
+      path: '/categoria/list',
+      categoriaList: '/categoria/list/categoria_list',
+    ),
   ),
   home: '/home',
 );
