@@ -33,6 +33,9 @@ import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
+import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
+import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
+
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
 // ============================================================================
@@ -91,6 +94,17 @@ final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
   ref.onDispose(repository.dispose);
   return repository;
 });
+
+// ============================================================================
+// USE CASES - Camada de Domínio
+// ============================================================================
+
+final categoriaFilterUseCaseProvider = Provider<CategoriaFilterUseCase>(
+  (ref) => CategoriaFilterUseCase(), //
+);
+final categoriaTreeUseCaseProvider = Provider<CategoriaTreeUseCase>(
+  (ref) => CategoriaTreeUseCase(), //
+);
 
 // ============================================================================
 // VIEWMODELS - Camada de Apresentação
@@ -169,7 +183,11 @@ final centroCustoDeleteViewModelProvider = Provider<CentroCustoDeleteViewModel>(
 
 // Categoria
 final categoriaListViewModelProvider = ChangeNotifierProvider<CategoriaListViewModel>(
-  (ref) => CategoriaListViewModel(ref.watch(categoriaRepositoryProvider)),
+  (ref) => CategoriaListViewModel(
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(categoriaFilterUseCaseProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  ),
 );
 
 final categoriaCreateViewModelProvider = Provider<CategoriaCreateViewModel>(
