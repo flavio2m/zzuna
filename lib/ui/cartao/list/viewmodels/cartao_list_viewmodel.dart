@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
@@ -8,7 +7,9 @@ import 'package:zzuna/domain/dtos/cartao/cartao_filter_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 
-class CartaoListViewModel extends ChangeNotifier {
+import 'package:zzuna/utils/comparers/string_comparer.dart';
+
+class CartaoListViewModel {
   final CartaoRepository _repository;
   StreamSubscription? _repositorySubscription;
 
@@ -46,7 +47,13 @@ class CartaoListViewModel extends ChangeNotifier {
   }
 
   List<CartaoDetails> _toDetailsList(List<Cartao> cartoes) {
-    return cartoes.map(_toDetails).toList();
+    return cartoes.map(_toDetails).toList()
+      ..sort(
+        (a, b) => StringComparer.compareIgnoreAccents(
+          a.descricao,
+          b.descricao,
+        ),
+      );
   }
 
   CartaoDetails _toDetails(Cartao cartao) {
@@ -80,9 +87,7 @@ class CartaoListViewModel extends ChangeNotifier {
     loadCommand.execute();
   }
 
-  @override
   void dispose() {
     _repositorySubscription?.cancel();
-    super.dispose();
   }
 }

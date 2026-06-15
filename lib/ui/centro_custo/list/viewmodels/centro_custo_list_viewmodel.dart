@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/domain/dtos/centro_custo/centro_custo_filter_dto.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 
-class CentroCustoListViewModel extends ChangeNotifier {
+import 'package:zzuna/utils/comparers/string_comparer.dart';
+
+class CentroCustoListViewModel {
   final CentroCustoRepository _repository;
   StreamSubscription? _repositorySubscription;
 
@@ -29,10 +30,7 @@ class CentroCustoListViewModel extends ChangeNotifier {
     // Ensure seed data exists
     await _repository.getAll();
 
-    final filter = CentroCustoFilterDto(
-      descricao: descricaoQuery ?? '',
-      ativo: ativoSelecionado,
-    );
+    final filter = CentroCustoFilterDto(descricao: descricaoQuery ?? '', ativo: ativoSelecionado);
     final result = await _repository.search(filter);
     return result.map((list) {
       centros = _toDetailsList(list);
@@ -41,15 +39,17 @@ class CentroCustoListViewModel extends ChangeNotifier {
   }
 
   List<CentroCustoDetails> _toDetailsList(List<CentroCusto> list) {
-    return list.map(_toDetails).toList();
+    return list.map(_toDetails).toList()
+      ..sort(
+        (a, b) => StringComparer.compareIgnoreAccents(
+          a.descricao,
+          b.descricao,
+        ),
+      );
   }
 
   CentroCustoDetails _toDetails(CentroCusto centro) {
-    return CentroCustoDetails(
-      id: centro.id,
-      descricao: centro.descricao,
-      ativo: centro.ativo,
-    );
+    return CentroCustoDetails(id: centro.id, descricao: centro.descricao, ativo: centro.ativo);
   }
 
   void setDescricao(String value) {
@@ -65,9 +65,7 @@ class CentroCustoListViewModel extends ChangeNotifier {
     loadCommand.execute();
   }
 
-  @override
   void dispose() {
     _repositorySubscription?.cancel();
-    super.dispose();
   }
 }

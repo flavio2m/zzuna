@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
@@ -8,7 +7,9 @@ import 'package:zzuna/domain/dtos/conta/conta_filter_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 
-class ContaListViewModel extends ChangeNotifier {
+import 'package:zzuna/utils/comparers/string_comparer.dart';
+
+class ContaListViewModel {
   final ContaRepository _repository;
   StreamSubscription? _repositorySubscription;
 
@@ -46,7 +47,13 @@ class ContaListViewModel extends ChangeNotifier {
   }
 
   List<ContaDetails> _toDetailsList(List<Conta> contas) {
-    return contas.map(_toDetails).toList();
+    return contas.map(_toDetails).toList()
+      ..sort(
+        (a, b) => StringComparer.compareIgnoreAccents(
+          a.descricao,
+          b.descricao,
+        ),
+      );
   }
 
   ContaDetails _toDetails(Conta conta) {
@@ -78,9 +85,7 @@ class ContaListViewModel extends ChangeNotifier {
     loadCommand.execute();
   }
 
-  @override
   void dispose() {
     _repositorySubscription?.cancel();
-    super.dispose();
   }
 }

@@ -29,7 +29,6 @@ import 'package:zzuna/ui/cartao/list/viewmodels/cartao_list_viewmodel.dart';
 import 'package:zzuna/ui/cartao/update/viewmodels/cartao_update_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
-// import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
@@ -89,6 +88,14 @@ final cartaoRepositoryProvider = Provider<CartaoRepository>((ref) {
   return repository;
 });
 
+final centroCustoRepositoryProvider = Provider<CentroCustoRepository>((ref) {
+  final repository = CentroCustoRepository(ref.watch(centroCustoStorageProvider));
+
+  ref.onDispose(repository.dispose);
+
+  return repository;
+});
+
 final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
   final repository = CategoriaRepository(ref.watch(categoriaStorageProvider));
   ref.onDispose(repository.dispose);
@@ -110,41 +117,27 @@ final categoriaTreeUseCaseProvider = Provider<CategoriaTreeUseCase>(
 // VIEWMODELS - Camada de Apresentação
 // ============================================================================
 
-/// Provider para LoginViewModel
+// AUTH
 final loginViewModelProvider = Provider<LoginViewModel>(
   (ref) => LoginViewModel(ref.watch(authRepositoryProvider)), //
 );
 
-/// Provider para LogoutViewModel
 final logoutViewModelProvider = Provider<LogoutViewModel>(
   (ref) => LogoutViewModel(ref.watch(authRepositoryProvider)), //
 );
 
-/// Provider para RegisterViewModel
 final registerViewModelProvider = Provider<RegisterViewModel>(
   (ref) => RegisterViewModel(ref.watch(authRepositoryProvider)),
 );
 
-/// Provider para ContaListViewModel
-final contaListViewModelProvider = ChangeNotifierProvider<ContaListViewModel>(
-  (ref) => ContaListViewModel(ref.watch(contaRepositoryProvider)),
-);
+// CONTA
+final contaListViewModelProvider = Provider.autoDispose<ContaListViewModel>((ref) {
+  final vm = ContaListViewModel(ref.watch(contaRepositoryProvider));
 
-final cartaoListViewModelProvider = ChangeNotifierProvider<CartaoListViewModel>(
-  (ref) => CartaoListViewModel(ref.watch(cartaoRepositoryProvider)),
-);
+  ref.onDispose(vm.dispose);
 
-final cartaoCreateViewModelProvider = Provider<CartaoCreateViewModel>(
-  (ref) => CartaoCreateViewModel(ref.watch(cartaoRepositoryProvider)),
-);
-
-final cartaoUpdateViewModelProvider = Provider<CartaoUpdateViewModel>(
-  (ref) => CartaoUpdateViewModel(ref.watch(cartaoRepositoryProvider)),
-);
-
-final cartaoDeleteViewModelProvider = Provider<CartaoDeleteViewModel>(
-  (ref) => CartaoDeleteViewModel(ref.watch(cartaoRepositoryProvider)),
-);
+  return vm;
+});
 
 final contaCreateViewModelProvider = Provider<ContaCreateViewModel>(
   (ref) => ContaCreateViewModel(ref.watch(contaRepositoryProvider)),
@@ -158,16 +151,38 @@ final contaDeleteViewModelProvider = Provider<ContaDeleteViewModel>(
   (ref) => ContaDeleteViewModel(ref.watch(contaRepositoryProvider)),
 );
 
-// Centro de Custo
-final centroCustoRepositoryProvider = Provider<CentroCustoRepository>((ref) {
-  final repository = CentroCustoRepository(ref.watch(centroCustoStorageProvider));
-  ref.onDispose(repository.dispose);
-  return repository;
+// CARTAO
+final cartaoListViewModelProvider = Provider.autoDispose<CartaoListViewModel>((ref) {
+  final vm = CartaoListViewModel(ref.watch(cartaoRepositoryProvider));
+
+  ref.onDispose(vm.dispose);
+
+  return vm;
 });
 
-final centroCustoListViewModelProvider = ChangeNotifierProvider<CentroCustoListViewModel>(
-  (ref) => CentroCustoListViewModel(ref.watch(centroCustoRepositoryProvider)),
+final cartaoCreateViewModelProvider = Provider<CartaoCreateViewModel>(
+  (ref) => CartaoCreateViewModel(ref.watch(cartaoRepositoryProvider)),
 );
+
+final cartaoUpdateViewModelProvider = Provider<CartaoUpdateViewModel>(
+  (ref) => CartaoUpdateViewModel(ref.watch(cartaoRepositoryProvider)),
+);
+
+final cartaoDeleteViewModelProvider = Provider<CartaoDeleteViewModel>(
+  (ref) => CartaoDeleteViewModel(ref.watch(cartaoRepositoryProvider)),
+);
+
+// ============================================================================
+// CENTRO DE CUSTO
+// ============================================================================
+
+final centroCustoListViewModelProvider = Provider.autoDispose<CentroCustoListViewModel>((ref) {
+  final vm = CentroCustoListViewModel(ref.watch(centroCustoRepositoryProvider));
+
+  ref.onDispose(vm.dispose);
+
+  return vm;
+});
 
 final centroCustoCreateViewModelProvider = Provider<CentroCustoCreateViewModel>(
   (ref) => CentroCustoCreateViewModel(ref.watch(centroCustoRepositoryProvider)),
@@ -181,7 +196,7 @@ final centroCustoDeleteViewModelProvider = Provider<CentroCustoDeleteViewModel>(
   (ref) => CentroCustoDeleteViewModel(ref.watch(centroCustoRepositoryProvider)),
 );
 
-// Categoria
+// CATEGORIA
 final categoriaListViewModelProvider = ChangeNotifierProvider<CategoriaListViewModel>(
   (ref) => CategoriaListViewModel(
     ref.watch(categoriaRepositoryProvider),
