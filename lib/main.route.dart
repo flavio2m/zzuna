@@ -5,9 +5,10 @@ import 'package:routefly/routefly.dart';
 
 import 'ui/auth/login/login_page.dart' as a4;
 import 'ui/cartao/list/cartao_list_page.dart' as a5;
+import 'ui/categoria/list/categoria_list_page.dart' as a6;
 import 'ui/centro_custo/list/centro_custo_list_page.dart' as a0;
 import 'ui/conta/list/conta_list_page.dart' as a3;
-import 'ui/home/home_page.dart' as a6;
+import 'ui/home/home_page.dart' as a7;
 import 'ui/lancamentos/lancamentos_page.dart' as a2;
 import 'ui/relatorios/relatorios_page.dart' as a1;
 
@@ -24,4 +25,6 @@ Route b4Builder(BuildContext ctx, RouteSettings settings) =>
 Route b5Builder(BuildContext ctx, RouteSettings settings) =>
     Routefly.defaultRouteBuilder(ctx, settings, const a5.CartaoListPage());
 Route b6Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a6.MyWidget());
+    Routefly.defaultRouteBuilder(ctx, settings, const a6.CategoriaListPage());
+Route b7Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a7.MyWidget());
