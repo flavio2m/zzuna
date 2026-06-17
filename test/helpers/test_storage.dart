@@ -4,6 +4,9 @@ import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
+import 'package:zzuna/domain/entities/cartao_entity.dart';
+import 'package:zzuna/domain/entities/centro_custo_entity.dart';
+import 'package:zzuna/domain/entities/categoria_entity.dart';
 
 LocalStorage<LoadedUser> createTestUserStorage({String collectionName = 'users'}) {
   return LocalStorage<LoadedUser>(
@@ -51,5 +54,36 @@ LocalStorage<Conta> createTestContaStorage({String collectionName = 'contas'}) {
     collectionName: collectionName,
     fromJson: Conta.fromJson,
     toJson: (conta) => conta.toJson(),
+  );
+}
+
+LocalStorage<Cartao> createTestCartaoStorage({String collectionName = 'cartoes'}) {
+  return LocalStorage<Cartao>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: Cartao.fromJson,
+    toJson: (cartao) => cartao.toJson(),
+  );
+}
+
+LocalStorage<CentroCusto> createTestCentroCustoStorage({
+  String collectionName = 'centros_custo',
+}) {
+  return LocalStorage<CentroCusto>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: CentroCusto.fromJson,
+    toJson: (centro) => centro.toJson(),
+  );
+}
+
+LocalStorage<Categoria> createTestCategoriaStorage({
+  String collectionName = 'categorias',
+}) {
+  return LocalStorage<Categoria>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: Categoria.fromJson,
+    toJson: (categoria) => categoria.toJson(),
   );
 }

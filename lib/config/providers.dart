@@ -19,6 +19,9 @@ import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/categoria/create/viewModels/categoria_create_viewmodel.dart';
 import 'package:zzuna/ui/categoria/delete/viewModel/categoria_delete_viewmodel.dart';
 import 'package:zzuna/ui/categoria/list/viewmodels/categoria_list_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_notifier.dart';
+import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_state.dart';
+import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_sidebar_viewmodel.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
@@ -216,6 +219,22 @@ final categoriaUpdateViewModelProvider = Provider<CategoriaUpdateViewModel>(
 final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
   (ref) => CategoriaDeleteViewModel(ref.watch(categoriaRepositoryProvider)),
 );
+
+final lancamentosSidebarStateProvider = StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
+  (ref) => LancamentosSidebarNotifier(),
+);
+
+final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSidebarViewModel>((ref) {
+  final vm = LancamentosSidebarViewModel(
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(centroCustoRepositoryProvider),
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  );
+  ref.onDispose(vm.dispose);
+  return vm;
+});
 
 // ============================================================================
 // STATE PROVIDERS - Estado Global da Aplicação
