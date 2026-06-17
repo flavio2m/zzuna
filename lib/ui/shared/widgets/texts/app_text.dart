@@ -30,29 +30,19 @@ class AppText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      textAlign: textAlign,
-      maxLines: maxLines,
-      overflow: overflow,
-      style: TextStyle(
-        fontSize: _fontSize,
-        fontWeight: fontWeight ?? _defaultWeight,
-        color: color, //
-      ),
-    );
+    return Text(text, textAlign: textAlign, maxLines: maxLines, overflow: overflow, style: _textStyle);
   }
 
   double get _fontSize {
     switch (variant) {
       case AppTextVariant.caption:
-        return 12;
+        return 11;
 
       case AppTextVariant.body:
-        return 14;
+        return 12;
 
       case AppTextVariant.subtitle:
-        return 16;
+        return 14;
 
       case AppTextVariant.title:
         return 20;
@@ -69,7 +59,15 @@ class AppText extends StatelessWidget {
         return FontWeight.bold;
 
       default:
-        return FontWeight.normal;
+        return FontWeight.w700;
     }
+  }
+
+  TextStyle get _textStyle {
+    return TextStyle(
+      fontSize: _fontSize,
+      fontWeight: fontWeight ?? _defaultWeight,
+      color: color, //
+    );
   }
 }
