@@ -1,0 +1,138 @@
+import 'dart:async';
+
+import 'package:result_dart/result_dart.dart';
+import 'package:uuid/uuid.dart';
+import 'package:zzuna/data/exception/local_storage_exception.dart';
+import 'package:zzuna/data/repositories/base_repository.dart';
+import 'package:zzuna/data/services/storage/base_storage.dart';
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
+import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+
+class LancamentoRepository
+    implements
+        BaseRepository<
+          Lancamento,
+          LancamentoDto,
+          LancamentoDto,
+          LancamentoFilterDto //
+        > {
+  final BaseStorage<Lancamento> _storage;
+
+  final _streamController = //
+      StreamController<RepositoryEvent<Lancamento>>.broadcast();
+
+  LancamentoRepository(LocalStorage<Lancamento> storage) : _storage = storage;
+
+  @override
+  AsyncResult<Lancamento> create(LancamentoDto dto) async {
+    final lancamento = Lancamento(
+      id: const Uuid().v4(),
+      tipo: dto.tipo,
+      data: dto.data,
+      descricao: dto.descricao,
+      referencia: dto.referencia,
+      origem: dto.origem,
+      itens: dto.itens,
+      conciliado: dto.conciliado,
+      observacao: dto.observacao,
+    );
+
+    return _storage.create(lancamento).onSuccess((model) {
+      _streamController.add(RepositoryCreated(model));
+    });
+  }
+
+  @override
+  AsyncResult<Lancamento> update(LancamentoDto dto) async {
+    final lancamento = Lancamento(
+      id: dto.id!,
+      tipo: dto.tipo,
+      data: dto.data,
+      descricao: dto.descricao,
+      referencia: dto.referencia,
+      origem: dto.origem,
+      itens: dto.itens,
+      conciliado: dto.conciliado,
+      observacao: dto.observacao,
+    );
+
+    return _storage.update(lancamento).onSuccess((model) {
+      _streamController.add(RepositoryUpdated(model));
+    });
+  }
+
+  @override
+  AsyncResult<Unit> delete(String id) async {
+    return _storage.delete(id).onSuccess((_) {
+      _streamController.add(RepositoryDeleted(id));
+    });
+  }
+
+  @override
+  AsyncResult<List<Lancamento>> getAll() async {
+    return _storage.getAll();
+  }
+
+  @override
+  AsyncResult<Lancamento> getById(String id) async {
+    return _storage.getById(id);
+  }
+
+  @override
+  AsyncResult<List<Lancamento>> search(LancamentoFilterDto filter) async {
+    final searchFields = <SearchField>[];
+
+    if (filter.descricao.isNotEmpty) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'descricao',
+          value: filter.descricao,
+          type: SearchFieldType.string, //
+        ),
+      );
+    }
+
+    if (filter.tipo != null) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'tipo',
+          value: filter.tipo!.name,
+          type: SearchFieldType.string, //
+        ),
+      );
+    }
+
+    if (filter.conciliado != null) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'conciliado',
+          value: filter.conciliado,
+          type: SearchFieldType.boolean, //
+        ),
+      );
+    }
+
+    final result = await _storage.searchByFields(searchFields);
+
+    return result.fold(
+      Success.new,
+      (error) => Failure(
+        LocalStorageException(
+          'Erro ao buscar lançamentos', //
+        ),
+      ),
+    );
+  }
+
+  @override
+  Stream<RepositoryEvent<Lancamento>> observer() {
+    return _streamController.stream;
+  }
+
+  @override
+  void dispose() {
+    _streamController.close();
+  }
+}
