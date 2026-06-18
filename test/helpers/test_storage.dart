@@ -8,6 +8,8 @@ import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/fatura_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_entity.dart';
 
 LocalStorage<LoadedUser> createTestUserStorage({String collectionName = 'users'}) {
   return LocalStorage<LoadedUser>(
@@ -97,5 +99,27 @@ LocalStorage<Lancamento> createTestLancamentoStorage({
     collectionName: collectionName,
     fromJson: Lancamento.fromJson,
     toJson: (lancamento) => lancamento.toJson(),
+  );
+}
+
+LocalStorage<Fatura> createTestFaturaStorage({
+  String collectionName = 'faturas',
+}) {
+  return LocalStorage<Fatura>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: Fatura.fromJson,
+    toJson: (fatura) => fatura.toJson(),
+  );
+}
+
+LocalStorage<Extrato> createTestExtratoStorage({
+  String collectionName = 'extratos',
+}) {
+  return LocalStorage<Extrato>(
+    prefsService: SharedPreferencesService(),
+    collectionName: collectionName,
+    fromJson: Extrato.fromJson,
+    toJson: (extrato) => extrato.toJson(),
   );
 }
