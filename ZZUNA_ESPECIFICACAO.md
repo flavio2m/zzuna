@@ -521,4 +521,16 @@ O recurso de rateio é muito importante e deve ser possível para qualquer tipo 
 Segue o mesmo princípio do cartão de crédito.
 
 
+RECOMENDAÇÃO PARA CRIAR
+Minha recomendação
 
+A sequência que considero mais segura e alinhada ao padrão simples que você vem adotando é:
+
+Entidades (Lancamento, LancamentoItem, Documento).
+DTOs de criação, atualização e filtro.
+Repository com CRUD e seeds.
+Testes do Repository para validar a persistência e as regras básicas.
+CRUD simples da tela de Lançamentos (sempre criando um único Lancamento e um único LancamentoItem).
+Adicionar as regras de negócio complexas em etapas (documento automático, parcelamento, replicação, rateio e transferência).
+
+Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e permite validar o domínio antes de adicionar comportamentos mais sofisticados. Além disso, ela combina com a arquitetura simples que você já consolidou nas demais features do projeto.
