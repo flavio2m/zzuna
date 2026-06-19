@@ -337,7 +337,7 @@ $LancamentoOrigemCopyWith<$Res> get origem {
 /// @nodoc
 mixin _$LancamentoDetails {
 
- String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; LancamentoReferenciaDetail get referencia; LancamentoOrigem get origem; List<LancamentoItemDetails> get itens; bool get conciliado; String? get observacao;
+ String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; LancamentoReferenciaDetail get referencia; LancamentoOrigemDetail get origem; List<LancamentoItemDetails> get itens; bool get conciliado; String? get observacao;
 /// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -368,11 +368,11 @@ abstract mixin class $LancamentoDetailsCopyWith<$Res>  {
   factory $LancamentoDetailsCopyWith(LancamentoDetails value, $Res Function(LancamentoDetails) _then) = _$LancamentoDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigem origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
 });
 
 
-$LancamentoReferenciaDetailCopyWith<$Res> get referencia;$LancamentoOrigemCopyWith<$Res> get origem;
+$LancamentoReferenciaDetailCopyWith<$Res> get referencia;$LancamentoOrigemDetailCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -393,7 +393,7 @@ as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullabl
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
 as LancamentoReferenciaDetail,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
-as LancamentoOrigem,itens: null == itens ? _self.itens : itens // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigemDetail,itens: null == itens ? _self.itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItemDetails>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -412,9 +412,9 @@ $LancamentoReferenciaDetailCopyWith<$Res> get referencia {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$LancamentoOrigemCopyWith<$Res> get origem {
+$LancamentoOrigemDetailCopyWith<$Res> get origem {
   
-  return $LancamentoOrigemCopyWith<$Res>(_self.origem, (value) {
+  return $LancamentoOrigemDetailCopyWith<$Res>(_self.origem, (value) {
     return _then(_self.copyWith(origem: value));
   });
 }
@@ -496,7 +496,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigem origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LancamentoDetails() when $default != null:
 return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
@@ -517,7 +517,7 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigem origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoDetails():
 return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);}
@@ -534,7 +534,7 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigem origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoDetails() when $default != null:
 return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
@@ -557,7 +557,7 @@ class _LancamentoDetails extends LancamentoDetails {
 @override final  DateTime data;
 @override final  String descricao;
 @override final  LancamentoReferenciaDetail referencia;
-@override final  LancamentoOrigem origem;
+@override final  LancamentoOrigemDetail origem;
  final  List<LancamentoItemDetails> _itens;
 @override List<LancamentoItemDetails> get itens {
   if (_itens is EqualUnmodifiableListView) return _itens;
@@ -598,11 +598,11 @@ abstract mixin class _$LancamentoDetailsCopyWith<$Res> implements $LancamentoDet
   factory _$LancamentoDetailsCopyWith(_LancamentoDetails value, $Res Function(_LancamentoDetails) _then) = __$LancamentoDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigem origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
 });
 
 
-@override $LancamentoReferenciaDetailCopyWith<$Res> get referencia;@override $LancamentoOrigemCopyWith<$Res> get origem;
+@override $LancamentoReferenciaDetailCopyWith<$Res> get referencia;@override $LancamentoOrigemDetailCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -623,7 +623,7 @@ as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullabl
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
 as LancamentoReferenciaDetail,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
-as LancamentoOrigem,itens: null == itens ? _self._itens : itens // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigemDetail,itens: null == itens ? _self._itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItemDetails>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -643,9 +643,9 @@ $LancamentoReferenciaDetailCopyWith<$Res> get referencia {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$LancamentoOrigemCopyWith<$Res> get origem {
+$LancamentoOrigemDetailCopyWith<$Res> get origem {
   
-  return $LancamentoOrigemCopyWith<$Res>(_self.origem, (value) {
+  return $LancamentoOrigemDetailCopyWith<$Res>(_self.origem, (value) {
     return _then(_self.copyWith(origem: value));
   });
 }

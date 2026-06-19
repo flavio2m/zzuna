@@ -1,12 +1,32 @@
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/domain/entities/categoria_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/ui/lancamentos/widgets/accounts_side_menu.dart';
-import 'package:zzuna/ui/lancamentos/widgets/lancamentos_toolbar.dart';
+import 'package:zzuna/ui/lancamentos/widgets/lancamento_filter_bar.dart';
 import 'package:zzuna/ui/lancamentos/widgets/transaction_day_header.dart';
 import 'package:zzuna/ui/lancamentos/widgets/transaction_row.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
-import 'package:flutter/material.dart';
+import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
-class LancamentosPage extends StatelessWidget {
+class LancamentosPage extends ConsumerStatefulWidget {
   const LancamentosPage({super.key});
+
+  @override
+  ConsumerState<LancamentosPage> createState() => _LancamentosPageState();
+}
+
+class _LancamentosPageState extends ConsumerState<LancamentosPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(lancamentosListViewModelProvider).loadCommand.execute();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +36,7 @@ class LancamentosPage extends StatelessWidget {
         Expanded(
           child: Column(
             children: [
-              LancamentosToolbar(),
+              LancamentoFilterBar(),
               Expanded(child: _TransactionsWorkspace()),
             ],
           ),
@@ -26,91 +46,151 @@ class LancamentosPage extends StatelessWidget {
   }
 }
 
-class _TransactionsWorkspace extends StatelessWidget {
+class _TransactionsWorkspace extends ConsumerWidget {
   const _TransactionsWorkspace();
 
+  String _formatGroupDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+
+    final weekdays = {
+      DateTime.monday: 'Segunda-feira',
+      DateTime.tuesday: 'Terça-feira',
+      DateTime.wednesday: 'Quarta-feira',
+      DateTime.thursday: 'Quinta-feira',
+      DateTime.friday: 'Sexta-feira',
+      DateTime.saturday: 'Sábado',
+      DateTime.sunday: 'Domingo',
+    };
+
+    final weekdayStr = weekdays[date.weekday] ?? '';
+    return '$day/$month/$year, $weekdayStr';
+  }
+
+  String _categoryPath(CategoriaDetails cat) {
+    if (cat.categoriaPai != null) {
+      return '${_categoryPath(cat.categoriaPai!)} > ${cat.descricao}';
+    }
+    return cat.descricao;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.watch(lancamentosListViewModelProvider);
+
     return Container(
       color: AppColors.background,
-      child: ListView(
-        padding: const EdgeInsets.all(24),
-        children: const [
-          _TransactionDayCard(
-            date: '05/03/2026, Quinta-feira',
-            balance: '+R\$ 6.708,73',
-            positive: true,
-            rows: [
-              TransactionRow(
-                description: 'Salario',
-                category: 'Receitas > Salario',
-                account: 'BC BB',
-                value: '+R\$ 7.374,93',
-                kind: TransactionKind.income,
-                status: 'Ativo',
-                costCenter: 'CC: Geral',
-                selected: true,
+      child: ListenableBuilder(
+        listenable: viewModel.loadCommand,
+        builder: (context, _) {
+          final state = viewModel.loadCommand.value;
+          final list = viewModel.lancamentos;
+
+          if (state.isRunning && list.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.isFailure) {
+            return Center(
+              child: Text(
+                'Erro ao carregar lançamentos: ${state.getExceptionOrNull()}',
+                style: const TextStyle(color: AppColors.danger),
               ),
-              TransactionRow(
-                description: 'Emprestimo Guilherme',
-                category: 'Receitas > Terceiros',
-                account: 'BC BB',
-                value: '-R\$ 666,20',
-                status: 'Pendente',
-                costCenter: 'CC: Geral',
+            );
+          }
+
+          if (list.isEmpty) {
+            return const Center(
+              child: Text(
+                'Nenhum lançamento encontrado.',
+                style: TextStyle(color: AppColors.slate500),
               ),
-            ],
-          ),
-          SizedBox(height: 16),
-          _TransactionDayCard(
-            date: '04/03/2026, Quarta-feira',
-            balance: '-R\$ 2.040,07',
-            rows: [
-              TransactionRow(
-                description: 'Boleto Cartorio Registro Imoveis',
-                category: 'Moradia > Financiamento',
-                account: 'BC C6',
-                value: '-R\$ 1.877,21',
-                status: 'Ativo',
-                costCenter: 'CC: Habitacao',
-                badge: 'Recorrente',
-              ),
-              TransactionRow(
-                description: 'Seguro Imovel',
-                category: 'Moradia > Condominio',
-                account: 'BC Bradesco',
-                value: '-R\$ 162,86',
-                status: 'Pendente',
-                costCenter: 'CC: Habitacao',
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          _TransactionDayCard(
-            date: '03/03/2026, Terca-feira',
-            balance: '-R\$ 884,72',
-            rows: [
-              TransactionRow(
-                description: 'Supermercado Goncalves',
-                category: 'Alimentacao > Supermercado',
-                account: 'Nubank Ultravioleta',
-                value: '-R\$ 524,15',
-                status: 'Pendente',
-                costCenter: 'CC: Geral',
-                badge: 'Rateio',
-              ),
-              TransactionRow(
-                description: 'Transferencia Bradesco',
-                category: 'Transferencia',
-                account: 'BC Bradesco',
-                value: '-R\$ 360,57',
-                kind: TransactionKind.transfer,
-                status: 'Ativo',
-                costCenter: 'CC: Geral',
-              ),
-            ],
-          ),
-        ],
+            );
+          }
+
+          final sortedList = List<LancamentoDetails>.from(list)
+            ..sort((a, b) => b.data.compareTo(a.data));
+
+          final Map<String, List<LancamentoDetails>> grouped = {};
+          for (final item in sortedList) {
+            final dateKey = _formatGroupDate(item.data);
+            grouped.putIfAbsent(dateKey, () => []).add(item);
+          }
+
+          final keys = grouped.keys.toList();
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(24),
+            itemCount: keys.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, groupIndex) {
+              final dateKey = keys[groupIndex];
+              final items = grouped[dateKey]!;
+
+              double dailySum = 0;
+              for (final l in items) {
+                if (l.tipo == LancamentoTipo.receita) {
+                  dailySum += l.valor;
+                } else {
+                  dailySum -= l.valor;
+                }
+              }
+
+              final isPositive = dailySum >= 0;
+              final prefix = isPositive ? '+' : '-';
+              final balanceStr = UtilBrasilFields.obterReal(
+                dailySum.abs(),
+                moeda: true,
+              ).replaceFirst('R\$', '$prefix R\$');
+
+              return _TransactionDayCard(
+                date: dateKey,
+                balance: balanceStr,
+                positive: isPositive,
+                rows: items.map((l) {
+                  final kind = l.tipo == LancamentoTipo.receita
+                      ? TransactionKind.income
+                      : (l.tipo == LancamentoTipo.transferencia
+                          ? TransactionKind.transfer
+                          : TransactionKind.expense);
+
+                  final rowPrefix = l.tipo == LancamentoTipo.receita ? '+' : '-';
+                  final formattedValue = UtilBrasilFields.obterReal(
+                    l.valor,
+                    moeda: true,
+                  ).replaceFirst('R\$', '$rowPrefix R\$');
+
+                  const String? badge = null;
+
+                  final costCenter = l.itens.isEmpty
+                      ? 'CC: Geral'
+                      : 'CC: ${l.itens.map((i) => i.centroCusto.descricao).join(', ')}';
+
+                  final categoryPath = l.itens.isNotEmpty
+                      ? _categoryPath(l.itens.first.categoria)
+                      : 'Sem categoria';
+
+                  return TransactionRow(
+                    description: l.descricao,
+                    category: categoryPath,
+                    account: switch (l.origem) {
+                      LancamentoOrigemContaDetail(conta: final c) =>
+                        c.descricao,
+                      LancamentoOrigemCartaoDetail(cartao: final c) =>
+                        c.descricao,
+                    },
+                    value: formattedValue,
+                    kind: kind,
+                    status: l.conciliado ? 'Ativo' : 'Pendente',
+                    costCenter: costCenter,
+                    badge: badge,
+                  );
+                }).toList(),
+              );
+            },
+          );
+        },
       ),
     );
   }

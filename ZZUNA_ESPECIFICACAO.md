@@ -534,3 +534,17 @@ CRUD simples da tela de Lançamentos (sempre criando um único Lancamento e um �
 Adicionar as regras de negócio complexas em etapas (documento automático, parcelamento, replicação, rateio e transferência).
 
 Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e permite validar o domínio antes de adicionar comportamentos mais sofisticados. Além disso, ela combina com a arquitetura simples que você já consolidou nas demais features do projeto.
+
+
+A ordem que considero mais produtiva seria:
+
+✅ Entities
+✅ DTOs
+✅ Repository
+✅ Repository Tests
+FaturaRepository
+ExtratoRepository
+UseCases de geração de Faturas/Extratos
+UseCases de Parcelamento
+UseCases de Rateio
+Tela de Lançamentos

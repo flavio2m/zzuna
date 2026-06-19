@@ -1,13 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_tipo.dart';
+export 'package:zzuna/domain/enums/lancamento_tipo.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia_detail.dart';
 
 part 'lancamento_entity.freezed.dart';
 part 'lancamento_entity.g.dart';
-
-enum LancamentoTipo { receita, despesa, transferencia, investimento }
 
 @freezed
 sealed class Lancamento with _$Lancamento {
@@ -38,7 +39,7 @@ sealed class LancamentoDetails with _$LancamentoDetails {
     required DateTime data,
     required String descricao,
     required LancamentoReferenciaDetail referencia,
-    required LancamentoOrigem origem,
+    required LancamentoOrigemDetail origem,
     required List<LancamentoItemDetails> itens,
     required bool conciliado,
     String? observacao,
