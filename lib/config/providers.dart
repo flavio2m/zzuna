@@ -36,10 +36,10 @@ import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_view
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
- 
+
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
- 
+
 import 'package:zzuna/data/repositories/lancamento/extrato_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
@@ -49,6 +49,7 @@ import 'package:zzuna/data/services/storage/local/lancamento_storage_provider.da
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -267,9 +268,10 @@ final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
   (ref) => CategoriaDeleteViewModel(ref.watch(categoriaRepositoryProvider)),
 );
 
-final lancamentosSidebarStateProvider = StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
-  (ref) => LancamentosSidebarNotifier(),
-);
+final lancamentosSidebarStateProvider =
+    StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
+      (ref) => LancamentosSidebarNotifier(),
+    );
 
 final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSidebarViewModel>((ref) {
   final vm = LancamentosSidebarViewModel(
@@ -287,11 +289,15 @@ final lancamentoFilterProvider = StateNotifierProvider<LancamentoFilterNotifier,
   return LancamentoFilterNotifier();
 });
 
-final lancamentosListViewModelProvider =
-    Provider.autoDispose<LancamentosListViewModel>((ref) {
+final lancamentoResumoMensalUseCaseProvider = Provider<LancamentoResumoMensalUseCase>((ref) {
+  return LancamentoResumoMensalUseCase();
+});
+
+final lancamentosListViewModelProvider = Provider.autoDispose<LancamentosListViewModel>((ref) {
   final vm = LancamentosListViewModel(
     ref.watch(lancamentoDetailsUseCaseProvider),
     ref.watch(lancamentoFilterUseCaseProvider),
+    ref.watch(lancamentoResumoMensalUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
   );
   ref.listen(lancamentoFilterProvider, (previous, next) {

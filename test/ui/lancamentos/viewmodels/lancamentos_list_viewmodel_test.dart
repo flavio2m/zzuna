@@ -6,6 +6,7 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
@@ -18,7 +19,7 @@ class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
     executeCallCount++;
     return [];
   }
-  
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -109,6 +110,22 @@ void main() {
       expect(notifier.state.mes, Mes.dezembro);
       expect(notifier.state.ano, maxYear);
     });
+
+    test('setTipo updates type and allows resetting to null', () {
+      notifier.setTipo(LancamentoTipo.receita);
+      expect(notifier.state.tipo, LancamentoTipo.receita);
+
+      notifier.setTipo(null);
+      expect(notifier.state.tipo, isNull);
+    });
+
+    test('setConciliado updates conciliated and allows resetting to null', () {
+      notifier.setConciliado(true);
+      expect(notifier.state.conciliado, isTrue);
+
+      notifier.setConciliado(null);
+      expect(notifier.state.conciliado, isNull);
+    });
   });
 
   group('LancamentosListViewModel Cache and Filtering Tests', () {
@@ -120,16 +137,13 @@ void main() {
       viewModel = LancamentosListViewModel(
         detailsUseCase,
         FakeLancamentoFilterUseCase(),
+        LancamentoResumoMensalUseCase(),
         FakeLancamentoRepository(),
       );
     });
 
     test('updateFilter with same period does not query repository again', () async {
-      final initialFilter = LancamentoFilterState(
-        mes: Mes.janeiro,
-        ano: 2026,
-        descricao: '',
-      );
+      final initialFilter = LancamentoFilterState(mes: Mes.janeiro, ano: 2026, descricao: '');
 
       // 1. Initial filter update (triggers load because it is the first time or different period)
       viewModel.updateFilter(initialFilter);
@@ -146,11 +160,7 @@ void main() {
     });
 
     test('updateFilter with different period queries repository', () async {
-      final initialFilter = LancamentoFilterState(
-        mes: Mes.janeiro,
-        ano: 2026,
-        descricao: '',
-      );
+      final initialFilter = LancamentoFilterState(mes: Mes.janeiro, ano: 2026, descricao: '');
 
       viewModel.updateFilter(initialFilter);
       await Future<void>.delayed(Duration.zero);

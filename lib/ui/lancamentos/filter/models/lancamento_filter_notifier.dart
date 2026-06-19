@@ -29,11 +29,17 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
   }
 
   void setTipo(LancamentoTipo? value) {
-    state = state.copyWith(tipo: value);
+    state = state.copyWith(
+      tipo: value,
+      clearTipo: value == null,
+    );
   }
 
   void setConciliado(bool? value) {
-    state = state.copyWith(conciliado: value);
+    state = state.copyWith(
+      conciliado: value,
+      clearConciliado: value == null,
+    );
   }
 
   void toggleConta(String id) {
@@ -87,6 +93,8 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
       descricao: '',
       tipo: null,
       conciliado: null,
+      clearTipo: true,
+      clearConciliado: true,
       contasSelecionadas: const {},
       cartoesSelecionados: const {},
       centrosSelecionados: const {},

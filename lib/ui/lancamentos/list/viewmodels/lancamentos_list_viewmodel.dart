@@ -10,19 +10,22 @@ import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
+import 'package:zzuna/domain/models/lancamento_resumo_mensal.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 
 class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoDetailsUseCase _detailsUseCase;
   final LancamentoFilterUseCase _filterUseCase;
+  final LancamentoResumoMensalUseCase _resumoMensalUseCase;
   final LancamentoRepository _repository;
   StreamSubscription? _repositorySubscription;
 
   List<LancamentoDetails> _allLancamentos = [];
   LancamentoFilterDto _currentFilter = LancamentoFilterDto(mes: Mes.fromDate(DateTime.now()), ano: DateTime.now().year);
 
-  List<LancamentoDetails> lancamentos = [];
+  LancamentoResumoMensal? resumoMensal;
 
-  LancamentosListViewModel(this._detailsUseCase, this._filterUseCase, this._repository) {
+  LancamentosListViewModel(this._detailsUseCase, this._filterUseCase, this._resumoMensalUseCase, this._repository) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
     });
@@ -30,14 +33,14 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   late final loadCommand = Command0(_load);
 
-  AsyncResult<List<LancamentoDetails>> _load() async {
+  AsyncResult<LancamentoResumoMensal> _load() async {
     try {
       final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
       final ano = _currentFilter.ano ?? DateTime.now().year;
       final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
       _allLancamentos = allDetails;
       _applyFilter();
-      return Success(lancamentos);
+      return Success(resumoMensal!);
     } catch (e) {
       return Failure(Exception('Erro ao carregar lançamentos: $e'));
     }
@@ -45,7 +48,7 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   void _applyFilter() {
     final filtered = _filterUseCase.execute(_allLancamentos, _currentFilter);
-    lancamentos = filtered;
+    resumoMensal = _resumoMensalUseCase.execute(filtered);
     notifyListeners();
   }
 
