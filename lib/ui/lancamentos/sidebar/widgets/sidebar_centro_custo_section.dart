@@ -1,50 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/entities/conta_entity.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_origin_section.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_item.dart';
+import 'package:zzuna/domain/entities/centro_custo_entity.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_origin_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_item.dart';
 
-class SidebarContaSection extends ConsumerWidget {
-  final List<ContaDetails> items;
+class SidebarCentroCustoSection extends ConsumerWidget {
+  final List<CentroCusto> items;
 
-  const SidebarContaSection({super.key, required this.items});
+  const SidebarCentroCustoSection({super.key, required this.items});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lancamentosSidebarStateProvider);
 
     return SidebarOriginSection(
-      title: 'CONTAS CORRENTES',
-      expanded: state.contasExpandidas || state.filtro.isNotEmpty,
-      active: state.contasSelecionadas.isNotEmpty,
+      title: 'CENTROS DE CUSTO',
+      expanded: state.centrosExpandidos || state.filtro.isNotEmpty,
+      active: state.centrosSelecionados.isNotEmpty,
       onTap: () =>
           ref //
               .read(lancamentosSidebarStateProvider.notifier)
-              .toggleContasSection(),
+              .toggleCentrosSection(),
       onFilterTap: () {
         final notifier = ref //
             .read(lancamentosSidebarStateProvider.notifier);
-        if (state.contasSelecionadas.isNotEmpty) {
-          notifier.clearContas();
+        if (state.centrosSelecionados.isNotEmpty) {
+          notifier.clearCentros();
         } else {
-          notifier.selectAllContas(
+          notifier.selectAllCentros(
             items.map((e) => e.id).toList(), //
           );
         }
       },
       child: Column(
         children: items.map((item) {
-          final checked = state.contasSelecionadas.contains(item.id);
+          final checked = state.centrosSelecionados.contains(item.id);
 
           return SidebarItem(
             descricao: item.descricao,
             checked: checked,
-            icon: item.banco.getIcon(),
+            icon: Icons.account_balance,
             onTap: () =>
                 ref //
                     .read(lancamentosSidebarStateProvider.notifier)
-                    .toggleConta(item.id),
+                    .toggleCentroCusto(item.id),
           );
         }).toList(),
       ),

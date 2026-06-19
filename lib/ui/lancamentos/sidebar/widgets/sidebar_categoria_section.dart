@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_state.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_categoria_item.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_origin_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_categoria_item.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_origin_section.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class SidebarCategoriaSection extends ConsumerWidget {

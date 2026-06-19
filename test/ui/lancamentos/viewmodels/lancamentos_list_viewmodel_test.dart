@@ -5,7 +5,7 @@ import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_list_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 
 import 'package:zzuna/data/repositories/base_repository.dart';
 

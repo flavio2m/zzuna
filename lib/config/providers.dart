@@ -19,9 +19,9 @@ import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/categoria/create/viewModels/categoria_create_viewmodel.dart';
 import 'package:zzuna/ui/categoria/delete/viewModel/categoria_delete_viewmodel.dart';
 import 'package:zzuna/ui/categoria/list/viewmodels/categoria_list_viewmodel.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_notifier.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_state.dart';
-import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_sidebar_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_notifier.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_viewmodel.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
@@ -34,10 +34,10 @@ import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_view
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
-
+ 
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
-
+ 
 import 'package:zzuna/data/repositories/lancamento/extrato_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
@@ -46,7 +46,7 @@ import 'package:zzuna/data/services/storage/local/fatura_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/lancamento_storage_provider.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
-import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_list_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura

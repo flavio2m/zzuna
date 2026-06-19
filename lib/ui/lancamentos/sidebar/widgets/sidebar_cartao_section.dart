@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_origin_section.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_item.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_origin_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_item.dart';
 
 class SidebarCartaoSection extends ConsumerWidget {
   final List<CartaoDetails> items;

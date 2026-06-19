@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_sidebar_viewmodel.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_search.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_conta_section.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_cartao_section.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_centro_custo_section.dart';
-import 'package:zzuna/ui/lancamentos/widgets/sidebar_categoria_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_search.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_conta_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_cartao_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_centro_custo_section.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/sidebar_categoria_section.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class AccountsSideMenu extends ConsumerStatefulWidget {

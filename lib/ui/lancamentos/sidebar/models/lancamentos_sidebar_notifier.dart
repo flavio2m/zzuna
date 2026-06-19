@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_state.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
 
 class LancamentosSidebarNotifier extends StateNotifier<LancamentosSidebarState> {
   LancamentosSidebarNotifier() : super(const LancamentosSidebarState());

@@ -5,10 +5,10 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
-import 'package:zzuna/ui/lancamentos/widgets/accounts_side_menu.dart';
-import 'package:zzuna/ui/lancamentos/widgets/lancamento_filter_bar.dart';
-import 'package:zzuna/ui/lancamentos/widgets/transaction_day_header.dart';
-import 'package:zzuna/ui/lancamentos/widgets/transaction_row.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/widgets/accounts_side_menu.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_filter_bar.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_header.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/transaction_row.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
