@@ -10,7 +10,6 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
-import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});
@@ -26,8 +25,8 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
   @override
   void initState() {
     super.initState();
-    final viewModel = ref.read(lancamentosListViewModelProvider);
-    _descricaoController = TextEditingController(text: viewModel.descricaoQuery);
+    final filterState = ref.read(lancamentoFilterProvider);
+    _descricaoController = TextEditingController(text: filterState.descricao);
     _descricaoFocusNode = FocusNode();
   }
 
@@ -41,136 +40,140 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
   @override
   Widget build(BuildContext context) {
     final viewModel = ref.watch(lancamentosListViewModelProvider);
+    final filterState = ref.watch(lancamentoFilterProvider);
     final maxYear = DateTime.now().year + 2;
 
-    return ListenableBuilder(
-      listenable: viewModel.loadCommand,
-      builder: (context, _) {
-        return AppFilterCard(
-          child: Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              _buildPeriodNavigator(viewModel, maxYear),
-              // 3. Descrição
-              SizedBox(
-                width: 250,
-                child: AppTextFormField(
-                  controller: _descricaoController,
-                  focusNode: _descricaoFocusNode,
-                  textInputAction: TextInputAction.search,
-                  label: 'Descrição',
-                  onChanged: (value) {
-                    viewModel.setDescricao(value);
-                  },
-                  onFieldSubmitted: (_) {
-                    viewModel.pesquisar();
-                  },
-                ),
-              ),
-              // 4. Tipo
-              SizedBox(
-                width: 128,
-                child: AppDropdownFormField<LancamentoTipo?>(
-                  label: 'Tipo',
-                  value: viewModel.tipoSelecionado,
-                  items: [
-                    AppDropdownMenuItem<LancamentoTipo?>(
-                      value: null,
-                      label: 'Todos', //
-                    ),
-                    AppDropdownMenuItem<LancamentoTipo?>(
-                      value: LancamentoTipo.receita,
-                      label: LancamentoTipo.receita.descricao,
-                    ),
-                    AppDropdownMenuItem<LancamentoTipo?>(
-                      value: LancamentoTipo.despesa,
-                      label: LancamentoTipo.despesa.descricao,
-                    ),
-                    AppDropdownMenuItem<LancamentoTipo?>(
-                      value: LancamentoTipo.transferencia,
-                      label: LancamentoTipo.transferencia.descricao,
-                    ),
-                    AppDropdownMenuItem<LancamentoTipo?>(
-                      value: LancamentoTipo.investimento,
-                      label: LancamentoTipo.investimento.descricao,
-                    ),
-                  ],
-                  onChanged: (value) {
-                    viewModel.setTipo(value);
-                  },
-                ),
-              ),
-              // 5. Conciliado (AppDropdownFormField)
-              SizedBox(
-                width: 160,
-                child: AppDropdownFormField<bool?>(
-                  label: 'Conciliado',
-                  value: viewModel.conciliadoSelecionado,
-                  items: [
-                    AppDropdownMenuItem<bool?>(value: null, label: 'Todos'),
-                    AppDropdownMenuItem<bool?>(value: true, label: 'Conciliado'),
-                    AppDropdownMenuItem<bool?>(value: false, label: 'Não conciliado'),
-                  ],
-                  onChanged: (value) {
-                    viewModel.setConciliado(value);
-                  },
-                ),
-              ),
-              // 6. Pesquisar
-              ButtonFind(
-                onPressed: () {
-                  viewModel.pesquisar();
-                },
-              ),
-              // 7. Adicionar
-              ButtonAdd(onPressed: () {}),
-            ],
+    return AppFilterCard(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          _buildPeriodNavigator(filterState, maxYear),
+          // 3. Descrição
+          SizedBox(
+            width: 250,
+            child: AppTextFormField(
+              controller: _descricaoController,
+              focusNode: _descricaoFocusNode,
+              textInputAction: TextInputAction.search,
+              label: 'Descrição',
+              onFieldSubmitted: (value) {
+                ref.read(lancamentoFilterProvider.notifier).setDescricao(value);
+                viewModel.pesquisar();
+              },
+            ),
           ),
-        );
-      },
+          // 4. Tipo
+          SizedBox(
+            width: 128,
+            child: AppDropdownFormField<LancamentoTipo?>(
+              label: 'Tipo',
+              value: filterState.tipo,
+              items: [
+                AppDropdownMenuItem<LancamentoTipo?>(
+                  value: null,
+                  label: 'Todos', //
+                ),
+                AppDropdownMenuItem<LancamentoTipo?>(
+                  value: LancamentoTipo.receita,
+                  label: LancamentoTipo.receita.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoTipo?>(
+                  value: LancamentoTipo.despesa,
+                  label: LancamentoTipo.despesa.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoTipo?>(
+                  value: LancamentoTipo.transferencia,
+                  label: LancamentoTipo.transferencia.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoTipo?>(
+                  value: LancamentoTipo.investimento,
+                  label: LancamentoTipo.investimento.descricao,
+                ),
+              ],
+              onChanged: (value) {
+                ref.read(lancamentoFilterProvider.notifier).setTipo(value);
+              },
+            ),
+          ),
+          // 5. Conciliado (AppDropdownFormField)
+          SizedBox(
+            width: 160,
+            child: AppDropdownFormField<bool?>(
+              label: 'Conciliado',
+              value: filterState.conciliado,
+              items: [
+                AppDropdownMenuItem<bool?>(value: null, label: 'Todos'),
+                AppDropdownMenuItem<bool?>(value: true, label: 'Conciliado'),
+                AppDropdownMenuItem<bool?>(value: false, label: 'Não conciliado'),
+              ],
+              onChanged: (value) {
+                ref.read(lancamentoFilterProvider.notifier).setConciliado(value);
+              },
+            ),
+          ),
+          // 6. Pesquisar
+          ButtonFind(
+            onPressed: () {
+              ref //
+                  .read(lancamentoFilterProvider.notifier)
+                  .setDescricao(_descricaoController.text);
+              viewModel.pesquisar();
+            },
+          ),
+          // 7. Adicionar
+          ButtonAdd(onPressed: () {}),
+        ],
+      ),
     );
   }
 
-  Widget _buildPeriodNavigator(LancamentosListViewModel viewModel, int maxYear) {
+  Widget _buildPeriodNavigator(dynamic filterState, int maxYear) {
+    final notifier = ref.read(lancamentoFilterProvider.notifier);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: (viewModel.mesSelecionado == Mes.janeiro && viewModel.anoSelecionado == 2025)
+          onPressed:
+              (filterState.mes == Mes.janeiro && filterState.ano == 2025) //
               ? null
-              : () => viewModel.mesAnterior(),
+              : () => notifier.mesAnterior(),
         ),
         const SizedBox(width: 2),
         SizedBox(
           width: 108,
           child: AppDropdownFormField<Mes>(
             label: 'Mês',
-            value: viewModel.mesSelecionado,
-            items: Mes.values.map((mes) => AppDropdownMenuItem(value: mes, label: mes.descricao)).toList(),
+            value: filterState.mes,
+            items: Mes.values
+                .map(
+                  (mes) => AppDropdownMenuItem(value: mes, label: mes.descricao), //
+                )
+                .toList(),
             onChanged: (value) {
-              viewModel.setMes(value);
+              notifier.setMes(value);
             },
           ),
         ),
         const SizedBox(width: 8),
         AppYearStepper(
-          value: viewModel.anoSelecionado,
+          value: filterState.ano,
           min: 2025,
           max: maxYear,
           onChanged: (value) {
-            viewModel.setAno(value);
+            notifier.setAno(value);
           },
         ),
         const SizedBox(width: 2),
         IconButton(
           icon: const Icon(Icons.chevron_right),
-          onPressed: (viewModel.mesSelecionado == Mes.dezembro && viewModel.anoSelecionado == maxYear)
+          onPressed: (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
               ? null
-              : () => viewModel.proximoMes(),
+              : () => notifier.proximoMes(),
         ),
       ],
     );

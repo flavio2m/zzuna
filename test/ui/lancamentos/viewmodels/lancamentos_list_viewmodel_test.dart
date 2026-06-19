@@ -6,13 +6,16 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
-
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 
-// Fake implementations for testing VM logic
 class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
+  int executeCallCount = 0;
+
   @override
   Future<List<LancamentoDetails>> execute({required Mes mes, required int ano}) async {
+    executeCallCount++;
     return [];
   }
   
@@ -39,84 +42,127 @@ class FakeLancamentoRepository implements LancamentoRepository {
 }
 
 void main() {
-  late LancamentosListViewModel viewModel;
+  group('LancamentoFilterNotifier Navigation Tests', () {
+    late LancamentoFilterNotifier notifier;
 
-  setUp(() {
-    viewModel = LancamentosListViewModel(
-      FakeLancamentoDetailsUseCase(),
-      FakeLancamentoFilterUseCase(),
-      FakeLancamentoRepository(),
-    );
-  });
+    setUp(() {
+      notifier = LancamentoFilterNotifier();
+    });
 
-  group('LancamentosListViewModel Navigation Tests', () {
-    test('initial state', () {
+    test('initial state matches current date', () {
       final now = DateTime.now();
-      expect(viewModel.mesSelecionado.numero, now.month);
-      expect(viewModel.anoSelecionado, now.year);
+      expect(notifier.state.mes.numero, now.month);
+      expect(notifier.state.ano, now.year);
     });
 
     test('mesAnterior decreases month', () {
-      viewModel.mesSelecionado = Mes.fevereiro;
-      viewModel.anoSelecionado = 2026;
+      notifier.state = notifier.state.copyWith(mes: Mes.fevereiro, ano: 2026);
 
-      viewModel.mesAnterior();
+      notifier.mesAnterior();
 
-      expect(viewModel.mesSelecionado, Mes.janeiro);
-      expect(viewModel.anoSelecionado, 2026);
+      expect(notifier.state.mes, Mes.janeiro);
+      expect(notifier.state.ano, 2026);
     });
 
     test('mesAnterior wraps to previous year on January', () {
-      viewModel.mesSelecionado = Mes.janeiro;
-      viewModel.anoSelecionado = 2026;
+      notifier.state = notifier.state.copyWith(mes: Mes.janeiro, ano: 2026);
 
-      viewModel.mesAnterior();
+      notifier.mesAnterior();
 
-      expect(viewModel.mesSelecionado, Mes.dezembro);
-      expect(viewModel.anoSelecionado, 2025);
+      expect(notifier.state.mes, Mes.dezembro);
+      expect(notifier.state.ano, 2025);
     });
 
     test('mesAnterior does not wrap before minimum limit (January 2025)', () {
-      viewModel.mesSelecionado = Mes.janeiro;
-      viewModel.anoSelecionado = 2025;
+      notifier.state = notifier.state.copyWith(mes: Mes.janeiro, ano: 2025);
 
-      viewModel.mesAnterior();
+      notifier.mesAnterior();
 
-      // Should remain at January 2025
-      expect(viewModel.mesSelecionado, Mes.janeiro);
-      expect(viewModel.anoSelecionado, 2025);
+      expect(notifier.state.mes, Mes.janeiro);
+      expect(notifier.state.ano, 2025);
     });
 
     test('proximoMes increases month', () {
-      viewModel.mesSelecionado = Mes.janeiro;
-      viewModel.anoSelecionado = 2026;
+      notifier.state = notifier.state.copyWith(mes: Mes.janeiro, ano: 2026);
 
-      viewModel.proximoMes();
+      notifier.proximoMes();
 
-      expect(viewModel.mesSelecionado, Mes.fevereiro);
-      expect(viewModel.anoSelecionado, 2026);
+      expect(notifier.state.mes, Mes.fevereiro);
+      expect(notifier.state.ano, 2026);
     });
 
     test('proximoMes wraps to next year on December', () {
-      viewModel.mesSelecionado = Mes.dezembro;
-      viewModel.anoSelecionado = 2026;
+      notifier.state = notifier.state.copyWith(mes: Mes.dezembro, ano: 2026);
 
-      viewModel.proximoMes();
+      notifier.proximoMes();
 
-      expect(viewModel.mesSelecionado, Mes.janeiro);
-      expect(viewModel.anoSelecionado, 2027);
+      expect(notifier.state.mes, Mes.janeiro);
+      expect(notifier.state.ano, 2027);
     });
 
     test('proximoMes does not wrap after maximum limit (December of current year + 2)', () {
       final maxYear = DateTime.now().year + 2;
-      viewModel.mesSelecionado = Mes.dezembro;
-      viewModel.anoSelecionado = maxYear;
+      notifier.state = notifier.state.copyWith(mes: Mes.dezembro, ano: maxYear);
 
-      viewModel.proximoMes();
+      notifier.proximoMes();
 
-      // Should remain at December maxYear
-      expect(viewModel.mesSelecionado, Mes.dezembro);
-      expect(viewModel.anoSelecionado, maxYear);
+      expect(notifier.state.mes, Mes.dezembro);
+      expect(notifier.state.ano, maxYear);
+    });
+  });
+
+  group('LancamentosListViewModel Cache and Filtering Tests', () {
+    late LancamentosListViewModel viewModel;
+    late FakeLancamentoDetailsUseCase detailsUseCase;
+
+    setUp(() {
+      detailsUseCase = FakeLancamentoDetailsUseCase();
+      viewModel = LancamentosListViewModel(
+        detailsUseCase,
+        FakeLancamentoFilterUseCase(),
+        FakeLancamentoRepository(),
+      );
+    });
+
+    test('updateFilter with same period does not query repository again', () async {
+      final initialFilter = LancamentoFilterState(
+        mes: Mes.janeiro,
+        ano: 2026,
+        descricao: '',
+      );
+
+      // 1. Initial filter update (triggers load because it is the first time or different period)
+      viewModel.updateFilter(initialFilter);
+      await Future<void>.delayed(Duration.zero);
+      expect(detailsUseCase.executeCallCount, 1);
+
+      // 2. Update filters without changing period (e.g. change description)
+      final newFilter = initialFilter.copyWith(descricao: 'Supermercado');
+      viewModel.updateFilter(newFilter);
+      await Future<void>.delayed(Duration.zero);
+
+      // Call count should still be 1 (filtered in-memory)
+      expect(detailsUseCase.executeCallCount, 1);
+    });
+
+    test('updateFilter with different period queries repository', () async {
+      final initialFilter = LancamentoFilterState(
+        mes: Mes.janeiro,
+        ano: 2026,
+        descricao: '',
+      );
+
+      viewModel.updateFilter(initialFilter);
+      await Future<void>.delayed(Duration.zero);
+      expect(detailsUseCase.executeCallCount, 1);
+
+      // Change month to February
+      final newFilter = initialFilter.copyWith(mes: Mes.fevereiro);
+      viewModel.updateFilter(newFilter);
+      await Future<void>.delayed(Duration.zero);
+
+      // Call count should increase to 2
+      expect(detailsUseCase.executeCallCount, 2);
     });
   });
 }

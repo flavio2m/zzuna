@@ -13,19 +13,19 @@ class SidebarContaSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lancamentosSidebarStateProvider);
+    final filterState = ref.watch(lancamentoFilterProvider);
 
     return SidebarOriginSection(
       title: 'CONTAS CORRENTES',
       expanded: state.contasExpandidas || state.filtro.isNotEmpty,
-      active: state.contasSelecionadas.isNotEmpty,
+      active: filterState.contasSelecionadas.isNotEmpty,
       onTap: () =>
           ref //
               .read(lancamentosSidebarStateProvider.notifier)
               .toggleContasSection(),
       onFilterTap: () {
-        final notifier = ref //
-            .read(lancamentosSidebarStateProvider.notifier);
-        if (state.contasSelecionadas.isNotEmpty) {
+        final notifier = ref.read(lancamentoFilterProvider.notifier);
+        if (filterState.contasSelecionadas.isNotEmpty) {
           notifier.clearContas();
         } else {
           notifier.selectAllContas(
@@ -35,7 +35,7 @@ class SidebarContaSection extends ConsumerWidget {
       },
       child: Column(
         children: items.map((item) {
-          final checked = state.contasSelecionadas.contains(item.id);
+          final checked = filterState.contasSelecionadas.contains(item.id);
 
           return SidebarItem(
             descricao: item.descricao,
@@ -43,7 +43,7 @@ class SidebarContaSection extends ConsumerWidget {
             icon: item.banco.getIcon(),
             onTap: () =>
                 ref //
-                    .read(lancamentosSidebarStateProvider.notifier)
+                    .read(lancamentoFilterProvider.notifier)
                     .toggleConta(item.id),
           );
         }).toList(),

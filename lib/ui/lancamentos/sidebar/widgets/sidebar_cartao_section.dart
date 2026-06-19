@@ -13,19 +13,19 @@ class SidebarCartaoSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lancamentosSidebarStateProvider);
+    final filterState = ref.watch(lancamentoFilterProvider);
 
     return SidebarOriginSection(
       title: 'CARTOES DE CREDITO',
       expanded: state.cartoesExpandidos || state.filtro.isNotEmpty,
-      active: state.cartoesSelecionados.isNotEmpty,
+      active: filterState.cartoesSelecionados.isNotEmpty,
       onTap: () =>
           ref //
               .read(lancamentosSidebarStateProvider.notifier)
               .toggleCartoesSection(),
       onFilterTap: () {
-        final notifier = ref //
-            .read(lancamentosSidebarStateProvider.notifier);
-        if (state.cartoesSelecionados.isNotEmpty) {
+        final notifier = ref.read(lancamentoFilterProvider.notifier);
+        if (filterState.cartoesSelecionados.isNotEmpty) {
           notifier.clearCartoes();
         } else {
           notifier.selectAllCartoes(
@@ -35,7 +35,7 @@ class SidebarCartaoSection extends ConsumerWidget {
       },
       child: Column(
         children: items.map((item) {
-          final checked = state.cartoesSelecionados.contains(item.id);
+          final checked = filterState.cartoesSelecionados.contains(item.id);
 
           return SidebarItem(
             descricao: item.descricao,
@@ -43,7 +43,7 @@ class SidebarCartaoSection extends ConsumerWidget {
             icon: Icons.credit_card,
             onTap: () =>
                 ref //
-                    .read(lancamentosSidebarStateProvider.notifier)
+                    .read(lancamentoFilterProvider.notifier)
                     .toggleCartao(item.id),
           );
         }).toList(),

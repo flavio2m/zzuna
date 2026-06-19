@@ -82,7 +82,7 @@ class _TransactionsWorkspace extends ConsumerWidget {
     return Container(
       color: AppColors.background,
       child: ListenableBuilder(
-        listenable: viewModel.loadCommand,
+        listenable: Listenable.merge([viewModel.loadCommand, viewModel]),
         builder: (context, _) {
           final state = viewModel.loadCommand.value;
           final list = viewModel.lancamentos;

@@ -13,19 +13,19 @@ class SidebarCentroCustoSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lancamentosSidebarStateProvider);
+    final filterState = ref.watch(lancamentoFilterProvider);
 
     return SidebarOriginSection(
       title: 'CENTROS DE CUSTO',
       expanded: state.centrosExpandidos || state.filtro.isNotEmpty,
-      active: state.centrosSelecionados.isNotEmpty,
+      active: filterState.centrosSelecionados.isNotEmpty,
       onTap: () =>
           ref //
               .read(lancamentosSidebarStateProvider.notifier)
               .toggleCentrosSection(),
       onFilterTap: () {
-        final notifier = ref //
-            .read(lancamentosSidebarStateProvider.notifier);
-        if (state.centrosSelecionados.isNotEmpty) {
+        final notifier = ref.read(lancamentoFilterProvider.notifier);
+        if (filterState.centrosSelecionados.isNotEmpty) {
           notifier.clearCentros();
         } else {
           notifier.selectAllCentros(
@@ -35,7 +35,7 @@ class SidebarCentroCustoSection extends ConsumerWidget {
       },
       child: Column(
         children: items.map((item) {
-          final checked = state.centrosSelecionados.contains(item.id);
+          final checked = filterState.centrosSelecionados.contains(item.id);
 
           return SidebarItem(
             descricao: item.descricao,
@@ -43,7 +43,7 @@ class SidebarCentroCustoSection extends ConsumerWidget {
             icon: Icons.account_balance,
             onTap: () =>
                 ref //
-                    .read(lancamentosSidebarStateProvider.notifier)
+                    .read(lancamentoFilterProvider.notifier)
                     .toggleCentroCusto(item.id),
           );
         }).toList(),

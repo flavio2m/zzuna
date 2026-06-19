@@ -15,22 +15,22 @@ class SidebarCategoriaSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lancamentosSidebarStateProvider);
+    final filterState = ref.watch(lancamentoFilterProvider);
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SidebarOriginSection(
         title: 'CATEGORIAS',
         expanded: state.categoriasExpandidas || state.filtro.isNotEmpty,
-        active: state.categoriasSelecionadas.isNotEmpty,
+        active: filterState.categoriasSelecionadas.isNotEmpty,
         onTap: () {
           ref //
               .read(lancamentosSidebarStateProvider.notifier)
               .toggleCategoriasSection();
         },
         onFilterTap: () {
-          final notifier = ref //
-              .read(lancamentosSidebarStateProvider.notifier);
-          if (state.categoriasSelecionadas.isNotEmpty) {
+          final notifier = ref.read(lancamentoFilterProvider.notifier);
+          if (filterState.categoriasSelecionadas.isNotEmpty) {
             notifier.clearCategorias();
           } else {
             final allIds = <String>[];
@@ -50,7 +50,7 @@ class SidebarCategoriaSection extends ConsumerWidget {
         child: Column(
           children:
               items //
-                  .map((categoria) => _buildNode(ref, categoria, state, level: 0))
+                  .map((categoria) => _buildNode(ref, categoria, state, filterState, level: 0))
                   .toList(), //
         ),
       ),
@@ -60,7 +60,8 @@ class SidebarCategoriaSection extends ConsumerWidget {
   Widget _buildNode(
     WidgetRef ref,
     CategoriaDetails categoria,
-    LancamentosSidebarState state, {
+    LancamentosSidebarState state,
+    dynamic filterState, {
     required int level, //
   }) {
     final hasChildren = categoria.subcategorias.isNotEmpty;
@@ -76,7 +77,7 @@ class SidebarCategoriaSection extends ConsumerWidget {
       children: [
         SidebarCategoryItem(
           descricao: categoria.descricao,
-          checked: state.categoriasSelecionadas.contains(categoria.id),
+          checked: filterState.categoriasSelecionadas.contains(categoria.id),
           level: level,
           hasChildren: hasChildren,
           expanded: expanded,
@@ -91,7 +92,7 @@ class SidebarCategoriaSection extends ConsumerWidget {
 
             collect(categoria);
             ref //
-                .read(lancamentosSidebarStateProvider.notifier)
+                .read(lancamentoFilterProvider.notifier)
                 .toggleCategoria(
                   categoria.id,
                   subcategoriesIds: subIds, //
@@ -114,7 +115,7 @@ class SidebarCategoriaSection extends ConsumerWidget {
             ),
             child: Column(
               children: categoria.subcategorias
-                  .map((child) => _buildNode(ref, child, state, level: level + 1))
+                  .map((child) => _buildNode(ref, child, state, filterState, level: level + 1))
                   .toList(),
             ),
           ),

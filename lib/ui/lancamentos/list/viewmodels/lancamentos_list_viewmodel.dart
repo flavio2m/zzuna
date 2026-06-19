@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
@@ -8,26 +9,20 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 
-class LancamentosListViewModel {
+class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoDetailsUseCase _detailsUseCase;
   final LancamentoFilterUseCase _filterUseCase;
   final LancamentoRepository _repository;
   StreamSubscription? _repositorySubscription;
 
-  String? descricaoQuery;
-  LancamentoTipo? tipoSelecionado;
-  bool? conciliadoSelecionado;
-  Mes mesSelecionado = Mes.fromDate(DateTime.now());
-  int anoSelecionado = DateTime.now().year;
+  List<LancamentoDetails> _allLancamentos = [];
+  LancamentoFilterDto _currentFilter = LancamentoFilterDto(mes: Mes.fromDate(DateTime.now()), ano: DateTime.now().year);
 
   List<LancamentoDetails> lancamentos = [];
 
-  LancamentosListViewModel(
-    this._detailsUseCase,
-    this._filterUseCase,
-    this._repository,
-  ) {
+  LancamentosListViewModel(this._detailsUseCase, this._filterUseCase, this._repository) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
     });
@@ -37,80 +32,55 @@ class LancamentosListViewModel {
 
   AsyncResult<List<LancamentoDetails>> _load() async {
     try {
-      final allDetails = await _detailsUseCase.execute(
-        mes: mesSelecionado,
-        ano: anoSelecionado,
-      );
-      final filter = LancamentoFilterDto(
-        descricao: descricaoQuery ?? '',
-        tipo: tipoSelecionado,
-        conciliado: conciliadoSelecionado,
-      );
-      final filtered = _filterUseCase.execute(allDetails, filter);
-      lancamentos = filtered;
-      return Success(filtered);
+      final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+      final ano = _currentFilter.ano ?? DateTime.now().year;
+      final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
+      _allLancamentos = allDetails;
+      _applyFilter();
+      return Success(lancamentos);
     } catch (e) {
       return Failure(Exception('Erro ao carregar lançamentos: $e'));
     }
   }
 
-  void setDescricao(String value) {
-    descricaoQuery = value;
+  void _applyFilter() {
+    final filtered = _filterUseCase.execute(_allLancamentos, _currentFilter);
+    lancamentos = filtered;
+    notifyListeners();
   }
 
-  void setTipo(LancamentoTipo? value) {
-    tipoSelecionado = value;
-    loadCommand.execute();
-  }
+  void updateFilter(LancamentoFilterState filterState) {
+    final newFilter = LancamentoFilterDto(
+      descricao: filterState.descricao,
+      tipo: filterState.tipo,
+      conciliado: filterState.conciliado,
+      mes: filterState.mes,
+      ano: filterState.ano,
+      contasSelecionadas: filterState.contasSelecionadas,
+      cartoesSelecionados: filterState.cartoesSelecionados,
+      centrosSelecionados: filterState.centrosSelecionados,
+      categoriasSelecionadas: filterState.categoriasSelecionadas,
+    );
 
-  void setConciliado(bool? value) {
-    conciliadoSelecionado = value;
-    loadCommand.execute();
-  }
+    final periodChanged = //
+        newFilter.mes != _currentFilter.mes || newFilter.ano != _currentFilter.ano;
 
-  void setMes(Mes? value) {
-    if (value != null) {
-      mesSelecionado = value;
+    _currentFilter = newFilter;
+
+    if (periodChanged) {
       loadCommand.execute();
+    } else {
+      _applyFilter();
     }
-  }
-
-  void setAno(int? value) {
-    if (value != null) {
-      anoSelecionado = value;
-      loadCommand.execute();
-    }
-  }
-
-  void mesAnterior() {
-    const minYear = 2025;
-    if (mesSelecionado == Mes.janeiro && anoSelecionado == minYear) {
-      return;
-    }
-    if (mesSelecionado == Mes.janeiro) {
-      anoSelecionado--;
-    }
-    mesSelecionado = mesSelecionado.anterior;
-    loadCommand.execute();
-  }
-
-  void proximoMes() {
-    final maxYear = DateTime.now().year + 2;
-    if (mesSelecionado == Mes.dezembro && anoSelecionado == maxYear) {
-      return;
-    }
-    if (mesSelecionado == Mes.dezembro) {
-      anoSelecionado++;
-    }
-    mesSelecionado = mesSelecionado.proximo;
-    loadCommand.execute();
   }
 
   void pesquisar() {
-    loadCommand.execute();
+    _applyFilter();
   }
 
+  @override
   void dispose() {
     _repositorySubscription?.cancel();
+    super.dispose();
   }
 }

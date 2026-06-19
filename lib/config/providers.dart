@@ -22,6 +22,8 @@ import 'package:zzuna/ui/categoria/list/viewmodels/categoria_list_viewmodel.dart
 import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_notifier.dart';
 import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
 import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
@@ -281,6 +283,10 @@ final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSide
   return vm;
 });
 
+final lancamentoFilterProvider = StateNotifierProvider<LancamentoFilterNotifier, LancamentoFilterState>((ref) {
+  return LancamentoFilterNotifier();
+});
+
 final lancamentosListViewModelProvider =
     Provider.autoDispose<LancamentosListViewModel>((ref) {
   final vm = LancamentosListViewModel(
@@ -288,6 +294,10 @@ final lancamentosListViewModelProvider =
     ref.watch(lancamentoFilterUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
   );
+  ref.listen(lancamentoFilterProvider, (previous, next) {
+    vm.updateFilter(next);
+  });
+  vm.updateFilter(ref.read(lancamentoFilterProvider));
   ref.onDispose(vm.dispose);
   return vm;
 });
