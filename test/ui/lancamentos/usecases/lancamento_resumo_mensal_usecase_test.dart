@@ -7,8 +7,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia_detail.dart';
-import 'package:zzuna/domain/entities/lancamento/extrato_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 
 void main() {
@@ -37,16 +36,16 @@ void main() {
         tipo: tipo,
         data: data,
         descricao: 'Test $id',
-        referencia: ReferenciaExtratoLancamentoDetail(
-          extrato: ExtratoDetails(
-            id: 'ext-1',
-            conta: contaDetails,
-            ano: 2026,
-            mes: Mes.junho,
-            dataInicio: DateTime(2026, 6, 1),
-            dataFim: DateTime(2026, 6, 30),
-            fechado: false,
-          ),
+        extratoFatura: ExtratoFaturaDetails(
+          id: 'ef-1',
+          origem: LancamentoOrigemContaDetail(conta: contaDetails),
+          ano: 2026,
+          mes: Mes.junho,
+          dataInicio: DateTime(2026, 6, 1),
+          dataFim: DateTime(2026, 6, 30),
+          saldoInicial: 0.0,
+          saldoFinal: 0.0,
+          fechado: false,
         ),
         origem: LancamentoOrigemContaDetail(conta: contaDetails),
         itens: [

@@ -1,7 +1,6 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia.dart';
 
 class LancamentoDto {
   String? id;
@@ -10,7 +9,7 @@ class LancamentoDto {
   DateTime data;
   String descricao;
   LancamentoOrigem origem;
-  LancamentoReferencia referencia;
+  String extratoFaturaId;
   List<LancamentoItem> itens;
   bool conciliado;
   String? observacao;
@@ -21,14 +20,12 @@ class LancamentoDto {
     DateTime? data,
     this.descricao = '',
     LancamentoOrigem? origem,
-    LancamentoReferencia? referencia,
+    this.extratoFaturaId = '',
     this.itens = const [],
     this.conciliado = false,
     this.observacao,
   }) : data = data ?? DateTime.now(),
-       origem = origem ?? const LancamentoOrigem.conta(contaId: ''),
-       referencia = //
-           referencia ?? const LancamentoReferencia.extrato(extratoId: '');
+       origem = origem ?? const LancamentoOrigem.conta(contaId: '');
 
   void setId(String? id) {
     this.id = id;
@@ -50,8 +47,8 @@ class LancamentoDto {
     this.origem = origem;
   }
 
-  void setReferencia(LancamentoReferencia referencia) {
-    this.referencia = referencia;
+  void setExtratoFaturaId(String extratoFaturaId) {
+    this.extratoFaturaId = extratoFaturaId;
   }
 
   void setItens(List<LancamentoItem> itens) {
@@ -80,7 +77,7 @@ class LancamentoDto {
     'data': data.toIso8601String(),
     'descricao': descricao,
     'origem': origem.toJson(),
-    'referencia': referencia.toJson(),
+    'extratoFaturaId': extratoFaturaId,
     'itens': itens.map((e) => e.toJson()).toList(),
     'conciliado': conciliado,
     'observacao': observacao,
@@ -95,9 +92,7 @@ class LancamentoDto {
       origem: LancamentoOrigem.fromJson(
         Map<String, dynamic>.from(json['origem']), //
       ),
-      referencia: LancamentoReferencia.fromJson(
-        Map<String, dynamic>.from(json['referencia']), //
-      ),
+      extratoFaturaId: json['extratoFaturaId'] ?? '',
       itens: (json['itens'] as List<dynamic>? ?? [])
           .map((e) => LancamentoItem.fromJson(Map<String, dynamic>.from(e)))
           .toList(),

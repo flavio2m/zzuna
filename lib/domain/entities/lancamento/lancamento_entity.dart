@@ -4,8 +4,7 @@ import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 export 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia_detail.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 
 part 'lancamento_entity.freezed.dart';
 part 'lancamento_entity.g.dart';
@@ -17,7 +16,7 @@ sealed class Lancamento with _$Lancamento {
     required LancamentoTipo tipo,
     required DateTime data,
     required String descricao,
-    required LancamentoReferencia referencia,
+    required String extratoFaturaId,
     required LancamentoOrigem origem,
     required List<LancamentoItem> itens,
     required bool conciliado,
@@ -38,7 +37,7 @@ sealed class LancamentoDetails with _$LancamentoDetails {
     required LancamentoTipo tipo,
     required DateTime data,
     required String descricao,
-    required LancamentoReferenciaDetail referencia,
+    required ExtratoFaturaDetails extratoFatura,
     required LancamentoOrigemDetail origem,
     required List<LancamentoItemDetails> itens,
     required bool conciliado,

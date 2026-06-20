@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Lancamento {
 
- String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; LancamentoReferencia get referencia; LancamentoOrigem get origem; List<LancamentoItem> get itens; bool get conciliado; String? get observacao;
+ String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; String get extratoFaturaId; LancamentoOrigem get origem; List<LancamentoItem> get itens; bool get conciliado; String? get observacao;
 /// Create a copy of Lancamento
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LancamentoCopyWith<Lancamento> get copyWith => _$LancamentoCopyWithImpl<Lancame
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Lancamento&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.referencia, referencia) || other.referencia == referencia)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other.itens, itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Lancamento&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.extratoFaturaId, extratoFaturaId) || other.extratoFaturaId == extratoFaturaId)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other.itens, itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,referencia,origem,const DeepCollectionEquality().hash(itens),conciliado,observacao);
+int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,extratoFaturaId,origem,const DeepCollectionEquality().hash(itens),conciliado,observacao);
 
 @override
 String toString() {
-  return 'Lancamento(id: $id, tipo: $tipo, data: $data, descricao: $descricao, referencia: $referencia, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
+  return 'Lancamento(id: $id, tipo: $tipo, data: $data, descricao: $descricao, extratoFaturaId: $extratoFaturaId, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
 }
 
 
@@ -48,11 +48,11 @@ abstract mixin class $LancamentoCopyWith<$Res>  {
   factory $LancamentoCopyWith(Lancamento value, $Res Function(Lancamento) _then) = _$LancamentoCopyWithImpl;
 @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferencia referencia, LancamentoOrigem origem, List<LancamentoItem> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, String extratoFaturaId, LancamentoOrigem origem, List<LancamentoItem> itens, bool conciliado, String? observacao
 });
 
 
-$LancamentoReferenciaCopyWith<$Res> get referencia;$LancamentoOrigemCopyWith<$Res> get origem;
+$LancamentoOrigemCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -65,14 +65,14 @@ class _$LancamentoCopyWithImpl<$Res>
 
 /// Create a copy of Lancamento
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? referencia = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? extratoFaturaId = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
 as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
-as LancamentoReferencia,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
+as String,extratoFaturaId: null == extratoFaturaId ? _self.extratoFaturaId : extratoFaturaId // ignore: cast_nullable_to_non_nullable
+as String,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as LancamentoOrigem,itens: null == itens ? _self.itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItem>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
@@ -80,15 +80,6 @@ as String?,
   ));
 }
 /// Create a copy of Lancamento
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$LancamentoReferenciaCopyWith<$Res> get referencia {
-  
-  return $LancamentoReferenciaCopyWith<$Res>(_self.referencia, (value) {
-    return _then(_self.copyWith(referencia: value));
-  });
-}/// Create a copy of Lancamento
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -176,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferencia referencia,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  String extratoFaturaId,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Lancamento() when $default != null:
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFaturaId,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
   return orElse();
 
 }
@@ -197,10 +188,10 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferencia referencia,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  String extratoFaturaId,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
 switch (_that) {
 case _Lancamento():
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);}
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFaturaId,_that.origem,_that.itens,_that.conciliado,_that.observacao);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -214,10 +205,10 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferencia referencia,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  String extratoFaturaId,  LancamentoOrigem origem,  List<LancamentoItem> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
 switch (_that) {
 case _Lancamento() when $default != null:
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFaturaId,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
   return null;
 
 }
@@ -229,14 +220,14 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 @JsonSerializable()
 
 class _Lancamento implements Lancamento {
-  const _Lancamento({required this.id, required this.tipo, required this.data, required this.descricao, required this.referencia, required this.origem, required final  List<LancamentoItem> itens, required this.conciliado, this.observacao}): _itens = itens;
+  const _Lancamento({required this.id, required this.tipo, required this.data, required this.descricao, required this.extratoFaturaId, required this.origem, required final  List<LancamentoItem> itens, required this.conciliado, this.observacao}): _itens = itens;
   factory _Lancamento.fromJson(Map<String, dynamic> json) => _$LancamentoFromJson(json);
 
 @override final  String id;
 @override final  LancamentoTipo tipo;
 @override final  DateTime data;
 @override final  String descricao;
-@override final  LancamentoReferencia referencia;
+@override final  String extratoFaturaId;
 @override final  LancamentoOrigem origem;
  final  List<LancamentoItem> _itens;
 @override List<LancamentoItem> get itens {
@@ -261,16 +252,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Lancamento&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.referencia, referencia) || other.referencia == referencia)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other._itens, _itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Lancamento&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.extratoFaturaId, extratoFaturaId) || other.extratoFaturaId == extratoFaturaId)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other._itens, _itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,referencia,origem,const DeepCollectionEquality().hash(_itens),conciliado,observacao);
+int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,extratoFaturaId,origem,const DeepCollectionEquality().hash(_itens),conciliado,observacao);
 
 @override
 String toString() {
-  return 'Lancamento(id: $id, tipo: $tipo, data: $data, descricao: $descricao, referencia: $referencia, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
+  return 'Lancamento(id: $id, tipo: $tipo, data: $data, descricao: $descricao, extratoFaturaId: $extratoFaturaId, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
 }
 
 
@@ -281,11 +272,11 @@ abstract mixin class _$LancamentoCopyWith<$Res> implements $LancamentoCopyWith<$
   factory _$LancamentoCopyWith(_Lancamento value, $Res Function(_Lancamento) _then) = __$LancamentoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferencia referencia, LancamentoOrigem origem, List<LancamentoItem> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, String extratoFaturaId, LancamentoOrigem origem, List<LancamentoItem> itens, bool conciliado, String? observacao
 });
 
 
-@override $LancamentoReferenciaCopyWith<$Res> get referencia;@override $LancamentoOrigemCopyWith<$Res> get origem;
+@override $LancamentoOrigemCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -298,14 +289,14 @@ class __$LancamentoCopyWithImpl<$Res>
 
 /// Create a copy of Lancamento
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? referencia = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? extratoFaturaId = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
   return _then(_Lancamento(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
 as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
-as LancamentoReferencia,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
+as String,extratoFaturaId: null == extratoFaturaId ? _self.extratoFaturaId : extratoFaturaId // ignore: cast_nullable_to_non_nullable
+as String,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as LancamentoOrigem,itens: null == itens ? _self._itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItem>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
@@ -314,15 +305,6 @@ as String?,
 }
 
 /// Create a copy of Lancamento
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$LancamentoReferenciaCopyWith<$Res> get referencia {
-  
-  return $LancamentoReferenciaCopyWith<$Res>(_self.referencia, (value) {
-    return _then(_self.copyWith(referencia: value));
-  });
-}/// Create a copy of Lancamento
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -337,7 +319,7 @@ $LancamentoOrigemCopyWith<$Res> get origem {
 /// @nodoc
 mixin _$LancamentoDetails {
 
- String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; LancamentoReferenciaDetail get referencia; LancamentoOrigemDetail get origem; List<LancamentoItemDetails> get itens; bool get conciliado; String? get observacao;
+ String get id; LancamentoTipo get tipo; DateTime get data; String get descricao; ExtratoFaturaDetails get extratoFatura; LancamentoOrigemDetail get origem; List<LancamentoItemDetails> get itens; bool get conciliado; String? get observacao;
 /// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -348,16 +330,16 @@ $LancamentoDetailsCopyWith<LancamentoDetails> get copyWith => _$LancamentoDetail
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.referencia, referencia) || other.referencia == referencia)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other.itens, itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.extratoFatura, extratoFatura) || other.extratoFatura == extratoFatura)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other.itens, itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,referencia,origem,const DeepCollectionEquality().hash(itens),conciliado,observacao);
+int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,extratoFatura,origem,const DeepCollectionEquality().hash(itens),conciliado,observacao);
 
 @override
 String toString() {
-  return 'LancamentoDetails(id: $id, tipo: $tipo, data: $data, descricao: $descricao, referencia: $referencia, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
+  return 'LancamentoDetails(id: $id, tipo: $tipo, data: $data, descricao: $descricao, extratoFatura: $extratoFatura, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
 }
 
 
@@ -368,11 +350,11 @@ abstract mixin class $LancamentoDetailsCopyWith<$Res>  {
   factory $LancamentoDetailsCopyWith(LancamentoDetails value, $Res Function(LancamentoDetails) _then) = _$LancamentoDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, ExtratoFaturaDetails extratoFatura, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
 });
 
 
-$LancamentoReferenciaDetailCopyWith<$Res> get referencia;$LancamentoOrigemDetailCopyWith<$Res> get origem;
+$ExtratoFaturaDetailsCopyWith<$Res> get extratoFatura;$LancamentoOrigemDetailCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -385,14 +367,14 @@ class _$LancamentoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? referencia = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? extratoFatura = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
 as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
-as LancamentoReferenciaDetail,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
+as String,extratoFatura: null == extratoFatura ? _self.extratoFatura : extratoFatura // ignore: cast_nullable_to_non_nullable
+as ExtratoFaturaDetails,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as LancamentoOrigemDetail,itens: null == itens ? _self.itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItemDetails>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
@@ -403,10 +385,10 @@ as String?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$LancamentoReferenciaDetailCopyWith<$Res> get referencia {
+$ExtratoFaturaDetailsCopyWith<$Res> get extratoFatura {
   
-  return $LancamentoReferenciaDetailCopyWith<$Res>(_self.referencia, (value) {
-    return _then(_self.copyWith(referencia: value));
+  return $ExtratoFaturaDetailsCopyWith<$Res>(_self.extratoFatura, (value) {
+    return _then(_self.copyWith(extratoFatura: value));
   });
 }/// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.
@@ -496,10 +478,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  ExtratoFaturaDetails extratoFatura,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LancamentoDetails() when $default != null:
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFatura,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
   return orElse();
 
 }
@@ -517,10 +499,10 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  ExtratoFaturaDetails extratoFatura,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoDetails():
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);}
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFatura,_that.origem,_that.itens,_that.conciliado,_that.observacao);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -534,10 +516,10 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  LancamentoReferenciaDetail referencia,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoTipo tipo,  DateTime data,  String descricao,  ExtratoFaturaDetails extratoFatura,  LancamentoOrigemDetail origem,  List<LancamentoItemDetails> itens,  bool conciliado,  String? observacao)?  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoDetails() when $default != null:
-return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
+return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.extratoFatura,_that.origem,_that.itens,_that.conciliado,_that.observacao);case _:
   return null;
 
 }
@@ -549,14 +531,14 @@ return $default(_that.id,_that.tipo,_that.data,_that.descricao,_that.referencia,
 
 
 class _LancamentoDetails extends LancamentoDetails {
-  const _LancamentoDetails({required this.id, required this.tipo, required this.data, required this.descricao, required this.referencia, required this.origem, required final  List<LancamentoItemDetails> itens, required this.conciliado, this.observacao}): _itens = itens,super._();
+  const _LancamentoDetails({required this.id, required this.tipo, required this.data, required this.descricao, required this.extratoFatura, required this.origem, required final  List<LancamentoItemDetails> itens, required this.conciliado, this.observacao}): _itens = itens,super._();
   
 
 @override final  String id;
 @override final  LancamentoTipo tipo;
 @override final  DateTime data;
 @override final  String descricao;
-@override final  LancamentoReferenciaDetail referencia;
+@override final  ExtratoFaturaDetails extratoFatura;
 @override final  LancamentoOrigemDetail origem;
  final  List<LancamentoItemDetails> _itens;
 @override List<LancamentoItemDetails> get itens {
@@ -578,16 +560,16 @@ _$LancamentoDetailsCopyWith<_LancamentoDetails> get copyWith => __$LancamentoDet
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.referencia, referencia) || other.referencia == referencia)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other._itens, _itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.data, data) || other.data == data)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.extratoFatura, extratoFatura) || other.extratoFatura == extratoFatura)&&(identical(other.origem, origem) || other.origem == origem)&&const DeepCollectionEquality().equals(other._itens, _itens)&&(identical(other.conciliado, conciliado) || other.conciliado == conciliado)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,referencia,origem,const DeepCollectionEquality().hash(_itens),conciliado,observacao);
+int get hashCode => Object.hash(runtimeType,id,tipo,data,descricao,extratoFatura,origem,const DeepCollectionEquality().hash(_itens),conciliado,observacao);
 
 @override
 String toString() {
-  return 'LancamentoDetails(id: $id, tipo: $tipo, data: $data, descricao: $descricao, referencia: $referencia, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
+  return 'LancamentoDetails(id: $id, tipo: $tipo, data: $data, descricao: $descricao, extratoFatura: $extratoFatura, origem: $origem, itens: $itens, conciliado: $conciliado, observacao: $observacao)';
 }
 
 
@@ -598,11 +580,11 @@ abstract mixin class _$LancamentoDetailsCopyWith<$Res> implements $LancamentoDet
   factory _$LancamentoDetailsCopyWith(_LancamentoDetails value, $Res Function(_LancamentoDetails) _then) = __$LancamentoDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, LancamentoTipo tipo, DateTime data, String descricao, LancamentoReferenciaDetail referencia, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
+ String id, LancamentoTipo tipo, DateTime data, String descricao, ExtratoFaturaDetails extratoFatura, LancamentoOrigemDetail origem, List<LancamentoItemDetails> itens, bool conciliado, String? observacao
 });
 
 
-@override $LancamentoReferenciaDetailCopyWith<$Res> get referencia;@override $LancamentoOrigemDetailCopyWith<$Res> get origem;
+@override $ExtratoFaturaDetailsCopyWith<$Res> get extratoFatura;@override $LancamentoOrigemDetailCopyWith<$Res> get origem;
 
 }
 /// @nodoc
@@ -615,14 +597,14 @@ class __$LancamentoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? referencia = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tipo = null,Object? data = null,Object? descricao = null,Object? extratoFatura = null,Object? origem = null,Object? itens = null,Object? conciliado = null,Object? observacao = freezed,}) {
   return _then(_LancamentoDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
 as LancamentoTipo,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as DateTime,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,referencia: null == referencia ? _self.referencia : referencia // ignore: cast_nullable_to_non_nullable
-as LancamentoReferenciaDetail,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
+as String,extratoFatura: null == extratoFatura ? _self.extratoFatura : extratoFatura // ignore: cast_nullable_to_non_nullable
+as ExtratoFaturaDetails,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
 as LancamentoOrigemDetail,itens: null == itens ? _self._itens : itens // ignore: cast_nullable_to_non_nullable
 as List<LancamentoItemDetails>,conciliado: null == conciliado ? _self.conciliado : conciliado // ignore: cast_nullable_to_non_nullable
 as bool,observacao: freezed == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
@@ -634,10 +616,10 @@ as String?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$LancamentoReferenciaDetailCopyWith<$Res> get referencia {
+$ExtratoFaturaDetailsCopyWith<$Res> get extratoFatura {
   
-  return $LancamentoReferenciaDetailCopyWith<$Res>(_self.referencia, (value) {
-    return _then(_self.copyWith(referencia: value));
+  return $ExtratoFaturaDetailsCopyWith<$Res>(_self.extratoFatura, (value) {
+    return _then(_self.copyWith(extratoFatura: value));
   });
 }/// Create a copy of LancamentoDetails
 /// with the given fields replaced by the non-null parameter values.

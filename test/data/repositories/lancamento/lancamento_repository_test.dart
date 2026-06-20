@@ -6,7 +6,6 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -29,7 +28,7 @@ void main() {
         data: DateTime(2026, 6, 18),
         descricao: 'Supermercado',
         origem: const LancamentoOrigem.conta(contaId: 'conta-1'),
-        referencia: const LancamentoReferencia.extrato(extratoId: 'ext-1'),
+        extratoFaturaId: 'ef-1',
         itens: const [],
         conciliado: false,
         observacao: 'Compra mensal',

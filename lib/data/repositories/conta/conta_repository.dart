@@ -10,7 +10,6 @@ import 'package:zzuna/domain/dtos/conta/conta_filter_dto.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
-import 'package:zzuna/domain/statics/banco/bancos.dart';
 
 class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto, ContaFilterDto> {
   final BaseStorage<Conta> _storage;
@@ -67,25 +66,7 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
 
   @override
   AsyncResult<List<Conta>> getAll() async {
-    // return _storage.getAll();
-
-    /// REFATORAR: Somente para testes: popula storage
-    final result = await _storage.getAll();
-
-    if (result.isError()) {
-      return Failure(result.exceptionOrNull()!);
-    }
-
-    final contas = result.getOrThrow();
-
-    if (contas.isEmpty) {
-      await _seedContas();
-      return _storage.getAll();
-    }
-
-    return Success(contas);
-
-    /// Fim do código de teste
+    return _storage.getAll();
   }
 
   @override
@@ -176,21 +157,5 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
   @override
   void dispose() {
     _streamController.close();
-  }
-
-  // Para testes
-  Future<void> _seedContas() async {
-    final bancos = Bancos.items.take(10).toList();
-
-    for (var i = 0; i < bancos.length; i++) {
-      await _storage.create(
-        Conta(
-          id: const Uuid().v4(),
-          descricao: 'Conta ${bancos[i].descricao}',
-          bancoSigla: bancos[i].sigla,
-          ativo: i != 9,
-        ),
-      );
-    }
   }
 }

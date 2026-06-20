@@ -40,11 +40,9 @@ import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 
-import 'package:zzuna/data/repositories/lancamento/extrato_repository.dart';
-import 'package:zzuna/data/repositories/lancamento/fatura_repository.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/extrato_storage_provider.dart';
-import 'package:zzuna/data/services/storage/local/fatura_storage_provider.dart';
+import 'package:zzuna/data/services/storage/local/extrato_fatura_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/lancamento_storage_provider.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
@@ -124,14 +122,8 @@ final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
   return repository;
 });
 
-final faturaRepositoryProvider = Provider<FaturaRepository>((ref) {
-  final repository = FaturaRepository(ref.watch(faturaStorageProvider));
-  ref.onDispose(repository.dispose);
-  return repository;
-});
-
-final extratoRepositoryProvider = Provider<ExtratoRepository>((ref) {
-  final repository = ExtratoRepository(ref.watch(extratoStorageProvider));
+final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((ref) {
+  final repository = ExtratoFaturaRepository(ref.watch(extratoFaturaStorageProvider));
   ref.onDispose(repository.dispose);
   return repository;
 });
@@ -154,8 +146,7 @@ final lancamentoDetailsUseCaseProvider = Provider<LancamentoDetailsUseCase>((ref
     ref.watch(cartaoRepositoryProvider),
     ref.watch(categoriaRepositoryProvider),
     ref.watch(centroCustoRepositoryProvider),
-    ref.watch(faturaRepositoryProvider),
-    ref.watch(extratoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
     ref.watch(categoriaTreeUseCaseProvider),
   );
 });

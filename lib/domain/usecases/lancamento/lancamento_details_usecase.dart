@@ -3,23 +3,19 @@ import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
-import 'package:zzuna/data/repositories/lancamento/extrato_repository.dart';
-import 'package:zzuna/data/repositories/lancamento/fatura_repository.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/extrato_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/fatura_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_referencia_detail.dart';
 
 class LancamentoDetailsUseCase {
   final LancamentoRepository _lancamentoRepository;
@@ -27,8 +23,7 @@ class LancamentoDetailsUseCase {
   final CartaoRepository _cartaoRepository;
   final CategoriaRepository _categoriaRepository;
   final CentroCustoRepository _centroCustoRepository;
-  final FaturaRepository _faturaRepository;
-  final ExtratoRepository _extratoRepository;
+  final ExtratoFaturaRepository _extratoFaturaRepository;
   final CategoriaTreeUseCase _treeUseCase;
 
   LancamentoDetailsUseCase(
@@ -37,8 +32,7 @@ class LancamentoDetailsUseCase {
     this._cartaoRepository,
     this._categoriaRepository,
     this._centroCustoRepository,
-    this._faturaRepository,
-    this._extratoRepository,
+    this._extratoFaturaRepository,
     this._treeUseCase,
   );
 
@@ -56,24 +50,22 @@ class LancamentoDetailsUseCase {
     final cartoesResult = await _cartaoRepository.getAll();
     final categoriasResult = await _categoriaRepository.getAll();
     final centrosResult = await _centroCustoRepository.getAll();
-    final faturasResult = await _faturaRepository.getAll();
-    final extratosResult = await _extratoRepository.getAll();
+    final extratoFaturasResult = await _extratoFaturaRepository.getAll();
 
     final contas = contasResult.getOrElse((_) => <Conta>[]);
     final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
     final categorias = categoriasResult.getOrElse((_) => <Categoria>[]);
     final centros = centrosResult.getOrElse((_) => <CentroCusto>[]);
-    final faturas = faturasResult.getOrElse((_) => <Fatura>[]);
-    final extratos = extratosResult.getOrElse((_) => <Extrato>[]);
+    final extratoFaturas = extratoFaturasResult.getOrElse((_) => <ExtratoFatura>[]);
 
     final contaDetailsMap = _buildContaDetailsMap(contas);
     final cartaoDetailsMap = _buildCartaoDetailsMap(cartoes);
     final categoryDetailsMap = _buildCategoriaDetailsMap(categorias);
     final centroCustoMap = _buildCentroCustoMap(centros);
-    final faturaDetailsMap = _buildFaturaDetailsMap(faturas, cartaoDetailsMap);
-    final extratoDetailsMap = _buildExtratoDetailsMap(
-      extratos,
+    final extratoFaturaDetailsMap = _buildExtratoFaturaDetailsMap(
+      extratoFaturas,
       contaDetailsMap,
+      cartaoDetailsMap,
     );
 
     final List<LancamentoDetails> detailsList = [];
@@ -84,8 +76,7 @@ class LancamentoDetailsUseCase {
         cartaoDetailsMap,
         centroCustoMap,
         categoryDetailsMap,
-        faturaDetailsMap,
-        extratoDetailsMap,
+        extratoFaturaDetailsMap,
       );
       if (details != null) {
         detailsList.add(details);
@@ -152,44 +143,31 @@ class LancamentoDetailsUseCase {
     return {for (final c in centros) c.id: c};
   }
 
-  Map<String, FaturaDetails> _buildFaturaDetailsMap(
-    List<Fatura> faturas,
+  Map<String, ExtratoFaturaDetails> _buildExtratoFaturaDetailsMap(
+    List<ExtratoFatura> extratoFaturas,
+    Map<String, ContaDetails> contaDetailsMap,
     Map<String, CartaoDetails> cartaoDetailsMap,
   ) {
-    final Map<String, FaturaDetails> map = {};
-    for (final f in faturas) {
-      final cartao = cartaoDetailsMap[f.cartaoId];
-      if (cartao != null) {
-        map[f.id] = FaturaDetails(
-          id: f.id,
-          cartao: cartao,
-          ano: f.ano,
-          mes: f.mes,
-          dataInicio: f.dataInicio,
-          dataFim: f.dataFim,
-          fechada: f.fechada,
-        );
-      }
-    }
-    return map;
-  }
+    final Map<String, ExtratoFaturaDetails> map = {};
+    for (final ef in extratoFaturas) {
+      final origemDetail = switch (ef.origem) {
+        LancamentoOrigemConta(contaId: final cid) =>
+          contaDetailsMap[cid] != null ? LancamentoOrigemDetail.conta(conta: contaDetailsMap[cid]!) : null,
+        LancamentoOrigemCartao(cartaoId: final cid) =>
+          cartaoDetailsMap[cid] != null ? LancamentoOrigemDetail.cartao(cartao: cartaoDetailsMap[cid]!) : null,
+      };
 
-  Map<String, ExtratoDetails> _buildExtratoDetailsMap(
-    List<Extrato> extratos,
-    Map<String, ContaDetails> contaDetailsMap,
-  ) {
-    final Map<String, ExtratoDetails> map = {};
-    for (final e in extratos) {
-      final conta = contaDetailsMap[e.contaId];
-      if (conta != null) {
-        map[e.id] = ExtratoDetails(
-          id: e.id,
-          conta: conta,
-          ano: e.ano,
-          mes: e.mes,
-          dataInicio: e.dataInicio,
-          dataFim: e.dataFim,
-          fechado: e.fechado,
+      if (origemDetail != null) {
+        map[ef.id] = ExtratoFaturaDetails(
+          id: ef.id,
+          origem: origemDetail,
+          ano: ef.ano,
+          mes: ef.mes,
+          dataInicio: ef.dataInicio,
+          dataFim: ef.dataFim,
+          saldoInicial: ef.saldoInicial,
+          saldoFinal: ef.saldoFinal,
+          fechado: ef.fechado,
         );
       }
     }
@@ -221,27 +199,6 @@ class LancamentoDetailsUseCase {
     return itemDetails;
   }
 
-  LancamentoReferenciaDetail? _buildReferencia(
-    LancamentoReferencia ref,
-    Map<String, FaturaDetails> faturaDetailsMap,
-    Map<String, ExtratoDetails> extratoDetailsMap,
-  ) {
-    return switch (ref) {
-      ReferenciaFaturaLancamento(faturaId: final faturaId) =>
-        faturaDetailsMap[faturaId] != null
-            ? LancamentoReferenciaDetail.fatura(
-                fatura: faturaDetailsMap[faturaId]!,
-              )
-            : null,
-      ReferenciaExtratoLancamento(extratoId: final extratoId) =>
-        extratoDetailsMap[extratoId] != null
-            ? LancamentoReferenciaDetail.extrato(
-                extrato: extratoDetailsMap[extratoId]!,
-              )
-            : null,
-    };
-  }
-
   LancamentoOrigemDetail? _buildOrigem(
     LancamentoOrigem origem,
     Map<String, ContaDetails> contaDetailsMap,
@@ -267,8 +224,7 @@ class LancamentoDetailsUseCase {
     Map<String, CartaoDetails> cartaoDetailsMap,
     Map<String, CentroCusto> centroCustoMap,
     Map<String, CategoriaDetails> categoryDetailsMap,
-    Map<String, FaturaDetails> faturaDetailsMap,
-    Map<String, ExtratoDetails> extratoDetailsMap,
+    Map<String, ExtratoFaturaDetails> extratoFaturaDetailsMap,
   ) {
     final itemDetails = _buildItemDetails(
       l.itens,
@@ -276,11 +232,7 @@ class LancamentoDetailsUseCase {
       categoryDetailsMap,
     );
 
-    final refDetail = _buildReferencia(
-      l.referencia,
-      faturaDetailsMap,
-      extratoDetailsMap,
-    );
+    final extratoFaturaDetail = extratoFaturaDetailsMap[l.extratoFaturaId];
 
     final origemDetail = _buildOrigem(
       l.origem,
@@ -288,14 +240,14 @@ class LancamentoDetailsUseCase {
       cartaoDetailsMap,
     );
 
-    if (refDetail == null || origemDetail == null) return null;
+    if (extratoFaturaDetail == null || origemDetail == null) return null;
 
     return LancamentoDetails(
       id: l.id,
       tipo: l.tipo,
       data: l.data,
       descricao: l.descricao,
-      referencia: refDetail,
+      extratoFatura: extratoFaturaDetail,
       origem: origemDetail,
       itens: itemDetails,
       conciliado: l.conciliado,

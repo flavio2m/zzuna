@@ -1,4 +1,5 @@
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/data/seed/app_seed.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,21 @@ import 'package:routefly/routefly.dart';
 import 'main.route.dart';
 part 'main.g.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MainApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final container = ProviderContainer();
+
+  // Executa os seeds para desenvolvimento.
+  // Para desativar a massa de dados fake, comente a linha abaixo.
+  await initSeeds(container);
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MainApp(), //
+    ),
+  );
 }
 
 @Main('lib/ui/')
@@ -36,4 +50,15 @@ class MainApp extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> initSeeds(ProviderContainer container) async {
+  await AppSeed(
+    contaRepository: container.read(contaRepositoryProvider),
+    cartaoRepository: container.read(cartaoRepositoryProvider),
+    categoriaRepository: container.read(categoriaRepositoryProvider),
+    centroCustoRepository: container.read(centroCustoRepositoryProvider),
+    extratoFaturaRepository: container.read(extratoFaturaRepositoryProvider),
+    lancamentoRepository: container.read(lancamentoRepositoryProvider),
+  ).execute();
 }

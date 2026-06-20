@@ -61,14 +61,7 @@ class CentroCustoRepository
 
   @override
   AsyncResult<List<CentroCusto>> getAll() async {
-    final result = await _storage.getAll();
-    if (result.isError()) return Failure(result.exceptionOrNull()!);
-    final list = result.getOrThrow();
-    if (list.isEmpty) {
-      await _seedCentroCustos();
-      return _storage.getAll();
-    }
-    return Success(list);
+    return _storage.getAll();
   }
 
   @override
@@ -139,29 +132,4 @@ class CentroCustoRepository
   @override
   void dispose() => _streamController.close();
 
-  // Para testes – gera 10 centros de custo
-  Future<void> _seedCentroCustos() async {
-    const descricoes = [
-      'Moradia',
-      'Viagens',
-      'Lazer',
-      'Educação',
-      'Saúde',
-      'Pessoa A',
-      'Pessoa B',
-      'Pessoa C',
-      'Jurídico',
-      'Terceiros',
-    ];
-    for (var i = 0; i < descricoes.length; i++) {
-      await _storage.create(
-        CentroCusto(
-          id: const Uuid().v4(),
-          descricao: descricoes[i],
-          ativo: i != 9, //
-        ),
-      );
-    }
-    // REFATORAR: Somente para testes
-  }
 }

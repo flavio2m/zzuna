@@ -11,9 +11,7 @@ _Lancamento _$LancamentoFromJson(Map<String, dynamic> json) => _Lancamento(
   tipo: $enumDecode(_$LancamentoTipoEnumMap, json['tipo']),
   data: DateTime.parse(json['data'] as String),
   descricao: json['descricao'] as String,
-  referencia: LancamentoReferencia.fromJson(
-    json['referencia'] as Map<String, dynamic>,
-  ),
+  extratoFaturaId: json['extratoFaturaId'] as String,
   origem: LancamentoOrigem.fromJson(json['origem'] as Map<String, dynamic>),
   itens: (json['itens'] as List<dynamic>)
       .map((e) => LancamentoItem.fromJson(e as Map<String, dynamic>))
@@ -28,7 +26,7 @@ Map<String, dynamic> _$LancamentoToJson(_Lancamento instance) =>
       'tipo': _$LancamentoTipoEnumMap[instance.tipo]!,
       'data': instance.data.toIso8601String(),
       'descricao': instance.descricao,
-      'referencia': instance.referencia,
+      'extratoFaturaId': instance.extratoFaturaId,
       'origem': instance.origem,
       'itens': instance.itens,
       'conciliado': instance.conciliado,
