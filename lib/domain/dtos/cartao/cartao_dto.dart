@@ -6,6 +6,7 @@ class CartaoDto {
   String bancoSigla;
   bool ativo;
   int diaFechamento;
+  DateTime? dataInicial;
 
   CartaoDto({
     this.id,
@@ -14,7 +15,8 @@ class CartaoDto {
     this.bancoSigla = '',
     this.ativo = true,
     this.diaFechamento = 1,
-  });
+    DateTime? dataInicial,
+  }) : dataInicial = dataInicial ?? DateTime(DateTime.now().year, DateTime.now().month, 1);
 
   void setId(String? id) {
     this.id = id;
@@ -40,6 +42,10 @@ class CartaoDto {
     this.diaFechamento = diaFechamento;
   }
 
+  void setDataInicial(DateTime dataInicial) {
+    this.dataInicial = dataInicial;
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'descricao': descricao,
@@ -47,6 +53,7 @@ class CartaoDto {
     'bancoSigla': bancoSigla,
     'ativo': ativo,
     'diaFechamento': diaFechamento,
+    'dataInicial': dataInicial?.toIso8601String(),
   };
 
   factory CartaoDto.fromJson(Map<String, dynamic> json) {
@@ -57,6 +64,7 @@ class CartaoDto {
       bancoSigla: json['bancoSigla'] ?? '',
       ativo: json['ativo'] ?? true,
       diaFechamento: json['diaFechamento'] ?? 1,
+      dataInicial: json['dataInicial'] != null ? DateTime.parse(json['dataInicial']) : null,
     );
   }
 }

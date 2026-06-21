@@ -48,6 +48,9 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -116,10 +119,32 @@ final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
   return repository;
 });
 
+final recalculateExtratoFaturaBalanceUseCaseProvider = Provider<RecalculateExtratoFaturaBalanceUseCase>((ref) {
+  return RecalculateExtratoFaturaBalanceUseCase(
+    ref.watch(extratoFaturaStorageProvider),
+    ref.watch(lancamentoStorageProvider),
+  );
+});
+
+final resolveExtratoFaturaUseCaseProvider = Provider<ResolveExtratoFaturaUseCase>((ref) {
+  return ResolveExtratoFaturaUseCase(
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+  );
+});
+
 final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
   final repository = LancamentoRepository(ref.watch(lancamentoStorageProvider));
   ref.onDispose(repository.dispose);
   return repository;
+});
+
+final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) {
+  return CreateLancamentoUseCase(
+    ref.watch(resolveExtratoFaturaUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+  );
 });
 
 final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((ref) {
@@ -290,6 +315,7 @@ final lancamentosListViewModelProvider = Provider.autoDispose<LancamentosListVie
     ref.watch(lancamentoFilterUseCaseProvider),
     ref.watch(lancamentoResumoMensalUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
   );
   ref.listen(lancamentoFilterProvider, (previous, next) {
     vm.updateFilter(next);

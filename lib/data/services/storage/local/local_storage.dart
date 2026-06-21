@@ -153,6 +153,22 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
                 return true;
               }
               return fieldValue == field.value;
+
+            case SearchFieldType.int:
+              if (field.value is List<int?>) {
+                final range = field.value as List<int?>;
+                if (fieldValue == null) return false;
+
+                final val = num.tryParse(fieldValue.toString())?.toInt();
+                if (val == null) return false;
+
+                if (range[0] != null && val < range[0]!) return false;
+                if (range[1] != null && val > range[1]!) return false;
+
+                return true;
+              }
+              final val = num.tryParse(fieldValue.toString())?.toInt();
+              return val == field.value;
           }
         });
       }).toList();

@@ -6,6 +6,7 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -90,11 +91,11 @@ void main() {
     });
 
     test('search filters by descricao', () async {
-      await repository.create(LancamentoDto(descricao: 'Supermercado'));
-      await repository.create(LancamentoDto(descricao: 'Combustível'));
+      await repository.create(LancamentoDto(descricao: 'Supermercado', data: DateTime(2026, 6, 15)));
+      await repository.create(LancamentoDto(descricao: 'Combustível', data: DateTime(2026, 6, 16)));
 
       final searchResult = await repository.search(
-        LancamentoFilterDto(descricao: 'Super'), //
+        LancamentoFilterDto(descricao: 'Super', mes: Mes.junho, ano: 2026), //
       );
 
       expect(searchResult.getOrThrow(), hasLength(1));
@@ -103,14 +104,14 @@ void main() {
 
     test('search filters by tipo', () async {
       await repository.create(
-        LancamentoDto(descricao: 'A', tipo: LancamentoTipo.receita), //
+        LancamentoDto(descricao: 'A', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 15)), //
       );
       await repository.create(
-        LancamentoDto(descricao: 'B', tipo: LancamentoTipo.despesa), //
+        LancamentoDto(descricao: 'B', tipo: LancamentoTipo.despesa, data: DateTime(2026, 6, 16)), //
       );
 
       final searchResult = await repository.search(
-        LancamentoFilterDto(tipo: LancamentoTipo.receita), //
+        LancamentoFilterDto(tipo: LancamentoTipo.receita, mes: Mes.junho, ano: 2026), //
       );
 
       expect(searchResult.getOrThrow(), hasLength(1));
@@ -119,14 +120,14 @@ void main() {
 
     test('search filters by conciliado', () async {
       await repository.create(
-        LancamentoDto(descricao: 'A', conciliado: true), //
+        LancamentoDto(descricao: 'A', conciliado: true, data: DateTime(2026, 6, 15)), //
       );
       await repository.create(
-        LancamentoDto(descricao: 'B', conciliado: false), //
+        LancamentoDto(descricao: 'B', conciliado: false, data: DateTime(2026, 6, 16)), //
       );
 
       final searchResult = await repository.search(
-        LancamentoFilterDto(conciliado: true), //
+        LancamentoFilterDto(conciliado: true, mes: Mes.junho, ano: 2026), //
       );
 
       expect(searchResult.getOrThrow(), hasLength(1));

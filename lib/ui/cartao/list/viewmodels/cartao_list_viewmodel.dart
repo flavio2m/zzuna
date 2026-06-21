@@ -66,6 +66,7 @@ class CartaoListViewModel {
       banco: banco,
       ativo: cartao.ativo,
       diaFechamento: cartao.diaFechamento,
+      dataInicial: cartao.dataInicial,
     );
   }
 

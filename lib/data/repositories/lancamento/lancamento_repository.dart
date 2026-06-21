@@ -11,7 +11,6 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 
 import 'package:zzuna/domain/enums/mes.dart';
-
 class LancamentoRepository
     implements
         BaseRepository<
@@ -110,8 +109,6 @@ class LancamentoRepository
 
   @override
   AsyncResult<List<Lancamento>> search(LancamentoFilterDto filter) async {
-    //Esse método não será utilizado para buscas diferentes de ano e mês
-
     // Retorna failure se não for passado ano ou mês
     if (filter.ano == null || filter.mes == null) {
       return Failure(
@@ -131,6 +128,36 @@ class LancamentoRepository
         type: SearchFieldType.date, //
       ),
     ];
+
+    if (filter.descricao.isNotEmpty) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'descricao',
+          value: filter.descricao,
+          type: SearchFieldType.string,
+        ),
+      );
+    }
+
+    if (filter.tipo != null) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'tipo',
+          value: filter.tipo!.name,
+          type: SearchFieldType.string,
+        ),
+      );
+    }
+
+    if (filter.conciliado != null) {
+      searchFields.add(
+        SearchField(
+          fieldName: 'conciliado',
+          value: filter.conciliado,
+          type: SearchFieldType.boolean,
+        ),
+      );
+    }
 
     final result = await _storage.searchByFields(searchFields);
     return result.fold(

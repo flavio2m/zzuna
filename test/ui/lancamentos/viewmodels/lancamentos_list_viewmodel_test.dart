@@ -1,4 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
@@ -37,6 +41,16 @@ class FakeLancamentoFilterUseCase implements LancamentoFilterUseCase {
 class FakeLancamentoRepository implements LancamentoRepository {
   @override
   Stream<RepositoryEvent<Lancamento>> observer() => const Stream.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeExtratoFaturaRepository implements ExtratoFaturaRepository {
+  @override
+  AsyncResult<List<ExtratoFatura>> search(ExtratoFaturaFilterDto filter) async {
+    return const Success([]);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -139,6 +153,7 @@ void main() {
         FakeLancamentoFilterUseCase(),
         LancamentoResumoMensalUseCase(),
         FakeLancamentoRepository(),
+        FakeExtratoFaturaRepository(),
       );
     });
 

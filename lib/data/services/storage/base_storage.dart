@@ -1,6 +1,6 @@
 import 'package:result_dart/result_dart.dart';
 
-enum SearchFieldType { string, boolean, date }
+enum SearchFieldType { string, boolean, date, int }
 
 class SearchField {
   final String fieldName;

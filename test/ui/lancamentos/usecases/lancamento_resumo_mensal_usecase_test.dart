@@ -23,6 +23,7 @@ void main() {
       descricao: 'Conta 1',
       ativo: true,
       banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+      dataInicial: DateTime(2026, 1, 1),
     );
 
     LancamentoDetails buildLancamento({
@@ -75,10 +76,19 @@ void main() {
         buildLancamento(id: '5', tipo: LancamentoTipo.transferencia, data: DateTime(2026, 6, 19), valor: 100.0),
       ];
 
-      final result = useCase.execute(list);
+      final result = useCase.execute(
+        list,
+        extratos: [],
+        contasSelecionadas: {},
+        cartoesSelecionados: {},
+        temFiltroRestritivo: false,
+        mes: Mes.junho,
+        ano: 2026,
+      );
 
       expect(result.receitas, 1500.0);
       expect(result.despesas, 300.0);
+      expect(result.transferencias, 100.0);
       expect(result.investimentos, 200.0);
       expect(result.mes, Mes.junho);
       expect(result.ano, 2026);
@@ -91,7 +101,15 @@ void main() {
         buildLancamento(id: '3', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 16, 09, 0), valor: 500.0),
       ];
 
-      final result = useCase.execute(list);
+      final result = useCase.execute(
+        list,
+        extratos: [],
+        contasSelecionadas: {},
+        cartoesSelecionados: {},
+        temFiltroRestritivo: false,
+        mes: Mes.junho,
+        ano: 2026,
+      );
 
       expect(result.dias.length, 2);
 
@@ -108,14 +126,26 @@ void main() {
     });
 
     test('handles empty list gracefully by returning empty days and current month/year', () {
-      final result = useCase.execute([]);
+      final now = DateTime.now();
+      final currentMes = Mes.fromDate(now);
+      final currentAno = now.year;
+
+      final result = useCase.execute(
+        [],
+        extratos: [],
+        contasSelecionadas: {},
+        cartoesSelecionados: {},
+        temFiltroRestritivo: false,
+        mes: currentMes,
+        ano: currentAno,
+      );
 
       expect(result.receitas, 0.0);
       expect(result.despesas, 0.0);
       expect(result.investimentos, 0.0);
       expect(result.dias, isEmpty);
-      expect(result.mes, Mes.fromDate(DateTime.now()));
-      expect(result.ano, DateTime.now().year);
+      expect(result.mes, currentMes);
+      expect(result.ano, currentAno);
     });
   });
 }

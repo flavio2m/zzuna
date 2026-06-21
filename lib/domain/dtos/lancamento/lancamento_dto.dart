@@ -27,6 +27,30 @@ class LancamentoDto {
   }) : data = data ?? DateTime.now(),
        origem = origem ?? const LancamentoOrigem.conta(contaId: '');
 
+  LancamentoDto copyWith({
+    String? id,
+    LancamentoTipo? tipo,
+    DateTime? data,
+    String? descricao,
+    LancamentoOrigem? origem,
+    String? extratoFaturaId,
+    List<LancamentoItem>? itens,
+    bool? conciliado,
+    String? observacao,
+  }) {
+    return LancamentoDto(
+      id: id ?? this.id,
+      tipo: tipo ?? this.tipo,
+      data: data ?? this.data,
+      descricao: descricao ?? this.descricao,
+      origem: origem ?? this.origem,
+      extratoFaturaId: extratoFaturaId ?? this.extratoFaturaId,
+      itens: itens ?? this.itens,
+      conciliado: conciliado ?? this.conciliado,
+      observacao: observacao ?? this.observacao,
+    );
+  }
+
   void setId(String? id) {
     this.id = id;
   }

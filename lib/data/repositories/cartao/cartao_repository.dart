@@ -19,10 +19,16 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
 
   @override
   AsyncResult<Cartao> create(CartaoDto dto) async {
-    final exists = await findByDescricao(dto.descricao).then((result) => result.isSuccess());
+    final exists = await findByDescricao(dto.descricao).then(
+      (result) => result.isSuccess(), //
+    );
 
     if (exists) {
-      return Failure(LocalStorageException('Já existe um cartão com a descrição: ${dto.descricao}'));
+      return Failure(
+        LocalStorageException(
+          'Já existe um cartão com a descrição: ${dto.descricao}', //
+        ),
+      );
     }
 
     final cartao = Cartao(
@@ -32,6 +38,13 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
       bancoSigla: dto.bancoSigla,
       ativo: dto.ativo,
       diaFechamento: dto.diaFechamento,
+      dataInicial:
+          dto.dataInicial ??
+          DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            1, //
+          ),
     );
 
     return _storage.create(cartao).onSuccess((cartao) {
@@ -48,6 +61,7 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
       bancoSigla: dto.bancoSigla,
       ativo: dto.ativo,
       diaFechamento: dto.diaFechamento,
+      dataInicial: dto.dataInicial!,
     );
     return _storage.update(cartao).onSuccess((cartao) {
       _streamController.add(RepositoryUpdated(cartao));

@@ -36,7 +36,14 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
       id: const Uuid().v4(),
       descricao: dto.descricao,
       ativo: dto.ativo,
-      bancoSigla: dto.bancoSigla, //
+      bancoSigla: dto.bancoSigla,
+      dataInicial:
+          dto.dataInicial ??
+          DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            1, //
+          ),
     );
 
     return _storage.create(conta).onSuccess((conta) {
@@ -50,7 +57,8 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
       id: dto.id,
       descricao: dto.descricao,
       ativo: dto.ativo,
-      bancoSigla: dto.bancoSigla, //
+      bancoSigla: dto.bancoSigla,
+      dataInicial: dto.dataInicial,
     );
     return _storage.update(conta).onSuccess((conta) {
       _streamController.add(RepositoryUpdated(conta));

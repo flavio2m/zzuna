@@ -111,7 +111,8 @@ class LancamentosSidebarViewModel {
       id: conta.id,
       descricao: conta.descricao,
       banco: banco,
-      ativo: conta.ativo, //
+      ativo: conta.ativo,
+      dataInicial: conta.dataInicial,
     );
   }
 
@@ -124,6 +125,7 @@ class LancamentosSidebarViewModel {
       banco: banco,
       ativo: cartao.ativo,
       diaFechamento: cartao.diaFechamento,
+      dataInicial: cartao.dataInicial,
     );
   }
 

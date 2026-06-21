@@ -9,6 +9,7 @@ import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
 class ExtratoFaturaRepository
     implements BaseRepository<ExtratoFatura, ExtratoFaturaDto, ExtratoFaturaDto, ExtratoFaturaFilterDto> {
@@ -113,6 +114,49 @@ class ExtratoFaturaRepository
         ),
       ),
     );
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchByAno(int ano) async {
+    final searchFields = [
+      SearchField(
+        fieldName: 'ano',
+        value: ano.toString(),
+        type: SearchFieldType.string,
+      ),
+    ];
+    final result = await _storage.searchByFields(searchFields);
+    return result.fold(
+      Success.new,
+      (error) => Failure(
+        LocalStorageException(
+          'Erro ao buscar extratos por ano',
+        ),
+      ),
+    );
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchByOrigemAndAno(
+    LancamentoOrigem origem,
+    int ano, [
+    int? mes,
+  ]) async {
+    final searchFields = [
+      SearchField(
+        fieldName: 'ano',
+        value: [ano, null],
+        type: SearchFieldType.int,
+      ),
+    ];
+    final result = await _storage.searchByFields(searchFields);
+    return result.map((list) {
+      var filtered = list.where((e) => e.origem == origem).toList();
+      if (mes != null) {
+        filtered = filtered.where((e) {
+          return e.ano > ano || (e.ano == ano && e.mes.numero >= mes);
+        }).toList();
+      }
+      return filtered;
+    });
   }
 
   @override

@@ -96,6 +96,7 @@ class LancamentoDetailsUseCase {
           descricao: c.descricao,
           banco: banco,
           ativo: c.ativo,
+          dataInicial: c.dataInicial,
         );
       }
     }
@@ -114,6 +115,7 @@ class LancamentoDetailsUseCase {
           banco: banco,
           ativo: c.ativo,
           diaFechamento: c.diaFechamento,
+          dataInicial: c.dataInicial,
         );
       }
     }

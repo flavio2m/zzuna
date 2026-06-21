@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
@@ -18,14 +21,22 @@ class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoFilterUseCase _filterUseCase;
   final LancamentoResumoMensalUseCase _resumoMensalUseCase;
   final LancamentoRepository _repository;
+  final ExtratoFaturaRepository _extratoFaturaRepository;
   StreamSubscription? _repositorySubscription;
 
   List<LancamentoDetails> _allLancamentos = [];
+  List<ExtratoFatura> _currentExtratos = [];
   LancamentoFilterDto _currentFilter = LancamentoFilterDto(mes: Mes.fromDate(DateTime.now()), ano: DateTime.now().year);
 
   LancamentoResumoMensal? resumoMensal;
 
-  LancamentosListViewModel(this._detailsUseCase, this._filterUseCase, this._resumoMensalUseCase, this._repository) {
+  LancamentosListViewModel(
+    this._detailsUseCase,
+    this._filterUseCase,
+    this._resumoMensalUseCase,
+    this._repository,
+    this._extratoFaturaRepository,
+  ) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
     });
@@ -37,6 +48,12 @@ class LancamentosListViewModel extends ChangeNotifier {
     try {
       final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
       final ano = _currentFilter.ano ?? DateTime.now().year;
+
+      final extratoResult = await _extratoFaturaRepository.search(
+        ExtratoFaturaFilterDto(mes: mes, ano: ano),
+      );
+      _currentExtratos = extratoResult.getOrElse((_) => []);
+
       final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
       _allLancamentos = allDetails;
       _applyFilter();
@@ -48,7 +65,18 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   void _applyFilter() {
     final filtered = _filterUseCase.execute(_allLancamentos, _currentFilter);
-    resumoMensal = _resumoMensalUseCase.execute(filtered);
+    final temFiltroRestritivo = _currentFilter.categoriasSelecionadas.isNotEmpty ||
+        _currentFilter.centrosSelecionados.isNotEmpty;
+
+    resumoMensal = _resumoMensalUseCase.execute(
+      filtered,
+      extratos: _currentExtratos,
+      contasSelecionadas: _currentFilter.contasSelecionadas,
+      cartoesSelecionados: _currentFilter.cartoesSelecionados,
+      temFiltroRestritivo: temFiltroRestritivo,
+      mes: _currentFilter.mes ?? Mes.fromDate(DateTime.now()),
+      ano: _currentFilter.ano ?? DateTime.now().year,
+    );
     notifyListeners();
   }
 
