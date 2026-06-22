@@ -179,6 +179,21 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
     }
   }
 
+  @override
+  AsyncResult<Unit> updateAll(List<T> models) async {
+    try {
+      for (final model in models) {
+        final result = await update(model);
+        if (result.isError()) {
+          return Failure(result.exceptionOrNull()!);
+        }
+      }
+      return const Success(unit);
+    } catch (e, s) {
+      return Failure(LocalStorageException('Erro ao atualizar lista: $e', s));
+    }
+  }
+
   AsyncResult<List<T>> _getList() async {
     final result = await _prefsService.getData(collectionName);
 

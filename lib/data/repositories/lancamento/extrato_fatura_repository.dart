@@ -159,6 +159,27 @@ class ExtratoFaturaRepository
     });
   }
 
+  AsyncResult<Unit> updateAll(List<ExtratoFaturaDto> dtos) async {
+    final entities = dtos.map((dto) => ExtratoFatura(
+      id: dto.id!,
+      origem: dto.origem,
+      ano: dto.ano,
+      mes: dto.mes,
+      dataInicio: dto.dataInicio,
+      dataFim: dto.dataFim,
+      saldoInicial: dto.saldoInicial,
+      saldoFinal: dto.saldoFinal,
+      fechado: dto.fechado,
+    )).toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final entity in entities) {
+        _streamController.add(RepositoryUpdated(entity));
+      }
+    });
+  }
+
   @override
   Stream<RepositoryEvent<ExtratoFatura>> observer() {
     return _streamController.stream;

@@ -63,11 +63,27 @@ class ResolveExtratoFaturaUseCase {
     // 5. Calcular o delta do lançamento
     final delta = _calculateDelta(dto.tipo, dto.valor);
 
-    // 6. Atualizar o saldoFinal do mês do lançamento
-    final updatedAlvo = await _updateSaldoFinal(extratoAlvo, delta);
+    // 6. Atualizar o saldoFinal do mês do lançamento (em memória)
+    final updatedAlvo = _updateSaldoFinal(extratoAlvo, delta);
 
-    // 7. Propagar esse mesmo delta para todos os extratos posteriores da mesma origem
-    await _propagateDelta(origem, targetMonth, delta);
+    // 7. Propagar esse mesmo delta para todos os extratos posteriores da mesma origem (em memória)
+    final propagatedUpdated = await _propagateDelta(origem, targetMonth, delta);
+
+    // 8. Montar a lista de DTOs para atualização em lote
+    final List<ExtratoFaturaDto> dtosToUpdate = [
+      _toDto(updatedAlvo), ...propagatedUpdated.map(_toDto), //
+    ];
+
+    // 9. Realizar a chamada de atualização em lote
+    final batchResult = await _extratoRepository.updateAll(dtosToUpdate);
+    if (batchResult.isError()) {
+      return Failure(
+        DomainException(
+          'Falha ao persistir alterações nos extratos: '
+          '${batchResult.exceptionOrNull()}', //
+        ),
+      );
+    }
 
     return Success(updatedAlvo);
   }
@@ -177,34 +193,11 @@ class ResolveExtratoFaturaUseCase {
     return -valor;
   }
 
-  Future<ExtratoFatura> _updateSaldoFinal(
-    ExtratoFatura extrato,
-    double delta, //
-  ) async {
-    final updatedExtrato = extrato.copyWith(
-      saldoFinal: extrato.saldoFinal + delta, //
-    );
-
-    final dto = ExtratoFaturaDto(
-      id: updatedExtrato.id,
-      origem: updatedExtrato.origem,
-      ano: updatedExtrato.ano,
-      mes: updatedExtrato.mes,
-      dataInicio: updatedExtrato.dataInicio,
-      dataFim: updatedExtrato.dataFim,
-      saldoInicial: updatedExtrato.saldoInicial,
-      saldoFinal: updatedExtrato.saldoFinal,
-      fechado: updatedExtrato.fechado,
-    );
-
-    final updateRes = await _extratoRepository.update(dto);
-    if (updateRes.isError()) {
-      throw Exception('Falha ao persistir saldo final do extrato');
-    }
-    return updateRes.getOrThrow();
+  ExtratoFatura _updateSaldoFinal(ExtratoFatura extrato, double delta) {
+    return extrato.copyWith(saldoFinal: extrato.saldoFinal + delta);
   }
 
-  Future<void> _propagateDelta(
+  Future<List<ExtratoFatura>> _propagateDelta(
     LancamentoOrigem origem,
     DateTime targetMonth,
     double delta, //
@@ -218,7 +211,7 @@ class ResolveExtratoFaturaUseCase {
 
     extratosOrigem.sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
 
-    //REFATORAR: criar atualização em lote para evitar múltiplas chamadas ao banco
+    final List<ExtratoFatura> updatedList = [];
     for (final extrato in extratosOrigem) {
       final start = DateTime(extrato.ano, extrato.mes.numero, 1);
       if (start.isAfter(targetMonth)) {
@@ -226,24 +219,23 @@ class ResolveExtratoFaturaUseCase {
           saldoInicial: extrato.saldoInicial + delta,
           saldoFinal: extrato.saldoFinal + delta,
         );
-
-        final dto = ExtratoFaturaDto(
-          id: updated.id,
-          origem: updated.origem,
-          ano: updated.ano,
-          mes: updated.mes,
-          dataInicio: updated.dataInicio,
-          dataFim: updated.dataFim,
-          saldoInicial: updated.saldoInicial,
-          saldoFinal: updated.saldoFinal,
-          fechado: updated.fechado,
-        );
-
-        final updateRes = await _extratoRepository.update(dto);
-        if (updateRes.isError()) {
-          throw Exception('Falha ao propagar delta para o extrato ${extrato.id}');
-        }
+        updatedList.add(updated);
       }
     }
+    return updatedList;
+  }
+
+  ExtratoFaturaDto _toDto(ExtratoFatura entity) {
+    return ExtratoFaturaDto(
+      id: entity.id,
+      origem: entity.origem,
+      ano: entity.ano,
+      mes: entity.mes,
+      dataInicio: entity.dataInicio,
+      dataFim: entity.dataFim,
+      saldoInicial: entity.saldoInicial,
+      saldoFinal: entity.saldoFinal,
+      fechado: entity.fechado,
+    );
   }
 }

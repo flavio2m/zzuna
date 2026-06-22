@@ -17,4 +17,5 @@ abstract class BaseStorage<T extends Object> {
   AsyncResult<List<T>> getAll();
   AsyncResult<T> getById(String id);
   AsyncResult<List<T>> searchByFields(List<SearchField> fields);
+  AsyncResult<Unit> updateAll(List<T> models);
 }
