@@ -3,7 +3,10 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
 class LancamentoFilterUseCase {
-  List<LancamentoDetails> execute(List<LancamentoDetails> list, LancamentoFilterDto filter) {
+  List<LancamentoDetails> execute(
+    List<LancamentoDetails> list,
+    LancamentoFilterDto filter, //
+  ) {
     return list.where((item) {
       // 1. Descrição
       if (filter.descricao.isNotEmpty) {
@@ -27,26 +30,29 @@ class LancamentoFilterUseCase {
         }
       }
 
-      // 4. Contas
-      if (filter.contasSelecionadas.isNotEmpty) {
-        final origem = item.origem;
-        if (origem is LancamentoOrigemContaDetail) {
-          if (!filter.contasSelecionadas.contains(origem.conta.id)) {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      }
+      // 4. Contas e Cartões (Filtro aditivo/OU entre eles se ambos ou algum estiver selecionado)
+      final temContasFiltro = filter.contasSelecionadas.isNotEmpty;
+      final temCartoesFiltro = filter.cartoesSelecionados.isNotEmpty;
 
-      // 5. Cartões
-      if (filter.cartoesSelecionados.isNotEmpty) {
+      if (temContasFiltro || temCartoesFiltro) {
         final origem = item.origem;
-        if (origem is LancamentoOrigemCartaoDetail) {
-          if (!filter.cartoesSelecionados.contains(origem.cartao.id)) {
-            return false;
-          }
-        } else {
+        bool match = false;
+
+        if (origem is LancamentoOrigemContaDetail) {
+          match =
+              temContasFiltro &&
+              filter.contasSelecionadas.contains(
+                origem.conta.id, //
+              );
+        } else if (origem is LancamentoOrigemCartaoDetail) {
+          match =
+              temCartoesFiltro &&
+              filter.cartoesSelecionados.contains(
+                origem.cartao.id, //
+              );
+        }
+
+        if (!match) {
           return false;
         }
       }
