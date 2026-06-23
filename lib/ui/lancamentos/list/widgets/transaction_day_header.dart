@@ -1,4 +1,5 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:flutter/material.dart';
 
 class TransactionDayHeader extends StatelessWidget {
@@ -6,12 +7,16 @@ class TransactionDayHeader extends StatelessWidget {
     super.key,
     required this.date,
     required this.balance,
+    required this.extractBalance,
     this.positive = false,
+    this.positiveExtract = false,
   });
 
   final String date;
   final String balance;
+  final String extractBalance;
   final bool positive;
+  final bool positiveExtract;
 
   @override
   Widget build(BuildContext context) {
@@ -24,39 +29,50 @@ class TransactionDayHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.check_box_outline_blank,
-            size: 16,
-            color: AppColors.slate300,
-          ),
+          const Icon(Icons.check_box_outline_blank, size: 16, color: AppColors.slate300),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              date,
-              style: const TextStyle(
-                color: AppColors.slate800,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
+            child: AppText(date, variant: AppTextVariant.body, color: AppColors.slate800, fontWeight: FontWeight.w800),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppText(
+                    'SALDO DO DIA: ',
+                    variant: AppTextVariant.caption,
+                    color: AppColors.slate400,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  AppText(
+                    balance,
+                    variant: AppTextVariant.caption,
+                    color: positive ? AppColors.primary : AppColors.danger,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ],
               ),
-            ),
-          ),
-          const Text(
-            'SALDO DO DIA:',
-            style: TextStyle(
-              color: AppColors.slate400,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            balance,
-            style: TextStyle(
-              color: positive ? AppColors.primary : AppColors.danger,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-            ),
+              const SizedBox(width: 16),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppText(
+                    'SALDO EXTRATO: ',
+                    variant: AppTextVariant.caption,
+                    color: AppColors.slate400,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  AppText(
+                    extractBalance,
+                    variant: AppTextVariant.caption,
+                    color: positiveExtract ? AppColors.primary : AppColors.danger,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

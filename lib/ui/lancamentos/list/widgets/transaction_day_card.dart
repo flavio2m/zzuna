@@ -29,7 +29,10 @@ class TransactionDayCard extends StatelessWidget {
 
   String _formatValue(double valor, LancamentoTipo tipo) {
     final rowPrefix = tipo == LancamentoTipo.receita ? '+' : '-';
-    return UtilBrasilFields.obterReal(valor, moeda: true).replaceFirst('R\$', '$rowPrefix R\$');
+    return UtilBrasilFields.obterReal(valor, moeda: true).replaceFirst(
+      'R\$',
+      '$rowPrefix R\$', //
+    );
   }
 
   Widget _buildTransactionRow(LancamentoDetails l) {
@@ -37,9 +40,15 @@ class TransactionDayCard extends StatelessWidget {
     final formattedValue = _formatValue(l.valor, l.tipo);
     const String? badge = null;
 
-    final costCenter = l.itens.isEmpty ? 'CC: Geral' : 'CC: ${l.itens.map((i) => i.centroCusto.descricao).join(', ')}';
+    final costCenter = //
+    l.itens.isEmpty
+        ? 'CC: Geral'
+        : 'CC: ${l.itens.map((i) => i.centroCusto.descricao).join(', ')}';
 
-    final categoryPath = l.itens.isNotEmpty ? _categoryPath(l.itens.first.categoria) : 'Sem categoria';
+    final categoryPath = //
+    l.itens.isNotEmpty
+        ? _categoryPath(l.itens.first.categoria)
+        : 'Sem categoria';
 
     return TransactionRow(
       description: l.descricao,
@@ -62,7 +71,17 @@ class TransactionDayCard extends StatelessWidget {
 
     final isPositive = dia.saldo >= 0;
     final prefix = isPositive ? '+' : '-';
-    final balanceStr = UtilBrasilFields.obterReal(dia.saldo.abs(), moeda: true).replaceFirst('R\$', '$prefix R\$');
+    final balanceStr =
+        UtilBrasilFields //
+            .obterReal(dia.saldo.abs(), moeda: true)
+            .replaceFirst('R\$', '$prefix R\$');
+
+    final isExtractPositive = dia.saldoExtrato >= 0;
+    final extractPrefix = isExtractPositive ? '+' : '-';
+    final extractBalanceStr = UtilBrasilFields.obterReal(
+      dia.saldoExtrato.abs(),
+      moeda: true,
+    ).replaceFirst('R\$', '$extractPrefix R\$');
 
     final rows = dia.lancamentos.map(_buildTransactionRow).toList();
 
@@ -71,16 +90,32 @@ class TransactionDayCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6), //
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Column(
           children: [
-            TransactionDayHeader(date: dateKey, balance: balanceStr, positive: isPositive),
+            TransactionDayHeader(
+              date: dateKey,
+              balance: balanceStr,
+              extractBalance: extractBalanceStr,
+              positive: isPositive,
+              positiveExtract: isExtractPositive,
+            ),
             for (var index = 0; index < rows.length; index++) ...[
               rows[index],
-              if (index != rows.length - 1) const Divider(height: 1, color: AppColors.slate100),
+              if (index != rows.length - 1)
+                const Divider(
+                  height: 1,
+                  color: AppColors.slate100, //
+                ),
             ],
           ],
         ),

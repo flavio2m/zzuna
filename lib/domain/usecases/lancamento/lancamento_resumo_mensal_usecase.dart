@@ -15,9 +15,6 @@ class LancamentoResumoMensalUseCase {
     required Mes mes,
     required int ano,
   }) {
-    final totals = _calcularTotais(lancamentos);
-    final dias = _agruparPorDia(lancamentos);
-
     double saldoInicial = 0;
     double saldoFinal = 0;
 
@@ -42,6 +39,9 @@ class LancamentoResumoMensalUseCase {
         saldoFinal += ef.saldoFinal;
       }
     }
+
+    final totals = _calcularTotais(lancamentos);
+    final dias = _agruparPorDia(lancamentos, saldoInicial);
 
     return LancamentoResumoMensal(
       mes: mes,
@@ -88,31 +88,47 @@ class LancamentoResumoMensalUseCase {
     );
   }
 
-  List<LancamentoResumoDia> _agruparPorDia(List<LancamentoDetails> lancamentos) {
-    final sorted = List<LancamentoDetails>.from(lancamentos)..sort((a, b) => b.data.compareTo(a.data));
-
+  List<LancamentoResumoDia> _agruparPorDia(
+    List<LancamentoDetails> lancamentos,
+    double saldoInicialExtrato, //
+  ) {
     final Map<DateTime, List<LancamentoDetails>> grouped = {};
-    for (final l in sorted) {
+    for (final l in lancamentos) {
       final dateKey = DateTime(l.data.year, l.data.month, l.data.day);
       grouped.putIfAbsent(dateKey, () => []).add(l);
     }
 
-    final sortedKeys = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+    final sortedKeysAsc = grouped.keys.toList()..sort((a, b) => a.compareTo(b));
 
-    return sortedKeys.map((date) {
+    final List<LancamentoResumoDia> resumosCronologicos = [];
+    double saldoExtratoAcumulado = saldoInicialExtrato;
+
+    for (final date in sortedKeysAsc) {
       final items = grouped[date]!;
-      double saldo = 0;
+      items.sort((a, b) => b.data.compareTo(a.data));
 
+      double saldoDia = 0;
       for (final l in items) {
         if (l.tipo == LancamentoTipo.receita) {
-          saldo += l.valor;
+          saldoDia += l.valor;
         } else {
-          saldo -= l.valor;
+          saldoDia -= l.valor;
         }
       }
 
-      return LancamentoResumoDia(data: date, saldo: saldo, lancamentos: items);
-    }).toList();
+      saldoExtratoAcumulado += saldoDia;
+
+      resumosCronologicos.add(
+        LancamentoResumoDia(
+          data: date,
+          saldo: saldoDia,
+          saldoExtrato: saldoExtratoAcumulado,
+          lancamentos: items, //
+        ),
+      );
+    }
+
+    return resumosCronologicos.reversed.toList();
   }
 }
 

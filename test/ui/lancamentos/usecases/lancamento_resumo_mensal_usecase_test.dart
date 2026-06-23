@@ -7,6 +7,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 
@@ -117,12 +118,70 @@ void main() {
       final firstDay = result.dias[0];
       expect(firstDay.data, DateTime(2026, 6, 16));
       expect(firstDay.saldo, 500.0);
+      expect(firstDay.saldoExtrato, 1300.0); // 800 (from 15th) + 500 (from 16th)
       expect(firstDay.lancamentos.length, 1);
 
       final secondDay = result.dias[1];
       expect(secondDay.data, DateTime(2026, 6, 15));
       expect(secondDay.saldo, 800.0); // 1000 (receita) - 200 (despesa)
+      expect(secondDay.saldoExtrato, 800.0); // 0 (initial) + 800
       expect(secondDay.lancamentos.length, 2);
+    });
+
+    test('calculates and propagates accumulated extract balance starting from non-zero initial extract balance', () {
+      final extrato = ExtratoFatura(
+        id: 'ef-1',
+        origem: const LancamentoOrigem.conta(contaId: 'conta-1'),
+        ano: 2026,
+        mes: Mes.junho,
+        dataInicio: DateTime(2026, 6, 1),
+        dataFim: DateTime(2026, 6, 30),
+        saldoInicial: 1000.0,
+        saldoFinal: 2500.0,
+        fechado: false,
+        periodo: 202606,
+        origemKey: 'conta_conta-1',
+      );
+
+      final list = [
+        buildLancamento(id: '1', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 5), valor: 500.0),
+        buildLancamento(id: '2', tipo: LancamentoTipo.despesa, data: DateTime(2026, 6, 10), valor: 200.0),
+        buildLancamento(id: '3', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 12), valor: 300.0),
+      ];
+
+      final result = useCase.execute(
+        list,
+        extratos: [extrato],
+        contasSelecionadas: {'conta-1'},
+        cartoesSelecionados: {},
+        temFiltroRestritivo: false,
+        mes: Mes.junho,
+        ano: 2026,
+      );
+
+      expect(result.dias.length, 3);
+
+      // Days in descending order: 12th, 10th, 5th
+      // Chronological calculations:
+      // Start: 1000.0
+      // 5th: +500 -> 1500.0
+      // 10th: -200 -> 1300.0
+      // 12th: +300 -> 1600.0
+
+      final day12 = result.dias[0];
+      expect(day12.data, DateTime(2026, 6, 12));
+      expect(day12.saldo, 300.0);
+      expect(day12.saldoExtrato, 1600.0);
+
+      final day10 = result.dias[1];
+      expect(day10.data, DateTime(2026, 6, 10));
+      expect(day10.saldo, -200.0);
+      expect(day10.saldoExtrato, 1300.0);
+
+      final day5 = result.dias[2];
+      expect(day5.data, DateTime(2026, 6, 5));
+      expect(day5.saldo, 500.0);
+      expect(day5.saldoExtrato, 1500.0);
     });
 
     test('handles empty list gracefully by returning empty days and current month/year', () {
