@@ -309,7 +309,7 @@ final lancamentoResumoMensalUseCaseProvider = Provider<LancamentoResumoMensalUse
   return LancamentoResumoMensalUseCase();
 });
 
-final lancamentosListViewModelProvider = Provider.autoDispose<LancamentosListViewModel>((ref) {
+final lancamentosListViewModelProvider = ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
   final vm = LancamentosListViewModel(
     ref.watch(lancamentoDetailsUseCaseProvider),
     ref.watch(lancamentoFilterUseCaseProvider),

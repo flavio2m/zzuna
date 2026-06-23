@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExtratoFatura {
 
- String get id; LancamentoOrigem get origem; int get ano; Mes get mes; DateTime get dataInicio; DateTime get dataFim; double get saldoInicial; double get saldoFinal; bool get fechado;
+ String get id; LancamentoOrigem get origem; int get ano; Mes get mes; DateTime get dataInicio; DateTime get dataFim; double get saldoInicial; double get saldoFinal; bool get fechado; int get periodo; String get origemKey;
 /// Create a copy of ExtratoFatura
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ExtratoFaturaCopyWith<ExtratoFatura> get copyWith => _$ExtratoFaturaCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExtratoFatura&&(identical(other.id, id) || other.id == id)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.ano, ano) || other.ano == ano)&&(identical(other.mes, mes) || other.mes == mes)&&(identical(other.dataInicio, dataInicio) || other.dataInicio == dataInicio)&&(identical(other.dataFim, dataFim) || other.dataFim == dataFim)&&(identical(other.saldoInicial, saldoInicial) || other.saldoInicial == saldoInicial)&&(identical(other.saldoFinal, saldoFinal) || other.saldoFinal == saldoFinal)&&(identical(other.fechado, fechado) || other.fechado == fechado));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExtratoFatura&&(identical(other.id, id) || other.id == id)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.ano, ano) || other.ano == ano)&&(identical(other.mes, mes) || other.mes == mes)&&(identical(other.dataInicio, dataInicio) || other.dataInicio == dataInicio)&&(identical(other.dataFim, dataFim) || other.dataFim == dataFim)&&(identical(other.saldoInicial, saldoInicial) || other.saldoInicial == saldoInicial)&&(identical(other.saldoFinal, saldoFinal) || other.saldoFinal == saldoFinal)&&(identical(other.fechado, fechado) || other.fechado == fechado)&&(identical(other.periodo, periodo) || other.periodo == periodo)&&(identical(other.origemKey, origemKey) || other.origemKey == origemKey));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,origem,ano,mes,dataInicio,dataFim,saldoInicial,saldoFinal,fechado);
+int get hashCode => Object.hash(runtimeType,id,origem,ano,mes,dataInicio,dataFim,saldoInicial,saldoFinal,fechado,periodo,origemKey);
 
 @override
 String toString() {
-  return 'ExtratoFatura(id: $id, origem: $origem, ano: $ano, mes: $mes, dataInicio: $dataInicio, dataFim: $dataFim, saldoInicial: $saldoInicial, saldoFinal: $saldoFinal, fechado: $fechado)';
+  return 'ExtratoFatura(id: $id, origem: $origem, ano: $ano, mes: $mes, dataInicio: $dataInicio, dataFim: $dataFim, saldoInicial: $saldoInicial, saldoFinal: $saldoFinal, fechado: $fechado, periodo: $periodo, origemKey: $origemKey)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ExtratoFaturaCopyWith<$Res>  {
   factory $ExtratoFaturaCopyWith(ExtratoFatura value, $Res Function(ExtratoFatura) _then) = _$ExtratoFaturaCopyWithImpl;
 @useResult
 $Res call({
- String id, LancamentoOrigem origem, int ano, Mes mes, DateTime dataInicio, DateTime dataFim, double saldoInicial, double saldoFinal, bool fechado
+ String id, LancamentoOrigem origem, int ano, Mes mes, DateTime dataInicio, DateTime dataFim, double saldoInicial, double saldoFinal, bool fechado, int periodo, String origemKey
 });
 
 
@@ -65,7 +65,7 @@ class _$ExtratoFaturaCopyWithImpl<$Res>
 
 /// Create a copy of ExtratoFatura
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? origem = null,Object? ano = null,Object? mes = null,Object? dataInicio = null,Object? dataFim = null,Object? saldoInicial = null,Object? saldoFinal = null,Object? fechado = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? origem = null,Object? ano = null,Object? mes = null,Object? dataInicio = null,Object? dataFim = null,Object? saldoInicial = null,Object? saldoFinal = null,Object? fechado = null,Object? periodo = null,Object? origemKey = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,9 @@ as DateTime,dataFim: null == dataFim ? _self.dataFim : dataFim // ignore: cast_n
 as DateTime,saldoInicial: null == saldoInicial ? _self.saldoInicial : saldoInicial // ignore: cast_nullable_to_non_nullable
 as double,saldoFinal: null == saldoFinal ? _self.saldoFinal : saldoFinal // ignore: cast_nullable_to_non_nullable
 as double,fechado: null == fechado ? _self.fechado : fechado // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,periodo: null == periodo ? _self.periodo : periodo // ignore: cast_nullable_to_non_nullable
+as int,origemKey: null == origemKey ? _self.origemKey : origemKey // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 /// Create a copy of ExtratoFatura
@@ -167,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado,  int periodo,  String origemKey)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExtratoFatura() when $default != null:
-return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado);case _:
+return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado,_that.periodo,_that.origemKey);case _:
   return orElse();
 
 }
@@ -188,10 +190,10 @@ return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado,  int periodo,  String origemKey)  $default,) {final _that = this;
 switch (_that) {
 case _ExtratoFatura():
-return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado);}
+return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado,_that.periodo,_that.origemKey);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -205,10 +207,10 @@ return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  LancamentoOrigem origem,  int ano,  Mes mes,  DateTime dataInicio,  DateTime dataFim,  double saldoInicial,  double saldoFinal,  bool fechado,  int periodo,  String origemKey)?  $default,) {final _that = this;
 switch (_that) {
 case _ExtratoFatura() when $default != null:
-return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado);case _:
+return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that.dataFim,_that.saldoInicial,_that.saldoFinal,_that.fechado,_that.periodo,_that.origemKey);case _:
   return null;
 
 }
@@ -220,7 +222,7 @@ return $default(_that.id,_that.origem,_that.ano,_that.mes,_that.dataInicio,_that
 @JsonSerializable()
 
 class _ExtratoFatura implements ExtratoFatura {
-  const _ExtratoFatura({required this.id, required this.origem, required this.ano, required this.mes, required this.dataInicio, required this.dataFim, required this.saldoInicial, required this.saldoFinal, required this.fechado});
+  const _ExtratoFatura({required this.id, required this.origem, required this.ano, required this.mes, required this.dataInicio, required this.dataFim, required this.saldoInicial, required this.saldoFinal, required this.fechado, required this.periodo, required this.origemKey});
   factory _ExtratoFatura.fromJson(Map<String, dynamic> json) => _$ExtratoFaturaFromJson(json);
 
 @override final  String id;
@@ -232,6 +234,8 @@ class _ExtratoFatura implements ExtratoFatura {
 @override final  double saldoInicial;
 @override final  double saldoFinal;
 @override final  bool fechado;
+@override final  int periodo;
+@override final  String origemKey;
 
 /// Create a copy of ExtratoFatura
 /// with the given fields replaced by the non-null parameter values.
@@ -246,16 +250,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExtratoFatura&&(identical(other.id, id) || other.id == id)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.ano, ano) || other.ano == ano)&&(identical(other.mes, mes) || other.mes == mes)&&(identical(other.dataInicio, dataInicio) || other.dataInicio == dataInicio)&&(identical(other.dataFim, dataFim) || other.dataFim == dataFim)&&(identical(other.saldoInicial, saldoInicial) || other.saldoInicial == saldoInicial)&&(identical(other.saldoFinal, saldoFinal) || other.saldoFinal == saldoFinal)&&(identical(other.fechado, fechado) || other.fechado == fechado));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExtratoFatura&&(identical(other.id, id) || other.id == id)&&(identical(other.origem, origem) || other.origem == origem)&&(identical(other.ano, ano) || other.ano == ano)&&(identical(other.mes, mes) || other.mes == mes)&&(identical(other.dataInicio, dataInicio) || other.dataInicio == dataInicio)&&(identical(other.dataFim, dataFim) || other.dataFim == dataFim)&&(identical(other.saldoInicial, saldoInicial) || other.saldoInicial == saldoInicial)&&(identical(other.saldoFinal, saldoFinal) || other.saldoFinal == saldoFinal)&&(identical(other.fechado, fechado) || other.fechado == fechado)&&(identical(other.periodo, periodo) || other.periodo == periodo)&&(identical(other.origemKey, origemKey) || other.origemKey == origemKey));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,origem,ano,mes,dataInicio,dataFim,saldoInicial,saldoFinal,fechado);
+int get hashCode => Object.hash(runtimeType,id,origem,ano,mes,dataInicio,dataFim,saldoInicial,saldoFinal,fechado,periodo,origemKey);
 
 @override
 String toString() {
-  return 'ExtratoFatura(id: $id, origem: $origem, ano: $ano, mes: $mes, dataInicio: $dataInicio, dataFim: $dataFim, saldoInicial: $saldoInicial, saldoFinal: $saldoFinal, fechado: $fechado)';
+  return 'ExtratoFatura(id: $id, origem: $origem, ano: $ano, mes: $mes, dataInicio: $dataInicio, dataFim: $dataFim, saldoInicial: $saldoInicial, saldoFinal: $saldoFinal, fechado: $fechado, periodo: $periodo, origemKey: $origemKey)';
 }
 
 
@@ -266,7 +270,7 @@ abstract mixin class _$ExtratoFaturaCopyWith<$Res> implements $ExtratoFaturaCopy
   factory _$ExtratoFaturaCopyWith(_ExtratoFatura value, $Res Function(_ExtratoFatura) _then) = __$ExtratoFaturaCopyWithImpl;
 @override @useResult
 $Res call({
- String id, LancamentoOrigem origem, int ano, Mes mes, DateTime dataInicio, DateTime dataFim, double saldoInicial, double saldoFinal, bool fechado
+ String id, LancamentoOrigem origem, int ano, Mes mes, DateTime dataInicio, DateTime dataFim, double saldoInicial, double saldoFinal, bool fechado, int periodo, String origemKey
 });
 
 
@@ -283,7 +287,7 @@ class __$ExtratoFaturaCopyWithImpl<$Res>
 
 /// Create a copy of ExtratoFatura
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? origem = null,Object? ano = null,Object? mes = null,Object? dataInicio = null,Object? dataFim = null,Object? saldoInicial = null,Object? saldoFinal = null,Object? fechado = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? origem = null,Object? ano = null,Object? mes = null,Object? dataInicio = null,Object? dataFim = null,Object? saldoInicial = null,Object? saldoFinal = null,Object? fechado = null,Object? periodo = null,Object? origemKey = null,}) {
   return _then(_ExtratoFatura(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,origem: null == origem ? _self.origem : origem // ignore: cast_nullable_to_non_nullable
@@ -294,7 +298,9 @@ as DateTime,dataFim: null == dataFim ? _self.dataFim : dataFim // ignore: cast_n
 as DateTime,saldoInicial: null == saldoInicial ? _self.saldoInicial : saldoInicial // ignore: cast_nullable_to_non_nullable
 as double,saldoFinal: null == saldoFinal ? _self.saldoFinal : saldoFinal // ignore: cast_nullable_to_non_nullable
 as double,fechado: null == fechado ? _self.fechado : fechado // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,periodo: null == periodo ? _self.periodo : periodo // ignore: cast_nullable_to_non_nullable
+as int,origemKey: null == origemKey ? _self.origemKey : origemKey // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

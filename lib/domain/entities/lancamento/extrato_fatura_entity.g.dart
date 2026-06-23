@@ -17,6 +17,8 @@ _ExtratoFatura _$ExtratoFaturaFromJson(Map<String, dynamic> json) =>
       saldoInicial: (json['saldoInicial'] as num).toDouble(),
       saldoFinal: (json['saldoFinal'] as num).toDouble(),
       fechado: json['fechado'] as bool,
+      periodo: (json['periodo'] as num).toInt(),
+      origemKey: json['origemKey'] as String,
     );
 
 Map<String, dynamic> _$ExtratoFaturaToJson(_ExtratoFatura instance) =>
@@ -30,6 +32,8 @@ Map<String, dynamic> _$ExtratoFaturaToJson(_ExtratoFatura instance) =>
       'saldoInicial': instance.saldoInicial,
       'saldoFinal': instance.saldoFinal,
       'fechado': instance.fechado,
+      'periodo': instance.periodo,
+      'origemKey': instance.origemKey,
     };
 
 const _$MesEnumMap = {

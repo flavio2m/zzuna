@@ -1,6 +1,9 @@
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 import '../../../../helpers/test_storage.dart';
 
@@ -119,6 +122,98 @@ void main() {
 
       expect(result.isSuccess(), isTrue);
       expect(result.getOrThrow(), isEmpty);
+    });
+
+    test('searchByFields with operators, ordering, and limits', () async {
+      final storage = createTestExtratoFaturaStorage(collectionName: nextCollectionName());
+      const o1 = LancamentoOrigem.conta(contaId: 'c1');
+
+      final ef1 = ExtratoFatura(
+        id: 'ef-1',
+        origem: o1,
+        ano: 2025,
+        mes: Mes.janeiro,
+        dataInicio: DateTime(2025, 1, 1),
+        dataFim: DateTime(2025, 1, 31),
+        saldoInicial: 100.0,
+        saldoFinal: 200.0,
+        fechado: false,
+        periodo: 202501,
+        origemKey: 'conta_c1',
+      );
+
+      final ef2 = ExtratoFatura(
+        id: 'ef-2',
+        origem: o1,
+        ano: 2026,
+        mes: Mes.fevereiro,
+        dataInicio: DateTime(2026, 2, 1),
+        dataFim: DateTime(2026, 2, 28),
+        saldoInicial: 200.0,
+        saldoFinal: 300.0,
+        fechado: false,
+        periodo: 202602,
+        origemKey: 'conta_c1',
+      );
+
+      final ef3 = ExtratoFatura(
+        id: 'ef-3',
+        origem: o1,
+        ano: 2027,
+        mes: Mes.marco,
+        dataInicio: DateTime(2027, 3, 1),
+        dataFim: DateTime(2027, 3, 31),
+        saldoInicial: 300.0,
+        saldoFinal: 400.0,
+        fechado: false,
+        periodo: 202703,
+        origemKey: 'conta_c1',
+      );
+
+      await storage.create(ef1);
+      await storage.create(ef2);
+      await storage.create(ef3);
+
+      // 1. Operator: greaterThanOrEqual
+      final resGte = await storage.searchByFields([
+        SearchField(
+          fieldName: 'ano',
+          value: 2026,
+          type: SearchFieldType.int,
+          operator: SearchOperator.greaterThanOrEqual,
+        ),
+      ]);
+      expect(resGte.getOrThrow(), containsAll([ef2, ef3]));
+      expect(resGte.getOrThrow(), isNot(contains(ef1)));
+
+      // 2. Operator: between
+      final resBetween = await storage.searchByFields([
+        SearchField(
+          fieldName: 'ano',
+          value: const [2025, 2026],
+          type: SearchFieldType.int,
+          operator: SearchOperator.between,
+        ),
+      ]);
+      expect(resBetween.getOrThrow(), containsAll([ef1, ef2]));
+      expect(resBetween.getOrThrow(), isNot(contains(ef3)));
+
+      // 3. Ordering: descending
+      final resOrder = await storage.searchByFields(
+        [],
+        orderBy: 'ano',
+        order: SearchOrder.descending,
+      );
+      expect(resOrder.getOrThrow(), [ef3, ef2, ef1]);
+
+      // 4. Limit
+      final resLimit = await storage.searchByFields(
+        [],
+        orderBy: 'ano',
+        order: SearchOrder.ascending,
+        limit: 2,
+      );
+      expect(resLimit.getOrThrow(), [ef1, ef2]);
     });
   });
 }

@@ -10,6 +10,7 @@ import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 class ExtratoFaturaRepository
     implements BaseRepository<ExtratoFatura, ExtratoFaturaDto, ExtratoFaturaDto, ExtratoFaturaFilterDto> {
@@ -21,17 +22,7 @@ class ExtratoFaturaRepository
 
   @override
   AsyncResult<ExtratoFatura> create(ExtratoFaturaDto dto) async {
-    final extratoFatura = ExtratoFatura(
-      id: const Uuid().v4(),
-      origem: dto.origem,
-      ano: dto.ano,
-      mes: dto.mes,
-      dataInicio: dto.dataInicio,
-      dataFim: dto.dataFim,
-      saldoInicial: dto.saldoInicial,
-      saldoFinal: dto.saldoFinal,
-      fechado: dto.fechado,
-    );
+    final extratoFatura = _toEntity(dto);
 
     return _storage.create(extratoFatura).onSuccess((model) {
       _streamController.add(RepositoryCreated(model));
@@ -40,17 +31,7 @@ class ExtratoFaturaRepository
 
   @override
   AsyncResult<ExtratoFatura> update(ExtratoFaturaDto dto) async {
-    final extratoFatura = ExtratoFatura(
-      id: dto.id!,
-      origem: dto.origem,
-      ano: dto.ano,
-      mes: dto.mes,
-      dataInicio: dto.dataInicio,
-      dataFim: dto.dataFim,
-      saldoInicial: dto.saldoInicial,
-      saldoFinal: dto.saldoFinal,
-      fechado: dto.fechado,
-    );
+    final extratoFatura = _toEntity(dto);
 
     return _storage.update(extratoFatura).onSuccess((model) {
       _streamController.add(RepositoryUpdated(model));
@@ -116,52 +97,136 @@ class ExtratoFaturaRepository
     );
   }
 
-  AsyncResult<List<ExtratoFatura>> searchByAno(int ano) async {
-    final searchFields = [
-      SearchField(
-        fieldName: 'ano',
-        value: ano.toString(),
-        type: SearchFieldType.string,
-      ),
-    ];
-    final result = await _storage.searchByFields(searchFields);
-    return result.fold(
-      Success.new,
-      (error) => Failure(
-        LocalStorageException(
-          'Erro ao buscar extratos por ano',
-        ),
-      ),
+  String _getOrigemKey(LancamentoOrigem origem) {
+    return origem.map(
+      conta: (c) => 'conta_${c.contaId}',
+      cartao: (c) => 'cartao_${c.cartaoId}', //
     );
   }
 
-  AsyncResult<List<ExtratoFatura>> searchByOrigemAndAno(
+  AsyncResult<List<ExtratoFatura>> searchByPeriodo(
     LancamentoOrigem origem,
-    int ano, [
-    int? mes,
-  ]) async {
-    final searchFields = [
+    int ano,
+    Mes mes, //
+  ) async {
+    final fields = [
       SearchField(
-        fieldName: 'ano',
-        value: [ano, null],
+        fieldName: 'origemKey',
+        value: _getOrigemKey(origem),
+        type: SearchFieldType.string,
+        operator: SearchOperator.equal,
+      ),
+      SearchField(
+        fieldName: 'periodo',
+        value: ano * 100 + mes.numero,
         type: SearchFieldType.int,
+        operator: SearchOperator.equal,
       ),
     ];
-    final result = await _storage.searchByFields(searchFields);
-    return result.map((list) {
-      var filtered = list.where((e) => e.origem == origem).toList();
-      if (mes != null) {
-        filtered = filtered.where((e) {
-          return e.ano > ano || (e.ano == ano && e.mes.numero >= mes);
-        }).toList();
-      }
-      return filtered;
-    });
+    return _storage.searchByFields(fields);
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchPrevious(
+    LancamentoOrigem origem,
+    int ano,
+    Mes mes, {
+    int limit = 1, //
+  }) async {
+    final fields = [
+      SearchField(
+        fieldName: 'origemKey',
+        value: _getOrigemKey(origem),
+        type: SearchFieldType.string,
+        operator: SearchOperator.equal,
+      ),
+      SearchField(
+        fieldName: 'periodo',
+        value: ano * 100 + mes.numero,
+        type: SearchFieldType.int,
+        operator: SearchOperator.lessThan,
+      ),
+    ];
+    return _storage.searchByFields(
+      fields,
+      orderBy: 'periodo',
+      order: SearchOrder.descending,
+      limit: limit, //
+    );
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchNext(
+    LancamentoOrigem origem,
+    int ano,
+    Mes mes, {
+    int limit = 1, //
+  }) async {
+    final fields = [
+      SearchField(
+        fieldName: 'origemKey',
+        value: _getOrigemKey(origem),
+        type: SearchFieldType.string,
+        operator: SearchOperator.equal,
+      ),
+      SearchField(
+        fieldName: 'periodo',
+        value: ano * 100 + mes.numero,
+        type: SearchFieldType.int,
+        operator: SearchOperator.greaterThan,
+      ),
+    ];
+    return _storage.searchByFields(
+      fields,
+      orderBy: 'periodo',
+      order: SearchOrder.ascending,
+      limit: limit, //
+    );
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchAfter(
+    LancamentoOrigem origem,
+    int ano,
+    Mes mes, {
+    int? limit, //
+  }) async {
+    final fields = [
+      SearchField(
+        fieldName: 'origemKey',
+        value: _getOrigemKey(origem),
+        type: SearchFieldType.string,
+        operator: SearchOperator.equal,
+      ),
+      SearchField(
+        fieldName: 'periodo',
+        value: ano * 100 + mes.numero,
+        type: SearchFieldType.int,
+        operator: SearchOperator.greaterThan,
+      ),
+    ];
+    return _storage.searchByFields(
+      fields,
+      orderBy: 'periodo',
+      order: SearchOrder.ascending,
+      limit: limit, //
+    );
   }
 
   AsyncResult<Unit> updateAll(List<ExtratoFaturaDto> dtos) async {
-    final entities = dtos.map((dto) => ExtratoFatura(
-      id: dto.id!,
+    final entities = dtos.map(_toEntity).toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final entity in entities) {
+        _streamController.add(RepositoryUpdated(entity));
+      }
+    });
+  }
+
+  ExtratoFatura _toEntity(ExtratoFaturaDto dto) {
+    final periodo = dto.ano * 100 + dto.mes.numero;
+    final origemKey = _getOrigemKey(dto.origem);
+
+    return ExtratoFatura(
+      id: dto.id ?? const Uuid().v4(),
       origem: dto.origem,
       ano: dto.ano,
       mes: dto.mes,
@@ -170,14 +235,9 @@ class ExtratoFaturaRepository
       saldoInicial: dto.saldoInicial,
       saldoFinal: dto.saldoFinal,
       fechado: dto.fechado,
-    )).toList();
-
-    final result = await _storage.updateAll(entities);
-    return result.onSuccess((_) {
-      for (final entity in entities) {
-        _streamController.add(RepositoryUpdated(entity));
-      }
-    });
+      periodo: periodo,
+      origemKey: origemKey,
+    );
   }
 
   @override

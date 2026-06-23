@@ -10,6 +10,8 @@ import 'package:zzuna/data/seed/centro_custo_seed.dart';
 import 'package:zzuna/data/seed/conta_seed.dart';
 import 'package:zzuna/data/seed/extrato_fatura_seed.dart';
 import 'package:zzuna/data/seed/lancamento_seed.dart';
+import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
 class AppSeed {
   final ContaRepository contaRepository;
@@ -19,6 +21,8 @@ class AppSeed {
   final ExtratoFaturaRepository extratoFaturaRepository;
   final LancamentoRepository lancamentoRepository;
 
+  final RecalculateExtratoFaturaBalanceUseCase recalculateBalanceUseCase;
+
   AppSeed({
     required this.contaRepository,
     required this.cartaoRepository,
@@ -26,6 +30,7 @@ class AppSeed {
     required this.centroCustoRepository,
     required this.extratoFaturaRepository,
     required this.lancamentoRepository,
+    required this.recalculateBalanceUseCase, //
   });
 
   Future<void> execute() async {
@@ -46,5 +51,16 @@ class AppSeed {
       centroCustoRepository: centroCustoRepository,
       extratoFaturaRepository: extratoFaturaRepository,
     ).execute();
+
+    // Recalcular os saldos dos extratos/faturas para todas as origens inseridas
+    final contas = (await contaRepository.getAll()).getOrElse((_) => []);
+    for (final c in contas) {
+      await recalculateBalanceUseCase.execute(LancamentoOrigem.conta(contaId: c.id));
+    }
+
+    final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
+    for (final c in cartoes) {
+      await recalculateBalanceUseCase.execute(LancamentoOrigem.cartao(cartaoId: c.id));
+    }
   }
 }

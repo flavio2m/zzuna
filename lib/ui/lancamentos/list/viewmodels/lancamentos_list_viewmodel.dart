@@ -26,7 +26,10 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   List<LancamentoDetails> _allLancamentos = [];
   List<ExtratoFatura> _currentExtratos = [];
-  LancamentoFilterDto _currentFilter = LancamentoFilterDto(mes: Mes.fromDate(DateTime.now()), ano: DateTime.now().year);
+  LancamentoFilterDto _currentFilter = LancamentoFilterDto(
+    mes: Mes.fromDate(DateTime.now()),
+    ano: DateTime.now().year, //
+  );
 
   LancamentoResumoMensal? resumoMensal;
 
@@ -50,7 +53,7 @@ class LancamentosListViewModel extends ChangeNotifier {
       final ano = _currentFilter.ano ?? DateTime.now().year;
 
       final extratoResult = await _extratoFaturaRepository.search(
-        ExtratoFaturaFilterDto(mes: mes, ano: ano),
+        ExtratoFaturaFilterDto(mes: mes, ano: ano), //
       );
       _currentExtratos = extratoResult.getOrElse((_) => []);
 
@@ -65,8 +68,8 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   void _applyFilter() {
     final filtered = _filterUseCase.execute(_allLancamentos, _currentFilter);
-    final temFiltroRestritivo = _currentFilter.categoriasSelecionadas.isNotEmpty ||
-        _currentFilter.centrosSelecionados.isNotEmpty;
+    final temFiltroRestritivo =
+        _currentFilter.categoriasSelecionadas.isNotEmpty || _currentFilter.centrosSelecionados.isNotEmpty;
 
     resumoMensal = _resumoMensalUseCase.execute(
       filtered,

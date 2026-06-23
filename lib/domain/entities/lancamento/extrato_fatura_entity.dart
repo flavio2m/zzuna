@@ -18,6 +18,8 @@ sealed class ExtratoFatura with _$ExtratoFatura {
     required double saldoInicial,
     required double saldoFinal,
     required bool fechado,
+    required int periodo,
+    required String origemKey,
   }) = _ExtratoFatura;
 
   factory ExtratoFatura.fromJson(Map<String, dynamic> json) => _$ExtratoFaturaFromJson(json);

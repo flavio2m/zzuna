@@ -88,7 +88,7 @@ void main() {
 
     test('Should resolve and create missing months since dataInicial when none exists', () async {
       // 1. Data do lançamento: Junho 2026. Conta iniciou em Março 2026.
-      // Deve criar: Março, Abril, Maio, Junho.
+      // Deve criar apenas o extrato de Junho 2026.
       final dto = ResolveExtratoFaturaDto(
         origem: origemConta,
         data: DateTime(2026, 6, 15),
@@ -102,25 +102,15 @@ void main() {
       expect(extrato.saldoInicial, 0.0);
       expect(extrato.saldoFinal, -100.0); // Despesa subtrai
 
-      // Verificar que os extratos intermediários foram criados
+      // Verificar que apenas o de Junho foi criado (meses intermediários vazios são ignorados)
       final extratosAll = (await extratoRepository.getAll()).getOrThrow();
-      expect(extratosAll, hasLength(4)); // Março, Abril, Maio, Junho
-
-      final sorted = extratosAll..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
-      expect(sorted[0].mes, Mes.marco);
-      expect(sorted[1].mes, Mes.abril);
-      expect(sorted[2].mes, Mes.maio);
-      expect(sorted[3].mes, Mes.junho);
-
-      for (int i = 0; i < 3; i++) {
-        expect(sorted[i].saldoInicial, 0.0);
-        expect(sorted[i].saldoFinal, 0.0);
-      }
-      expect(sorted[3].saldoInicial, 0.0);
-      expect(sorted[3].saldoFinal, -100.0);
+      expect(extratosAll, hasLength(1));
+      expect(extratosAll[0].mes, Mes.junho);
+      expect(extratosAll[0].saldoInicial, 0.0);
+      expect(extratosAll[0].saldoFinal, -100.0);
     });
 
-    test('Should find latest existing extrato from previous year and build intermediate months', () async {
+    test('Should find latest existing extrato from previous year and NOT build intermediate months', () async {
       // 1. Criar um extrato em Dezembro de 2025 com saldo final de 500
       await extratoRepository.create(
         ExtratoFaturaDto(
@@ -149,7 +139,7 @@ void main() {
       );
 
       // 2. Novo lançamento em Fevereiro de 2026.
-      // Deve pesquisar anos anteriores, encontrar Dezembro 2025, e criar: Janeiro 2026, Fevereiro 2026.
+      // Deve pesquisar anos anteriores, encontrar Dezembro 2025, e criar apenas Fevereiro 2026.
       final dto = ResolveExtratoFaturaDto(
         origem: origemConta,
         data: DateTime(2026, 2, 10),
@@ -160,12 +150,15 @@ void main() {
       final extrato = (await resolveUseCase.execute(dto)).getOrThrow();
       expect(extrato.ano, 2026);
       expect(extrato.mes, Mes.fevereiro);
-      expect(extrato.saldoInicial, 500.0); // herdado de dezembro 2025 / janeiro 2026
+      expect(extrato.saldoInicial, 500.0); // herdado de dezembro 2025
       expect(extrato.saldoFinal, 650.0); // 500 + 150
 
       final extratosAll = (await extratoRepository.getAll()).getOrThrow();
-      // Dezembro 2025, Janeiro 2026, Fevereiro 2026
-      expect(extratosAll, hasLength(3));
+      // Dezembro 2025 e Fevereiro 2026
+      expect(extratosAll, hasLength(2));
+      final sorted = extratosAll..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
+      expect(sorted[0].mes, Mes.dezembro);
+      expect(sorted[1].mes, Mes.fevereiro);
     });
 
     test('Should construct transaction successfully through CreateLancamentoUseCase', () async {

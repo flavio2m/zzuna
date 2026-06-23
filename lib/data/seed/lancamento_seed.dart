@@ -129,7 +129,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catReceitas, valor: 4800.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catReceitas,
+            valor: 4800.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -140,7 +145,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catSupermercado, valor: 524.15),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catSupermercado,
+            valor: 524.15,
+          ),
         ],
         conciliado: true,
       ),
@@ -151,7 +161,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccLazer, categoriaId: dep.catRestaurantes, valor: 145.20),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccLazer,
+            categoriaId: dep.catRestaurantes,
+            valor: 145.20,
+          ),
         ],
         conciliado: true,
       ),
@@ -162,7 +177,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catCombustivel, valor: 82.50),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catCombustivel,
+            valor: 82.50,
+          ),
         ],
         conciliado: false,
       ),
@@ -172,7 +192,9 @@ class LancamentoSeed {
         descricao: 'Drogasil Medicamentos',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 35.90)],
+        itens: [
+          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 35.90),
+        ],
         conciliado: true,
       ),
       LancamentoDto(
@@ -182,7 +204,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJun2Id,
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catReceitas, valor: 1250.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catReceitas,
+            valor: 1250.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -193,8 +220,18 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catMoradia, valor: 120.00),
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaB, categoriaId: dep.catMoradia, valor: 120.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catMoradia,
+            valor: 120.00,
+          ),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaB,
+            categoriaId: dep.catMoradia,
+            valor: 120.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -205,7 +242,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catMoradia, valor: 650.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catMoradia,
+            valor: 650.00,
+          ),
         ],
         conciliado: false,
       ),
@@ -215,7 +257,14 @@ class LancamentoSeed {
         descricao: 'Internet Fibra Claro',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catMoradia, valor: 99.90)],
+        itens: [
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catMoradia,
+            valor: 99.90,
+          ),
+        ],
         conciliado: true,
       ),
       LancamentoDto(
@@ -224,7 +273,14 @@ class LancamentoSeed {
         descricao: 'Reembolso Despesas Viagem',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 320.00)],
+        itens: [
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccViagens,
+            categoriaId: dep.catViagem,
+            valor: 320.00,
+          ),
+        ],
         conciliado: true,
       ),
     ];
@@ -239,7 +295,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catReceitas, valor: 4800.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catReceitas,
+            valor: 4800.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -250,7 +311,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catSupermercado, valor: 412.30),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catSupermercado,
+            valor: 412.30,
+          ),
         ],
         conciliado: true,
       ),
@@ -261,7 +327,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccLazer, categoriaId: dep.catRestaurantes, valor: 189.50),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccLazer,
+            categoriaId: dep.catRestaurantes,
+            valor: 189.50,
+          ),
         ],
         conciliado: true,
       ),
@@ -272,7 +343,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catCombustivel, valor: 90.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catCombustivel,
+            valor: 90.00,
+          ),
         ],
         conciliado: false,
       ),
@@ -282,7 +358,9 @@ class LancamentoSeed {
         descricao: 'Pague Menos Medicamentos',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 45.20)],
+        itens: [
+          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 45.20),
+        ],
         conciliado: true,
       ),
       LancamentoDto(
@@ -292,7 +370,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay2Id,
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catReceitas, valor: 800.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catReceitas,
+            valor: 800.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -303,8 +386,18 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaA, categoriaId: dep.catMoradia, valor: 110.00),
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccPessoaB, categoriaId: dep.catMoradia, valor: 110.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaA,
+            categoriaId: dep.catMoradia,
+            valor: 110.00,
+          ),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccPessoaB,
+            categoriaId: dep.catMoradia,
+            valor: 110.00,
+          ),
         ],
         conciliado: true,
       ),
@@ -315,7 +408,12 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catMoradia, valor: 650.00),
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catMoradia,
+            valor: 650.00,
+          ),
         ],
         conciliado: false,
       ),
@@ -325,7 +423,14 @@ class LancamentoSeed {
         descricao: 'Internet Fibra Claro',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccMoradia, categoriaId: dep.catMoradia, valor: 99.90)],
+        itens: [
+          LancamentoItem(
+            id: const Uuid().v4(),
+            centroCustoId: dep.ccMoradia,
+            categoriaId: dep.catMoradia,
+            valor: 99.90,
+          ),
+        ],
         conciliado: true,
       ),
       LancamentoDto(
@@ -334,7 +439,9 @@ class LancamentoSeed {
         descricao: 'Reembolso Almoço Comercial',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
-        itens: [LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 75.00)],
+        itens: [
+          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 75.00),
+        ],
         conciliado: true,
       ),
     ];

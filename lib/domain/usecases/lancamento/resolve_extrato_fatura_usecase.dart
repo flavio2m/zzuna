@@ -36,20 +36,65 @@ class ResolveExtratoFaturaUseCase {
       );
     }
 
-    // 2. Localizar o último ExtratoFatura existente
-    final ultimoEncontrado = await _findLastExtrato(
-      origem,
-      targetMonth,
-      dataInicial, //
-    );
+    final mes = Mes.values.firstWhere((m) => m.numero == dto.data.month);
 
-    // 3. Criar automaticamente os meses faltantes
-    final extratoAlvo = await _createMissingExtratos(
+    // 2. Buscar extrato do período
+    final targetRes = await _extratoRepository.searchByPeriodo(
       origem,
-      ultimoEncontrado,
-      targetMonth,
-      dataInicial, //
+      dto.data.year,
+      mes, //
     );
+    if (targetRes.isError()) {
+      return Failure(
+        DomainException(
+          'Erro ao buscar extrato do período: ${targetRes.exceptionOrNull()}', //
+        ),
+      );
+    }
+
+    final List<ExtratoFatura> existingExtratos = targetRes.getOrThrow();
+    final ExtratoFatura extratoAlvo;
+
+    if (existingExtratos.isEmpty) {
+      // 3. Buscar extrato anterior para herdar o saldoInicial
+      final prevRes = await _extratoRepository.searchPrevious(
+        origem,
+        dto.data.year,
+        mes, //
+      );
+      if (prevRes.isError()) {
+        return Failure(
+          DomainException(
+            'Erro ao buscar extrato anterior: ${prevRes.exceptionOrNull()}', //
+          ),
+        );
+      }
+      final List<ExtratoFatura> prevExtratos = prevRes.getOrThrow();
+      final saldoInicial = prevExtratos.isEmpty ? 0.0 : prevExtratos.first.saldoFinal;
+
+      final newExtratoDto = ExtratoFaturaDto(
+        origem: origem,
+        ano: dto.data.year,
+        mes: mes,
+        dataInicio: DateTime(dto.data.year, dto.data.month, 1),
+        dataFim: DateTime(dto.data.year, dto.data.month + 1, 0, 23, 59, 59, 999),
+        saldoInicial: saldoInicial,
+        saldoFinal: saldoInicial,
+        fechado: false,
+      );
+
+      final createRes = await _extratoRepository.create(newExtratoDto);
+      if (createRes.isError()) {
+        return Failure(
+          DomainException(
+            'Falha ao criar extrato automático: ${createRes.exceptionOrNull()}', //
+          ),
+        );
+      }
+      extratoAlvo = createRes.getOrThrow();
+    } else {
+      extratoAlvo = existingExtratos.first;
+    }
 
     // 4. Validar se o extrato do mês do lançamento está fechado
     if (extratoAlvo.fechado) {
@@ -67,7 +112,11 @@ class ResolveExtratoFaturaUseCase {
     final updatedAlvo = _updateSaldoFinal(extratoAlvo, delta);
 
     // 7. Propagar esse mesmo delta para todos os extratos posteriores da mesma origem (em memória)
-    final propagatedUpdated = await _propagateDelta(origem, targetMonth, delta);
+    final propagatedRes = await _propagateDelta(origem, targetMonth, delta);
+    if (propagatedRes.isError()) {
+      return Failure(propagatedRes.exceptionOrNull()!);
+    }
+    final propagatedUpdated = propagatedRes.getOrThrow();
 
     // 8. Montar a lista de DTOs para atualização em lote
     final List<ExtratoFaturaDto> dtosToUpdate = [
@@ -80,7 +129,7 @@ class ResolveExtratoFaturaUseCase {
       return Failure(
         DomainException(
           'Falha ao persistir alterações nos extratos: '
-          '${batchResult.exceptionOrNull()}', //
+          '${batchResult.exceptionOrNull()}',
         ),
       );
     }
@@ -108,84 +157,6 @@ class ResolveExtratoFaturaUseCase {
     return DateTime(dataInicial.year, dataInicial.month, 1);
   }
 
-  Future<ExtratoFatura?> _findLastExtrato(
-    LancamentoOrigem origem,
-    DateTime targetMonth,
-    DateTime dataInicial, //
-  ) async {
-    for (int y = targetMonth.year; y >= dataInicial.year; y--) {
-      final res = await _extratoRepository.searchByOrigemAndAno(origem, y);
-      final extratosOrigem = res.getOrElse((_) => <ExtratoFatura>[]);
-
-      if (extratosOrigem.isNotEmpty) {
-        extratosOrigem.sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
-        final anteriores = extratosOrigem.where((e) {
-          final start = DateTime(e.ano, e.mes.numero, 1);
-          return !start.isAfter(targetMonth);
-        }).toList();
-
-        if (anteriores.isNotEmpty) {
-          return anteriores.last;
-        }
-      }
-    }
-    return null;
-  }
-
-  Future<ExtratoFatura> _createMissingExtratos(
-    LancamentoOrigem origem,
-    ExtratoFatura? ultimoEncontrado,
-    DateTime targetMonth,
-    DateTime dataInicial,
-  ) async {
-    DateTime startMonth;
-    double saldoAcumulado;
-
-    if (ultimoEncontrado != null) {
-      startMonth = DateTime(ultimoEncontrado.ano, ultimoEncontrado.mes.numero + 1, 1);
-      saldoAcumulado = ultimoEncontrado.saldoFinal;
-    } else {
-      startMonth = dataInicial;
-      saldoAcumulado = 0.0;
-    }
-
-    ExtratoFatura? currentLast = ultimoEncontrado;
-
-    while (!startMonth.isAfter(targetMonth)) {
-      final currentYear = startMonth.year;
-      final currentMonthNum = startMonth.month;
-      final mes = Mes.values.firstWhere((m) => m.numero == currentMonthNum);
-
-      final newExtratoDto = ExtratoFaturaDto(
-        origem: origem,
-        ano: currentYear,
-        mes: mes,
-        dataInicio: DateTime(currentYear, currentMonthNum, 1),
-        dataFim: DateTime(currentYear, currentMonthNum + 1, 0, 23, 59, 59, 999),
-        saldoInicial: saldoAcumulado,
-        saldoFinal: saldoAcumulado,
-        fechado: false,
-      );
-
-      final createRes = await _extratoRepository.create(newExtratoDto);
-      if (createRes.isError()) {
-        throw Exception(
-          'Falha ao criar extrato automático para $currentMonthNum/$currentYear', //
-        );
-      }
-
-      currentLast = createRes.getOrThrow();
-      saldoAcumulado = currentLast.saldoFinal;
-      startMonth = DateTime(currentYear, currentMonthNum + 1, 1);
-    }
-
-    if (currentLast == null) {
-      throw Exception('Falha ao resolver extrato fatura.');
-    }
-
-    return currentLast;
-  }
-
   double _calculateDelta(LancamentoTipo tipo, double valor) {
     if (tipo == LancamentoTipo.receita) {
       return valor;
@@ -197,32 +168,35 @@ class ResolveExtratoFaturaUseCase {
     return extrato.copyWith(saldoFinal: extrato.saldoFinal + delta);
   }
 
-  Future<List<ExtratoFatura>> _propagateDelta(
+  AsyncResult<List<ExtratoFatura>> _propagateDelta(
     LancamentoOrigem origem,
     DateTime targetMonth,
     double delta, //
   ) async {
-    final res = await _extratoRepository.searchByOrigemAndAno(
+    final mes = Mes.values.firstWhere((m) => m.numero == targetMonth.month);
+    final res = await _extratoRepository.searchAfter(
       origem,
       targetMonth.year,
-      targetMonth.month, //
+      mes, //
     );
-    final extratosOrigem = res.getOrElse((_) => <ExtratoFatura>[]);
-
-    extratosOrigem.sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
-
-    final List<ExtratoFatura> updatedList = [];
-    for (final extrato in extratosOrigem) {
-      final start = DateTime(extrato.ano, extrato.mes.numero, 1);
-      if (start.isAfter(targetMonth)) {
-        final updated = extrato.copyWith(
-          saldoInicial: extrato.saldoInicial + delta,
-          saldoFinal: extrato.saldoFinal + delta,
-        );
-        updatedList.add(updated);
-      }
+    if (res.isError()) {
+      return Failure(
+        DomainException(
+          'Erro ao buscar extratos futuros: ${res.exceptionOrNull()}', //
+        ),
+      );
     }
-    return updatedList;
+
+    final extratosFuturos = res.getOrThrow();
+    final List<ExtratoFatura> updatedList = [];
+    for (final extrato in extratosFuturos) {
+      final updated = extrato.copyWith(
+        saldoInicial: extrato.saldoInicial + delta,
+        saldoFinal: extrato.saldoFinal + delta,
+      );
+      updatedList.add(updated);
+    }
+    return Success(updatedList);
   }
 
   ExtratoFaturaDto _toDto(ExtratoFatura entity) {

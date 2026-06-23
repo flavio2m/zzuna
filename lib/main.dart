@@ -60,5 +60,6 @@ Future<void> initSeeds(ProviderContainer container) async {
     centroCustoRepository: container.read(centroCustoRepositoryProvider),
     extratoFaturaRepository: container.read(extratoFaturaRepositoryProvider),
     lancamentoRepository: container.read(lancamentoRepositoryProvider),
+    recalculateBalanceUseCase: container.read(recalculateExtratoFaturaBalanceUseCaseProvider), //
   ).execute();
 }
