@@ -29,12 +29,33 @@ class ExtratoFaturaRepository
     });
   }
 
+  AsyncResult<Unit> createAll(List<ExtratoFaturaDto> dtos) async {
+    final entities = dtos.map(_toEntity).toList();
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final entity in entities) {
+        _streamController.add(RepositoryCreated(entity));
+      }
+    });
+  }
+
   @override
   AsyncResult<ExtratoFatura> update(ExtratoFaturaDto dto) async {
     final extratoFatura = _toEntity(dto);
 
     return _storage.update(extratoFatura).onSuccess((model) {
       _streamController.add(RepositoryUpdated(model));
+    });
+  }
+
+  AsyncResult<Unit> updateAll(List<ExtratoFaturaDto> dtos) async {
+    final entities = dtos.map(_toEntity).toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final entity in entities) {
+        _streamController.add(RepositoryUpdated(entity));
+      }
     });
   }
 
@@ -208,17 +229,6 @@ class ExtratoFaturaRepository
       order: SearchOrder.ascending,
       limit: limit, //
     );
-  }
-
-  AsyncResult<Unit> updateAll(List<ExtratoFaturaDto> dtos) async {
-    final entities = dtos.map(_toEntity).toList();
-
-    final result = await _storage.updateAll(entities);
-    return result.onSuccess((_) {
-      for (final entity in entities) {
-        _streamController.add(RepositoryUpdated(entity));
-      }
-    });
   }
 
   ExtratoFatura _toEntity(ExtratoFaturaDto dto) {

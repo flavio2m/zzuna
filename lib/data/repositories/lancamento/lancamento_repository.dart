@@ -11,6 +11,7 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 
 import 'package:zzuna/domain/enums/mes.dart';
+
 class LancamentoRepository
     implements
         BaseRepository<
@@ -45,6 +46,31 @@ class LancamentoRepository
     });
   }
 
+  AsyncResult<Unit> createAll(List<LancamentoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Lancamento(
+            id: dto.id ?? const Uuid().v4(),
+            tipo: dto.tipo,
+            data: dto.data,
+            descricao: dto.descricao,
+            extratoFaturaId: dto.extratoFaturaId,
+            origem: dto.origem,
+            itens: dto.itens,
+            conciliado: dto.conciliado,
+            observacao: dto.observacao,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
   @override
   AsyncResult<Lancamento> update(LancamentoDto dto) async {
     final lancamento = Lancamento(
@@ -61,6 +87,31 @@ class LancamentoRepository
 
     return _storage.update(lancamento).onSuccess((model) {
       _streamController.add(RepositoryUpdated(model));
+    });
+  }
+
+  AsyncResult<Unit> updateAll(List<LancamentoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Lancamento(
+            id: dto.id ?? const Uuid().v4(),
+            tipo: dto.tipo,
+            data: dto.data,
+            descricao: dto.descricao,
+            extratoFaturaId: dto.extratoFaturaId,
+            origem: dto.origem,
+            itens: dto.itens,
+            conciliado: dto.conciliado,
+            observacao: dto.observacao,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
     });
   }
 
@@ -130,33 +181,15 @@ class LancamentoRepository
     ];
 
     if (filter.descricao.isNotEmpty) {
-      searchFields.add(
-        SearchField(
-          fieldName: 'descricao',
-          value: filter.descricao,
-          type: SearchFieldType.string,
-        ),
-      );
+      searchFields.add(SearchField(fieldName: 'descricao', value: filter.descricao, type: SearchFieldType.string));
     }
 
     if (filter.tipo != null) {
-      searchFields.add(
-        SearchField(
-          fieldName: 'tipo',
-          value: filter.tipo!.name,
-          type: SearchFieldType.string,
-        ),
-      );
+      searchFields.add(SearchField(fieldName: 'tipo', value: filter.tipo!.name, type: SearchFieldType.string));
     }
 
     if (filter.conciliado != null) {
-      searchFields.add(
-        SearchField(
-          fieldName: 'conciliado',
-          value: filter.conciliado,
-          type: SearchFieldType.boolean,
-        ),
-      );
+      searchFields.add(SearchField(fieldName: 'conciliado', value: filter.conciliado, type: SearchFieldType.boolean));
     }
 
     final result = await _storage.searchByFields(searchFields);

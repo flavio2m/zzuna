@@ -72,6 +72,13 @@ class SearchField {
 abstract class BaseStorage<T extends Object> {
   AsyncResult<T> create(T model);
 
+  /// Criação em lote.
+  ///
+  /// LocalStorage pode implementar adicionando todos e salvando de uma vez.
+  /// Implementações futuras (Firebase, SQLite, etc.) poderão realizar
+  /// operações atômicas ou batch.
+  AsyncResult<Unit> createAll(List<T> models);
+
   AsyncResult<T> update(T model);
 
   /// Atualização em lote.

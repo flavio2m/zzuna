@@ -22,7 +22,7 @@ class AppTextAreaFormField extends StatelessWidget {
     this.initialValue,
     this.controller,
     this.focusNode,
-    this.minLines = 3,
+    this.minLines = 1,
     this.maxLines = 5,
     this.maxLength,
     this.showCounter = false,
@@ -40,9 +40,7 @@ class AppTextAreaFormField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: validator,
       initialValue: controller == null ? initialValue : null,
-      buildCounter: showCounter
-          ? null
-          : (context, {required currentLength, required isFocused, maxLength}) => null,
+      buildCounter: showCounter ? null : (context, {required currentLength, required isFocused, maxLength}) => null,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),

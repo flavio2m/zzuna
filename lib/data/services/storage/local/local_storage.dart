@@ -40,6 +40,24 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
   }
 
   @override
+  AsyncResult<Unit> createAll(List<T> models) async {
+    try {
+      final listResult = await _getList();
+
+      if (listResult.isError()) {
+        return listResult.exceptionOrNull()!.toFailure();
+      }
+
+      final list = listResult.getOrThrow();
+      list.addAll(models);
+
+      return _saveList(list);
+    } catch (e, s) {
+      return Failure(LocalStorageException('Erro ao criar lista: $e', s));
+    }
+  }
+
+  @override
   AsyncResult<T> getById(String id) async {
     try {
       final listResult = await _getList();

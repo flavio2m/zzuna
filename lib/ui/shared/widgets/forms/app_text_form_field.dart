@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 class AppTextFormField extends StatelessWidget {
   final String label;
   final IconData? icon;
+  final Widget? suffixIcon;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onFieldSubmitted;
   final String? Function(String?)? validator;
@@ -22,6 +23,7 @@ class AppTextFormField extends StatelessWidget {
     super.key,
     required this.label,
     this.icon,
+    this.suffixIcon,
     this.onChanged,
     this.onFieldSubmitted,
     this.validator,
@@ -57,6 +59,7 @@ class AppTextFormField extends StatelessWidget {
         labelText: label,
         border: const OutlineInputBorder(),
         prefixIcon: icon != null ? Icon(icon) : null,
+        suffixIcon: suffixIcon,
       ),
       onChanged: onChanged,
       onFieldSubmitted: (value) {
@@ -70,3 +73,4 @@ class AppTextFormField extends StatelessWidget {
     );
   }
 }
+

@@ -12,12 +12,14 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
 class LancamentoCreateViewModel extends ChangeNotifier {
   final CreateLancamentoUseCase _useCase;
+  final CreateLancamentosUseCase _batchUseCase;
   final ContaRepository _contaRepository;
   final CartaoRepository _cartaoRepository;
   final CategoriaRepository _categoriaRepository;
@@ -26,6 +28,7 @@ class LancamentoCreateViewModel extends ChangeNotifier {
 
   LancamentoCreateViewModel(
     this._useCase,
+    this._batchUseCase,
     this._contaRepository,
     this._cartaoRepository,
     this._categoriaRepository,
@@ -44,7 +47,7 @@ class LancamentoCreateViewModel extends ChangeNotifier {
 
   bool isLoading = false;
 
-  late final createCommand = Command1<Lancamento, LancamentoDto>(_create);
+  late final createCommand = Command1<List<Lancamento>, List<LancamentoDto>>(_createAll);
 
   /// Carrega todas as listas necessárias para o formulário de cadastro.
   Future<void> load() async {
@@ -111,5 +114,11 @@ class LancamentoCreateViewModel extends ChangeNotifier {
     }
   }
 
-  AsyncResult<Lancamento> _create(LancamentoDto dto) => _useCase.execute(dto);
+  AsyncResult<List<Lancamento>> _createAll(List<LancamentoDto> dtos) async {
+    if (dtos.isEmpty) return const Success([]);
+    if (dtos.length == 1) {
+      return _useCase.execute(dtos.first).map((l) => [l]);
+    }
+    return _batchUseCase.execute(dtos);
+  }
 }

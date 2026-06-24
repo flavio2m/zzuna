@@ -50,7 +50,9 @@ import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 
@@ -136,6 +138,14 @@ final resolveExtratoFaturaUseCaseProvider = Provider<ResolveExtratoFaturaUseCase
   );
 });
 
+final resolveExtratoFaturasUseCaseProvider = Provider<ResolveExtratoFaturasUseCase>((ref) {
+  return ResolveExtratoFaturasUseCase(
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+  );
+});
+
 final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
   final repository = LancamentoRepository(ref.watch(lancamentoStorageProvider));
   ref.onDispose(repository.dispose);
@@ -150,9 +160,18 @@ final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) 
   );
 });
 
+final createLancamentosUseCaseProvider = Provider<CreateLancamentosUseCase>((ref) {
+  return CreateLancamentosUseCase(
+    ref.watch(resolveExtratoFaturasUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    LancamentoValidator(),
+  );
+});
+
 final lancamentoCreateViewModelProvider = Provider<LancamentoCreateViewModel>(
   (ref) => LancamentoCreateViewModel(
     ref.watch(createLancamentoUseCaseProvider),
+    ref.watch(createLancamentosUseCaseProvider),
     ref.watch(contaRepositoryProvider),
     ref.watch(cartaoRepositoryProvider),
     ref.watch(categoriaRepositoryProvider),
