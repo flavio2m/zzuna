@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
@@ -71,7 +71,7 @@ void main() {
         extratoFaturaId: ef1.id,
         origem: origemA,
         data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(id: 'item-1', categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
+        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
       ));
 
       // 3. Fazer lançamento de despesa em Fevereiro (-30)
@@ -81,7 +81,7 @@ void main() {
         extratoFaturaId: ef2.id,
         origem: origemA,
         data: DateTime(2026, 2, 10),
-        itens: [const LancamentoItem(id: 'item-2', categoriaId: 'cat-2', centroCustoId: 'cc-2', valor: 30.0)],
+        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-2', centroCustoId: 'cc-2', valor: 30.0)],
       ));
 
       // Executar recálculo manual
@@ -132,7 +132,7 @@ void main() {
         extratoFaturaId: efA.id,
         origem: origemA,
         data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(id: 'item-1', categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
+        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
       ));
       final lancamento = createdLancRes.getOrThrow();
 
@@ -153,7 +153,7 @@ void main() {
         extratoFaturaId: efB.id,
         origem: origemB,
         data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(id: 'item-1', categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
+        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
       ));
 
       // Recalcular ambas as origens
@@ -185,7 +185,7 @@ void main() {
         extratoFaturaId: ef.id,
         origem: origemA,
         data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(id: 'item-1', categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
+        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
       ));
       final lancamento = createdLancRes.getOrThrow();
 

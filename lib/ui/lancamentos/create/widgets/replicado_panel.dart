@@ -25,7 +25,7 @@ class ReplicadoPanel extends StatelessWidget {
     final totalCompromisso = valorUnitario * (count > 0 ? count : 0);
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: theme.dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),

@@ -11,7 +11,7 @@ import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
@@ -187,7 +187,7 @@ class LancamentoDetailsUseCase {
       final cat = categoryDetailsMap[item.categoriaId];
       if (cc != null && cat != null) {
         itemDetails.add(LancamentoItemDetails(
-          id: item.id,
+          numero: item.numero,
           centroCusto: CentroCustoDetails(
             id: cc.id,
             descricao: cc.descricao,

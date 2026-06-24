@@ -5,7 +5,7 @@ import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
@@ -82,7 +82,7 @@ void main() {
           data: DateTime(2026, 1, 5),
           itens: [
             LancamentoItem(
-              id: 'item-1',
+              numero: 1,
               categoriaId: 'cat-1',
               centroCustoId: 'cc-1',
               valor: 5000.0,
@@ -96,7 +96,7 @@ void main() {
           data: DateTime(2026, 1, 10),
           itens: [
             LancamentoItem(
-              id: 'item-2',
+              numero: 1,
               categoriaId: 'cat-1',
               centroCustoId: 'cc-1',
               valor: 50.0,
@@ -123,7 +123,7 @@ void main() {
           data: DateTime(2026, 1, 5),
           itens: [
             LancamentoItem(
-              id: 'item-1',
+              numero: 1,
               categoriaId: 'cat-1',
               centroCustoId: 'cc-1',
               valor: 100.0,
@@ -137,7 +137,7 @@ void main() {
           data: DateTime(2026, 2, 10), // Outro mês
           itens: [
             LancamentoItem(
-              id: 'item-2',
+              numero: 1,
               categoriaId: 'cat-1',
               centroCustoId: 'cc-1',
               valor: 40.0,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/modo_selector.dart';
@@ -110,12 +110,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   List<LancamentoDto> _buildDtos() {
     switch (_modo) {
       case ModoLancamento.simples:
-        final item = LancamentoItem(
-          id: const Uuid().v4(),
-          categoriaId: _categoriaId,
-          centroCustoId: _centroCustoId,
-          valor: _valor,
-        );
+        final item = LancamentoItem(numero: 1, categoriaId: _categoriaId, centroCustoId: _centroCustoId, valor: _valor);
         return [
           dto.copyWith(itens: [item]),
         ];
@@ -125,7 +120,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
         return List.generate(_numParcelas, (index) {
           final i = index + 1;
           final item = LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             categoriaId: _categoriaId,
             centroCustoId: _centroCustoId,
             valor: preview[index],
@@ -143,7 +138,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
         return List.generate(count, (index) {
           final i = _parcelaInicial + index;
           final item = LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             categoriaId: _categoriaId,
             centroCustoId: _centroCustoId,
             valor: _valor,
@@ -160,9 +155,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
 
   void _handleSubmit() {
     // Sincroniza o item para fins de validação no formulário
-    dto.setItens([
-      LancamentoItem(id: const Uuid().v4(), categoriaId: _categoriaId, centroCustoId: _centroCustoId, valor: _valor),
-    ]);
+    dto.setItens([LancamentoItem(numero: 1, categoriaId: _categoriaId, centroCustoId: _centroCustoId, valor: _valor)]);
 
     if (_formKey.currentState?.validate() ?? false) {
       if (_modo == ModoLancamento.parcelado) {
@@ -210,43 +203,17 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // 1. Data (25%) + Descrição (75%)
-              if (isDesktop)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: AppDateFormField(
-                        label: 'Data',
-                        initialValue: _formatDate(dto.data),
-                        validator: validator.byField(dto, 'data'),
-                        onDateSelected: (date) => setState(() => dto.setData(date)),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 5,
-                      child: AppTextFormField(
-                        label: 'Descrição',
-                        icon: Icons.description_outlined,
-                        validator: validator.byField(dto, 'descricao'),
-                        onChanged: (value) {
-                          dto.setDescricao(value);
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ],
-                )
-              else ...[
-                AppDateFormField(
+              _FormRow(
+                isDesktop: isDesktop,
+                leftFlex: 2,
+                rightFlex: 5,
+                left: AppDateFormField(
                   label: 'Data',
                   initialValue: _formatDate(dto.data),
                   validator: validator.byField(dto, 'data'),
                   onDateSelected: (date) => setState(() => dto.setData(date)),
                 ),
-                const AppSpacing(size: AppSpacingSize.md),
-                AppTextFormField(
+                right: AppTextFormField(
                   label: 'Descrição',
                   icon: Icons.description_outlined,
                   validator: validator.byField(dto, 'descricao'),
@@ -255,7 +222,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                     setState(() {});
                   },
                 ),
-              ],
+              ),
 
               const AppSpacing(size: AppSpacingSize.md),
 
@@ -304,41 +271,12 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               const AppSpacing(size: AppSpacingSize.md),
 
               // 4. Valor (25%) + Observação (75%)
-              if (isDesktop)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: AppCurrencyFormField(
-                        label: 'Valor',
-                        // icon: Icons.attach_money,
-                        validator: validator.byField(dto, 'itensValores'),
-                        onChanged: (raw) {
-                          final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
-                          setState(() {
-                            _valor = clean.isEmpty ? 0 : double.parse(clean) / 100;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 5,
-                      child: AppTextAreaFormField(
-                        label: 'Observação',
-                        // icon: Icons.notes,
-                        onChanged: (value) => dto.setObservacao(
-                          value.isEmpty ? null : value, //
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              else ...[
-                AppCurrencyFormField(
+              _FormRow(
+                isDesktop: isDesktop,
+                leftFlex: 2,
+                rightFlex: 5,
+                left: AppCurrencyFormField(
                   label: 'Valor',
-                  // icon: Icons.attach_money,
                   validator: validator.byField(dto, 'itensValores'),
                   onChanged: (raw) {
                     final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
@@ -347,13 +285,13 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                     });
                   },
                 ),
-                const AppSpacing(size: AppSpacingSize.md),
-                AppTextAreaFormField(
+                right: AppTextAreaFormField(
                   label: 'Observação',
-                  // icon: Icons.notes,
-                  onChanged: (value) => dto.setObservacao(value.isEmpty ? null : value),
+                  onChanged: (value) => dto.setObservacao(
+                    value.isEmpty ? null : value,
+                  ),
                 ),
-              ],
+              ),
 
               const AppSpacing(size: AppSpacingSize.lg),
 
@@ -396,25 +334,37 @@ class _FormRow extends StatelessWidget {
   final Widget left;
   final Widget right;
   final bool isDesktop;
+  final int leftFlex;
+  final int rightFlex;
 
-  const _FormRow({required this.left, required this.right, required this.isDesktop});
+  const _FormRow({
+    required this.left,
+    required this.right,
+    required this.isDesktop,
+    this.leftFlex = 1,
+    this.rightFlex = 1,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (isDesktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: left),
-          const SizedBox(width: 16),
-          Expanded(child: right),
-        ],
-      );
-    } else {
+    if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [left, const SizedBox(height: 16), right],
+        children: [
+          left,
+          const SizedBox(height: 16),
+          right,
+        ],
       );
     }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: leftFlex, child: left),
+        const SizedBox(width: 16),
+        Expanded(flex: rightFlex, child: right),
+      ],
+    );
   }
 }

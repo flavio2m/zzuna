@@ -20,7 +20,7 @@ class ParceladoPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: theme.dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
@@ -33,8 +33,6 @@ class ParceladoPanel extends StatelessWidget {
               Expanded(
                 child: AppIntegerFormField(
                   label: 'Número de Parcelas',
-                  min: 2,
-                  max: 24,
                   initialValue: numParcelas.toString(),
                   onChanged: (val) {
                     final parsed = int.tryParse(val);
@@ -51,7 +49,7 @@ class ParceladoPanel extends StatelessWidget {
             const AppText('Preview das parcelas:', variant: AppTextVariant.caption),
             const SizedBox(height: 4),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 120),
+              constraints: const BoxConstraints(maxHeight: 96),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: previewValores.length,
@@ -66,7 +64,10 @@ class ParceladoPanel extends StatelessWidget {
                           variant: AppTextVariant.caption,
                           fontWeight: FontWeight.normal,
                         ),
-                        AppText('R\$ ${previewValores[i].toStringAsFixed(2)}', variant: AppTextVariant.caption),
+                        AppText(
+                          'R\$ ${previewValores[i].toStringAsFixed(2)}',
+                          variant: AppTextVariant.caption, //
+                        ),
                       ],
                     ),
                   );

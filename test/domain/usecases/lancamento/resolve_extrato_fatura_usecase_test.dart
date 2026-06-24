@@ -10,7 +10,7 @@ import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
@@ -175,7 +175,7 @@ void main() {
         data: DateTime(2026, 3, 5),
         itens: [
           LancamentoItem(
-            id: 'item-1',
+            numero: 1,
             categoriaId: 'cat-1',
             centroCustoId: 'cc-1',
             valor: 5000.0,

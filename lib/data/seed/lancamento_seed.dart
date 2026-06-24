@@ -1,4 +1,3 @@
-import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
@@ -10,7 +9,7 @@ import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
@@ -130,7 +129,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catReceitas,
             valor: 4800.00,
@@ -146,7 +145,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catSupermercado,
             valor: 524.15,
@@ -162,7 +161,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccLazer,
             categoriaId: dep.catRestaurantes,
             valor: 145.20,
@@ -178,7 +177,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catCombustivel,
             valor: 82.50,
@@ -193,7 +192,7 @@ class LancamentoSeed {
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 35.90),
+          LancamentoItem(numero: 1, centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 35.90),
         ],
         conciliado: true,
       ),
@@ -205,7 +204,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catReceitas,
             valor: 1250.00,
@@ -221,13 +220,13 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catMoradia,
             valor: 120.00,
           ),
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 2,
             centroCustoId: dep.ccPessoaB,
             categoriaId: dep.catMoradia,
             valor: 120.00,
@@ -243,7 +242,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catMoradia,
             valor: 650.00,
@@ -259,7 +258,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catMoradia,
             valor: 99.90,
@@ -275,7 +274,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccViagens,
             categoriaId: dep.catViagem,
             valor: 320.00,
@@ -296,7 +295,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catReceitas,
             valor: 4800.00,
@@ -312,7 +311,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catSupermercado,
             valor: 412.30,
@@ -328,7 +327,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccLazer,
             categoriaId: dep.catRestaurantes,
             valor: 189.50,
@@ -344,7 +343,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catCombustivel,
             valor: 90.00,
@@ -359,7 +358,7 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 45.20),
+          LancamentoItem(numero: 1, centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 45.20),
         ],
         conciliado: true,
       ),
@@ -371,7 +370,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catReceitas,
             valor: 800.00,
@@ -387,13 +386,13 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccPessoaA,
             categoriaId: dep.catMoradia,
             valor: 110.00,
           ),
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 2,
             centroCustoId: dep.ccPessoaB,
             categoriaId: dep.catMoradia,
             valor: 110.00,
@@ -409,7 +408,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catMoradia,
             valor: 650.00,
@@ -425,7 +424,7 @@ class LancamentoSeed {
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
           LancamentoItem(
-            id: const Uuid().v4(),
+            numero: 1,
             centroCustoId: dep.ccMoradia,
             categoriaId: dep.catMoradia,
             valor: 99.90,
@@ -440,7 +439,7 @@ class LancamentoSeed {
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(id: const Uuid().v4(), centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 75.00),
+          LancamentoItem(numero: 1, centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 75.00),
         ],
         conciliado: true,
       ),

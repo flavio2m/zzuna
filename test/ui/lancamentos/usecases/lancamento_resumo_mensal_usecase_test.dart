@@ -3,7 +3,7 @@ import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
@@ -52,7 +52,7 @@ void main() {
         origem: LancamentoOrigemContaDetail(conta: contaDetails),
         itens: [
           LancamentoItemDetails(
-            id: 'item-$id',
+            numero: 1,
             centroCusto: const CentroCustoDetails(id: 'cc-1', descricao: 'CC 1', ativo: true),
             categoria: const CategoriaDetails(
               id: 'cat-1',

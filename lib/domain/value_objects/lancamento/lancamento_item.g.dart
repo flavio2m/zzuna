@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'lancamento_item_entity.dart';
+part of 'lancamento_item.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -8,7 +8,7 @@ part of 'lancamento_item_entity.dart';
 
 _LancamentoItem _$LancamentoItemFromJson(Map<String, dynamic> json) =>
     _LancamentoItem(
-      id: json['id'] as String,
+      numero: (json['numero'] as num).toInt(),
       centroCustoId: json['centroCustoId'] as String,
       categoriaId: json['categoriaId'] as String,
       valor: (json['valor'] as num).toDouble(),
@@ -16,7 +16,7 @@ _LancamentoItem _$LancamentoItemFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LancamentoItemToJson(_LancamentoItem instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'numero': instance.numero,
       'centroCustoId': instance.centroCustoId,
       'categoriaId': instance.categoriaId,
       'valor': instance.valor,

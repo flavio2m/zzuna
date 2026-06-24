@@ -32,6 +32,12 @@ class LancamentoValidator<T extends LancamentoDto> extends LucidValidator<T> {
       'semItens',
     );
 
+    ruleFor((dto) => dto.itens, key: 'itensNumeros').must(
+      (itens) => itens.every((item) => item.numero > 0),
+      'Todos os itens devem ter número maior que zero',
+      'numeroInvalido',
+    );
+
     ruleFor((dto) => dto.itens, key: 'itensCategorias').must(
       (itens) => itens.every((item) => item.categoriaId.isNotEmpty),
       'Todos os itens devem ter uma categoria',

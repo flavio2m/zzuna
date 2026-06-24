@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'lancamento_item_entity.dart';
+part of 'lancamento_item.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LancamentoItem {
 
- String get id; String get centroCustoId; String get categoriaId; double get valor;
+ int get numero; String get centroCustoId; String get categoriaId; double get valor;
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LancamentoItemCopyWith<LancamentoItem> get copyWith => _$LancamentoItemCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItem&&(identical(other.id, id) || other.id == id)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,centroCustoId,categoriaId,valor);
+int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
 
 @override
 String toString() {
-  return 'LancamentoItem(id: $id, centroCustoId: $centroCustoId, categoriaId: $categoriaId, valor: $valor)';
+  return 'LancamentoItem(numero: $numero, centroCustoId: $centroCustoId, categoriaId: $categoriaId, valor: $valor)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LancamentoItemCopyWith<$Res>  {
   factory $LancamentoItemCopyWith(LancamentoItem value, $Res Function(LancamentoItem) _then) = _$LancamentoItemCopyWithImpl;
 @useResult
 $Res call({
- String id, String centroCustoId, String categoriaId, double valor
+ int numero, String centroCustoId, String categoriaId, double valor
 });
 
 
@@ -65,10 +65,10 @@ class _$LancamentoItemCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
 as String,categoriaId: null == categoriaId ? _self.categoriaId : categoriaId // ignore: cast_nullable_to_non_nullable
 as String,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,
@@ -153,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String centroCustoId,  String categoriaId,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LancamentoItem() when $default != null:
-return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
   return orElse();
 
 }
@@ -174,10 +174,10 @@ return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String centroCustoId,  String categoriaId,  double valor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoItem():
-return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);}
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +191,10 @@ return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String centroCustoId,  String categoriaId,  double valor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoItem() when $default != null:
-return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
   return null;
 
 }
@@ -206,10 +206,10 @@ return $default(_that.id,_that.centroCustoId,_that.categoriaId,_that.valor);case
 @JsonSerializable()
 
 class _LancamentoItem implements LancamentoItem {
-  const _LancamentoItem({required this.id, required this.centroCustoId, required this.categoriaId, required this.valor});
+  const _LancamentoItem({required this.numero, required this.centroCustoId, required this.categoriaId, required this.valor});
   factory _LancamentoItem.fromJson(Map<String, dynamic> json) => _$LancamentoItemFromJson(json);
 
-@override final  String id;
+@override final  int numero;
 @override final  String centroCustoId;
 @override final  String categoriaId;
 @override final  double valor;
@@ -227,16 +227,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItem&&(identical(other.id, id) || other.id == id)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,centroCustoId,categoriaId,valor);
+int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
 
 @override
 String toString() {
-  return 'LancamentoItem(id: $id, centroCustoId: $centroCustoId, categoriaId: $categoriaId, valor: $valor)';
+  return 'LancamentoItem(numero: $numero, centroCustoId: $centroCustoId, categoriaId: $categoriaId, valor: $valor)';
 }
 
 
@@ -247,7 +247,7 @@ abstract mixin class _$LancamentoItemCopyWith<$Res> implements $LancamentoItemCo
   factory _$LancamentoItemCopyWith(_LancamentoItem value, $Res Function(_LancamentoItem) _then) = __$LancamentoItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String centroCustoId, String categoriaId, double valor
+ int numero, String centroCustoId, String categoriaId, double valor
 });
 
 
@@ -264,10 +264,10 @@ class __$LancamentoItemCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
   return _then(_LancamentoItem(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
 as String,categoriaId: null == categoriaId ? _self.categoriaId : categoriaId // ignore: cast_nullable_to_non_nullable
 as String,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,
@@ -280,7 +280,7 @@ as double,
 /// @nodoc
 mixin _$LancamentoItemDetails {
 
- String get id; CentroCustoDetails get centroCusto; CategoriaDetails get categoria; double get valor;
+ int get numero; CentroCustoDetails get centroCusto; CategoriaDetails get categoria; double get valor;
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,16 +291,16 @@ $LancamentoItemDetailsCopyWith<LancamentoItemDetails> get copyWith => _$Lancamen
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetails&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,centroCusto,categoria,valor);
+int get hashCode => Object.hash(runtimeType,numero,centroCusto,categoria,valor);
 
 @override
 String toString() {
-  return 'LancamentoItemDetails(id: $id, centroCusto: $centroCusto, categoria: $categoria, valor: $valor)';
+  return 'LancamentoItemDetails(numero: $numero, centroCusto: $centroCusto, categoria: $categoria, valor: $valor)';
 }
 
 
@@ -311,7 +311,7 @@ abstract mixin class $LancamentoItemDetailsCopyWith<$Res>  {
   factory $LancamentoItemDetailsCopyWith(LancamentoItemDetails value, $Res Function(LancamentoItemDetails) _then) = _$LancamentoItemDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
+ int numero, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
 });
 
 
@@ -328,10 +328,10 @@ class _$LancamentoItemDetailsCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
 as CentroCustoDetails,categoria: null == categoria ? _self.categoria : categoria // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,
@@ -434,10 +434,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LancamentoItemDetails() when $default != null:
-return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);case _:
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case _:
   return orElse();
 
 }
@@ -455,10 +455,10 @@ return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoItemDetails():
-return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);}
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -472,10 +472,10 @@ return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,) {final _that = this;
 switch (_that) {
 case _LancamentoItemDetails() when $default != null:
-return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);case _:
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case _:
   return null;
 
 }
@@ -487,10 +487,10 @@ return $default(_that.id,_that.centroCusto,_that.categoria,_that.valor);case _:
 
 
 class _LancamentoItemDetails implements LancamentoItemDetails {
-  const _LancamentoItemDetails({required this.id, required this.centroCusto, required this.categoria, required this.valor});
+  const _LancamentoItemDetails({required this.numero, required this.centroCusto, required this.categoria, required this.valor});
   
 
-@override final  String id;
+@override final  int numero;
 @override final  CentroCustoDetails centroCusto;
 @override final  CategoriaDetails categoria;
 @override final  double valor;
@@ -505,16 +505,16 @@ _$LancamentoItemDetailsCopyWith<_LancamentoItemDetails> get copyWith => __$Lanca
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItemDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItemDetails&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,centroCusto,categoria,valor);
+int get hashCode => Object.hash(runtimeType,numero,centroCusto,categoria,valor);
 
 @override
 String toString() {
-  return 'LancamentoItemDetails(id: $id, centroCusto: $centroCusto, categoria: $categoria, valor: $valor)';
+  return 'LancamentoItemDetails(numero: $numero, centroCusto: $centroCusto, categoria: $categoria, valor: $valor)';
 }
 
 
@@ -525,7 +525,7 @@ abstract mixin class _$LancamentoItemDetailsCopyWith<$Res> implements $Lancament
   factory _$LancamentoItemDetailsCopyWith(_LancamentoItemDetails value, $Res Function(_LancamentoItemDetails) _then) = __$LancamentoItemDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
+ int numero, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
 });
 
 
@@ -542,10 +542,10 @@ class __$LancamentoItemDetailsCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
   return _then(_LancamentoItemDetails(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
 as CentroCustoDetails,categoria: null == categoria ? _self.categoria : categoria // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,

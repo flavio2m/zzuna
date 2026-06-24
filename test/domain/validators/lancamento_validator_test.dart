@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
@@ -9,13 +9,13 @@ void main() {
   late LancamentoValidator validator;
 
   LancamentoItem buildItem({
-    String id = 'item-1',
+    int numero = 1,
     String categoriaId = 'cat-1',
     String centroCustoId = 'cc-1',
     double valor = 100.0,
   }) {
     return LancamentoItem(
-      id: id,
+      numero: numero,
       categoriaId: categoriaId,
       centroCustoId: centroCustoId,
       valor: valor,
@@ -108,6 +108,13 @@ void main() {
       expect(result.exceptions.any((e) => e.key == 'itens'), isTrue);
     });
 
+    test('item com numero 0 → inválido', () {
+      final dto = buildDto(itens: [buildItem(numero: 0)]);
+      final result = validator.validate(dto);
+      expect(result.isValid, isFalse);
+      expect(result.exceptions.any((e) => e.key == 'itensNumeros'), isTrue);
+    });
+
     test('item sem categoriaId → inválido', () {
       final dto = buildDto(itens: [buildItem(categoriaId: '')]);
       final result = validator.validate(dto);
@@ -142,6 +149,33 @@ void main() {
       final dto = buildDto();
       final result = validator.validate(dto);
       expect(result.isValid, isTrue);
+    });
+  });
+
+  group('LancamentoItem – deserialization robustness', () {
+    test('successfully parses json missing the "numero" field (older format)', () {
+      final oldJson = {
+        'id': 'some-old-uuid',
+        'centroCustoId': 'cc-123',
+        'categoriaId': 'cat-456',
+        'valor': 150.75,
+      };
+
+      final item = LancamentoItem.fromJson(oldJson);
+      expect(item.numero, 1); // fallback default
+      expect(item.centroCustoId, 'cc-123');
+      expect(item.categoriaId, 'cat-456');
+      expect(item.valor, 150.75);
+    });
+
+    test('successfully parses json missing other optional/typed fields', () {
+      final emptyJson = <String, dynamic>{};
+
+      final item = LancamentoItem.fromJson(emptyJson);
+      expect(item.numero, 1);
+      expect(item.centroCustoId, '');
+      expect(item.categoriaId, '');
+      expect(item.valor, 0.0);
     });
   });
 }
