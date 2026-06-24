@@ -10,10 +10,12 @@ import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_item_entity.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
+import 'package:zzuna/domain/validators/lancamento_validator.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -49,6 +51,7 @@ void main() {
     createLancamentoUseCase = CreateLancamentoUseCase(
       resolveUseCase,
       lancamentoRepository,
+      LancamentoValidator(),
     );
 
     dataInicialConta = DateTime(2026, 3, 1); // Conta criada em Março 2026
@@ -74,14 +77,17 @@ void main() {
 
   group('ResolveExtratoFaturaUseCase & CreateLancamentoUseCase Tests', () {
     test('Should throw error when resolving/creating transaction before dataInicial', () async {
-      final dto = LancamentoDto(
-        tipo: LancamentoTipo.despesa,
-        descricao: 'Café',
+      // O teste valida que o ResolveExtratoFaturaUseCase rejeita datas anteriores
+      // ao dataInicial da conta. Usamos resolveUseCase diretamente pois
+      // o CreateLancamentoUseCase agora valida o DTO antes de resolver.
+      final dto = ResolveExtratoFaturaDto(
         origem: origemConta,
         data: DateTime(2026, 2, 28), // Antes de 01/03/2026
+        valor: 100.0,
+        tipo: LancamentoTipo.despesa,
       );
 
-      final res = await createLancamentoUseCase.execute(dto);
+      final res = await resolveUseCase.execute(dto);
       expect(res.isError(), isTrue);
       expect(res.exceptionOrNull()!.toString(), contains('não pode ser anterior à data inicial'));
     });
@@ -167,7 +173,14 @@ void main() {
         descricao: 'Salário',
         origem: origemConta,
         data: DateTime(2026, 3, 5),
-        itens: const [],
+        itens: [
+          LancamentoItem(
+            id: 'item-1',
+            categoriaId: 'cat-1',
+            centroCustoId: 'cc-1',
+            valor: 5000.0,
+          ),
+        ],
       );
 
       final res = await createLancamentoUseCase.execute(dto);
@@ -178,7 +191,7 @@ void main() {
 
       final extrato = (await extratoRepository.getById(created.extratoFaturaId)).getOrThrow();
       expect(extrato.mes, Mes.marco);
-      expect(extrato.saldoFinal, 0.0); // Sem itens, valor 0
+      expect(extrato.saldoFinal, 5000.0); // Receita soma
     });
 
     test('Should propagate delta to future months chronologically', () async {

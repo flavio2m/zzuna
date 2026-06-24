@@ -10,6 +10,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});
@@ -123,7 +124,7 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             },
           ),
           // 7. Adicionar
-          ButtonAdd(onPressed: () {}),
+          ButtonAdd(onPressed: () => LancamentoCreateModal.show(context)),
         ],
       ),
     );

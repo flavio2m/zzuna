@@ -51,6 +51,8 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecas
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/validators/lancamento_validator.dart';
+import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -144,8 +146,20 @@ final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) 
   return CreateLancamentoUseCase(
     ref.watch(resolveExtratoFaturaUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
+    LancamentoValidator(),
   );
 });
+
+final lancamentoCreateViewModelProvider = Provider<LancamentoCreateViewModel>(
+  (ref) => LancamentoCreateViewModel(
+    ref.watch(createLancamentoUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(centroCustoRepositoryProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  ),
+);
 
 final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((ref) {
   final repository = ExtratoFaturaRepository(ref.watch(extratoFaturaStorageProvider));
