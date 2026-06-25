@@ -13,6 +13,7 @@ _Cartao _$CartaoFromJson(Map<String, dynamic> json) => _Cartao(
   bancoSigla: json['bancoSigla'] as String,
   ativo: json['ativo'] as bool,
   diaFechamento: (json['diaFechamento'] as num).toInt(),
+  dataInicial: DateTime.parse(json['dataInicial'] as String),
 );
 
 Map<String, dynamic> _$CartaoToJson(_Cartao instance) => <String, dynamic>{
@@ -22,4 +23,5 @@ Map<String, dynamic> _$CartaoToJson(_Cartao instance) => <String, dynamic>{
   'bancoSigla': instance.bancoSigla,
   'ativo': instance.ativo,
   'diaFechamento': instance.diaFechamento,
+  'dataInicial': instance.dataInicial.toIso8601String(),
 };

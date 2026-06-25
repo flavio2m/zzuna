@@ -40,6 +40,24 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
   }
 
   @override
+  AsyncResult<Unit> createAll(List<T> models) async {
+    try {
+      final listResult = await _getList();
+
+      if (listResult.isError()) {
+        return listResult.exceptionOrNull()!.toFailure();
+      }
+
+      final list = listResult.getOrThrow();
+      list.addAll(models);
+
+      return _saveList(list);
+    } catch (e, s) {
+      return Failure(LocalStorageException('Erro ao criar lista: $e', s));
+    }
+  }
+
+  @override
   AsyncResult<T> getById(String id) async {
     try {
       final listResult = await _getList();
@@ -115,7 +133,12 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
   }
 
   @override
-  AsyncResult<List<T>> searchByFields(List<SearchField> fields) async {
+  AsyncResult<List<T>> searchByFields(
+    List<SearchField> fields, {
+    String? orderBy,
+    SearchOrder order = SearchOrder.ascending,
+    int? limit,
+  }) async {
     try {
       final listResult = await _getList();
 
@@ -125,7 +148,7 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
 
       final list = listResult.getOrThrow();
 
-      final filtered = list.where((item) {
+      var filtered = list.where((item) {
         final itemMap = toJson(item);
 
         return fields.every((field) {
@@ -140,26 +163,113 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
               return fieldValue == field.value;
 
             case SearchFieldType.date:
-              if (field.value is List<DateTime?>) {
-                final range = field.value as List<DateTime?>;
-                if (fieldValue == null) return false;
+              if (fieldValue == null) return false;
+              final date = DateTime.tryParse(fieldValue.toString());
+              if (date == null) return false;
 
-                final date = DateTime.tryParse(fieldValue.toString());
-                if (date == null) return false;
-
-                if (range[0] != null && date.isBefore(range[0]!)) return false;
-                if (range[1] != null && date.isAfter(range[1]!)) return false;
-
+              if (field.operator == SearchOperator.between || field.value is List) {
+                final range = field.value as List;
+                final start = range[0] as DateTime?;
+                final end = range[1] as DateTime?;
+                if (start != null && date.isBefore(start)) return false;
+                if (end != null && date.isAfter(end)) return false;
                 return true;
               }
-              return fieldValue == field.value;
+
+              final searchDate = field.value as DateTime;
+              switch (field.operator) {
+                case SearchOperator.equal:
+                  return date.isAtSameMomentAs(searchDate);
+                case SearchOperator.lessThan:
+                  return date.isBefore(searchDate);
+                case SearchOperator.lessThanOrEqual:
+                  return !date.isAfter(searchDate);
+                case SearchOperator.greaterThan:
+                  return date.isAfter(searchDate);
+                case SearchOperator.greaterThanOrEqual:
+                  return !date.isBefore(searchDate);
+                default:
+                  return false;
+              }
+
+            case SearchFieldType.int:
+              if (fieldValue == null) return false;
+              final val = num.tryParse(fieldValue.toString())?.toInt();
+              if (val == null) return false;
+
+              if (field.operator == SearchOperator.between || field.value is List) {
+                final range = field.value as List;
+                final start = range[0] as int?;
+                final end = range[1] as int?;
+                if (start != null && val < start) return false;
+                if (end != null && val > end) return false;
+                return true;
+              }
+
+              final searchVal = num.tryParse(field.value.toString())?.toInt();
+              if (searchVal == null) return false;
+              switch (field.operator) {
+                case SearchOperator.equal:
+                  return val == searchVal;
+                case SearchOperator.lessThan:
+                  return val < searchVal;
+                case SearchOperator.lessThanOrEqual:
+                  return val <= searchVal;
+                case SearchOperator.greaterThan:
+                  return val > searchVal;
+                case SearchOperator.greaterThanOrEqual:
+                  return val >= searchVal;
+                default:
+                  return false;
+              }
           }
         });
       }).toList();
 
+      if (orderBy != null) {
+        filtered.sort((a, b) {
+          final aMap = toJson(a);
+          final bMap = toJson(b);
+          final aVal = aMap[orderBy];
+          final bVal = bMap[orderBy];
+
+          if (aVal == null && bVal == null) return 0;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+
+          int compareResult;
+          if (aVal is Comparable && bVal is Comparable) {
+            compareResult = aVal.compareTo(bVal);
+          } else {
+            compareResult = aVal.toString().compareTo(bVal.toString());
+          }
+
+          return order == SearchOrder.ascending ? compareResult : -compareResult;
+        });
+      }
+
+      if (limit != null && limit > 0 && filtered.length > limit) {
+        filtered = filtered.sublist(0, limit);
+      }
+
       return Success(filtered);
     } catch (e, s) {
       return Failure(LocalStorageException('Erro ao pesquisar: $e', s));
+    }
+  }
+
+  @override
+  AsyncResult<Unit> updateAll(List<T> models) async {
+    try {
+      for (final model in models) {
+        final result = await update(model);
+        if (result.isError()) {
+          return Failure(result.exceptionOrNull()!);
+        }
+      }
+      return const Success(unit);
+    } catch (e, s) {
+      return Failure(LocalStorageException('Erro ao atualizar lista: $e', s));
     }
   }
 

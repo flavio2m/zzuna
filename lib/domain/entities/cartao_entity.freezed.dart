@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Cartao {
 
- String get id; String get descricao; double get limite; String get bancoSigla; bool get ativo; int get diaFechamento;
+ String get id; String get descricao; double get limite; String get bancoSigla; bool get ativo; int get diaFechamento; DateTime get dataInicial;
 /// Create a copy of Cartao
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CartaoCopyWith<Cartao> get copyWith => _$CartaoCopyWithImpl<Cartao>(this as Car
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cartao&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.bancoSigla, bancoSigla) || other.bancoSigla == bancoSigla)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cartao&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.bancoSigla, bancoSigla) || other.bancoSigla == bancoSigla)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento)&&(identical(other.dataInicial, dataInicial) || other.dataInicial == dataInicial));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,bancoSigla,ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,bancoSigla,ativo,diaFechamento,dataInicial);
 
 @override
 String toString() {
-  return 'Cartao(id: $id, descricao: $descricao, limite: $limite, bancoSigla: $bancoSigla, ativo: $ativo, diaFechamento: $diaFechamento)';
+  return 'Cartao(id: $id, descricao: $descricao, limite: $limite, bancoSigla: $bancoSigla, ativo: $ativo, diaFechamento: $diaFechamento, dataInicial: $dataInicial)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CartaoCopyWith<$Res>  {
   factory $CartaoCopyWith(Cartao value, $Res Function(Cartao) _then) = _$CartaoCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, double limite, String bancoSigla, bool ativo, int diaFechamento
+ String id, String descricao, double limite, String bancoSigla, bool ativo, int diaFechamento, DateTime dataInicial
 });
 
 
@@ -65,7 +65,7 @@ class _$CartaoCopyWithImpl<$Res>
 
 /// Create a copy of Cartao
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? bancoSigla = null,Object? ativo = null,Object? diaFechamento = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? bancoSigla = null,Object? ativo = null,Object? diaFechamento = null,Object? dataInicial = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullabl
 as double,bancoSigla: null == bancoSigla ? _self.bancoSigla : bancoSigla // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
-as int,
+as int,dataInicial: null == dataInicial ? _self.dataInicial : dataInicial // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento,  DateTime dataInicial)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Cartao() when $default != null:
-return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento);case _:
+return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento,_that.dataInicial);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ati
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento,  DateTime dataInicial)  $default,) {final _that = this;
 switch (_that) {
 case _Cartao():
-return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento);}
+return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento,_that.dataInicial);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -193,10 +194,10 @@ return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ati
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  double limite,  String bancoSigla,  bool ativo,  int diaFechamento,  DateTime dataInicial)?  $default,) {final _that = this;
 switch (_that) {
 case _Cartao() when $default != null:
-return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento);case _:
+return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ativo,_that.diaFechamento,_that.dataInicial);case _:
   return null;
 
 }
@@ -208,7 +209,7 @@ return $default(_that.id,_that.descricao,_that.limite,_that.bancoSigla,_that.ati
 @JsonSerializable()
 
 class _Cartao implements Cartao {
-  const _Cartao({required this.id, required this.descricao, required this.limite, required this.bancoSigla, required this.ativo, required this.diaFechamento});
+  const _Cartao({required this.id, required this.descricao, required this.limite, required this.bancoSigla, required this.ativo, required this.diaFechamento, required this.dataInicial});
   factory _Cartao.fromJson(Map<String, dynamic> json) => _$CartaoFromJson(json);
 
 @override final  String id;
@@ -217,6 +218,7 @@ class _Cartao implements Cartao {
 @override final  String bancoSigla;
 @override final  bool ativo;
 @override final  int diaFechamento;
+@override final  DateTime dataInicial;
 
 /// Create a copy of Cartao
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cartao&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.bancoSigla, bancoSigla) || other.bancoSigla == bancoSigla)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cartao&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.bancoSigla, bancoSigla) || other.bancoSigla == bancoSigla)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento)&&(identical(other.dataInicial, dataInicial) || other.dataInicial == dataInicial));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,bancoSigla,ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,bancoSigla,ativo,diaFechamento,dataInicial);
 
 @override
 String toString() {
-  return 'Cartao(id: $id, descricao: $descricao, limite: $limite, bancoSigla: $bancoSigla, ativo: $ativo, diaFechamento: $diaFechamento)';
+  return 'Cartao(id: $id, descricao: $descricao, limite: $limite, bancoSigla: $bancoSigla, ativo: $ativo, diaFechamento: $diaFechamento, dataInicial: $dataInicial)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$CartaoCopyWith<$Res> implements $CartaoCopyWith<$Res> {
   factory _$CartaoCopyWith(_Cartao value, $Res Function(_Cartao) _then) = __$CartaoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, double limite, String bancoSigla, bool ativo, int diaFechamento
+ String id, String descricao, double limite, String bancoSigla, bool ativo, int diaFechamento, DateTime dataInicial
 });
 
 
@@ -268,7 +270,7 @@ class __$CartaoCopyWithImpl<$Res>
 
 /// Create a copy of Cartao
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? bancoSigla = null,Object? ativo = null,Object? diaFechamento = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? bancoSigla = null,Object? ativo = null,Object? diaFechamento = null,Object? dataInicial = null,}) {
   return _then(_Cartao(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
@@ -276,7 +278,8 @@ as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullabl
 as double,bancoSigla: null == bancoSigla ? _self.bancoSigla : bancoSigla // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
-as int,
+as int,dataInicial: null == dataInicial ? _self.dataInicial : dataInicial // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -286,7 +289,7 @@ as int,
 /// @nodoc
 mixin _$CartaoDetails {
 
- String get id; String get descricao; double get limite; Banco get banco; bool get ativo; int get diaFechamento;
+ String get id; String get descricao; double get limite; Banco get banco; bool get ativo; int get diaFechamento; DateTime get dataInicial;
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -297,16 +300,16 @@ $CartaoDetailsCopyWith<CartaoDetails> get copyWith => _$CartaoDetailsCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento)&&(identical(other.dataInicial, dataInicial) || other.dataInicial == dataInicial));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento,dataInicial);
 
 @override
 String toString() {
-  return 'CartaoDetails(id: $id, descricao: $descricao, limite: $limite, banco: $banco, ativo: $ativo, diaFechamento: $diaFechamento)';
+  return 'CartaoDetails(id: $id, descricao: $descricao, limite: $limite, banco: $banco, ativo: $ativo, diaFechamento: $diaFechamento, dataInicial: $dataInicial)';
 }
 
 
@@ -317,7 +320,7 @@ abstract mixin class $CartaoDetailsCopyWith<$Res>  {
   factory $CartaoDetailsCopyWith(CartaoDetails value, $Res Function(CartaoDetails) _then) = _$CartaoDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, double limite, Banco banco, bool ativo, int diaFechamento
+ String id, String descricao, double limite, Banco banco, bool ativo, int diaFechamento, DateTime dataInicial
 });
 
 
@@ -334,7 +337,7 @@ class _$CartaoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,Object? dataInicial = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
@@ -342,7 +345,8 @@ as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullabl
 as double,banco: null == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
 as Banco,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
-as int,
+as int,dataInicial: null == dataInicial ? _self.dataInicial : dataInicial // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -424,10 +428,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento,  DateTime dataInicial)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CartaoDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento);case _:
+return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento,_that.dataInicial);case _:
   return orElse();
 
 }
@@ -445,10 +449,10 @@ return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento,  DateTime dataInicial)  $default,) {final _that = this;
 switch (_that) {
 case _CartaoDetails():
-return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento);}
+return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento,_that.dataInicial);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -462,10 +466,10 @@ return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  double limite,  Banco banco,  bool ativo,  int diaFechamento,  DateTime dataInicial)?  $default,) {final _that = this;
 switch (_that) {
 case _CartaoDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento);case _:
+return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_that.diaFechamento,_that.dataInicial);case _:
   return null;
 
 }
@@ -477,7 +481,7 @@ return $default(_that.id,_that.descricao,_that.limite,_that.banco,_that.ativo,_t
 
 
 class _CartaoDetails implements CartaoDetails {
-  const _CartaoDetails({required this.id, required this.descricao, required this.limite, required this.banco, required this.ativo, required this.diaFechamento});
+  const _CartaoDetails({required this.id, required this.descricao, required this.limite, required this.banco, required this.ativo, required this.diaFechamento, required this.dataInicial});
   
 
 @override final  String id;
@@ -486,6 +490,7 @@ class _CartaoDetails implements CartaoDetails {
 @override final  Banco banco;
 @override final  bool ativo;
 @override final  int diaFechamento;
+@override final  DateTime dataInicial;
 
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
@@ -497,16 +502,16 @@ _$CartaoDetailsCopyWith<_CartaoDetails> get copyWith => __$CartaoDetailsCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartaoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.limite, limite) || other.limite == limite)&&(identical(other.banco, banco) || other.banco == banco)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaFechamento, diaFechamento) || other.diaFechamento == diaFechamento)&&(identical(other.dataInicial, dataInicial) || other.dataInicial == dataInicial));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento);
+int get hashCode => Object.hash(runtimeType,id,descricao,limite,banco,ativo,diaFechamento,dataInicial);
 
 @override
 String toString() {
-  return 'CartaoDetails(id: $id, descricao: $descricao, limite: $limite, banco: $banco, ativo: $ativo, diaFechamento: $diaFechamento)';
+  return 'CartaoDetails(id: $id, descricao: $descricao, limite: $limite, banco: $banco, ativo: $ativo, diaFechamento: $diaFechamento, dataInicial: $dataInicial)';
 }
 
 
@@ -517,7 +522,7 @@ abstract mixin class _$CartaoDetailsCopyWith<$Res> implements $CartaoDetailsCopy
   factory _$CartaoDetailsCopyWith(_CartaoDetails value, $Res Function(_CartaoDetails) _then) = __$CartaoDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, double limite, Banco banco, bool ativo, int diaFechamento
+ String id, String descricao, double limite, Banco banco, bool ativo, int diaFechamento, DateTime dataInicial
 });
 
 
@@ -534,7 +539,7 @@ class __$CartaoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CartaoDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? limite = null,Object? banco = null,Object? ativo = null,Object? diaFechamento = null,Object? dataInicial = null,}) {
   return _then(_CartaoDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
@@ -542,7 +547,8 @@ as String,limite: null == limite ? _self.limite : limite // ignore: cast_nullabl
 as double,banco: null == banco ? _self.banco : banco // ignore: cast_nullable_to_non_nullable
 as Banco,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaFechamento: null == diaFechamento ? _self.diaFechamento : diaFechamento // ignore: cast_nullable_to_non_nullable
-as int,
+as int,dataInicial: null == dataInicial ? _self.dataInicial : dataInicial // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 

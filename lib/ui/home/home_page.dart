@@ -4,7 +4,7 @@ import 'package:zzuna/ui/categoria/list/categoria_list_page.dart';
 import 'package:zzuna/ui/centro_custo/list/centro_custo_list_page.dart';
 import 'package:zzuna/ui/conta/list/conta_list_page.dart';
 import 'package:zzuna/ui/home/widgets/home_top_bar.dart';
-import 'package:zzuna/ui/lancamentos/lancamentos_page.dart';
+import 'package:zzuna/ui/lancamentos/list/lancamentos_page.dart';
 import 'package:zzuna/ui/relatorios/relatorios_page.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';

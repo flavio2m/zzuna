@@ -63,7 +63,8 @@ class ContaListViewModel {
       id: conta.id,
       descricao: conta.descricao,
       banco: banco,
-      ativo: conta.ativo, //
+      ativo: conta.ativo,
+      dataInicial: conta.dataInicial,
     );
   }
 

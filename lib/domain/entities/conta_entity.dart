@@ -11,6 +11,7 @@ sealed class Conta with _$Conta {
     required String descricao,
     required String bancoSigla,
     required bool ativo,
+    required DateTime dataInicial,
   }) = _Conta;
 
   factory Conta.fromJson(Map<String, dynamic> json) => _$ContaFromJson(json);
@@ -23,5 +24,6 @@ sealed class ContaDetails with _$ContaDetails {
     required String descricao,
     required Banco banco,
     required bool ativo,
+    required DateTime dataInicial,
   }) = _ContaDetails;
 }

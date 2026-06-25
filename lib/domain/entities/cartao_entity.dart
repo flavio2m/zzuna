@@ -13,6 +13,7 @@ sealed class Cartao with _$Cartao {
     required String bancoSigla,
     required bool ativo,
     required int diaFechamento,
+    required DateTime dataInicial,
   }) = _Cartao;
 
   factory Cartao.fromJson(Map<String, dynamic> json) => _$CartaoFromJson(json);
@@ -27,5 +28,6 @@ sealed class CartaoDetails with _$CartaoDetails {
     required Banco banco,
     required bool ativo,
     required int diaFechamento,
+    required DateTime dataInicial,
   }) = _CartaoDetails;
 }

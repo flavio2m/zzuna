@@ -9,7 +9,7 @@ import 'ui/categoria/list/categoria_list_page.dart' as a6;
 import 'ui/centro_custo/list/centro_custo_list_page.dart' as a0;
 import 'ui/conta/list/conta_list_page.dart' as a3;
 import 'ui/home/home_page.dart' as a7;
-import 'ui/lancamentos/lancamentos_page.dart' as a2;
+import 'ui/lancamentos/list/lancamentos_page.dart' as a2;
 import 'ui/relatorios/relatorios_page.dart' as a1;
 
 Route b0Builder(BuildContext ctx, RouteSettings settings) =>

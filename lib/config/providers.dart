@@ -19,9 +19,11 @@ import 'package:zzuna/ui/auth/register/viewmodels/register_viewmodel.dart';
 import 'package:zzuna/ui/categoria/create/viewModels/categoria_create_viewmodel.dart';
 import 'package:zzuna/ui/categoria/delete/viewModel/categoria_delete_viewmodel.dart';
 import 'package:zzuna/ui/categoria/list/viewmodels/categoria_list_viewmodel.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_notifier.dart';
-import 'package:zzuna/ui/lancamentos/models/lancamentos_sidebar_state.dart';
-import 'package:zzuna/ui/lancamentos/viewmodels/lancamentos_sidebar_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_notifier.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
+import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
+import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
@@ -37,6 +39,22 @@ import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
+
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
+import 'package:zzuna/data/services/storage/local/extrato_fatura_storage_provider.dart';
+import 'package:zzuna/data/services/storage/local/lancamento_storage_provider.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
+import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
+import 'package:zzuna/domain/validators/lancamento_validator.dart';
+import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -105,6 +123,69 @@ final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
   return repository;
 });
 
+final recalculateExtratoFaturaBalanceUseCaseProvider = Provider<RecalculateExtratoFaturaBalanceUseCase>((ref) {
+  return RecalculateExtratoFaturaBalanceUseCase(
+    ref.watch(extratoFaturaStorageProvider),
+    ref.watch(lancamentoStorageProvider),
+  );
+});
+
+final resolveExtratoFaturaUseCaseProvider = Provider<ResolveExtratoFaturaUseCase>((ref) {
+  return ResolveExtratoFaturaUseCase(
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+  );
+});
+
+final resolveExtratoFaturasUseCaseProvider = Provider<ResolveExtratoFaturasUseCase>((ref) {
+  return ResolveExtratoFaturasUseCase(
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+  );
+});
+
+final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
+  final repository = LancamentoRepository(ref.watch(lancamentoStorageProvider));
+  ref.onDispose(repository.dispose);
+  return repository;
+});
+
+final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) {
+  return CreateLancamentoUseCase(
+    ref.watch(resolveExtratoFaturaUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    LancamentoValidator(),
+  );
+});
+
+final createLancamentosUseCaseProvider = Provider<CreateLancamentosUseCase>((ref) {
+  return CreateLancamentosUseCase(
+    ref.watch(resolveExtratoFaturasUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    LancamentoValidator(),
+  );
+});
+
+final lancamentoCreateViewModelProvider = Provider<LancamentoCreateViewModel>(
+  (ref) => LancamentoCreateViewModel(
+    ref.watch(createLancamentoUseCaseProvider),
+    ref.watch(createLancamentosUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(centroCustoRepositoryProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  ),
+);
+
+final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((ref) {
+  final repository = ExtratoFaturaRepository(ref.watch(extratoFaturaStorageProvider));
+  ref.onDispose(repository.dispose);
+  return repository;
+});
+
 // ============================================================================
 // USE CASES - Camada de Domínio
 // ============================================================================
@@ -115,6 +196,22 @@ final categoriaFilterUseCaseProvider = Provider<CategoriaFilterUseCase>(
 final categoriaTreeUseCaseProvider = Provider<CategoriaTreeUseCase>(
   (ref) => CategoriaTreeUseCase(), //
 );
+
+final lancamentoDetailsUseCaseProvider = Provider<LancamentoDetailsUseCase>((ref) {
+  return LancamentoDetailsUseCase(
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(centroCustoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  );
+});
+
+final lancamentoFilterUseCaseProvider = Provider<LancamentoFilterUseCase>((ref) {
+  return LancamentoFilterUseCase();
+});
 
 // ============================================================================
 // VIEWMODELS - Camada de Apresentação
@@ -220,9 +317,10 @@ final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
   (ref) => CategoriaDeleteViewModel(ref.watch(categoriaRepositoryProvider)),
 );
 
-final lancamentosSidebarStateProvider = StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
-  (ref) => LancamentosSidebarNotifier(),
-);
+final lancamentosSidebarStateProvider =
+    StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
+      (ref) => LancamentosSidebarNotifier(),
+    );
 
 final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSidebarViewModel>((ref) {
   final vm = LancamentosSidebarViewModel(
@@ -232,6 +330,30 @@ final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSide
     ref.watch(categoriaRepositoryProvider),
     ref.watch(categoriaTreeUseCaseProvider),
   );
+  ref.onDispose(vm.dispose);
+  return vm;
+});
+
+final lancamentoFilterProvider = StateNotifierProvider<LancamentoFilterNotifier, LancamentoFilterState>((ref) {
+  return LancamentoFilterNotifier();
+});
+
+final lancamentoResumoMensalUseCaseProvider = Provider<LancamentoResumoMensalUseCase>((ref) {
+  return LancamentoResumoMensalUseCase();
+});
+
+final lancamentosListViewModelProvider = ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
+  final vm = LancamentosListViewModel(
+    ref.watch(lancamentoDetailsUseCaseProvider),
+    ref.watch(lancamentoFilterUseCaseProvider),
+    ref.watch(lancamentoResumoMensalUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+  );
+  ref.listen(lancamentoFilterProvider, (previous, next) {
+    vm.updateFilter(next);
+  });
+  vm.updateFilter(ref.read(lancamentoFilterProvider));
   ref.onDispose(vm.dispose);
   return vm;
 });

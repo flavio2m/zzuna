@@ -14,8 +14,8 @@ List<RouteEntity> get routes => [
     routeBuilder: b1Builder,
   ),
   RouteEntity(
-    key: 'lancamentos',
-    uri: Uri.parse('lancamentos'),
+    key: 'lancamentos/list/lancamentos',
+    uri: Uri.parse('lancamentos/list/lancamentos'),
     routeBuilder: b2Builder,
   ),
   RouteEntity(
@@ -51,7 +51,13 @@ const routePaths = (
     ),
   ),
   relatorios: '/relatorios',
-  lancamentos: '/lancamentos',
+  lancamentos: (
+    path: '/lancamentos',
+    list: (
+      path: '/lancamentos/list',
+      lancamentos: '/lancamentos/list/lancamentos',
+    ),
+  ),
   conta: (
     path: '/conta',
     list: (path: '/conta/list', contaList: '/conta/list/conta_list'),

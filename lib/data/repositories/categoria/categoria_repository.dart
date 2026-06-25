@@ -99,20 +99,7 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
 
   @override
   AsyncResult<List<Categoria>> getAll() async {
-    // return _storage.getAll();
-
-    /// REFATORAR: Somente para testes: popula storage
-    final result = await _storage.getAll();
-
-    if (result.isError()) return Failure(result.exceptionOrNull()!);
-
-    final list = result.getOrThrow();
-
-    if (list.isEmpty) {
-      await _seedCategorias();
-      return _storage.getAll();
-    }
-    return Success(list);
+    return _storage.getAll();
   }
 
   @override
@@ -190,102 +177,5 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
   @override
   void dispose() {
     _streamController.close();
-  }
-
-  // -----------------------------------------------------------------
-  // Seed de categorias (conforme especificação)
-  // -----------------------------------------------------------------
-  Future<void> _seedCategorias() async {
-    // 1. Categorias raiz
-    final alimentacao = Categoria(id: const Uuid().v4(), descricao: 'Alimentação', ativo: true);
-    final transporte = Categoria(id: const Uuid().v4(), descricao: 'Transporte', ativo: true);
-    final investimentos = Categoria(id: const Uuid().v4(), descricao: 'Investimentos', ativo: true);
-    final moradia = Categoria(id: const Uuid().v4(), descricao: 'Moradia', ativo: true);
-    final receitas = Categoria(id: const Uuid().v4(), descricao: 'Receitas', ativo: true);
-    final saude = Categoria(id: const Uuid().v4(), descricao: 'Saúde', ativo: true);
-    final terceiros = Categoria(id: const Uuid().v4(), descricao: 'Terceiros', ativo: true);
-    final viagem = Categoria(id: const Uuid().v4(), descricao: 'Viagem', ativo: true);
-
-    final List<Categoria> seeds = [alimentacao, transporte, investimentos, moradia, receitas, saude, terceiros, viagem];
-
-    // Helper para criar subcategoria
-    void addSub(String descricao, String paiId) {
-      seeds.add(Categoria(id: const Uuid().v4(), descricao: descricao, categoriaPaiId: paiId, ativo: true));
-    }
-
-    // 1) Alimentação
-    addSub('Feira', alimentacao.id);
-    addSub('Horta', alimentacao.id);
-    addSub('Lanche', alimentacao.id);
-    addSub('Restaurantes', alimentacao.id);
-    addSub('Supermercado', alimentacao.id);
-    addSub('Outros', alimentacao.id);
-
-    // 2) Transporte
-    addSub('Gadget', transporte.id);
-    addSub('IPVA, Taxas e Docs', transporte.id);
-    addSub('Limpeza', transporte.id);
-    addSub('Manutenção', transporte.id);
-    addSub('Combustível', transporte.id);
-    addSub('Diversos Transportes', transporte.id);
-
-    // 3) Investimentos
-    addSub('Ações', investimentos.id);
-    addSub('Cashback', investimentos.id);
-    addSub('FII', investimentos.id);
-    addSub('Milhas/Pontos', investimentos.id);
-    addSub('Natura', investimentos.id);
-    addSub('Renda Fixa', investimentos.id);
-    addSub('Reservas', investimentos.id);
-    addSub('Diversos Investimentos', investimentos.id);
-
-    // 4) Moradia
-    addSub('Água', moradia.id);
-    addSub('Cama, Mesa e Banho', moradia.id);
-    addSub('Cozinha', moradia.id);
-    addSub('Diversos Moradia', moradia.id);
-    addSub('Financeiras', moradia.id);
-    addSub('Gás', moradia.id);
-    addSub('Internet', moradia.id);
-    addSub('Jardim', moradia.id);
-    addSub('Luz', moradia.id);
-    addSub('Manutenção e Reforma', moradia.id);
-    addSub('Móveis e Decoração', moradia.id);
-    addSub('Telefone e comunicação', moradia.id);
-    addSub('Utensílios', moradia.id);
-
-    // 5) Receitas
-    addSub('Artezanato', receitas.id);
-    addSub('Descontos e outros', receitas.id);
-    addSub('Financeiras', receitas.id);
-    addSub('Salário', receitas.id);
-    addSub('Serviços Prestados', receitas.id);
-    addSub('Diversos Receitas', receitas.id);
-
-    // 6) Saúde
-    addSub('Dentista', saude.id);
-    addSub('Exames', saude.id);
-    addSub('Farmácia', saude.id);
-    addSub('Médico', saude.id);
-    addSub('Oftalmologista', saude.id);
-    addSub('Plano de Saúde', saude.id);
-    addSub('Diversos Saúde', saude.id);
-
-    // 7) Terceiros
-    addSub('Mãe', terceiros.id);
-    addSub('Pai', terceiros.id);
-    addSub('Fulano da Silva', terceiros.id);
-
-    // 8) Viagem
-    addSub('Alimentação Viagem', viagem.id);
-    addSub('Combustível Viagem', viagem.id);
-    addSub('Diversos Viagem', viagem.id);
-    addSub('Hospedagem', viagem.id);
-    addSub('Passagens', viagem.id);
-    addSub('Pedágios', viagem.id);
-
-    for (final cat in seeds) {
-      await _storage.create(cat);
-    }
   }
 }
