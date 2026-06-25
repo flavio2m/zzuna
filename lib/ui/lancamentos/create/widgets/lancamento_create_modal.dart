@@ -4,10 +4,13 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
+import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
+import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/modo_selector.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/parcelado_panel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/replicado_panel.dart';
+import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_itens_panel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/categoria_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/centro_custo_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/lancamento_origem_field.dart';
@@ -48,9 +51,14 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
 
   // Controle de modo
   ModoLancamento _modo = ModoLancamento.simples;
+  bool _showItens = false;
   int _numParcelas = 3;
-  int _parcelaInicial = 2;
+  int _parcelaInicial = 1;
   int _parcelaFinal = 3;
+
+  // Itens de distribuição
+  List<LancamentoItem> _itens = [];
+  final _distributionUseCase = LancamentoItemDistributionUseCase();
 
   late final LancamentoCreateViewModel viewModel;
 
@@ -60,6 +68,27 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     viewModel = ref.read(lancamentoCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
     viewModel.load();
+    _syncItem1();
+  }
+
+  void _syncItem1() {
+    final outrosItens = _itens.where((item) => item.numero != 1).toList();
+    final somaOutros = outrosItens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final valorItem1 = double.parse((_valor - somaOutros).toStringAsFixed(2));
+
+    final item1Idx = _itens.indexWhere((item) => item.numero == 1);
+    final updatedItem1 = LancamentoItem(
+      numero: 1,
+      categoriaId: _categoriaId,
+      centroCustoId: _centroCustoId,
+      valor: valorItem1,
+    );
+
+    if (item1Idx == -1) {
+      _itens.insert(0, updatedItem1);
+    } else {
+      _itens[item1Idx] = updatedItem1;
+    }
   }
 
   @override
@@ -108,28 +137,24 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   List<double> get _previewValores => _calculateParcelas(_valor, _numParcelas);
 
   List<LancamentoDto> _buildDtos() {
+    _syncItem1();
     switch (_modo) {
       case ModoLancamento.simples:
-        final item = LancamentoItem(numero: 1, categoriaId: _categoriaId, centroCustoId: _centroCustoId, valor: _valor);
-        return [
-          dto.copyWith(itens: [item]),
-        ];
+        return [dto.copyWith(itens: _itens)];
 
       case ModoLancamento.parcelado:
-        final preview = _previewValores;
+        final parcelasItens = _distributionUseCase.distributeParcelas(
+          totalValor: _valor,
+          parcelasCount: _numParcelas,
+          baseItems: _itens,
+        );
         return List.generate(_numParcelas, (index) {
           final i = index + 1;
-          final item = LancamentoItem(
-            numero: 1,
-            categoriaId: _categoriaId,
-            centroCustoId: _centroCustoId,
-            valor: preview[index],
-          );
           return dto.copyWith(
             id: const Uuid().v4(),
             descricao: '${dto.descricao} ($i/$_numParcelas)',
             data: _addMonths(dto.data, index),
-            itens: [item],
+            itens: parcelasItens[index],
           );
         });
 
@@ -137,25 +162,33 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
         final count = _parcelaFinal - _parcelaInicial + 1;
         return List.generate(count, (index) {
           final i = _parcelaInicial + index;
-          final item = LancamentoItem(
-            numero: 1,
-            categoriaId: _categoriaId,
-            centroCustoId: _centroCustoId,
-            valor: _valor,
+          final replicaItens = _distributionUseCase.distributeReplicado(
+            valorReplica: _valor,
+            baseItems: _itens,
+            baseTotalValor: _valor,
           );
           return dto.copyWith(
             id: const Uuid().v4(),
             descricao: '${dto.descricao} ($i/$_parcelaFinal)',
             data: _addMonths(dto.data, index),
-            itens: [item],
+            itens: replicaItens,
           );
         });
     }
   }
 
   void _handleSubmit() {
-    // Sincroniza o item para fins de validação no formulário
-    dto.setItens([LancamentoItem(numero: 1, categoriaId: _categoriaId, centroCustoId: _centroCustoId, valor: _valor)]);
+    _syncItem1();
+    dto.setItens(_itens);
+
+    final valRes = _distributionUseCase.validateDistribution(_itens, _valor);
+    if (valRes.isError()) {
+      AppSnackBar.showError(
+        context,
+        (valRes.exceptionOrNull() as DomainException).message, //
+      );
+      return;
+    }
 
     if (_formKey.currentState?.validate() ?? false) {
       if (_modo == ModoLancamento.parcelado) {
@@ -165,11 +198,17 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
         }
       } else if (_modo == ModoLancamento.replicado) {
         if (_parcelaFinal < _parcelaInicial) {
-          AppSnackBar.showError(context, 'A parcela final não pode ser menor que a inicial.');
+          AppSnackBar.showError(
+            context,
+            'A parcela final não pode ser menor que a inicial.', //
+          );
           return;
         }
         if ((_parcelaFinal - _parcelaInicial + 1) < 2) {
-          AppSnackBar.showError(context, 'A replicação deve gerar pelo menos 2 lançamentos.');
+          AppSnackBar.showError(
+            context,
+            'A replicação deve gerar pelo menos 2 lançamentos.', //
+          );
           return;
         }
       }
@@ -194,7 +233,12 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
             ListenableBuilder(
               listenable: viewModel.createCommand,
               builder: (_, _) {
-                return ButtonSave(onPressed: viewModel.createCommand.value.isRunning ? null : _handleSubmit);
+                return ButtonSave(
+                  onPressed: //
+                  viewModel.createCommand.value.isRunning
+                      ? null
+                      : _handleSubmit, //
+                );
               },
             ),
           ],
@@ -255,7 +299,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   value: _categoriaId.isNotEmpty ? _categoriaId : null,
                   validator: validator.byField(dto, 'itensCategorias'),
                   onChanged: (categoriaId) {
-                    setState(() => _categoriaId = categoriaId ?? '');
+                    setState(() {
+                      _categoriaId = categoriaId ?? '';
+                      _syncItem1();
+                    });
                   },
                 ),
                 right: CentroCustoField(
@@ -263,7 +310,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   value: _centroCustoId.isNotEmpty ? _centroCustoId : null,
                   validator: validator.byField(dto, 'itensCentrosCusto'),
                   onChanged: (centroCustoId) {
-                    setState(() => _centroCustoId = centroCustoId ?? '');
+                    setState(() {
+                      _centroCustoId = centroCustoId ?? '';
+                      _syncItem1();
+                    });
                   },
                 ),
               ),
@@ -282,27 +332,47 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                     final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
                     setState(() {
                       _valor = clean.isEmpty ? 0 : double.parse(clean) / 100;
+                      _syncItem1();
                     });
                   },
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
                   onChanged: (value) => dto.setObservacao(
-                    value.isEmpty ? null : value,
+                    value.isEmpty ? null : value, //
                   ),
                 ),
               ),
 
               const AppSpacing(size: AppSpacingSize.lg),
 
-              ModoSelector(selected: _modo, onChanged: (modo) => setState(() => _modo = modo)),
+              ModoSelector(
+                selected: _modo,
+                showItens: _showItens,
+                onModoChanged: (modo) {
+                  setState(() {
+                    _modo = modo;
+                    _showItens = false;
+                    _syncItem1();
+                  });
+                },
+                onShowItensChanged: (show) {
+                  setState(() {
+                    _showItens = show;
+                  });
+                },
+              ),
 
-              if (_modo != ModoLancamento.simples) ...[
+              if (_showItens) ...[
+                _buildItensPanel(),
+              ] else if (_modo != ModoLancamento.simples) ...[
                 const AppSpacing(size: AppSpacingSize.md),
                 if (_modo == ModoLancamento.parcelado)
                   ParceladoPanel(
                     numParcelas: _numParcelas,
-                    onNumParcelasChanged: (val) => setState(() => _numParcelas = val),
+                    onNumParcelasChanged: (val) => setState(
+                      () => _numParcelas = val, //
+                    ),
                     totalValor: _valor,
                     previewValores: _previewValores,
                   )
@@ -310,8 +380,12 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   ReplicadoPanel(
                     parcelaInicial: _parcelaInicial,
                     parcelaFinal: _parcelaFinal,
-                    onParcelaInicialChanged: (val) => setState(() => _parcelaInicial = val),
-                    onParcelaFinalChanged: (val) => setState(() => _parcelaFinal = val),
+                    onParcelaInicialChanged: (val) => setState(
+                      () => _parcelaInicial = val, //
+                    ),
+                    onParcelaFinalChanged: (val) => setState(
+                      () => _parcelaFinal = val, //
+                    ),
                     valorUnitario: _valor,
                   ),
               ],
@@ -327,6 +401,84 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     final m = date.month.toString().padLeft(2, '0');
     final y = date.year;
     return '$d/$m/$y';
+  }
+
+  Widget _buildItensPanel() {
+    return LancamentoItensPanel(
+      items: _itens,
+      totalValor: _valor,
+      categorias: viewModel.categorias,
+      centros: viewModel.centros,
+      onSaveNewItem: (ccId, catId, val) {
+        final res = _distributionUseCase.addItem(
+          currentItems: _itens,
+          totalValor: _valor,
+          centroCustoId: ccId,
+          categoriaId: catId,
+          itemValor: val,
+        );
+        res.fold(
+          (updatedList) {
+            setState(() {
+              _itens = updatedList;
+            });
+          },
+          (exception) {
+            final msg = //
+            exception is DomainException
+                ? exception.message
+                : exception.toString();
+            AppSnackBar.showError(context, msg);
+          },
+        );
+      },
+      onSaveEditItem: (numero, ccId, catId, val) {
+        final res = _distributionUseCase.editItem(
+          currentItems: _itens,
+          totalValor: _valor,
+          numero: numero,
+          centroCustoId: ccId,
+          categoriaId: catId,
+          itemValor: val,
+        );
+        res.fold(
+          (updatedList) {
+            setState(() {
+              _itens = updatedList;
+            });
+          },
+          (exception) {
+            final msg = //
+            exception is DomainException
+                ? exception.message
+                : exception.toString();
+            AppSnackBar.showError(context, msg);
+          },
+        );
+      },
+      onDeleteItem: (numero) {
+        final res = //
+        _distributionUseCase.removeItem(
+          currentItems: _itens,
+          totalValor: _valor,
+          numero: numero,
+        );
+        res.fold(
+          (updatedList) {
+            setState(() {
+              _itens = updatedList;
+            });
+          },
+          (exception) {
+            final msg = //
+            exception is DomainException
+                ? exception.message
+                : exception.toString();
+            AppSnackBar.showError(context, msg);
+          },
+        );
+      },
+    );
   }
 }
 
@@ -350,11 +502,7 @@ class _FormRow extends StatelessWidget {
     if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          left,
-          const SizedBox(height: 16),
-          right,
-        ],
+        children: [left, const SizedBox(height: 16), right],
       );
     }
 

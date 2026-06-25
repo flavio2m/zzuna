@@ -32,6 +32,8 @@ class ParceladoPanel extends StatelessWidget {
             children: [
               Expanded(
                 child: AppIntegerFormField(
+                  min: 2,
+                  max: 24,
                   label: 'Número de Parcelas',
                   initialValue: numParcelas.toString(),
                   onChanged: (val) {
@@ -46,7 +48,10 @@ class ParceladoPanel extends StatelessWidget {
           ),
           if (previewValores.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const AppText('Preview das parcelas:', variant: AppTextVariant.caption),
+            const AppText(
+              'Preview das parcelas:',
+              variant: AppTextVariant.caption, //
+            ),
             const SizedBox(height: 4),
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 96),
