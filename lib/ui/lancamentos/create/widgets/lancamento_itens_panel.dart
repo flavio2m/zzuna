@@ -5,7 +5,6 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_item_card.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_item_form.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
-import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 
 class LancamentoItensPanel extends StatelessWidget {

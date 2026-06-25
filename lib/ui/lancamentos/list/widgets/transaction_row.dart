@@ -15,6 +15,7 @@ class TransactionRow extends StatelessWidget {
     this.costCenter = 'CC: Geral',
     this.badge,
     this.selected = false,
+    this.onTap,
   });
 
   final String description;
@@ -26,6 +27,7 @@ class TransactionRow extends StatelessWidget {
   final String costCenter;
   final String? badge;
   final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,7 @@ class TransactionRow extends StatelessWidget {
         : (isTransfer ? Icons.layers_outlined : Icons.arrow_downward_rounded);
 
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         color: selected

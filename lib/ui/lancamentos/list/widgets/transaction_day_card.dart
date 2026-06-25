@@ -8,6 +8,8 @@ import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_header.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_row.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/formatters/date_formatter.dart';
+import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
@@ -35,7 +37,7 @@ class TransactionDayCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionRow(LancamentoDetails l) {
+  Widget _buildTransactionRow(BuildContext context, LancamentoDetails l) {
     final kind = _transactionKind(l.tipo);
     final formattedValue = _formatValue(l.valor, l.tipo);
     const String? badge = null;
@@ -62,6 +64,14 @@ class TransactionDayCard extends StatelessWidget {
       status: l.conciliado ? 'Ativo' : 'Pendente',
       costCenter: costCenter,
       badge: badge,
+      onTap: () {
+        AppDialog.show(
+          context: context,
+          child: LancamentoDetailsModal(
+            lancamento: l, //
+          ),
+        );
+      },
     );
   }
 
@@ -83,7 +93,9 @@ class TransactionDayCard extends StatelessWidget {
       moeda: true,
     ).replaceFirst('R\$', '$extractPrefix R\$');
 
-    final rows = dia.lancamentos.map(_buildTransactionRow).toList();
+    final rows = dia.lancamentos.map(
+      (l) => _buildTransactionRow(context, l), //
+    ).toList();
 
     return DecoratedBox(
       decoration: BoxDecoration(
