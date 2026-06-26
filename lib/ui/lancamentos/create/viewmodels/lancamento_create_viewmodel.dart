@@ -54,64 +54,62 @@ class LancamentoCreateViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    try {
-      final contasResult = await _contaRepository.getAll();
-      final cartoesResult = await _cartaoRepository.getAll();
-      final categoriasResult = await _categoriaRepository.getAll();
-      final centrosResult = await _centroCustoRepository.getAll();
+    final contasResult = await _contaRepository.getAll();
+    final cartoesResult = await _cartaoRepository.getAll();
+    final categoriasResult = await _categoriaRepository.getAll();
+    final centrosResult = await _centroCustoRepository.getAll();
 
-      // Monta a lista de origens: primeiro contas ativas, depois cartões ativos
-      final novasOrigens = <LancamentoOrigemDetail>[];
+    // Monta a lista de origens: primeiro contas ativas, depois cartões ativos
+    final novasOrigens = <LancamentoOrigemDetail>[];
 
-      final contas = contasResult.getOrElse((_) => <Conta>[]);
-      for (final conta in contas) {
-        if (!conta.ativo) continue;
-        final banco = Bancos.bySigla(conta.bancoSigla).getOrNull();
-        if (banco == null) continue;
-        novasOrigens.add(
-          LancamentoOrigemDetail.conta(
-            conta: ContaDetails(
-              id: conta.id,
-              descricao: conta.descricao,
-              banco: banco,
-              ativo: conta.ativo,
-              dataInicial: conta.dataInicial,
-            ),
+    final contas = contasResult.getOrElse((_) => <Conta>[]);
+    for (final conta in contas) {
+      if (!conta.ativo) continue;
+      final banco = Bancos.bySigla(conta.bancoSigla).getOrNull();
+      if (banco == null) continue;
+      novasOrigens.add(
+        LancamentoOrigemDetail.conta(
+          conta: ContaDetails(
+            id: conta.id,
+            descricao: conta.descricao,
+            banco: banco,
+            ativo: conta.ativo,
+            dataInicial: conta.dataInicial,
           ),
-        );
-      }
-
-      final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
-      for (final cartao in cartoes) {
-        if (!cartao.ativo) continue;
-        final banco = Bancos.bySigla(cartao.bancoSigla).getOrNull();
-        if (banco == null) continue;
-        novasOrigens.add(
-          LancamentoOrigemDetail.cartao(
-            cartao: CartaoDetails(
-              id: cartao.id,
-              descricao: cartao.descricao,
-              limite: cartao.limite,
-              banco: banco,
-              ativo: cartao.ativo,
-              diaFechamento: cartao.diaFechamento,
-              dataInicial: cartao.dataInicial,
-            ),
-          ),
-        );
-      }
-
-      origens = novasOrigens;
-
-      final categoriasList = categoriasResult.getOrElse((_) => <Categoria>[]);
-      categorias = _categoriaTreeUseCase.build(categoriasList);
-
-      centros =
-          centrosResult.getOrElse((_) => <CentroCusto>[]).where((cc) => cc.ativo).toList();
-    } finally {
-      isLoading = false;
-      notifyListeners();
+        ),
+      );
     }
+
+    final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
+    for (final cartao in cartoes) {
+      if (!cartao.ativo) continue;
+      final banco = Bancos.bySigla(cartao.bancoSigla).getOrNull();
+      if (banco == null) continue;
+      novasOrigens.add(
+        LancamentoOrigemDetail.cartao(
+          cartao: CartaoDetails(
+            id: cartao.id,
+            descricao: cartao.descricao,
+            limite: cartao.limite,
+            banco: banco,
+            ativo: cartao.ativo,
+            diaFechamento: cartao.diaFechamento,
+            dataInicial: cartao.dataInicial,
+          ),
+        ),
+      );
+    }
+
+    origens = novasOrigens;
+
+    final categoriasList = categoriasResult.getOrElse((_) => <Categoria>[]);
+    categorias = _categoriaTreeUseCase.build(categoriasList);
+
+    centros =
+        centrosResult.getOrElse((_) => <CentroCusto>[]).where((cc) => cc.ativo).toList();
+
+    isLoading = false;
+    notifyListeners();
   }
 
   AsyncResult<List<Lancamento>> _createAll(List<LancamentoDto> dtos) async {

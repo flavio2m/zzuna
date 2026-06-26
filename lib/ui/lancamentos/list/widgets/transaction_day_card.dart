@@ -23,12 +23,6 @@ class TransactionDayCard extends StatelessWidget {
     return cat.descricao;
   }
 
-  TransactionKind _transactionKind(LancamentoTipo tipo) {
-    return tipo == LancamentoTipo.receita
-        ? TransactionKind.income
-        : (tipo == LancamentoTipo.transferencia ? TransactionKind.transfer : TransactionKind.expense);
-  }
-
   String _formatValue(double valor, LancamentoTipo tipo) {
     final rowPrefix = tipo == LancamentoTipo.receita ? '+' : '-';
     return UtilBrasilFields.obterReal(valor, moeda: true).replaceFirst(
@@ -38,7 +32,6 @@ class TransactionDayCard extends StatelessWidget {
   }
 
   Widget _buildTransactionRow(BuildContext context, LancamentoDetails l) {
-    final kind = _transactionKind(l.tipo);
     final formattedValue = _formatValue(l.valor, l.tipo);
     const String? badge = null;
 
@@ -57,8 +50,8 @@ class TransactionDayCard extends StatelessWidget {
       category: categoryPath,
       origem: l.origem,
       value: formattedValue,
-      kind: kind,
-      status: l.conciliado ? 'Ativo' : 'Pendente',
+      tipo: l.tipo,
+      status: l.conciliado,
       costCenter: costCenter,
       badge: badge,
       onTap: () {

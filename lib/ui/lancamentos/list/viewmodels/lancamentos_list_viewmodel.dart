@@ -48,22 +48,21 @@ class LancamentosListViewModel extends ChangeNotifier {
   late final loadCommand = Command0(_load);
 
   AsyncResult<LancamentoResumoMensal> _load() async {
-    try {
-      final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
-      final ano = _currentFilter.ano ?? DateTime.now().year;
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
 
-      final extratoResult = await _extratoFaturaRepository.search(
-        ExtratoFaturaFilterDto(mes: mes, ano: ano), //
-      );
-      _currentExtratos = extratoResult.getOrElse((_) => []);
-
-      final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
-      _allLancamentos = allDetails;
-      _applyFilter();
-      return Success(resumoMensal!);
-    } catch (e) {
-      return Failure(Exception('Erro ao carregar lançamentos: $e'));
+    final extratoResult = await _extratoFaturaRepository.search(
+      ExtratoFaturaFilterDto(mes: mes, ano: ano), //
+    );
+    if (extratoResult.isError()) {
+      return Failure(extratoResult.exceptionOrNull()!);
     }
+    _currentExtratos = extratoResult.getOrThrow();
+
+    final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
+    _allLancamentos = allDetails;
+    _applyFilter();
+    return Success(resumoMensal!);
   }
 
   void _applyFilter() {

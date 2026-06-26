@@ -1,8 +1,8 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
-
-enum TransactionKind { income, expense, transfer }
+import 'package:zzuna/domain/enums/lancamento_tipo.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -11,8 +11,8 @@ class TransactionRow extends StatelessWidget {
     required this.category,
     required this.origem,
     required this.value,
-    this.kind = TransactionKind.expense,
-    this.status = 'Pendente',
+    required this.status,
+    this.tipo = LancamentoTipo.despesa,
     this.costCenter = 'CC: Geral',
     this.badge,
     this.selected = false,
@@ -24,8 +24,8 @@ class TransactionRow extends StatelessWidget {
   final String category;
   final LancamentoOrigemDetail origem;
   final String value;
-  final TransactionKind kind;
-  final String status;
+  final LancamentoTipo tipo;
+  final bool status;
   final String costCenter;
   final String? badge;
   final bool selected;
@@ -34,13 +34,26 @@ class TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isIncome = kind == TransactionKind.income;
-    final isTransfer = kind == TransactionKind.transfer;
-    final iconColor = isIncome ? AppColors.primary : (isTransfer ? AppColors.indigo600 : AppColors.danger);
-    final iconBackground = isIncome ? AppColors.emerald50 : (isTransfer ? AppColors.indigo50 : AppColors.rose50);
-    final icon = isIncome
-        ? Icons.arrow_upward_rounded
-        : (isTransfer ? Icons.layers_outlined : Icons.arrow_downward_rounded);
+    final iconColor = switch (tipo) {
+      LancamentoTipo.receita => AppColors.primary,
+      LancamentoTipo.transferencia => AppColors.indigo600,
+      LancamentoTipo.investimento => AppColors.indigo600,
+      LancamentoTipo.despesa => AppColors.danger,
+    };
+
+    final iconBackground = switch (tipo) {
+      LancamentoTipo.receita => AppColors.emerald50,
+      LancamentoTipo.transferencia => AppColors.indigo50,
+      LancamentoTipo.investimento => AppColors.indigo50,
+      LancamentoTipo.despesa => AppColors.rose50,
+    };
+
+    final icon = switch (tipo) {
+      LancamentoTipo.receita => Icons.arrow_upward_rounded,
+      LancamentoTipo.transferencia => Icons.layers_outlined,
+      LancamentoTipo.investimento => Icons.trending_up,
+      LancamentoTipo.despesa => Icons.arrow_downward_rounded,
+    };
 
     return InkWell(
       onTap: onTap,
@@ -121,7 +134,12 @@ class TransactionRow extends StatelessWidget {
                 value,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  color: isIncome ? AppColors.primary : (isTransfer ? AppColors.slate600 : AppColors.danger),
+                  color: switch (tipo) {
+                    LancamentoTipo.receita => AppColors.primary,
+                    LancamentoTipo.transferencia => AppColors.slate600,
+                    LancamentoTipo.investimento => AppColors.slate600,
+                    LancamentoTipo.despesa => AppColors.danger,
+                  },
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                 ),
@@ -129,16 +147,9 @@ class TransactionRow extends StatelessWidget {
             ),
             if (onEdit != null) ...[
               const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, color: AppColors.slate500, size: 18),
-                onPressed: onEdit,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                splashRadius: 20,
+              IconEditarButton(
+                onPressed: onEdit, //
               ),
-            ] else ...[
-              const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: AppColors.slate300, size: 18),
             ],
           ],
         ),
@@ -207,26 +218,21 @@ class _Badge extends StatelessWidget {
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({required this.status});
 
-  final String status;
+  final bool status;
 
   @override
   Widget build(BuildContext context) {
-    final consolidated = status == 'Ativo';
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: consolidated ? AppColors.emerald100 : AppColors.orange100,
+        color: status ? AppColors.emerald100 : AppColors.orange100,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: consolidated ? AppColors.emerald200 : AppColors.orange200),
+        border: Border.all(color: status ? AppColors.emerald200 : AppColors.orange200),
       ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(
-          color: consolidated ? AppColors.emerald800 : AppColors.orange800,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-        ),
+      child: Icon(
+        status ? Icons.check : Icons.close,
+        color: status ? AppColors.emerald800 : AppColors.orange800,
+        size: 12,
       ),
     );
   }

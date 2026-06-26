@@ -25,7 +25,11 @@ class ResolveExtratoFaturaUseCase {
     final origem = dto.origem;
 
     // 1. Localizar Conta/Cartão e obter dataInicial
-    final dataInicial = await _getDataInicial(origem);
+    final dataInicialRes = await _getDataInicial(origem);
+    if (dataInicialRes.isError()) {
+      return Failure(dataInicialRes.exceptionOrNull()!);
+    }
+    final dataInicial = dataInicialRes.getOrThrow();
 
     final targetMonth = DateTime(dto.data.year, dto.data.month, 1);
     if (targetMonth.isBefore(dataInicial)) {
@@ -137,24 +141,24 @@ class ResolveExtratoFaturaUseCase {
     return Success(updatedAlvo);
   }
 
-  Future<DateTime> _getDataInicial(LancamentoOrigem origem) async {
+  Future<Result<DateTime>> _getDataInicial(LancamentoOrigem origem) async {
     DateTime dataInicial;
     if (origem is LancamentoOrigemConta) {
       final contaRes = await _contaRepository.getById(origem.contaId);
       if (contaRes.isError()) {
-        throw Exception('Conta não encontrada: ${origem.contaId}');
+        return Failure(DomainException('Conta não encontrada: ${origem.contaId}'));
       }
       dataInicial = contaRes.getOrThrow().dataInicial;
     } else if (origem is LancamentoOrigemCartao) {
       final cartaoRes = await _cartaoRepository.getById(origem.cartaoId);
       if (cartaoRes.isError()) {
-        throw Exception('Cartão não encontrado: ${origem.cartaoId}');
+        return Failure(DomainException('Cartão não encontrado: ${origem.cartaoId}'));
       }
       dataInicial = cartaoRes.getOrThrow().dataInicial;
     } else {
-      throw Exception('Origem de lançamento desconhecida');
+      return Failure(DomainException('Origem de lançamento desconhecida'));
     }
-    return DateTime(dataInicial.year, dataInicial.month, 1);
+    return Success(DateTime(dataInicial.year, dataInicial.month, 1));
   }
 
   double _calculateDelta(LancamentoTipo tipo, double valor) {
