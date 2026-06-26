@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
-import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_card.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/transactions_actions_bar.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
-import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class TransactionsWorkspace extends ConsumerWidget {
@@ -39,45 +37,9 @@ class TransactionsWorkspace extends ConsumerWidget {
           final hasSelection = viewModel.selectedLancamentoIds.isNotEmpty;
           final selectedIds = viewModel.selectedLancamentoIds.toList();
 
-          final actionsBar = Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: const BoxDecoration(
-              color: AppColors.slate50,
-              border: Border(bottom: BorderSide(color: AppColors.border)),
-            ),
-            child: Row(
-              children: [
-                IconSelecionarTodosButton(
-                  allSelected: viewModel.allSelected,
-                  onPressed: () => viewModel.toggleSelectAll(),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  icon: const Icon(Icons.add, size: 20),
-                  color: AppColors.primary,
-                  tooltip: 'Adicionar lançamento',
-                  onPressed: () => LancamentoCreateModal.show(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  splashRadius: 20,
-                ),
-                if (hasSelection) ...[
-                  const SizedBox(width: 16),
-                  LancamentosReconcileButton(
-                    conciliado: true,
-                    selectedIds: selectedIds,
-                    onSuccess: () => viewModel.clearSelection(),
-                  ),
-                  const SizedBox(width: 16),
-                  LancamentosReconcileButton(
-                    conciliado: false,
-                    selectedIds: selectedIds,
-                    onSuccess: () => viewModel.clearSelection(),
-                  ),
-                ],
-              ],
-            ),
+          final actionsBar = TransactionsActionsBar(
+            selectedIds: selectedIds,
+            onClearSelection: () => viewModel.clearSelection(),
           );
 
           if (resumoMensal == null || resumoMensal.dias.isEmpty) {
