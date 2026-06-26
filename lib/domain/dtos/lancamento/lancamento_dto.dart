@@ -1,6 +1,7 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
 class LancamentoDto {
   String? id;
@@ -122,6 +123,32 @@ class LancamentoDto {
           .toList(),
       conciliado: json['conciliado'] ?? false,
       observacao: json['observacao'],
+    );
+  }
+
+  factory LancamentoDto.fromDetails(LancamentoDetails details) {
+    return LancamentoDto(
+      id: details.id,
+      tipo: details.tipo,
+      data: details.data,
+      descricao: details.descricao,
+      origem: switch (details.origem) {
+        LancamentoOrigemContaDetail(conta: final c) => LancamentoOrigem.conta(contaId: c.id),
+        LancamentoOrigemCartaoDetail(cartao: final c) => LancamentoOrigem.cartao(cartaoId: c.id),
+      },
+      extratoFaturaId: details.extratoFatura.id,
+      itens: details.itens
+          .map(
+            (item) => LancamentoItem(
+              numero: item.numero,
+              centroCustoId: item.centroCusto.id,
+              categoriaId: item.categoria.id,
+              valor: item.valor,
+            ),
+          )
+          .toList(),
+      conciliado: details.conciliado,
+      observacao: details.observacao,
     );
   }
 }

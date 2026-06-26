@@ -2,7 +2,6 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_dia.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_header.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_row.dart';
@@ -10,6 +9,7 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/formatters/date_formatter.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
@@ -55,10 +55,7 @@ class TransactionDayCard extends StatelessWidget {
     return TransactionRow(
       description: l.descricao,
       category: categoryPath,
-      account: switch (l.origem) {
-        LancamentoOrigemContaDetail(conta: final c) => c.descricao,
-        LancamentoOrigemCartaoDetail(cartao: final c) => c.descricao,
-      },
+      origem: l.origem,
       value: formattedValue,
       kind: kind,
       status: l.conciliado ? 'Ativo' : 'Pendente',
@@ -70,6 +67,12 @@ class TransactionDayCard extends StatelessWidget {
           child: LancamentoDetailsModal(
             lancamento: l, //
           ),
+        );
+      },
+      onEdit: () {
+        AppDialog.show(
+          context: context,
+          child: LancamentoUpdateModal(lancamento: l),
         );
       },
     );
@@ -93,9 +96,11 @@ class TransactionDayCard extends StatelessWidget {
       moeda: true,
     ).replaceFirst('R\$', '$extractPrefix R\$');
 
-    final rows = dia.lancamentos.map(
-      (l) => _buildTransactionRow(context, l), //
-    ).toList();
+    final rows = dia.lancamentos
+        .map(
+          (l) => _buildTransactionRow(context, l), //
+        )
+        .toList();
 
     return DecoratedBox(
       decoration: BoxDecoration(

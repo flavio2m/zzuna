@@ -8,6 +8,7 @@ import 'package:zzuna/data/services/storage/local/centro_custo_storage_provider.
 import 'package:zzuna/ui/centro_custo/delete/viewmodel/centro_custo_delete_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/list/viewmodels/centro_custo_list_viewmodel.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
+import 'package:zzuna/data/services/shared_preferences_service.dart';
 import 'package:zzuna/data/services/storage/local/cartao_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/categoria_storage_provider.dart';
 import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
@@ -53,8 +54,10 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/viewmodels/lancamento_update_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -66,6 +69,10 @@ import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmod
 /// Provider para cliente de autenticação local
 final authLocalClientProvider = Provider<AuthLocalClient>(
   (ref) => AuthLocalClient(ref.watch(userLocalStorageProvider)), //
+);
+
+final sharedPreferencesServiceProvider = Provider<SharedPreferencesService>(
+  (ref) => SharedPreferencesService(),
 );
 
 // ============================================================================
@@ -172,6 +179,27 @@ final lancamentoCreateViewModelProvider = Provider<LancamentoCreateViewModel>(
   (ref) => LancamentoCreateViewModel(
     ref.watch(createLancamentoUseCaseProvider),
     ref.watch(createLancamentosUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(categoriaRepositoryProvider),
+    ref.watch(centroCustoRepositoryProvider),
+    ref.watch(categoriaTreeUseCaseProvider),
+  ),
+);
+
+final updateLancamentoUseCaseProvider = Provider<UpdateLancamentoUseCase>((ref) {
+  return UpdateLancamentoUseCase(
+    ref.watch(resolveExtratoFaturaUseCaseProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+    LancamentoValidator(),
+  );
+});
+
+final lancamentoUpdateViewModelProvider = Provider<LancamentoUpdateViewModel>(
+  (ref) => LancamentoUpdateViewModel(
+    ref.watch(updateLancamentoUseCaseProvider),
     ref.watch(contaRepositoryProvider),
     ref.watch(cartaoRepositoryProvider),
     ref.watch(categoriaRepositoryProvider),
