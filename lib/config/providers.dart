@@ -55,9 +55,11 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reconcile_lancamentos_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/update/viewmodels/lancamento_update_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/reconcile/viewmodels/lancamento_reconcile_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -205,6 +207,18 @@ final lancamentoUpdateViewModelProvider = Provider<LancamentoUpdateViewModel>(
     ref.watch(categoriaRepositoryProvider),
     ref.watch(centroCustoRepositoryProvider),
     ref.watch(categoriaTreeUseCaseProvider),
+  ),
+);
+
+final reconcileLancamentosUseCaseProvider = Provider<ReconcileLancamentosUseCase>((ref) {
+  return ReconcileLancamentosUseCase(
+    ref.watch(lancamentoRepositoryProvider),
+  );
+});
+
+final lancamentoReconcileViewModelProvider = Provider<LancamentoReconcileViewModel>(
+  (ref) => LancamentoReconcileViewModel(
+    ref.watch(reconcileLancamentosUseCaseProvider),
   ),
 );
 

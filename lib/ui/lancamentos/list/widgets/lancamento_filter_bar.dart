@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
+import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -10,7 +11,6 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
-import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});

@@ -33,6 +33,32 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   LancamentoResumoMensal? resumoMensal;
 
+  final Set<String> _selectedLancamentoIds = {};
+  Set<String> get selectedLancamentoIds => _selectedLancamentoIds;
+
+  void toggleSelection(String id) {
+    if (_selectedLancamentoIds.contains(id)) {
+      _selectedLancamentoIds.remove(id);
+    } else {
+      _selectedLancamentoIds.add(id);
+    }
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedLancamentoIds.clear();
+    notifyListeners();
+  }
+
+  void toggleSelectionForList(List<String> ids, bool select) {
+    if (select) {
+      _selectedLancamentoIds.addAll(ids);
+    } else {
+      _selectedLancamentoIds.removeAll(ids);
+    }
+    notifyListeners();
+  }
+
   LancamentosListViewModel(
     this._detailsUseCase,
     this._filterUseCase,
@@ -48,6 +74,8 @@ class LancamentosListViewModel extends ChangeNotifier {
   late final loadCommand = Command0(_load);
 
   AsyncResult<LancamentoResumoMensal> _load() async {
+    _selectedLancamentoIds.clear(); // Clear selection when period loads/changes
+
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
 

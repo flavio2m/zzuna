@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_conciliado_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -11,13 +12,15 @@ class TransactionRow extends StatelessWidget {
     required this.category,
     required this.origem,
     required this.value,
-    required this.status,
+    required this.conciliado,
     this.tipo = LancamentoTipo.despesa,
     this.costCenter = 'CC: Geral',
     this.badge,
     this.selected = false,
     this.onTap,
     this.onEdit,
+    this.onSelect,
+    this.onReconcile,
   });
 
   final String description;
@@ -25,12 +28,14 @@ class TransactionRow extends StatelessWidget {
   final LancamentoOrigemDetail origem;
   final String value;
   final LancamentoTipo tipo;
-  final bool status;
+  final bool conciliado;
   final String costCenter;
   final String? badge;
   final bool selected;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
+  final ValueChanged<bool>? onSelect;
+  final ValueChanged<bool>? onReconcile;
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +67,17 @@ class TransactionRow extends StatelessWidget {
         color: selected ? AppColors.emerald50.withValues(alpha: 0.35) : AppColors.surface,
         child: Row(
           children: [
-            Icon(
-              selected ? Icons.check_box : Icons.check_box_outline_blank,
-              size: 17,
-              color: selected ? AppColors.primary : AppColors.slate300,
+            GestureDetector(
+              onTap: onSelect != null ? () => onSelect!(!selected) : null,
+              child: Container(
+                color: Colors.transparent, // Amplia a área de toque
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  selected ? Icons.check_box : Icons.check_box_outline_blank,
+                  size: 17,
+                  color: selected ? AppColors.primary : AppColors.slate300,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Container(
@@ -126,8 +138,6 @@ class TransactionRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            _StatusBadge(status: status),
-            const SizedBox(width: 12),
             SizedBox(
               width: 104,
               child: Text(
@@ -149,6 +159,14 @@ class TransactionRow extends StatelessWidget {
               const SizedBox(width: 8),
               IconEditarButton(
                 onPressed: onEdit, //
+              ),
+              const SizedBox(width: 8),
+              IconConciliadoButton(
+                conciliado: conciliado,
+                onPressed: //
+                onReconcile != null
+                    ? () => onReconcile!(!conciliado)
+                    : null,
               ),
             ],
           ],
@@ -184,7 +202,11 @@ class _MetaChip extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.slate600, fontSize: 10, fontWeight: FontWeight.w800),
+              style: const TextStyle(
+                color: AppColors.slate600,
+                fontSize: 10,
+                fontWeight: FontWeight.w800, //
+              ),
             ),
           ),
         ],
@@ -209,30 +231,11 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(color: AppColors.indigo600, fontSize: 10, fontWeight: FontWeight.w900),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.status});
-
-  final bool status;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-      decoration: BoxDecoration(
-        color: status ? AppColors.emerald100 : AppColors.orange100,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: status ? AppColors.emerald200 : AppColors.orange200),
-      ),
-      child: Icon(
-        status ? Icons.check : Icons.close,
-        color: status ? AppColors.emerald800 : AppColors.orange800,
-        size: 12,
+        style: const TextStyle(
+          color: AppColors.indigo600,
+          fontSize: 10,
+          fontWeight: FontWeight.w900, //
+        ),
       ),
     );
   }

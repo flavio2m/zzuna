@@ -11,6 +11,9 @@ import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
 import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zzuna/config/providers.dart';
+
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
 
@@ -45,27 +48,47 @@ class TransactionDayCard extends StatelessWidget {
         ? _categoryPath(l.itens.first.categoria)
         : 'Sem categoria';
 
-    return TransactionRow(
-      description: l.descricao,
-      category: categoryPath,
-      origem: l.origem,
-      value: formattedValue,
-      tipo: l.tipo,
-      status: l.conciliado,
-      costCenter: costCenter,
-      badge: badge,
-      onTap: () {
-        AppDialog.show(
-          context: context,
-          child: LancamentoDetailsModal(
-            lancamento: l, //
+    return Consumer(
+      builder: (context, ref, child) {
+        final selected = ref.watch(
+          lancamentosListViewModelProvider.select(
+            (vm) => vm.selectedLancamentoIds.contains(l.id), //
           ),
         );
-      },
-      onEdit: () {
-        AppDialog.show(
-          context: context,
-          child: LancamentoUpdateModal(lancamento: l),
+
+        return TransactionRow(
+          description: l.descricao,
+          category: categoryPath,
+          origem: l.origem,
+          value: formattedValue,
+          tipo: l.tipo,
+          conciliado: l.conciliado,
+          costCenter: costCenter,
+          badge: badge,
+          selected: selected,
+          onTap: () {
+            AppDialog.show(
+              context: context,
+              child: LancamentoDetailsModal(
+                lancamento: l, //
+              ),
+            );
+          },
+          onEdit: () {
+            AppDialog.show(
+              context: context,
+              child: LancamentoUpdateModal(lancamento: l),
+            );
+          },
+          onSelect: (_) {
+            ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
+          },
+          onReconcile: (value) {
+            ref //
+                .read(lancamentoReconcileViewModelProvider)
+                .reconcileCommand
+                .execute((ids: [l.id], conciliado: value));
+          },
         );
       },
     );
@@ -112,12 +135,26 @@ class TransactionDayCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Column(
           children: [
-            TransactionDayHeader(
-              date: dateKey,
-              balance: balanceStr,
-              extractBalance: extractBalanceStr,
-              positive: isPositive,
-              positiveExtract: isExtractPositive,
+            Consumer(
+              builder: (context, ref, child) {
+                final viewModel = ref.watch(lancamentosListViewModelProvider);
+                final allSelected = dia.lancamentos.every(
+                  (l) => viewModel.selectedLancamentoIds.contains(l.id), //
+                );
+
+                return TransactionDayHeader(
+                  date: dateKey,
+                  balance: balanceStr,
+                  extractBalance: extractBalanceStr,
+                  positive: isPositive,
+                  positiveExtract: isExtractPositive,
+                  selected: allSelected,
+                  onSelectAll: () {
+                    final ids = dia.lancamentos.map((l) => l.id).toList();
+                    viewModel.toggleSelectionForList(ids, !allSelected);
+                  },
+                );
+              },
             ),
             for (var index = 0; index < rows.length; index++) ...[
               rows[index],
