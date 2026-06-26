@@ -11,11 +11,7 @@ class LancamentoReconcileViewModel extends ChangeNotifier {
   late final reconcileCommand = Command1<Unit, ({List<String> ids, bool conciliado})>(_reconcile);
 
   AsyncResult<Unit> _reconcile(
-    ({
-      List<String> ids,
-      bool conciliado, //
-    })
-    params,
+    ({List<String> ids, bool conciliado}) params, //
   ) async {
     return _useCase.execute(ids: params.ids, conciliado: params.conciliado);
   }

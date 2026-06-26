@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
-import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_conciliado_button.dart';
+import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_card.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
@@ -36,6 +36,7 @@ class TransactionsWorkspace extends ConsumerWidget {
           }
 
           final hasSelection = viewModel.selectedLancamentoIds.isNotEmpty;
+          final selectedIds = viewModel.selectedLancamentoIds.toList();
 
           final actionsBar = Container(
             height: 40,
@@ -57,32 +58,16 @@ class TransactionsWorkspace extends ConsumerWidget {
                 ),
                 if (hasSelection) ...[
                   const SizedBox(width: 16),
-                  IconConciliadoButton(
+                  LancamentosReconcileButton(
                     conciliado: true,
-                    size: 20,
-                    tooltip: 'Conciliar selecionados',
-                    onPressed: () {
-                      final ids = viewModel.selectedLancamentoIds.toList();
-                      ref.read(lancamentoReconcileViewModelProvider).reconcileCommand.execute((
-                        ids: ids,
-                        conciliado: true,
-                      ));
-                      viewModel.clearSelection();
-                    },
+                    selectedIds: selectedIds,
+                    onSuccess: () => viewModel.clearSelection(),
                   ),
                   const SizedBox(width: 16),
-                  IconConciliadoButton(
+                  LancamentosReconcileButton(
                     conciliado: false,
-                    size: 20,
-                    tooltip: 'Desconciliar selecionados',
-                    onPressed: () {
-                      final ids = viewModel.selectedLancamentoIds.toList();
-                      ref.read(lancamentoReconcileViewModelProvider).reconcileCommand.execute((
-                        ids: ids,
-                        conciliado: false,
-                      ));
-                      viewModel.clearSelection();
-                    },
+                    selectedIds: selectedIds,
+                    onSuccess: () => viewModel.clearSelection(),
                   ),
                 ],
               ],

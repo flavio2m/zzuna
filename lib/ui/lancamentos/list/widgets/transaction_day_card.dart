@@ -14,6 +14,8 @@ import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 
+import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
+
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
 
@@ -62,10 +64,13 @@ class TransactionDayCard extends StatelessWidget {
           origem: l.origem,
           value: formattedValue,
           tipo: l.tipo,
-          conciliado: l.conciliado,
           costCenter: costCenter,
           badge: badge,
           selected: selected,
+          reconcileButton: LancamentoReconcileButton(
+            lancamentoId: l.id,
+            conciliado: l.conciliado, //
+          ),
           onTap: () {
             AppDialog.show(
               context: context,
@@ -82,12 +87,6 @@ class TransactionDayCard extends StatelessWidget {
           },
           onSelect: (_) {
             ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
-          },
-          onReconcile: (value) {
-            ref //
-                .read(lancamentoReconcileViewModelProvider)
-                .reconcileCommand
-                .execute((ids: [l.id], conciliado: value));
           },
         );
       },

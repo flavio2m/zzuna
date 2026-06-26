@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
-import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_conciliado_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -12,15 +11,14 @@ class TransactionRow extends StatelessWidget {
     required this.category,
     required this.origem,
     required this.value,
-    required this.conciliado,
     this.tipo = LancamentoTipo.despesa,
     this.costCenter = 'CC: Geral',
     this.badge,
     this.selected = false,
+    this.reconcileButton,
     this.onTap,
     this.onEdit,
     this.onSelect,
-    this.onReconcile,
   });
 
   final String description;
@@ -28,14 +26,13 @@ class TransactionRow extends StatelessWidget {
   final LancamentoOrigemDetail origem;
   final String value;
   final LancamentoTipo tipo;
-  final bool conciliado;
   final String costCenter;
   final String? badge;
   final bool selected;
+  final Widget? reconcileButton;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final ValueChanged<bool>? onSelect;
-  final ValueChanged<bool>? onReconcile;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +80,10 @@ class TransactionRow extends StatelessWidget {
             Container(
               width: 32,
               height: 32,
-              decoration: BoxDecoration(color: iconBackground, borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(
+                color: iconBackground,
+                borderRadius: BorderRadius.circular(8), //
+              ),
               child: Icon(icon, size: 17, color: iconColor),
             ),
             const SizedBox(width: 12),
@@ -98,10 +98,16 @@ class TransactionRow extends StatelessWidget {
                           description,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: AppColors.slate800, fontSize: 12, fontWeight: FontWeight.w800),
+                          style: const TextStyle(
+                            color: AppColors.slate800,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800, //
+                          ),
                         ),
                       ),
-                      if (badge != null) ...[const SizedBox(width: 6), _Badge(label: badge!)],
+                      if (badge != null) ...[
+                        const SizedBox(width: 6), _Badge(label: badge!), //
+                      ],
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -115,14 +121,27 @@ class TransactionRow extends StatelessWidget {
                           conta: (_) => Icons.account_balance_wallet_outlined,
                           cartao: (_) => Icons.credit_card,
                         ),
-                        label: origem.map(conta: (c) => c.conta.descricao, cartao: (c) => c.cartao.descricao),
+                        label: origem.map(
+                          conta: (c) => c.conta.descricao,
+                          cartao: (c) => c.cartao.descricao, //
+                        ),
                       ),
-                      const Text('•', style: TextStyle(color: AppColors.slate300, fontSize: 10)),
+                      const Text(
+                        '•',
+                        style: TextStyle(color: AppColors.slate300, fontSize: 10), //
+                      ),
                       Text(
                         category,
-                        style: const TextStyle(color: AppColors.slate600, fontSize: 10, fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          color: AppColors.slate600,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700, //
+                        ),
                       ),
-                      const Text('•', style: TextStyle(color: AppColors.slate300, fontSize: 10)),
+                      const Text(
+                        '•',
+                        style: TextStyle(color: AppColors.slate300, fontSize: 10), //
+                      ),
                       Text(
                         costCenter,
                         style: const TextStyle(
@@ -160,14 +179,9 @@ class TransactionRow extends StatelessWidget {
               IconEditarButton(
                 onPressed: onEdit, //
               ),
-              const SizedBox(width: 8),
-              IconConciliadoButton(
-                conciliado: conciliado,
-                onPressed: //
-                onReconcile != null
-                    ? () => onReconcile!(!conciliado)
-                    : null,
-              ),
+              if (reconcileButton != null) ...[
+                const SizedBox(width: 8), reconcileButton!, //
+              ],
             ],
           ],
         ),

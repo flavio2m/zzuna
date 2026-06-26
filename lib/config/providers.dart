@@ -216,7 +216,7 @@ final reconcileLancamentosUseCaseProvider = Provider<ReconcileLancamentosUseCase
   );
 });
 
-final lancamentoReconcileViewModelProvider = Provider<LancamentoReconcileViewModel>(
+final lancamentoReconcileViewModelProvider = ChangeNotifierProvider<LancamentoReconcileViewModel>(
   (ref) => LancamentoReconcileViewModel(
     ref.watch(reconcileLancamentosUseCaseProvider),
   ),
