@@ -59,6 +59,40 @@ class LancamentosListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get allSelected {
+    final visibleIds = resumoMensal?.dias
+            .expand((dia) => dia.lancamentos)
+            .map((l) => l.id)
+            .toList() ??
+        [];
+    if (visibleIds.isEmpty) return false;
+    return visibleIds.every((id) => _selectedLancamentoIds.contains(id));
+  }
+
+  void selectAll() {
+    final visibleIds = resumoMensal?.dias
+            .expand((dia) => dia.lancamentos)
+            .map((l) => l.id)
+            .toList() ??
+        [];
+    _selectedLancamentoIds.addAll(visibleIds);
+    notifyListeners();
+  }
+
+  void toggleSelectAll() {
+    if (allSelected) {
+      final visibleIds = resumoMensal?.dias
+              .expand((dia) => dia.lancamentos)
+              .map((l) => l.id)
+              .toList() ??
+          [];
+      _selectedLancamentoIds.removeAll(visibleIds);
+    } else {
+      selectAll();
+    }
+    notifyListeners();
+  }
+
   LancamentosListViewModel(
     this._detailsUseCase,
     this._filterUseCase,

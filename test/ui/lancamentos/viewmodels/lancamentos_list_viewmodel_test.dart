@@ -6,6 +6,9 @@ import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
+import 'package:zzuna/domain/entities/conta_entity.dart';
+import 'package:zzuna/domain/statics/banco/banco.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
@@ -17,11 +20,12 @@ import 'package:zzuna/data/repositories/base_repository.dart';
 
 class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
   int executeCallCount = 0;
+  List<LancamentoDetails> returnList = [];
 
   @override
   Future<List<LancamentoDetails>> execute({required Mes mes, required int ano}) async {
     executeCallCount++;
-    return [];
+    return returnList;
   }
 
   @override
@@ -188,6 +192,100 @@ void main() {
 
       // Call count should increase to 2
       expect(detailsUseCase.executeCallCount, 2);
+    });
+  });
+
+  group('LancamentosListViewModel Selection Tests', () {
+    late LancamentosListViewModel viewModel;
+    late FakeLancamentoDetailsUseCase detailsUseCase;
+
+    setUp(() {
+      detailsUseCase = FakeLancamentoDetailsUseCase();
+      viewModel = LancamentosListViewModel(
+        detailsUseCase,
+        FakeLancamentoFilterUseCase(),
+        LancamentoResumoMensalUseCase(),
+        FakeLancamentoRepository(),
+        FakeExtratoFaturaRepository(),
+      );
+    });
+
+    final extratoFake = ExtratoFaturaDetails(
+      id: 'ef-1',
+      origem: LancamentoOrigemContaDetail(
+        conta: ContaDetails(
+          id: 'c-1',
+          descricao: 'Conta 1',
+          ativo: true,
+          dataInicial: DateTime(2026, 1, 1),
+          banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+        ),
+      ),
+      ano: 2026,
+      mes: Mes.janeiro,
+      dataInicio: DateTime(2026, 1, 1),
+      dataFim: DateTime(2026, 1, 31),
+      saldoInicial: 0.0,
+      saldoFinal: 0.0,
+      fechado: false,
+    );
+
+    LancamentoDetails buildLancamento(String id) {
+      return LancamentoDetails(
+        id: id,
+        tipo: LancamentoTipo.despesa,
+        data: DateTime(2026, 1, 15),
+        descricao: 'Lancamento $id',
+        extratoFatura: extratoFake,
+        origem: LancamentoOrigemContaDetail(
+          conta: ContaDetails(
+            id: 'c-1',
+            descricao: 'Conta 1',
+            ativo: true,
+            dataInicial: DateTime(2026, 1, 1),
+            banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+          ),
+        ),
+        itens: const [],
+        conciliado: true,
+      );
+    }
+
+    test('allSelected is false when there are no visible items', () {
+      expect(viewModel.allSelected, isFalse);
+    });
+
+    test('selectAll and toggleSelectAll work correctly with visible items', () async {
+      detailsUseCase.returnList = [
+        buildLancamento('1'),
+        buildLancamento('2'),
+      ];
+
+      // Load items
+      viewModel.updateFilter(const LancamentoFilterState(
+        mes: Mes.janeiro,
+        ano: 2026,
+        descricao: '',
+      ));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(viewModel.allSelected, isFalse);
+      expect(viewModel.selectedLancamentoIds, isEmpty);
+
+      // Select all
+      viewModel.selectAll();
+      expect(viewModel.allSelected, isTrue);
+      expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
+
+      // Toggle select all (should deselect since all are selected)
+      viewModel.toggleSelectAll();
+      expect(viewModel.allSelected, isFalse);
+      expect(viewModel.selectedLancamentoIds, isEmpty);
+
+      // Toggle select all again (should select all)
+      viewModel.toggleSelectAll();
+      expect(viewModel.allSelected, isTrue);
+      expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
     });
   });
 }

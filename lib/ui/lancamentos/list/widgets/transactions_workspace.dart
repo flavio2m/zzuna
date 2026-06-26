@@ -5,6 +5,7 @@ import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_card.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class TransactionsWorkspace extends ConsumerWidget {
@@ -47,6 +48,11 @@ class TransactionsWorkspace extends ConsumerWidget {
             ),
             child: Row(
               children: [
+                IconSelecionarTodosButton(
+                  allSelected: viewModel.allSelected,
+                  onPressed: () => viewModel.toggleSelectAll(),
+                ),
+                const SizedBox(width: 16),
                 IconButton(
                   icon: const Icon(Icons.add, size: 20),
                   color: AppColors.primary,
