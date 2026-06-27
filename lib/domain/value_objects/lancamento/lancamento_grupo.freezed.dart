@@ -183,12 +183,12 @@ return replicacao(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId)?  replicacao,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that.grupoId);case _:
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case _:
   return orElse();
 
 }
@@ -206,12 +206,12 @@ return replicacao(_that.grupoId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId)  replicacao,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId,  int parcela,  int totalParcelas)  replicacao,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento():
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia():
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao():
-return replicacao(_that.grupoId);}
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -225,12 +225,12 @@ return replicacao(_that.grupoId);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId)?  replicacao,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that.grupoId);case _:
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case _:
   return null;
 
 }
@@ -392,10 +392,12 @@ as String,
 @JsonSerializable()
 
 class LancamentoGrupoReplicacao implements LancamentoGrupo {
-  const LancamentoGrupoReplicacao({required this.grupoId, final  String? $type}): $type = $type ?? 'replicacao';
+  const LancamentoGrupoReplicacao({required this.grupoId, required this.parcela, required this.totalParcelas, final  String? $type}): $type = $type ?? 'replicacao';
   factory LancamentoGrupoReplicacao.fromJson(Map<String, dynamic> json) => _$LancamentoGrupoReplicacaoFromJson(json);
 
 @override final  String grupoId;
+ final  int parcela;
+ final  int totalParcelas;
 
 @JsonKey(name: 'runtimeType')
 final String $type;
@@ -414,16 +416,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoGrupoReplicacao&&(identical(other.grupoId, grupoId) || other.grupoId == grupoId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoGrupoReplicacao&&(identical(other.grupoId, grupoId) || other.grupoId == grupoId)&&(identical(other.parcela, parcela) || other.parcela == parcela)&&(identical(other.totalParcelas, totalParcelas) || other.totalParcelas == totalParcelas));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,grupoId);
+int get hashCode => Object.hash(runtimeType,grupoId,parcela,totalParcelas);
 
 @override
 String toString() {
-  return 'LancamentoGrupo.replicacao(grupoId: $grupoId)';
+  return 'LancamentoGrupo.replicacao(grupoId: $grupoId, parcela: $parcela, totalParcelas: $totalParcelas)';
 }
 
 
@@ -434,7 +436,7 @@ abstract mixin class $LancamentoGrupoReplicacaoCopyWith<$Res> implements $Lancam
   factory $LancamentoGrupoReplicacaoCopyWith(LancamentoGrupoReplicacao value, $Res Function(LancamentoGrupoReplicacao) _then) = _$LancamentoGrupoReplicacaoCopyWithImpl;
 @override @useResult
 $Res call({
- String grupoId
+ String grupoId, int parcela, int totalParcelas
 });
 
 
@@ -451,10 +453,12 @@ class _$LancamentoGrupoReplicacaoCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoGrupo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? grupoId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? grupoId = null,Object? parcela = null,Object? totalParcelas = null,}) {
   return _then(LancamentoGrupoReplicacao(
 grupoId: null == grupoId ? _self.grupoId : grupoId // ignore: cast_nullable_to_non_nullable
-as String,
+as String,parcela: null == parcela ? _self.parcela : parcela // ignore: cast_nullable_to_non_nullable
+as int,totalParcelas: null == totalParcelas ? _self.totalParcelas : totalParcelas // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

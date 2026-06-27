@@ -34,7 +34,6 @@ class TransactionsWorkspace extends ConsumerWidget {
             );
           }
 
-          final hasSelection = viewModel.selectedLancamentoIds.isNotEmpty;
           final selectedIds = viewModel.selectedLancamentoIds.toList();
 
           final actionsBar = TransactionsActionsBar(
@@ -69,7 +68,8 @@ class TransactionsWorkspace extends ConsumerWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.all(24),
                   itemCount: dias.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final dia = dias[index];
                     return TransactionDayCard(dia: dia);

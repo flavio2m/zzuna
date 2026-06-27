@@ -4,6 +4,7 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
@@ -41,7 +42,8 @@ class LancamentoUpdateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<LancamentoUpdateModal> createState() => _LancamentoUpdateModalState();
+  ConsumerState<LancamentoUpdateModal> createState() =>
+      _LancamentoUpdateModalState();
 }
 
 class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
@@ -111,7 +113,10 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
 
   void _syncItem1() {
     final outrosItens = _itens.where((item) => item.numero != 1).toList();
-    final somaOutros = outrosItens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final somaOutros = outrosItens.fold<double>(
+      0.0,
+      (sum, item) => sum + item.valor,
+    );
     final valorItem1 = double.parse((_valor - somaOutros).toStringAsFixed(2));
 
     final item1Idx = _itens.indexWhere((item) => item.numero == 1);
@@ -151,18 +156,30 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
   }
 
   String _getModeText() {
-    final relationRegExp = RegExp(r'\s\((\d+)/(\d+)\)$');
-    final match = relationRegExp.firstMatch(widget.lancamento.descricao);
-    if (match != null) {
-      final isReplicado =
-          widget //
-              .lancamento
-              .descricao
-              .toLowerCase()
-              .contains('replicado');
-      return isReplicado ? 'Replicado' : 'Parcelado';
+    final grupo = widget.lancamento.grupo;
+    if (grupo == null) {
+      // Fallback para dados de visualização/teste legados se grupo for nulo
+      final relationRegExp = RegExp(r'\s\((\d+)/(\d+)\)$');
+      final match = relationRegExp.firstMatch(widget.lancamento.descricao);
+      if (match != null) {
+        final current = match.group(1);
+        final total = match.group(2);
+        final isReplicado = widget.lancamento.descricao.toLowerCase().contains(
+          'replicado',
+        );
+        final modeStr = isReplicado ? 'Replicado' : 'Parcelado';
+        return '$modeStr ($current de $total)';
+      }
+      return 'Simples';
     }
-    return 'Simples';
+
+    return switch (grupo) {
+      LancamentoGrupoParcelamento(:final parcela, :final totalParcelas) =>
+        'Parcelado ($parcela de $totalParcelas)',
+      LancamentoGrupoReplicacao(:final parcela, :final totalParcelas) =>
+        'Replicado ($parcela de $totalParcelas)',
+      LancamentoGrupoTransferencia() => 'Transferência',
+    };
   }
 
   @override
@@ -336,7 +353,9 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                           width: 2, //
                         ),
                         borderRadius: BorderRadius.circular(8),
-                        color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.05,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,

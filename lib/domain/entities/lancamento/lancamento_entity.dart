@@ -5,6 +5,7 @@ export 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 
 part 'lancamento_entity.freezed.dart';
 part 'lancamento_entity.g.dart';
@@ -20,6 +21,7 @@ sealed class Lancamento with _$Lancamento {
     required LancamentoOrigem origem,
     required List<LancamentoItem> itens,
     required bool conciliado,
+    LancamentoGrupo? grupo,
     String? observacao,
   }) = _Lancamento;
 
@@ -41,6 +43,7 @@ sealed class LancamentoDetails with _$LancamentoDetails {
     required LancamentoOrigemDetail origem,
     required List<LancamentoItemDetails> itens,
     required bool conciliado,
+    LancamentoGrupo? grupo,
     String? observacao,
   }) = _LancamentoDetails;
 

@@ -1,8 +1,9 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
-import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
+import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -14,9 +15,12 @@ class TransactionRow extends StatelessWidget {
     this.tipo = LancamentoTipo.despesa,
     this.costCenter = 'CC: Geral',
     this.badge,
+    this.grupo,
+    this.conciliado = false,
     this.selected = false,
-    this.reconcileButton,
+    required this.reconcileButton,
     this.onTap,
+    this.onView,
     this.onEdit,
     this.onSelect,
   });
@@ -28,9 +32,12 @@ class TransactionRow extends StatelessWidget {
   final LancamentoTipo tipo;
   final String costCenter;
   final String? badge;
+  final LancamentoGrupo? grupo;
+  final bool conciliado;
   final bool selected;
-  final Widget? reconcileButton;
+  final Widget reconcileButton;
   final VoidCallback? onTap;
+  final VoidCallback? onView;
   final VoidCallback? onEdit;
   final ValueChanged<bool>? onSelect;
 
@@ -61,7 +68,9 @@ class TransactionRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: selected ? AppColors.emerald50.withValues(alpha: 0.35) : AppColors.surface,
+        color: selected
+            ? AppColors.emerald50.withValues(alpha: 0.35)
+            : AppColors.surface,
         child: Row(
           children: [
             GestureDetector(
@@ -128,7 +137,10 @@ class TransactionRow extends StatelessWidget {
                       ),
                       const Text(
                         '•',
-                        style: TextStyle(color: AppColors.slate300, fontSize: 10), //
+                        style: TextStyle(
+                          color: AppColors.slate300,
+                          fontSize: 10,
+                        ), //
                       ),
                       Text(
                         category,
@@ -140,7 +152,10 @@ class TransactionRow extends StatelessWidget {
                       ),
                       const Text(
                         '•',
-                        style: TextStyle(color: AppColors.slate300, fontSize: 10), //
+                        style: TextStyle(
+                          color: AppColors.slate300,
+                          fontSize: 10,
+                        ), //
                       ),
                       Text(
                         costCenter,
@@ -151,6 +166,42 @@ class TransactionRow extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
+                      if (grupo != null) ...[
+                        const Text(
+                          '•',
+                          style: TextStyle(
+                            color: AppColors.slate300,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Tooltip(
+                          message: switch (grupo!) {
+                            LancamentoGrupoParcelamento(
+                              :final parcela,
+                              :final totalParcelas,
+                            ) =>
+                              'Parcelado ($parcela/$totalParcelas)',
+                            LancamentoGrupoReplicacao(
+                              :final parcela,
+                              :final totalParcelas,
+                            ) =>
+                              'Replicado ($parcela de $totalParcelas)',
+                            LancamentoGrupoTransferencia() => 'Transferência',
+                          },
+                          child: Icon(
+                            switch (grupo!) {
+                              LancamentoGrupoParcelamento() =>
+                                Icons.auto_awesome_motion_outlined,
+                              LancamentoGrupoReplicacao() =>
+                                Icons.repeat_outlined,
+                              LancamentoGrupoTransferencia() =>
+                                Icons.swap_horiz_outlined,
+                            },
+                            size: 13,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ],
@@ -174,15 +225,14 @@ class TransactionRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (onEdit != null) ...[
-              const SizedBox(width: 8),
-              IconEditarButton(
-                onPressed: onEdit, //
-              ),
-              if (reconcileButton != null) ...[
-                const SizedBox(width: 8), reconcileButton!, //
-              ],
-            ],
+            const SizedBox(width: 8),
+            IconAcoesButton(
+              conciliado: conciliado,
+              onView: onView ?? onTap,
+              onEdit: onEdit,
+            ),
+            const SizedBox(width: 8),
+            reconcileButton,
           ],
         ),
       ),

@@ -66,17 +66,30 @@ class TransactionDayCard extends StatelessWidget {
           tipo: l.tipo,
           costCenter: costCenter,
           badge: badge,
+          grupo: l.grupo,
+          conciliado: l.conciliado,
           selected: selected,
           reconcileButton: LancamentoReconcileButton(
             lancamentoId: l.id,
-            conciliado: l.conciliado, //
+            conciliado: l.conciliado,
           ),
           onTap: () {
+            if (l.conciliado) {
+              AppDialog.show(
+                context: context,
+                child: LancamentoDetailsModal(lancamento: l),
+              );
+            } else {
+              AppDialog.show(
+                context: context,
+                child: LancamentoUpdateModal(lancamento: l),
+              );
+            }
+          },
+          onView: () {
             AppDialog.show(
               context: context,
-              child: LancamentoDetailsModal(
-                lancamento: l, //
-              ),
+              child: LancamentoDetailsModal(lancamento: l),
             );
           },
           onEdit: () {

@@ -36,6 +36,7 @@ class ReconcileLancamentosUseCase {
           extratoFaturaId: lancamento.extratoFaturaId,
           itens: lancamento.itens,
           conciliado: conciliado,
+          grupo: lancamento.grupo,
           observacao: lancamento.observacao,
         ),
       );

@@ -89,6 +89,7 @@ class CreateLancamentosUseCase {
       origem: dto.origem,
       itens: dto.itens,
       conciliado: dto.conciliado,
+      grupo: dto.grupo,
       observacao: dto.observacao,
     )).toList();
 

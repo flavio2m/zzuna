@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
@@ -17,24 +18,38 @@ class LancamentoDetailsModal extends StatelessWidget {
 
   const LancamentoDetailsModal({super.key, required this.lancamento});
 
-  @override
-  Widget build(BuildContext context) {
-    final valorStr = UtilBrasilFields.obterReal(lancamento.valor, moeda: true);
+  String _getRelationText() {
+    final grupo = lancamento.grupo;
+    if (grupo != null) {
+      switch (grupo) {
+        case LancamentoGrupoParcelamento(:final parcela, :final totalParcelas):
+          return 'Parcelado ($parcela de $totalParcelas)';
+        case LancamentoGrupoReplicacao(:final parcela, :final totalParcelas):
+          return 'Replicado ($parcela de $totalParcelas)';
+        case LancamentoGrupoTransferencia():
+          return 'Transferência';
+      }
+    }
 
-    // Identificar modo de lançamento e parcelas/réplicas
     final relationRegExp = RegExp(r'\s\((\d+)/(\d+)\)$');
     final match = relationRegExp.firstMatch(lancamento.descricao);
-
-    String relationText = 'Simples';
     if (match != null) {
       final current = match.group(1);
       final total = match.group(2);
       final isReplicado = lancamento.descricao.toLowerCase().contains(
-        'replicado', //
+        'replicado',
       );
       final modeStr = isReplicado ? 'Replicado' : 'Parcelado';
-      relationText = '$modeStr ($current de $total)';
+      return '$modeStr ($current de $total)';
     }
+
+    return 'Simples';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final valorStr = UtilBrasilFields.obterReal(lancamento.valor, moeda: true);
+    final relationText = _getRelationText();
 
     final isIncome = lancamento.tipo == LancamentoTipo.receita;
     final isTransfer = lancamento.tipo == LancamentoTipo.transferencia;
@@ -192,7 +207,8 @@ class LancamentoDetailsModal extends StatelessWidget {
         }),
 
         // Se houver observações
-        if (lancamento.observacao != null && lancamento.observacao!.trim().isNotEmpty) ...[
+        if (lancamento.observacao != null &&
+            lancamento.observacao!.trim().isNotEmpty) ...[
           const AppSpacing(size: AppSpacingSize.md),
           const AppDivider(variant: AppDividerVariant.normal),
           const AppSpacing(size: AppSpacingSize.md),
@@ -228,7 +244,9 @@ class LancamentoDetailsModal extends StatelessWidget {
             backgroundColor: AppColors.slate200,
             foregroundColor: AppColors.slate700,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
           child: const AppText(

@@ -11,7 +11,6 @@ part of 'lancamento_item.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$LancamentoItem {
 
@@ -22,8 +21,6 @@ mixin _$LancamentoItem {
 @pragma('vm:prefer-inline')
 $LancamentoItemCopyWith<LancamentoItem> get copyWith => _$LancamentoItemCopyWithImpl<LancamentoItem>(this as LancamentoItem, _$identity);
 
-  /// Serializes this LancamentoItem to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -31,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
 
@@ -203,11 +200,11 @@ return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);
 }
 
 /// @nodoc
-@JsonSerializable()
 
-class _LancamentoItem implements LancamentoItem {
-  const _LancamentoItem({required this.numero, required this.centroCustoId, required this.categoriaId, required this.valor});
-  factory _LancamentoItem.fromJson(Map<String, dynamic> json) => _$LancamentoItemFromJson(json);
+
+class _LancamentoItem extends LancamentoItem {
+  const _LancamentoItem({required this.numero, required this.centroCustoId, required this.categoriaId, required this.valor}): super._();
+  
 
 @override final  int numero;
 @override final  String centroCustoId;
@@ -220,17 +217,14 @@ class _LancamentoItem implements LancamentoItem {
 @pragma('vm:prefer-inline')
 _$LancamentoItemCopyWith<_LancamentoItem> get copyWith => __$LancamentoItemCopyWithImpl<_LancamentoItem>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$LancamentoItemToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
 

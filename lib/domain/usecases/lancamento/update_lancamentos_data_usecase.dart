@@ -1,16 +1,16 @@
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
-import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import '../../../data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
-import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
-import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'recalculate_extrato_fatura_balance_usecase.dart';
+import 'resolve_extrato_fatura_usecase.dart';
 
 class UpdateLancamentosDataUseCase {
   final ResolveExtratoFaturaUseCase _resolveUseCase;
@@ -29,7 +29,10 @@ class UpdateLancamentosDataUseCase {
     this._cartaoRepository,
   );
 
-  AsyncResult<Unit> execute({required List<String> ids, required DateTime novaData}) async {
+  AsyncResult<Unit> execute({
+    required List<String> ids,
+    required DateTime novaData,
+  }) async {
     if (ids.isEmpty) {
       return const Success(unit);
     }
@@ -39,30 +42,45 @@ class UpdateLancamentosDataUseCase {
     for (final id in ids) {
       final res = await _repository.getById(id);
       if (res.isError()) {
-        return Failure(DomainException('Lançamento com ID $id não encontrado.'));
+        return Failure(
+          DomainException('Lançamento com ID $id não encontrado.'),
+        );
       }
       lancamentos.add(res.getOrNull()!);
     }
 
     // 2. Validar se o período original de cada lançamento está aberto
     for (final l in lancamentos) {
-      final oldExtratoResult = await _extratoRepository.getById(l.extratoFaturaId);
+      final oldExtratoResult = await _extratoRepository.getById(
+        l.extratoFaturaId,
+      );
       if (oldExtratoResult.isError()) {
-        return Failure(DomainException('Extrato original do lançamento ${l.id} não encontrado.'));
+        return Failure(
+          DomainException(
+            'Extrato original do lançamento ${l.id} não encontrado.',
+          ),
+        );
       }
       final oldExtrato = oldExtratoResult.getOrNull()!;
       if (oldExtrato.fechado) {
-        return Failure(DomainException('Não é possível editar lançamentos de um período encerrado.'));
+        return Failure(
+          DomainException(
+            'Não é possível editar lançamentos de um período encerrado.',
+          ),
+        );
       }
     }
 
     // 3. Validar limite da nova data (não superior a 24 meses do dia atual)
     final limit = DateTime.now().add(const Duration(days: 730));
     if (novaData.isAfter(limit)) {
-      return Failure(DomainException('Data não pode ser superior a 24 meses da data atual'));
+      return Failure(
+        DomainException('Data não pode ser superior a 24 meses da data atual'),
+      );
     }
 
-    // 4. Validar se a data destino é anterior à data inicial da conta/cartão e se o extrato destino está aberto
+    // 4. Validar se a data destino é anterior à data inicial da conta/cartão
+    // e se o extrato destino está aberto
     final targetMonth = DateTime(novaData.year, novaData.month, 1);
     final mes = Mes.values.firstWhere((m) => m.numero == novaData.month);
 
@@ -73,31 +91,52 @@ class UpdateLancamentosDataUseCase {
       if (origem is LancamentoOrigemConta) {
         final contaRes = await _contaRepository.getById(origem.contaId);
         if (contaRes.isError()) {
-          return Failure(DomainException('Conta não encontrada: ${origem.contaId}'));
+          return Failure(
+            DomainException('Conta não encontrada: ${origem.contaId}'),
+          );
         }
         dataInicial = contaRes.getOrThrow().dataInicial;
       } else if (origem is LancamentoOrigemCartao) {
         final cartaoRes = await _cartaoRepository.getById(origem.cartaoId);
         if (cartaoRes.isError()) {
-          return Failure(DomainException('Cartão não encontrado: ${origem.cartaoId}'));
+          return Failure(
+            DomainException('Cartão não encontrado: ${origem.cartaoId}'),
+          );
         }
         dataInicial = cartaoRes.getOrThrow().dataInicial;
       } else {
         return Failure(DomainException('Origem de lançamento desconhecida'));
       }
 
-      final dataInicialCompare = DateTime(dataInicial.year, dataInicial.month, 1);
+      final dataInicialCompare = DateTime(
+        dataInicial.year,
+        dataInicial.month,
+        1,
+      );
       if (targetMonth.isBefore(dataInicialCompare)) {
-        return Failure(DomainException('Data do lançamento não pode ser anterior à data inicial do cartão/conta'));
+        return Failure(
+          DomainException(
+            'Data do lançamento não pode ser anterior à data inicial do '
+            'cartão/conta',
+          ),
+        );
       }
 
-      final targetExtratosRes = await _extratoRepository.searchByPeriodo(origem, novaData.year, mes);
+      final targetExtratosRes = await _extratoRepository.searchByPeriodo(
+        origem,
+        novaData.year,
+        mes,
+      );
       if (targetExtratosRes.isError()) {
         return Failure(DomainException('Erro ao buscar extrato de destino.'));
       }
       final targetExtratos = targetExtratosRes.getOrThrow();
       if (targetExtratos.isNotEmpty && targetExtratos.first.fechado) {
-        return Failure(DomainException('Não é possível registrar lançamentos em um período encerrado.'));
+        return Failure(
+          DomainException(
+            'Não é possível registrar lançamentos em um período encerrado.',
+          ),
+        );
       }
     }
 
@@ -126,6 +165,7 @@ class UpdateLancamentosDataUseCase {
           origem: l.origem,
           itens: l.itens,
           conciliado: l.conciliado,
+          grupo: l.grupo,
           observacao: l.observacao,
         ),
       );
@@ -138,7 +178,9 @@ class UpdateLancamentosDataUseCase {
     }
 
     // 7. Recalcular os saldos de todas as origens únicas afetadas
-    final Set<LancamentoOrigem> origensAfetadas = lancamentos.map((l) => l.origem).toSet();
+    final Set<LancamentoOrigem> origensAfetadas = lancamentos
+        .map((l) => l.origem)
+        .toSet();
     for (final origem in origensAfetadas) {
       final recalcRes = await _recalculateUseCase.execute(origem);
       if (recalcRes.isError()) {

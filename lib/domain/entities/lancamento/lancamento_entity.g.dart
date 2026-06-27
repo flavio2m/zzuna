@@ -17,6 +17,9 @@ _Lancamento _$LancamentoFromJson(Map<String, dynamic> json) => _Lancamento(
       .map((e) => LancamentoItem.fromJson(e as Map<String, dynamic>))
       .toList(),
   conciliado: json['conciliado'] as bool,
+  grupo: json['grupo'] == null
+      ? null
+      : LancamentoGrupo.fromJson(json['grupo'] as Map<String, dynamic>),
   observacao: json['observacao'] as String?,
 );
 
@@ -30,6 +33,7 @@ Map<String, dynamic> _$LancamentoToJson(_Lancamento instance) =>
       'origem': instance.origem,
       'itens': instance.itens,
       'conciliado': instance.conciliado,
+      'grupo': instance.grupo,
       'observacao': instance.observacao,
     };
 

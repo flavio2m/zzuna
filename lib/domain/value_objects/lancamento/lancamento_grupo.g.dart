@@ -42,6 +42,8 @@ LancamentoGrupoReplicacao _$LancamentoGrupoReplicacaoFromJson(
   Map<String, dynamic> json,
 ) => LancamentoGrupoReplicacao(
   grupoId: json['grupoId'] as String,
+  parcela: (json['parcela'] as num).toInt(),
+  totalParcelas: (json['totalParcelas'] as num).toInt(),
   $type: json['runtimeType'] as String?,
 );
 
@@ -49,5 +51,7 @@ Map<String, dynamic> _$LancamentoGrupoReplicacaoToJson(
   LancamentoGrupoReplicacao instance,
 ) => <String, dynamic>{
   'grupoId': instance.grupoId,
+  'parcela': instance.parcela,
+  'totalParcelas': instance.totalParcelas,
   'runtimeType': instance.$type,
 };

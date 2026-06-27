@@ -253,6 +253,7 @@ class LancamentoDetailsUseCase {
       origem: origemDetail,
       itens: itemDetails,
       conciliado: l.conciliado,
+      grupo: l.grupo,
       observacao: l.observacao,
     );
   }

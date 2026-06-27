@@ -1,4 +1,5 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
@@ -13,6 +14,7 @@ class LancamentoDto {
   String extratoFaturaId;
   List<LancamentoItem> itens;
   bool conciliado;
+  LancamentoGrupo? grupo;
   String? observacao;
 
   LancamentoDto({
@@ -24,6 +26,7 @@ class LancamentoDto {
     this.extratoFaturaId = '',
     this.itens = const [],
     this.conciliado = false,
+    this.grupo,
     this.observacao,
   }) : data = data ?? DateTime.now(),
        origem = origem ?? const LancamentoOrigem.conta(contaId: '');
@@ -37,6 +40,7 @@ class LancamentoDto {
     String? extratoFaturaId,
     List<LancamentoItem>? itens,
     bool? conciliado,
+    LancamentoGrupo? grupo,
     String? observacao,
   }) {
     return LancamentoDto(
@@ -48,6 +52,7 @@ class LancamentoDto {
       extratoFaturaId: extratoFaturaId ?? this.extratoFaturaId,
       itens: itens ?? this.itens,
       conciliado: conciliado ?? this.conciliado,
+      grupo: grupo ?? this.grupo,
       observacao: observacao ?? this.observacao,
     );
   }
@@ -92,6 +97,10 @@ class LancamentoDto {
     this.conciliado = conciliado;
   }
 
+  void setGrupo(LancamentoGrupo? grupo) {
+    this.grupo = grupo;
+  }
+
   void setObservacao(String? observacao) {
     this.observacao = observacao;
   }
@@ -105,6 +114,7 @@ class LancamentoDto {
     'extratoFaturaId': extratoFaturaId,
     'itens': itens.map((e) => e.toJson()).toList(),
     'conciliado': conciliado,
+    'grupo': grupo?.toJson(),
     'observacao': observacao,
   };
 
@@ -122,6 +132,9 @@ class LancamentoDto {
           .map((e) => LancamentoItem.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       conciliado: json['conciliado'] ?? false,
+      grupo: json['grupo'] != null
+          ? LancamentoGrupo.fromJson(Map<String, dynamic>.from(json['grupo']))
+          : null,
       observacao: json['observacao'],
     );
   }
@@ -148,6 +161,7 @@ class LancamentoDto {
           )
           .toList(),
       conciliado: details.conciliado,
+      grupo: details.grupo,
       observacao: details.observacao,
     );
   }

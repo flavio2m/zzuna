@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
@@ -36,7 +37,8 @@ class LancamentoCreateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<LancamentoCreateModal> createState() => _LancamentoCreateModalState();
+  ConsumerState<LancamentoCreateModal> createState() =>
+      _LancamentoCreateModalState();
 }
 
 class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
@@ -73,7 +75,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
 
   void _syncItem1() {
     final outrosItens = _itens.where((item) => item.numero != 1).toList();
-    final somaOutros = outrosItens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final somaOutros = outrosItens.fold<double>(
+      0.0,
+      (sum, item) => sum + item.valor,
+    );
     final valorItem1 = double.parse((_valor - somaOutros).toStringAsFixed(2));
 
     final item1Idx = _itens.indexWhere((item) => item.numero == 1);
@@ -101,7 +106,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Lançamento(s) cadastrado(s) com sucesso');
+      AppSnackBar.showSuccess(
+        context,
+        'Lançamento(s) cadastrado(s) com sucesso',
+      );
       Navigator.pop(context);
     });
 
@@ -119,7 +127,16 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     }
     final targetDays = DateTime(year, month + 1, 0).day;
     final day = date.day > targetDays ? targetDays : date.day;
-    return DateTime(year, month, day, date.hour, date.minute, date.second, date.millisecond, date.microsecond);
+    return DateTime(
+      year,
+      month,
+      day,
+      date.hour,
+      date.minute,
+      date.second,
+      date.millisecond,
+      date.microsecond,
+    );
   }
 
   List<double> _calculateParcelas(double totalValor, int parcelasCount) {
@@ -148,6 +165,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
           parcelasCount: _numParcelas,
           baseItems: _itens,
         );
+        final grupoId = const Uuid().v4();
         return List.generate(_numParcelas, (index) {
           final i = index + 1;
           return dto.copyWith(
@@ -155,11 +173,17 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
             descricao: '${dto.descricao} ($i/$_numParcelas)',
             data: _addMonths(dto.data, index),
             itens: parcelasItens[index],
+            grupo: LancamentoGrupo.parcelamento(
+              grupoId: grupoId,
+              parcela: i,
+              totalParcelas: _numParcelas,
+            ),
           );
         });
 
       case ModoLancamento.replicado:
         final count = _parcelaFinal - _parcelaInicial + 1;
+        final grupoId = const Uuid().v4();
         return List.generate(count, (index) {
           final i = _parcelaInicial + index;
           final replicaItens = _distributionUseCase.distributeReplicado(
@@ -172,6 +196,11 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
             descricao: '${dto.descricao} ($i/$_parcelaFinal)',
             data: _addMonths(dto.data, index),
             itens: replicaItens,
+            grupo: LancamentoGrupo.replicacao(
+              grupoId: grupoId,
+              parcela: i,
+              totalParcelas: _parcelaFinal,
+            ),
           );
         });
     }
