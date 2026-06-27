@@ -8,7 +8,8 @@ class LancamentoUpdateDataViewModel extends ChangeNotifier {
 
   LancamentoUpdateDataViewModel(this._useCase);
 
-  late final updateDataCommand = Command1<Unit, ({List<String> ids, DateTime novaData})>(_updateData);
+  late final updateDataCommand =
+      Command1<Unit, ({List<String> ids, DateTime novaData})>(_updateData);
 
   AsyncResult<Unit> _updateData(
     ({List<String> ids, DateTime novaData}) params,

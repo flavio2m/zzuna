@@ -51,7 +51,6 @@ class LancamentoResumoMensalUseCase {
       receitas: totals.receitas,
       despesas: totals.despesas,
       transferencias: totals.transferencias,
-      investimentos: totals.investimentos,
       exibirResumoFinanceiro: exibirResumoFinanceiro,
       dias: dias,
     );
@@ -61,7 +60,6 @@ class LancamentoResumoMensalUseCase {
     double receitas = 0;
     double despesas = 0;
     double transferencias = 0;
-    double investimentos = 0;
 
     for (final l in lancamentos) {
       switch (l.tipo) {
@@ -70,9 +68,6 @@ class LancamentoResumoMensalUseCase {
           break;
         case LancamentoTipo.despesa:
           despesas += l.valor;
-          break;
-        case LancamentoTipo.investimento:
-          investimentos += l.valor;
           break;
         case LancamentoTipo.transferencia:
           transferencias += l.valor;
@@ -84,7 +79,6 @@ class LancamentoResumoMensalUseCase {
       receitas: receitas,
       despesas: despesas,
       transferencias: transferencias,
-      investimentos: investimentos,
     );
   }
 
@@ -136,12 +130,10 @@ class _Totais {
   final double receitas;
   final double despesas;
   final double transferencias;
-  final double investimentos;
 
   const _Totais({
     required this.receitas,
     required this.despesas,
     required this.transferencias,
-    required this.investimentos,
   });
 }

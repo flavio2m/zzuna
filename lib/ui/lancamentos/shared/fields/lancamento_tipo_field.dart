@@ -22,6 +22,7 @@ class LancamentoTipoField extends StatelessWidget {
       value: value,
       validator: validator != null ? (v) => validator!(v) : null,
       items: LancamentoTipo.values
+          .where((tipo) => tipo != LancamentoTipo.transferencia)
           .map(
             (tipo) => AppDropdownMenuItem<LancamentoTipo>(
               value: tipo,

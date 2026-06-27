@@ -9,7 +9,6 @@ class LancamentoResumoMensal {
   final double receitas;
   final double despesas;
   final double transferencias;
-  final double investimentos;
   final bool exibirResumoFinanceiro;
   final List<LancamentoResumoDia> dias;
 
@@ -21,7 +20,6 @@ class LancamentoResumoMensal {
     required this.receitas,
     required this.despesas,
     required this.transferencias,
-    required this.investimentos,
     required this.exibirResumoFinanceiro,
     required this.dias,
   });

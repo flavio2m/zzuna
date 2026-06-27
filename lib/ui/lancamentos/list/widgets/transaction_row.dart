@@ -46,21 +46,18 @@ class TransactionRow extends StatelessWidget {
     final iconColor = switch (tipo) {
       LancamentoTipo.receita => AppColors.primary,
       LancamentoTipo.transferencia => AppColors.indigo600,
-      LancamentoTipo.investimento => AppColors.indigo600,
       LancamentoTipo.despesa => AppColors.danger,
     };
 
     final iconBackground = switch (tipo) {
       LancamentoTipo.receita => AppColors.emerald50,
       LancamentoTipo.transferencia => AppColors.indigo50,
-      LancamentoTipo.investimento => AppColors.indigo50,
       LancamentoTipo.despesa => AppColors.rose50,
     };
 
     final icon = switch (tipo) {
       LancamentoTipo.receita => Icons.arrow_upward_rounded,
       LancamentoTipo.transferencia => Icons.layers_outlined,
-      LancamentoTipo.investimento => Icons.trending_up,
       LancamentoTipo.despesa => Icons.arrow_downward_rounded,
     };
 
@@ -217,7 +214,6 @@ class TransactionRow extends StatelessWidget {
                   color: switch (tipo) {
                     LancamentoTipo.receita => AppColors.primary,
                     LancamentoTipo.transferencia => AppColors.slate600,
-                    LancamentoTipo.investimento => AppColors.slate600,
                     LancamentoTipo.despesa => AppColors.danger,
                   },
                   fontSize: 12,

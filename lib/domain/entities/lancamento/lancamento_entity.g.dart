@@ -41,5 +41,4 @@ const _$LancamentoTipoEnumMap = {
   LancamentoTipo.receita: 'receita',
   LancamentoTipo.despesa: 'despesa',
   LancamentoTipo.transferencia: 'transferencia',
-  LancamentoTipo.investimento: 'investimento',
 };

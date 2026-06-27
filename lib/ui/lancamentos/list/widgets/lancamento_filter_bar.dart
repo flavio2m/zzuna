@@ -88,10 +88,6 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
                   value: LancamentoTipo.transferencia,
                   label: LancamentoTipo.transferencia.descricao,
                 ),
-                AppDropdownMenuItem<LancamentoTipo?>(
-                  value: LancamentoTipo.investimento,
-                  label: LancamentoTipo.investimento.descricao,
-                ),
               ],
               onChanged: (value) {
                 ref.read(lancamentoFilterProvider.notifier).setTipo(value);

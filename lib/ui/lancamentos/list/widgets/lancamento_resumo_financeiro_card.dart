@@ -70,14 +70,6 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
           Expanded(
             child: _InfoItem(
               width: 120,
-              title: 'Investimentos: ',
-              value: _formatCurrency(resumo.investimentos),
-              color: AppColors.orange800,
-            ),
-          ),
-          Expanded(
-            child: _InfoItem(
-              width: 120,
               title: 'Transferências: ',
               value: _formatCurrency(resumo.transferencias),
               color: AppColors.indigo600,
