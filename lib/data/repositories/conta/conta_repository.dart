@@ -52,6 +52,28 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
   }
 
   @override
+  AsyncResult<Unit> createAll(List<CreateContaDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Conta(
+            id: const Uuid().v4(),
+            descricao: dto.descricao,
+            ativo: dto.ativo,
+            bancoSigla: dto.bancoSigla,
+            dataInicial: dto.dataInicial ?? DateTime(DateTime.now().year, DateTime.now().month, 1),
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<Conta> update(LoadedContaDto dto) async {
     final conta = Conta(
       id: dto.id,
@@ -62,6 +84,28 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     );
     return _storage.update(conta).onSuccess((conta) {
       _streamController.add(RepositoryUpdated(conta));
+    });
+  }
+
+  @override
+  AsyncResult<Unit> updateAll(List<LoadedContaDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Conta(
+            id: dto.id,
+            descricao: dto.descricao,
+            ativo: dto.ativo,
+            bancoSigla: dto.bancoSigla,
+            dataInicial: dto.dataInicial,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
     });
   }
 

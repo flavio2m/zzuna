@@ -47,6 +47,7 @@ class LancamentoRepository
     });
   }
 
+  @override
   AsyncResult<Unit> createAll(List<LancamentoDto> dtos) async {
     final entities = dtos
         .map(
@@ -93,6 +94,7 @@ class LancamentoRepository
     });
   }
 
+  @override
   AsyncResult<Unit> updateAll(List<LancamentoDto> dtos) async {
     final entities = dtos
         .map(

@@ -1,9 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesService {
   AsyncResult<String> saveData(String key, String value) async {
+    debugPrint('saveData $key');
+
+    // Time de 2s para simular latencia da rede
+    await Future.delayed(const Duration(seconds: 2));
+
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(key, value);
@@ -14,6 +20,11 @@ class SharedPreferencesService {
   }
 
   AsyncResult<String> getData(String key) async {
+    // Time de 2s para simular latencia da rede
+    // await Future.delayed(const Duration(seconds: 2));
+
+    debugPrint('getData $key');
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final value = prefs.getString(key);
@@ -30,6 +41,11 @@ class SharedPreferencesService {
   }
 
   AsyncResult<Unit> deleteData(String key) async {
+    debugPrint('deleteData $key');
+
+    // Time de 2s para simular latencia da rede
+    await Future.delayed(const Duration(seconds: 2));
+
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(key);

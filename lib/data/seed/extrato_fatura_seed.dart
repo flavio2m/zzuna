@@ -24,9 +24,11 @@ class ExtratoFaturaSeed {
     final contas = (await contaRepository.getAll()).getOrElse((_) => []);
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
 
+    final dtos = <ExtratoFaturaDto>[];
+
     for (final c in cartoes) {
       for (final m in [Mes.maio, Mes.junho]) {
-        await repository.create(
+        dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.cartao(cartaoId: c.id),
             ano: 2026,
@@ -43,7 +45,7 @@ class ExtratoFaturaSeed {
 
     for (final c in contas) {
       for (final m in [Mes.maio, Mes.junho]) {
-        await repository.create(
+        dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.conta(contaId: c.id),
             ano: 2026,
@@ -56,6 +58,10 @@ class ExtratoFaturaSeed {
           ),
         );
       }
+    }
+
+    if (dtos.isNotEmpty) {
+      await repository.createAll(dtos);
     }
   }
 }

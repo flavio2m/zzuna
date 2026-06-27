@@ -42,8 +42,8 @@ class LancamentoSeed {
     seeds.addAll(_criarLancamentosJunho(dependencies));
     seeds.addAll(_criarLancamentosMaio(dependencies));
 
-    for (final s in seeds) {
-      await repository.create(s);
+    if (seeds.isNotEmpty) {
+      await repository.createAll(seeds);
     }
   }
 

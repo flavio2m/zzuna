@@ -22,7 +22,9 @@ class RepositoryDeleted<T extends Object> extends RepositoryEvent<T> {
 
 abstract class BaseRepository<TEntity extends Object, TCreateDto, TUpdateDto, TFilterDto> {
   AsyncResult<TEntity> create(TCreateDto dto);
+  AsyncResult<Unit> createAll(List<TCreateDto> dtos);
   AsyncResult<TEntity> update(TUpdateDto dto);
+  AsyncResult<Unit> updateAll(List<TUpdateDto> dtos);
   AsyncResult<Unit> delete(String id);
   AsyncResult<List<TEntity>> getAll();
   AsyncResult<TEntity> getById(String id);

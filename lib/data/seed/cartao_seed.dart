@@ -14,16 +14,17 @@ class CartaoSeed {
 
     final bancos = Bancos.items.take(10).toList();
 
-    for (var i = 0; i < bancos.length; i++) {
-      await repository.create(
-        CartaoDto(
-          descricao: 'Cartão ${bancos[i].descricao}',
-          limite: (i + 1) * 1000.0,
-          bancoSigla: bancos[i].sigla,
-          ativo: i != 9,
-          diaFechamento: 5 + i,
-        ),
-      );
-    }
+    final dtos = List.generate(
+      bancos.length,
+      (i) => CartaoDto(
+        descricao: 'Cartão ${bancos[i].descricao}',
+        limite: (i + 1) * 1000.0,
+        bancoSigla: bancos[i].sigla,
+        ativo: i != 9,
+        diaFechamento: 5 + i,
+      ),
+    );
+
+    await repository.createAll(dtos);
   }
 }

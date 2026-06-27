@@ -57,6 +57,27 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
   }
 
   @override
+  AsyncResult<Unit> createAll(List<CategoriaDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Categoria(
+            id: dto.id ?? const Uuid().v4(),
+            descricao: dto.descricao,
+            categoriaPaiId: dto.categoriaPaiId,
+            ativo: dto.ativo,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<Categoria> update(CategoriaDto dto) async {
     // Busca a categoria existente
     final existingResult = await _storage.getById(dto.id!);
@@ -87,6 +108,27 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
     );
     return _storage.update(categoria).onSuccess((cat) {
       _streamController.add(RepositoryUpdated(cat));
+    });
+  }
+
+  @override
+  AsyncResult<Unit> updateAll(List<CategoriaDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Categoria(
+            id: dto.id!,
+            descricao: dto.descricao,
+            categoriaPaiId: dto.categoriaPaiId,
+            ativo: dto.ativo,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
     });
   }
 

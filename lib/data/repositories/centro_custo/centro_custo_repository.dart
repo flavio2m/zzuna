@@ -41,6 +41,26 @@ class CentroCustoRepository
   }
 
   @override
+  AsyncResult<Unit> createAll(List<CentroCustoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => CentroCusto(
+            id: dto.id ?? const Uuid().v4(),
+            descricao: dto.descricao,
+            ativo: dto.ativo,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<CentroCusto> update(CentroCustoDto dto) async {
     final centro = CentroCusto(
       id: dto.id!,
@@ -49,6 +69,26 @@ class CentroCustoRepository
     );
     return _storage.update(centro).onSuccess((c) {
       _streamController.add(RepositoryUpdated(c));
+    });
+  }
+
+  @override
+  AsyncResult<Unit> updateAll(List<CentroCustoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => CentroCusto(
+            id: dto.id!,
+            descricao: dto.descricao,
+            ativo: dto.ativo,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
     });
   }
 
