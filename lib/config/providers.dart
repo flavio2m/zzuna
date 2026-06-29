@@ -62,6 +62,8 @@ import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmod
 import 'package:zzuna/ui/lancamentos/update/viewmodels/lancamento_update_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/viewmodels/lancamento_reconcile_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/update_data/viewmodels/lancamento_update_data_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_metadata_usecase.dart';
+import 'package:zzuna/ui/lancamentos/update_metadata/viewmodels/lancamento_update_metadata_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -238,6 +240,18 @@ final updateLancamentosDataUseCaseProvider = Provider<UpdateLancamentosDataUseCa
 final lancamentoUpdateDataViewModelProvider = ChangeNotifierProvider<LancamentoUpdateDataViewModel>(
   (ref) => LancamentoUpdateDataViewModel(
     ref.watch(updateLancamentosDataUseCaseProvider),
+  ),
+);
+
+final updateLancamentosMetadataUseCaseProvider = Provider<UpdateLancamentosMetadataUseCase>((ref) {
+  return UpdateLancamentosMetadataUseCase(
+    ref.watch(lancamentoRepositoryProvider),
+  );
+});
+
+final lancamentoUpdateMetadataViewModelProvider = ChangeNotifierProvider<LancamentoUpdateMetadataViewModel>(
+  (ref) => LancamentoUpdateMetadataViewModel(
+    ref.watch(updateLancamentosMetadataUseCaseProvider),
   ),
 );
 

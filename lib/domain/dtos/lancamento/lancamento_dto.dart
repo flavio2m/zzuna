@@ -165,4 +165,19 @@ class LancamentoDto {
       observacao: details.observacao,
     );
   }
+
+  factory LancamentoDto.fromEntity(Lancamento entity) {
+    return LancamentoDto(
+      id: entity.id,
+      tipo: entity.tipo,
+      data: entity.data,
+      descricao: entity.descricao,
+      origem: entity.origem,
+      extratoFaturaId: entity.extratoFaturaId,
+      itens: entity.itens,
+      conciliado: entity.conciliado,
+      grupo: entity.grupo,
+      observacao: entity.observacao,
+    );
+  }
 }
