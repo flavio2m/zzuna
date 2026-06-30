@@ -17,6 +17,8 @@ import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_bala
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -29,6 +31,7 @@ void main() {
   late CreateLancamentosUseCase createLancamentosUseCase;
   late CreateTransferenciaUseCase createTransferenciaUseCase;
   late UpdateTransferenciaUseCase updateTransferenciaUseCase;
+  late LocalStorage<Lancamento> lancamentoStorage;
 
   late LancamentoOrigem contaA;
   late LancamentoOrigem contaB;
@@ -40,7 +43,7 @@ void main() {
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
     final extratoStorage = createTestExtratoFaturaStorage();
-    final lancamentoStorage = createTestLancamentoStorage();
+    lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
     cartaoRepository = CartaoRepository(cartaoStorage);
@@ -145,7 +148,7 @@ void main() {
       );
       expect(createRes.isSuccess(), isTrue);
 
-      final launches = (await lancamentoRepository.getAll()).getOrThrow();
+      final launches = (await lancamentoStorage.getAll()).getOrThrow();
       final originalGrupoId = launches.first.grupo!.grupoId;
       final originalSaidaId = launches.firstWhere((l) => l.origem == contaA).id;
       final originalEntradaId = launches
@@ -167,7 +170,7 @@ void main() {
       expect(updateRes.isSuccess(), isTrue);
 
       // 3. Verificar atualizações
-      final updatedLaunches = (await lancamentoRepository.getAll())
+      final updatedLaunches = (await lancamentoStorage.getAll())
           .getOrThrow();
       expect(updatedLaunches.length, 2);
 
@@ -198,7 +201,7 @@ void main() {
       );
       expect(createRes.isSuccess(), isTrue);
 
-      final launches = (await lancamentoRepository.getAll()).getOrThrow();
+      final launches = (await lancamentoStorage.getAll()).getOrThrow();
       final originalGrupoId = launches.first.grupo!.grupoId;
 
       // 2. Mudar data para Fevereiro
@@ -254,7 +257,7 @@ void main() {
       );
       expect(createRes.isSuccess(), isTrue);
 
-      final originalGrupoId = (await lancamentoRepository.getAll())
+      final originalGrupoId = (await lancamentoStorage.getAll())
           .getOrThrow()
           .first
           .grupo!
@@ -303,7 +306,7 @@ void main() {
         );
         expect(createRes.isSuccess(), isTrue);
 
-        final originalGrupoId = (await lancamentoRepository.getAll())
+        final originalGrupoId = (await lancamentoStorage.getAll())
             .getOrThrow()
             .first
             .grupo!
@@ -367,7 +370,7 @@ void main() {
         );
         expect(createRes.isSuccess(), isTrue);
 
-        final originalGrupoId = (await lancamentoRepository.getAll())
+        final originalGrupoId = (await lancamentoStorage.getAll())
             .getOrThrow()
             .first
             .grupo!
@@ -405,7 +408,7 @@ void main() {
         );
         expect(createRes.isSuccess(), isTrue);
 
-        final originalGrupoId = (await lancamentoRepository.getAll())
+        final originalGrupoId = (await lancamentoStorage.getAll())
             .getOrThrow()
             .first
             .grupo!

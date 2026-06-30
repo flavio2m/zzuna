@@ -116,7 +116,6 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
     });
   }
 
-  @override
   AsyncResult<List<Conta>> getAll() async {
     return _storage.getAll();
   }

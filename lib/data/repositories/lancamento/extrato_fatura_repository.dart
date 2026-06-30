@@ -68,10 +68,6 @@ class ExtratoFaturaRepository
     });
   }
 
-  @override
-  AsyncResult<List<ExtratoFatura>> getAll() async {
-    return _storage.getAll();
-  }
 
   @override
   AsyncResult<ExtratoFatura> getById(String id) async {

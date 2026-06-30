@@ -99,7 +99,6 @@ class CentroCustoRepository
     });
   }
 
-  @override
   AsyncResult<List<CentroCusto>> getAll() async {
     return _storage.getAll();
   }

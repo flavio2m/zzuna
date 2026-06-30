@@ -91,11 +91,10 @@ class TransferenciaUpdateViewModel extends ChangeNotifier {
     origens = novasOrigens;
 
     // 2. Carregar os dois lançamentos da transferência
-    final allResult = await _lancamentoRepository.getAll();
-    final all = allResult.getOrElse((_) => []);
-    final groupLaunches = all
-        .where((item) => item.grupo?.grupoId == grupoId)
-        .toList();
+    final groupLaunchesResult = await _lancamentoRepository.getByGrupoId(
+      grupoId,
+    );
+    final groupLaunches = groupLaunchesResult.getOrElse((_) => []);
 
     if (groupLaunches.length == 2) {
       final first = groupLaunches[0];

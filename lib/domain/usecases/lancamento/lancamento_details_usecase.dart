@@ -16,6 +16,7 @@ import 'package:zzuna/domain/statics/banco/bancos.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 
 class LancamentoDetailsUseCase {
   final LancamentoRepository _lancamentoRepository;
@@ -50,7 +51,9 @@ class LancamentoDetailsUseCase {
     final cartoesResult = await _cartaoRepository.getAll();
     final categoriasResult = await _categoriaRepository.getAll();
     final centrosResult = await _centroCustoRepository.getAll();
-    final extratoFaturasResult = await _extratoFaturaRepository.getAll();
+    final extratoFaturasResult = await _extratoFaturaRepository.search(
+      ExtratoFaturaFilterDto(mes: mes, ano: ano),
+    );
 
     final contas = contasResult.getOrElse((_) => <Conta>[]);
     final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);

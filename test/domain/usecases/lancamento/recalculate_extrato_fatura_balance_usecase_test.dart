@@ -10,18 +10,21 @@ import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_bala
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
   late ExtratoFaturaRepository extratoRepository;
   late LancamentoRepository lancamentoRepository;
   late RecalculateExtratoFaturaBalanceUseCase recalculateUseCase;
+  late LocalStorage<ExtratoFatura> extratoStorage;
   late LancamentoOrigem origemA;
   late LancamentoOrigem origemB;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    final extratoStorage = createTestExtratoFaturaStorage();
+    extratoStorage = createTestExtratoFaturaStorage();
     final lancamentoStorage = createTestLancamentoStorage();
 
     extratoRepository = ExtratoFaturaRepository(extratoStorage);
@@ -88,7 +91,7 @@ void main() {
       await recalculateUseCase.execute(origemA);
 
       // 4. Verificar propagação
-      final extratos = await extratoRepository.getAll();
+      final extratos = await extratoStorage.getAll();
       final extratosList = extratos.getOrThrow()..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
 
       expect(extratosList[0].saldoInicial, 100.0);

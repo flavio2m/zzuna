@@ -6,7 +6,6 @@ import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dar
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/create_transferencia_dto.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
@@ -16,6 +15,8 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -26,6 +27,8 @@ void main() {
   late CreateLancamentosUseCase createLancamentosUseCase;
   late CreateTransferenciaUseCase createTransferenciaUseCase;
 
+  late LocalStorage<Lancamento> lancamentoStorage;
+
   late LancamentoOrigem origemA;
   late LancamentoOrigem origemB;
 
@@ -34,7 +37,7 @@ void main() {
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
     final extratoStorage = createTestExtratoFaturaStorage();
-    final lancamentoStorage = createTestLancamentoStorage();
+    lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
     extratoRepository = ExtratoFaturaRepository(extratoStorage);
@@ -102,7 +105,7 @@ void main() {
 
         expect(res.isSuccess(), isTrue);
 
-        final launchesRes = await lancamentoRepository.getAll();
+        final launchesRes = await lancamentoStorage.getAll();
         final launches = launchesRes.getOrThrow();
         expect(launches.length, 2);
 

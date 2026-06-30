@@ -12,6 +12,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 
 class LancamentoSeed {
   final LancamentoRepository repository;
@@ -31,7 +32,7 @@ class LancamentoSeed {
   });
 
   Future<void> execute() async {
-    final result = await repository.getAll();
+    final result = await repository.searchByPeriodo(mes: Mes.junho, ano: 2026);
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
@@ -52,7 +53,15 @@ class LancamentoSeed {
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
     final centros = (await centroCustoRepository.getAll()).getOrElse((_) => []);
     final categorias = (await categoriaRepository.getAll()).getOrElse((_) => []);
-    final extratoFaturas = (await extratoFaturaRepository.getAll()).getOrElse((_) => []);
+
+    final extratoFaturasMay = (await extratoFaturaRepository.search(
+      ExtratoFaturaFilterDto(mes: Mes.maio, ano: 2026),
+    )).getOrElse((_) => []);
+    final extratoFaturasJune = (await extratoFaturaRepository.search(
+      ExtratoFaturaFilterDto(mes: Mes.junho, ano: 2026),
+    )).getOrElse((_) => []);
+
+    final extratoFaturas = [...extratoFaturasMay, ...extratoFaturasJune];
 
     if (contas.isEmpty || cartoes.isEmpty || centros.isEmpty || categorias.isEmpty || extratoFaturas.isEmpty) {
       return null;

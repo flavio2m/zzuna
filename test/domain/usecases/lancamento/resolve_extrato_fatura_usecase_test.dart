@@ -17,6 +17,8 @@ import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dar
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -26,6 +28,7 @@ void main() {
   late LancamentoRepository lancamentoRepository;
   late ResolveExtratoFaturaUseCase resolveUseCase;
   late CreateLancamentoUseCase createLancamentoUseCase;
+  late LocalStorage<ExtratoFatura> extratoStorage;
 
   late LancamentoOrigem origemConta;
   late DateTime dataInicialConta;
@@ -34,7 +37,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
-    final extratoStorage = createTestExtratoFaturaStorage();
+    extratoStorage = createTestExtratoFaturaStorage();
     final lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
@@ -109,7 +112,7 @@ void main() {
       expect(extrato.saldoFinal, -100.0); // Despesa subtrai
 
       // Verificar que apenas o de Junho foi criado (meses intermediários vazios são ignorados)
-      final extratosAll = (await extratoRepository.getAll()).getOrThrow();
+      final extratosAll = (await extratoStorage.getAll()).getOrThrow();
       expect(extratosAll, hasLength(1));
       expect(extratosAll[0].mes, Mes.junho);
       expect(extratosAll[0].saldoInicial, 0.0);
@@ -159,7 +162,7 @@ void main() {
       expect(extrato.saldoInicial, 500.0); // herdado de dezembro 2025
       expect(extrato.saldoFinal, 650.0); // 500 + 150
 
-      final extratosAll = (await extratoRepository.getAll()).getOrThrow();
+      final extratosAll = (await extratoStorage.getAll()).getOrThrow();
       // Dezembro 2025 e Fevereiro 2026
       expect(extratosAll, hasLength(2));
       final sorted = extratosAll..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));

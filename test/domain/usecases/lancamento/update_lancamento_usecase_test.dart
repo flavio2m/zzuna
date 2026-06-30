@@ -15,6 +15,8 @@ import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_bala
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -25,6 +27,7 @@ void main() {
   late ResolveExtratoFaturaUseCase resolveUseCase;
   late RecalculateExtratoFaturaBalanceUseCase recalculateUseCase;
   late UpdateLancamentoUseCase useCase;
+  late LocalStorage<ExtratoFatura> extratoStorage;
 
   late LancamentoOrigem origemConta;
   late LancamentoOrigem origemConta2;
@@ -34,7 +37,7 @@ void main() {
 
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
-    final extratoStorage = createTestExtratoFaturaStorage();
+    extratoStorage = createTestExtratoFaturaStorage();
     final lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
@@ -232,7 +235,7 @@ void main() {
       expect(updatedEntity.origem, equals(origemConta2));
 
       // 3. Verify balance recalculation in storages
-      final allExtratosRes = await extratoRepository.getAll();
+      final allExtratosRes = await extratoStorage.getAll();
       final allExtratos = allExtratosRes.getOrThrow();
 
       // Old extrato (Conta 1) should have saldoFinal = 0.0 (since launch was moved out)

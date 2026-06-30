@@ -103,7 +103,6 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
     });
   }
 
-  @override
   AsyncResult<List<LoadedUser>> getAll() async {
     return _storage.getAll();
   }

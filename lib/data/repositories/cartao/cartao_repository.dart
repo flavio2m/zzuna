@@ -123,7 +123,6 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
     });
   }
 
-  @override
   AsyncResult<List<Cartao>> getAll() async {
     return _storage.getAll();
   }

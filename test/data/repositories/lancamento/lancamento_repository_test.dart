@@ -8,14 +8,17 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
   late LancamentoRepository repository;
+  late LocalStorage<Lancamento> storage;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    repository = LancamentoRepository(createTestLancamentoStorage());
+    storage = createTestLancamentoStorage();
+    repository = LancamentoRepository(storage);
   });
 
   tearDown(() {
@@ -36,7 +39,7 @@ void main() {
       );
 
       final result = await repository.create(dto);
-      final lancamentos = await repository.getAll();
+      final lancamentos = await storage.getAll();
 
       expect(result.isSuccess(), isTrue);
       expect(lancamentos.getOrThrow(), hasLength(1));

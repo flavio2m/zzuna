@@ -41,14 +41,11 @@ class UpdateTransferenciaUseCase {
     }
 
     // 2. Localizar lançamentos originais do grupo
-    final allLaunchesRes = await _repository.getAll();
-    if (allLaunchesRes.isError()) {
-      return Failure(allLaunchesRes.exceptionOrNull()!);
+    final groupLaunchesRes = await _repository.getByGrupoId(grupoId);
+    if (groupLaunchesRes.isError()) {
+      return Failure(groupLaunchesRes.exceptionOrNull()!);
     }
-    final allLaunches = allLaunchesRes.getOrThrow();
-    final groupLaunches = allLaunches
-        .where((l) => l.grupo?.grupoId == grupoId)
-        .toList();
+    final groupLaunches = groupLaunchesRes.getOrThrow();
 
     if (groupLaunches.length != 2) {
       return Failure(
@@ -209,7 +206,8 @@ class UpdateTransferenciaUseCase {
       return Failure(updateResult.exceptionOrNull()!);
     }
 
-    // 8. Recalcular saldos de todas as origens únicas envolvidas (originais e novas)
+    // 8. Recalcular saldos de todas as origens únicas envolvidas
+    // (originais e novas)
     final Set<LancamentoOrigem> affectedOrigins = {
       originalSaida.origem,
       originalEntrada.origem,

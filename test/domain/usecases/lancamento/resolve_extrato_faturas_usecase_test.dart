@@ -12,6 +12,8 @@ import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -19,6 +21,7 @@ void main() {
   late CartaoRepository cartaoRepository;
   late ExtratoFaturaRepository extratoRepository;
   late ResolveExtratoFaturasUseCase resolveUseCase;
+  late LocalStorage<ExtratoFatura> extratoStorage;
 
   late LancamentoOrigem origemConta;
   late DateTime dataInicialConta;
@@ -27,7 +30,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
-    final extratoStorage = createTestExtratoFaturaStorage();
+    extratoStorage = createTestExtratoFaturaStorage();
 
     contaRepository = ContaRepository(contaStorage);
     cartaoRepository = CartaoRepository(cartaoStorage);
@@ -153,7 +156,7 @@ void main() {
       expect(list.length, greaterThanOrEqualTo(2));
 
       // Buscar do repositório para validar o estado final persistido
-      final all = (await extratoRepository.getAll()).getOrThrow()..sort((a, b) => a.periodo.compareTo(b.periodo));
+      final all = (await extratoStorage.getAll()).getOrThrow()..sort((a, b) => a.periodo.compareTo(b.periodo));
 
       expect(all, hasLength(3)); // Jan, Fev, Mar
 

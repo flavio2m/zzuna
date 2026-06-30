@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zzuna/domain/enums/mes.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
@@ -15,6 +14,9 @@ import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -24,6 +26,8 @@ void main() {
   late LancamentoRepository lancamentoRepository;
   late ResolveExtratoFaturasUseCase resolveUseCase;
   late CreateLancamentosUseCase createLancamentosUseCase;
+  late LocalStorage<ExtratoFatura> extratoStorage;
+  late LocalStorage<Lancamento> lancamentoStorage;
 
   late LancamentoOrigem origemConta;
   late DateTime dataInicialConta;
@@ -32,8 +36,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
-    final extratoStorage = createTestExtratoFaturaStorage();
-    final lancamentoStorage = createTestLancamentoStorage();
+    extratoStorage = createTestExtratoFaturaStorage();
+    lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
     cartaoRepository = CartaoRepository(cartaoStorage);
@@ -111,7 +115,7 @@ void main() {
       expect(res.exceptionOrNull()!.toString(), contains('Descrição é obrigatória'));
 
       // Validar que NADA foi persistido
-      final lancamentos = (await lancamentoRepository.getAll()).getOrThrow();
+      final lancamentos = (await lancamentoStorage.getAll()).getOrThrow();
       expect(lancamentos, isEmpty);
     });
 
@@ -157,11 +161,11 @@ void main() {
       expect(createdList[0].extratoFaturaId, isNot(createdList[1].extratoFaturaId));
 
       // Verificar no repositório de lançamentos
-      final storedLaunches = (await lancamentoRepository.getAll()).getOrThrow();
+      final storedLaunches = (await lancamentoStorage.getAll()).getOrThrow();
       expect(storedLaunches, hasLength(2));
 
       // Verificar no repositório de extratos
-      final storedExtratos = (await extratoRepository.getAll()).getOrThrow()
+      final storedExtratos = (await extratoStorage.getAll()).getOrThrow()
         ..sort((a, b) => a.periodo.compareTo(b.periodo));
 
       expect(storedExtratos, hasLength(2)); // Jan e Fev
@@ -215,7 +219,7 @@ void main() {
       }
 
       // Validar persistência e recuperação do repositório/storage
-      final stored = (await lancamentoRepository.getAll()).getOrThrow()
+      final stored = (await lancamentoStorage.getAll()).getOrThrow()
         ..sort((a, b) => a.data.compareTo(b.data));
 
       expect(stored, hasLength(3));
@@ -254,7 +258,7 @@ void main() {
       final result = await createLancamentosUseCase.execute(dtos);
       expect(result.isSuccess(), isTrue);
 
-      final stored = (await lancamentoRepository.getAll()).getOrThrow();
+      final stored = (await lancamentoStorage.getAll()).getOrThrow();
       for (int i = 0; i < stored.length; i++) {
         final l = stored[i];
         expect(l.grupo, isNotNull);

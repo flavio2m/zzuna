@@ -5,6 +5,8 @@ import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
+
 class ExtratoFaturaSeed {
   final ExtratoFaturaRepository repository;
   final ContaRepository contaRepository;
@@ -17,7 +19,9 @@ class ExtratoFaturaSeed {
   });
 
   Future<void> execute() async {
-    final result = await repository.getAll();
+    final result = await repository.search(
+      ExtratoFaturaFilterDto(mes: Mes.maio, ano: 2026),
+    );
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 

@@ -139,7 +139,6 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
     });
   }
 
-  @override
   AsyncResult<List<Categoria>> getAll() async {
     return _storage.getAll();
   }
