@@ -67,6 +67,8 @@ import 'package:zzuna/ui/lancamentos/update_metadata/viewmodels/lancamento_updat
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/update_transferencia_usecase.dart';
+import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_update_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -270,6 +272,26 @@ final transferenciaCreateViewModelProvider = ChangeNotifierProvider<Transferenci
     ref.watch(createTransferenciaUseCaseProvider),
     ref.watch(contaRepositoryProvider),
     ref.watch(cartaoRepositoryProvider),
+  ),
+);
+
+final updateTransferenciaUseCaseProvider = Provider<UpdateTransferenciaUseCase>((ref) {
+  return UpdateTransferenciaUseCase(
+    ref.watch(resolveExtratoFaturasUseCaseProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+    TransferenciaValidator(),
+  );
+});
+
+final transferenciaUpdateViewModelProvider = ChangeNotifierProvider.family<TransferenciaUpdateViewModel, String>(
+  (ref, grupoId) => TransferenciaUpdateViewModel(
+    ref.watch(updateTransferenciaUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    grupoId,
   ),
 );
 

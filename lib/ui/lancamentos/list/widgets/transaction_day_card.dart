@@ -11,6 +11,7 @@ import 'package:zzuna/utils/formatters/date_formatter.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
 import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
+import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_update_modal.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
@@ -89,10 +90,17 @@ class TransactionDayCard extends StatelessWidget {
                 child: LancamentoDetailsModal(lancamento: l),
               );
             } else {
-              AppDialog.show(
-                context: context,
-                child: LancamentoUpdateModal(lancamento: l),
-              );
+              if (l.tipo == LancamentoTipo.transferencia && l.grupo != null) {
+                TransferenciaUpdateModal.show(
+                  context,
+                  grupoId: l.grupo!.grupoId,
+                );
+              } else {
+                AppDialog.show(
+                  context: context,
+                  child: LancamentoUpdateModal(lancamento: l),
+                );
+              }
             }
           },
           onView: () {
@@ -102,10 +110,14 @@ class TransactionDayCard extends StatelessWidget {
             );
           },
           onEdit: () {
-            AppDialog.show(
-              context: context,
-              child: LancamentoUpdateModal(lancamento: l),
-            );
+            if (l.tipo == LancamentoTipo.transferencia && l.grupo != null) {
+              TransferenciaUpdateModal.show(context, grupoId: l.grupo!.grupoId);
+            } else {
+              AppDialog.show(
+                context: context,
+                child: LancamentoUpdateModal(lancamento: l),
+              );
+            }
           },
           onSelect: (_) {
             ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
