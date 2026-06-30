@@ -53,7 +53,7 @@ class TransactionsActionsBar extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded, size: 20),
             color: AppColors.primary,
-            tooltip: 'Transferência de valores',
+            tooltip: 'Adicionar transferência',
             onPressed: () => TransferenciaCreateModal.show(context),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),

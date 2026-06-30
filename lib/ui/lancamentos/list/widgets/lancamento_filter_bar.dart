@@ -4,6 +4,7 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
+import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -16,7 +17,8 @@ class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});
 
   @override
-  ConsumerState<LancamentoFilterBar> createState() => _LancamentoFilterBarState();
+  ConsumerState<LancamentoFilterBar> createState() =>
+      _LancamentoFilterBarState();
 }
 
 class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
@@ -103,10 +105,15 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
               items: [
                 AppDropdownMenuItem<bool?>(value: null, label: 'Todos'),
                 AppDropdownMenuItem<bool?>(value: true, label: 'Conciliado'),
-                AppDropdownMenuItem<bool?>(value: false, label: 'Não conciliado'),
+                AppDropdownMenuItem<bool?>(
+                  value: false,
+                  label: 'Não conciliado',
+                ),
               ],
               onChanged: (value) {
-                ref.read(lancamentoFilterProvider.notifier).setConciliado(value);
+                ref
+                    .read(lancamentoFilterProvider.notifier)
+                    .setConciliado(value);
               },
             ),
           ),
@@ -121,6 +128,11 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
           ),
           // 7. Adicionar
           ButtonAdd(onPressed: () => LancamentoCreateModal.show(context)),
+          ButtonAdd(
+            icon: Icons.swap_horiz_rounded,
+            label: 'Transferência',
+            onPressed: () => TransferenciaCreateModal.show(context),
+          ),
         ],
       ),
     );
@@ -148,7 +160,8 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             value: filterState.mes,
             items: Mes.values
                 .map(
-                  (mes) => AppDropdownMenuItem(value: mes, label: mes.descricao), //
+                  (mes) =>
+                      AppDropdownMenuItem(value: mes, label: mes.descricao), //
                 )
                 .toList(),
             onChanged: (value) {
@@ -168,7 +181,8 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
         const SizedBox(width: 2),
         IconButton(
           icon: const Icon(Icons.chevron_right),
-          onPressed: (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
+          onPressed:
+              (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
               ? null
               : () => notifier.proximoMes(),
         ),
