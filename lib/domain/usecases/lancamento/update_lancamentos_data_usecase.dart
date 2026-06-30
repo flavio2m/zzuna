@@ -37,8 +37,8 @@ class UpdateLancamentosDataUseCase {
       return const Success(unit);
     }
 
-    // 1. Carregar todos os lançamentos originais de forma atômica
-    final List<Lancamento> lancamentos = [];
+    // 1. Carregar todos os lançamentos originais e seus companheiros de transferência
+    final Map<String, Lancamento> uniqueLancamentos = {};
     for (final id in ids) {
       final res = await _repository.getById(id);
       if (res.isError()) {
@@ -46,8 +46,24 @@ class UpdateLancamentosDataUseCase {
           DomainException('Lançamento com ID $id não encontrado.'),
         );
       }
-      lancamentos.add(res.getOrNull()!);
+      final l = res.getOrThrow();
+      uniqueLancamentos[l.id] = l;
     }
+
+    final List<Lancamento> initialLancamentos = uniqueLancamentos.values.toList();
+    for (final l in initialLancamentos) {
+      if (l.tipo == LancamentoTipo.transferencia && l.grupo?.grupoId != null) {
+        final grupoId = l.grupo!.grupoId;
+        final companionsRes = await _repository.getByGrupoId(grupoId);
+        if (companionsRes.isSuccess()) {
+          for (final comp in companionsRes.getOrThrow()) {
+            uniqueLancamentos[comp.id] = comp;
+          }
+        }
+      }
+    }
+
+    final List<Lancamento> lancamentos = uniqueLancamentos.values.toList();
 
     // 2. Validar se o período original de cada lançamento está aberto
     for (final l in lancamentos) {

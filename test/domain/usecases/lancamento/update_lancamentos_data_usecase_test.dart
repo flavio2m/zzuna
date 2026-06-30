@@ -7,7 +7,6 @@ import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
@@ -17,6 +16,14 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_data_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/dtos/lancamento/create_transferencia_dto.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
+import 'package:zzuna/domain/validators/transferencia_validator.dart';
+
 import '../../../helpers/test_storage.dart';
 
 void main() {
@@ -25,11 +32,16 @@ void main() {
   late ExtratoFaturaRepository extratoRepository;
   late LancamentoRepository lancamentoRepository;
   late ResolveExtratoFaturaUseCase resolveUseCase;
+  late ResolveExtratoFaturasUseCase resolveLoteUseCase;
   late RecalculateExtratoFaturaBalanceUseCase recalculateUseCase;
   late CreateLancamentoUseCase createLancamentoUseCase;
+  late CreateLancamentosUseCase createLancamentosUseCase;
+  late CreateTransferenciaUseCase createTransferenciaUseCase;
   late UpdateLancamentosDataUseCase updateDataUseCase;
+  late LocalStorage<Lancamento> lancamentoStorage;
 
   late LancamentoOrigem origemConta;
+  late LancamentoOrigem origemConta2;
   late DateTime dataInicialConta;
 
   setUp(() async {
@@ -37,7 +49,7 @@ void main() {
     final contaStorage = createTestContaStorage();
     final cartaoStorage = createTestCartaoStorage();
     final extratoStorage = createTestExtratoFaturaStorage();
-    final lancamentoStorage = createTestLancamentoStorage();
+    lancamentoStorage = createTestLancamentoStorage();
 
     contaRepository = ContaRepository(contaStorage);
     cartaoRepository = CartaoRepository(cartaoStorage);
@@ -45,10 +57,16 @@ void main() {
     lancamentoRepository = LancamentoRepository(lancamentoStorage);
 
     resolveUseCase = ResolveExtratoFaturaUseCase(extratoRepository, contaRepository, cartaoRepository);
+    resolveLoteUseCase = ResolveExtratoFaturasUseCase(extratoRepository, contaRepository, cartaoRepository);
 
     recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(extratoStorage, lancamentoStorage);
 
     createLancamentoUseCase = CreateLancamentoUseCase(resolveUseCase, lancamentoRepository, LancamentoValidator());
+    createLancamentosUseCase = CreateLancamentosUseCase(resolveLoteUseCase, lancamentoRepository, LancamentoValidator());
+    createTransferenciaUseCase = CreateTransferenciaUseCase(
+      createLancamentosUseCase,
+      TransferenciaValidator(),
+    );
 
     updateDataUseCase = UpdateLancamentosDataUseCase(
       resolveUseCase,
@@ -64,8 +82,12 @@ void main() {
     final conta = await contaRepository.create(
       CreateContaDto(descricao: 'Conta Principal', bancoSigla: 'BB', ativo: true, dataInicial: dataInicialConta),
     );
-
     origemConta = LancamentoOrigem.conta(contaId: conta.getOrThrow().id);
+
+    final conta2 = await contaRepository.create(
+      CreateContaDto(descricao: 'Conta Secundária', bancoSigla: 'NU', ativo: true, dataInicial: dataInicialConta),
+    );
+    origemConta2 = LancamentoOrigem.conta(contaId: conta2.getOrThrow().id);
   });
 
   tearDown(() {
@@ -285,6 +307,41 @@ void main() {
 
       expect(res.isError(), isTrue);
       expect(res.exceptionOrNull()!.toString(), contains('Data não pode ser superior a 24 meses da data atual'));
+    });
+
+    test('Should update the date of both transactions in a transfer by group ID', () async {
+      // 1. Criar transferência (Conta Principal -> Conta Secundária)
+      final transferRes = await createTransferenciaUseCase.execute(
+        CreateTransferenciaDto(
+          data: DateTime(2026, 1, 10),
+          descricao: 'Transferência Pix',
+          valor: 150.0,
+          origemSaida: origemConta,
+          origemEntrada: origemConta2,
+          observacao: 'Pix de teste',
+        ),
+      );
+      expect(transferRes.isSuccess(), isTrue);
+
+      // 2. Localizar as duas transações criadas
+      final launches = (await lancamentoStorage.getAll()).getOrThrow();
+      expect(launches.length, 2);
+      final idSaida = launches.firstWhere((l) => l.origem == origemConta).id;
+      final idEntrada = launches.firstWhere((l) => l.origem == origemConta2).id;
+
+      // 3. Chamar updateDataUseCase passando apenas o ID da saída
+      final novaData = DateTime(2026, 1, 25);
+      final res = await updateDataUseCase.execute(
+        ids: [idSaida],
+        novaData: novaData,
+      );
+      expect(res.isSuccess(), isTrue);
+
+      // 4. Verificar que a data de ambas as transações foi atualizada
+      final updatedSaida = (await lancamentoRepository.getById(idSaida)).getOrThrow();
+      final updatedEntrada = (await lancamentoRepository.getById(idEntrada)).getOrThrow();
+      expect(updatedSaida.data, novaData);
+      expect(updatedEntrada.data, novaData);
     });
   });
 }
