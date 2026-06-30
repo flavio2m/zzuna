@@ -560,9 +560,9 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 ## 🚀 Funcionalidades
 | Status | Item |
 |--------|------|
-| ☐ | Alterar descrição e observação para aplicar automaticamente ao grupo de lançamentos (parcelamento, replicação e transferência). |
 | ☐ | Implementar Transferência de lançamentos. |
-| ☐ | Implementar Lançamentos por Recorrência. |
+| ☐ | Alterar descrição e observação para aplicar automaticamente ao grupo de lançamentos (parcelamento, replicação e transferência). |
 | ☐ | Alterar data para todo o grupo de lançamentos. |
 | ☐ | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
+| ☐ | Implementar Lançamentos por Recorrência. |
 ```

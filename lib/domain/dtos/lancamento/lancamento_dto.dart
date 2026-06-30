@@ -146,18 +146,49 @@ class LancamentoDto {
       data: details.data,
       descricao: details.descricao,
       origem: switch (details.origem) {
-        LancamentoOrigemContaDetail(conta: final c) => LancamentoOrigem.conta(contaId: c.id),
-        LancamentoOrigemCartaoDetail(cartao: final c) => LancamentoOrigem.cartao(cartaoId: c.id),
+        LancamentoOrigemContaDetail(conta: final c) => LancamentoOrigem.conta(
+          contaId: c.id,
+        ),
+        LancamentoOrigemCartaoDetail(cartao: final c) =>
+          LancamentoOrigem.cartao(cartaoId: c.id),
       },
       extratoFaturaId: details.extratoFatura.id,
       itens: details.itens
           .map(
-            (item) => LancamentoItem(
-              numero: item.numero,
-              centroCustoId: item.centroCusto.id,
-              categoriaId: item.categoria.id,
-              valor: item.valor,
-            ),
+            (item) => switch (item) {
+              LancamentoItemDetailsStandard(
+                :final numero,
+                :final centroCusto,
+                :final categoria,
+                :final valor,
+              ) =>
+                LancamentoItem(
+                  numero: numero,
+                  centroCustoId: centroCusto.id,
+                  categoriaId: categoria.id,
+                  valor: valor,
+                ),
+              LancamentoItemDetailsTransferencia(
+                :final numero,
+                :final origemEntrada,
+                :final origemSaida,
+                :final valor,
+              ) =>
+                LancamentoItem.transferencia(
+                  numero: numero,
+                  origemEntrada: origemEntrada.map(
+                    conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                    cartao: (c) =>
+                        LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                  ),
+                  origemSaida: origemSaida.map(
+                    conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                    cartao: (c) =>
+                        LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                  ),
+                  valor: valor,
+                ),
+            },
           )
           .toList(),
       conciliado: details.conciliado,

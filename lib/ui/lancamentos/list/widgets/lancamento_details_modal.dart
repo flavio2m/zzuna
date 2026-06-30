@@ -311,8 +311,25 @@ class LancamentoDetailsModal extends StatelessWidget {
       return cat.descricao;
     }
 
-    final catDesc = categoryPath(item.categoria);
-    final ccDesc = item.centroCusto.descricao;
+    final catDesc = switch (item) {
+      LancamentoItemDetailsStandard(:final categoria) => categoryPath(
+        categoria,
+      ),
+      LancamentoItemDetailsTransferencia(:final origemSaida) =>
+        'Origem: ${origemSaida.map(
+          conta: (c) => c.conta.descricao,
+          cartao: (c) => c.cartao.descricao, //
+        )}',
+    };
+    final ccDesc = switch (item) {
+      LancamentoItemDetailsStandard(:final centroCusto) =>
+        centroCusto.descricao,
+      LancamentoItemDetailsTransferencia(:final origemEntrada) =>
+        'Destino: ${origemEntrada.map(
+          conta: (c) => c.conta.descricao,
+          cartao: (c) => c.cartao.descricao, //
+        )}',
+    };
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),

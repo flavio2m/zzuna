@@ -64,6 +64,9 @@ import 'package:zzuna/ui/lancamentos/reconcile/viewmodels/lancamento_reconcile_v
 import 'package:zzuna/ui/lancamentos/update_data/viewmodels/lancamento_update_data_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_metadata_usecase.dart';
 import 'package:zzuna/ui/lancamentos/update_metadata/viewmodels/lancamento_update_metadata_viewmodel.dart';
+import 'package:zzuna/domain/validators/transferencia_validator.dart';
+import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
+import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -252,6 +255,21 @@ final updateLancamentosMetadataUseCaseProvider = Provider<UpdateLancamentosMetad
 final lancamentoUpdateMetadataViewModelProvider = ChangeNotifierProvider<LancamentoUpdateMetadataViewModel>(
   (ref) => LancamentoUpdateMetadataViewModel(
     ref.watch(updateLancamentosMetadataUseCaseProvider),
+  ),
+);
+
+final createTransferenciaUseCaseProvider = Provider<CreateTransferenciaUseCase>((ref) {
+  return CreateTransferenciaUseCase(
+    ref.watch(createLancamentosUseCaseProvider),
+    TransferenciaValidator(),
+  );
+});
+
+final transferenciaCreateViewModelProvider = ChangeNotifierProvider<TransferenciaCreateViewModel>(
+  (ref) => TransferenciaCreateViewModel(
+    ref.watch(createTransferenciaUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
   ),
 );
 

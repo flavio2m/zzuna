@@ -22,7 +22,9 @@ class ResolveExtratoFaturasUseCase {
     this._cartaoRepository, //
   );
 
-  AsyncResult<List<ExtratoFatura>> execute(ResolveExtratoFaturaLoteDto dto) async {
+  AsyncResult<List<ExtratoFatura>> execute(
+    ResolveExtratoFaturaLoteDto dto,
+  ) async {
     // 1. Agrupar impactos por Origem + Período
     final Map<LancamentoOrigem, Map<int, double>> deltasByOrigem = {};
     final Map<LancamentoOrigem, Set<int>> periodosByOrigem = {};
@@ -30,7 +32,11 @@ class ResolveExtratoFaturasUseCase {
     for (final item in dto.itens) {
       final origem = item.origem;
       final periodo = item.data.year * 100 + item.data.month;
-      final delta = _calculateDelta(item.tipo, item.valor);
+      final delta = _calculateDelta(
+        item.tipo,
+        item.valor,
+        isTransferenciaEntrada: item.isTransferenciaEntrada,
+      );
 
       deltasByOrigem.putIfAbsent(origem, () => {});
       deltasByOrigem[origem]![periodo] = //
@@ -192,12 +198,14 @@ class ResolveExtratoFaturasUseCase {
       final Map<int, double> movimentacoes = {};
       for (final currentPeriod in timeline) {
         final extrato = inMemoryExtratos[currentPeriod]!;
-        movimentacoes[currentPeriod] = extrato.saldoFinal - extrato.saldoInicial;
+        movimentacoes[currentPeriod] =
+            extrato.saldoFinal - extrato.saldoInicial;
       }
 
       // 5. Aplicar os novos deltas às movimentações
       for (final currentPeriod in deltas.keys) {
-        movimentacoes[currentPeriod] = (movimentacoes[currentPeriod] ?? 0.0) + deltas[currentPeriod]!;
+        movimentacoes[currentPeriod] =
+            (movimentacoes[currentPeriod] ?? 0.0) + deltas[currentPeriod]!;
       }
 
       // 6. Recalcular a linha do tempo cronologicamente
@@ -219,8 +227,14 @@ class ResolveExtratoFaturasUseCase {
 
       // 7. Separar novos e modificados para persistência acumulada
       final allOrigemResolved = inMemoryExtratos.values.toList();
-      final newExtratos = allOrigemResolved.where((e) => newExtratoIds.contains(e.id)).map(_toDto).toList();
-      final updatedExtratos = allOrigemResolved.where((e) => !newExtratoIds.contains(e.id)).map(_toDto).toList();
+      final newExtratos = allOrigemResolved
+          .where((e) => newExtratoIds.contains(e.id))
+          .map(_toDto)
+          .toList();
+      final updatedExtratos = allOrigemResolved
+          .where((e) => !newExtratoIds.contains(e.id))
+          .map(_toDto)
+          .toList();
 
       allNewExtratos.addAll(newExtratos);
       allUpdatedExtratos.addAll(updatedExtratos);
@@ -232,14 +246,22 @@ class ResolveExtratoFaturasUseCase {
     if (allNewExtratos.isNotEmpty) {
       final createRes = await _extratoRepository.createAll(allNewExtratos);
       if (createRes.isError()) {
-        return Failure(DomainException('Falha ao salvar novos extratos em lote: ${createRes.exceptionOrNull()}'));
+        return Failure(
+          DomainException(
+            'Falha ao salvar novos extratos em lote: ${createRes.exceptionOrNull()}',
+          ),
+        );
       }
     }
 
     if (allUpdatedExtratos.isNotEmpty) {
       final updateRes = await _extratoRepository.updateAll(allUpdatedExtratos);
       if (updateRes.isError()) {
-        return Failure(DomainException('Falha ao atualizar extratos em lote: ${updateRes.exceptionOrNull()}'));
+        return Failure(
+          DomainException(
+            'Falha ao atualizar extratos em lote: ${updateRes.exceptionOrNull()}',
+          ),
+        );
       }
     }
 
@@ -269,13 +291,17 @@ class ResolveExtratoFaturasUseCase {
     if (origem is LancamentoOrigemConta) {
       final contaRes = await _contaRepository.getById(origem.contaId);
       if (contaRes.isError()) {
-        return Failure(DomainException('Conta não encontrada: ${origem.contaId}'));
+        return Failure(
+          DomainException('Conta não encontrada: ${origem.contaId}'),
+        );
       }
       dataInicial = contaRes.getOrThrow().dataInicial;
     } else if (origem is LancamentoOrigemCartao) {
       final cartaoRes = await _cartaoRepository.getById(origem.cartaoId);
       if (cartaoRes.isError()) {
-        return Failure(DomainException('Cartão não encontrado: ${origem.cartaoId}'));
+        return Failure(
+          DomainException('Cartão não encontrado: ${origem.cartaoId}'),
+        );
       }
       dataInicial = cartaoRes.getOrThrow().dataInicial;
     } else {
@@ -284,15 +310,24 @@ class ResolveExtratoFaturasUseCase {
     return Success(DateTime(dataInicial.year, dataInicial.month, 1));
   }
 
-  double _calculateDelta(LancamentoTipo tipo, double valor) {
-    if (tipo == LancamentoTipo.receita) {
+  double _calculateDelta(
+    LancamentoTipo tipo,
+    double valor, {
+    bool? isTransferenciaEntrada,
+  }) {
+    if (tipo == LancamentoTipo.receita ||
+        (tipo == LancamentoTipo.transferencia &&
+            isTransferenciaEntrada == true)) {
       return valor;
     }
     return -valor;
   }
 
   String _getOrigemKey(LancamentoOrigem origem) {
-    return origem.map(conta: (c) => 'conta_${c.contaId}', cartao: (c) => 'cartao_${c.cartaoId}');
+    return origem.map(
+      conta: (c) => 'conta_${c.contaId}',
+      cartao: (c) => 'cartao_${c.cartaoId}',
+    );
   }
 
   ExtratoFaturaDto _toDto(ExtratoFatura entity) {

@@ -2,6 +2,8 @@ import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import '../../models/lancamento_resumo_dia.dart';
 import '../../models/lancamento_resumo_mensal.dart';
 
@@ -105,8 +107,36 @@ class LancamentoResumoMensalUseCase {
       for (final l in items) {
         if (l.tipo == LancamentoTipo.receita) {
           saldoDia += l.valor;
-        } else {
+        } else if (l.tipo == LancamentoTipo.despesa) {
           saldoDia -= l.valor;
+        } else if (l.tipo == LancamentoTipo.transferencia) {
+          final currentOrigem = l.origem.map(
+            conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+            cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+          );
+          for (final item in l.itens) {
+            switch (item) {
+              case LancamentoItemDetailsTransferencia(
+                :final origemEntrada,
+                :final origemSaida,
+              ):
+                final entryOrigem = origemEntrada.map(
+                  conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                  cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                );
+                final exitOrigem = origemSaida.map(
+                  conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                  cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                );
+                if (currentOrigem == entryOrigem) {
+                  saldoDia += item.valor;
+                } else if (currentOrigem == exitOrigem) {
+                  saldoDia -= item.valor;
+                }
+              default:
+                break;
+            }
+          }
         }
       }
 

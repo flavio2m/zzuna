@@ -2,6 +2,7 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_dia.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_header.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_row.dart';
@@ -43,11 +44,19 @@ class TransactionDayCard extends StatelessWidget {
     final costCenter = //
     l.itens.isEmpty
         ? 'CC: Geral'
-        : 'CC: ${l.itens.map((i) => i.centroCusto.descricao).join(', ')}';
+        : 'CC: ${l.itens.map((i) => switch (i) {
+            LancamentoItemDetailsStandard(:final centroCusto) => centroCusto.descricao,
+            LancamentoItemDetailsTransferencia() => 'Transferência',
+          }).join(', ')}';
 
     final categoryPath = //
     l.itens.isNotEmpty
-        ? _categoryPath(l.itens.first.categoria)
+        ? (switch (l.itens.first) {
+            LancamentoItemDetailsStandard(:final categoria) => _categoryPath(
+              categoria,
+            ),
+            LancamentoItemDetailsTransferencia() => 'Transferência',
+          })
         : 'Sem categoria';
 
     return Consumer(

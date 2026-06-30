@@ -56,7 +56,9 @@ class LancamentoDetailsUseCase {
     final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
     final categorias = categoriasResult.getOrElse((_) => <Categoria>[]);
     final centros = centrosResult.getOrElse((_) => <CentroCusto>[]);
-    final extratoFaturas = extratoFaturasResult.getOrElse((_) => <ExtratoFatura>[]);
+    final extratoFaturas = extratoFaturasResult.getOrElse(
+      (_) => <ExtratoFatura>[],
+    );
 
     final contaDetailsMap = _buildContaDetailsMap(contas);
     final cartaoDetailsMap = _buildCartaoDetailsMap(cartoes);
@@ -154,9 +156,13 @@ class LancamentoDetailsUseCase {
     for (final ef in extratoFaturas) {
       final origemDetail = switch (ef.origem) {
         LancamentoOrigemConta(contaId: final cid) =>
-          contaDetailsMap[cid] != null ? LancamentoOrigemDetail.conta(conta: contaDetailsMap[cid]!) : null,
+          contaDetailsMap[cid] != null
+              ? LancamentoOrigemDetail.conta(conta: contaDetailsMap[cid]!)
+              : null,
         LancamentoOrigemCartao(cartaoId: final cid) =>
-          cartaoDetailsMap[cid] != null ? LancamentoOrigemDetail.cartao(cartao: cartaoDetailsMap[cid]!) : null,
+          cartaoDetailsMap[cid] != null
+              ? LancamentoOrigemDetail.cartao(cartao: cartaoDetailsMap[cid]!)
+              : null,
       };
 
       if (origemDetail != null) {
@@ -180,23 +186,53 @@ class LancamentoDetailsUseCase {
     List<LancamentoItem> items,
     Map<String, CentroCusto> centroCustoMap,
     Map<String, CategoriaDetails> categoryDetailsMap,
+    Map<String, ContaDetails> contaDetailsMap,
+    Map<String, CartaoDetails> cartaoDetailsMap,
   ) {
     final List<LancamentoItemDetails> itemDetails = [];
     for (final item in items) {
-      final cc = centroCustoMap[item.centroCustoId];
-      final cat = categoryDetailsMap[item.categoriaId];
-      if (cc != null && cat != null) {
-        itemDetails.add(LancamentoItemDetails(
-          numero: item.numero,
-          centroCusto: CentroCustoDetails(
-            id: cc.id,
-            descricao: cc.descricao,
-            ativo: cc.ativo,
-          ),
-          categoria: cat,
-          valor: item.valor,
-        ));
-      }
+      item.map(
+        (standard) {
+          final cc = centroCustoMap[standard.centroCustoId];
+          final cat = categoryDetailsMap[standard.categoriaId];
+          if (cc != null && cat != null) {
+            itemDetails.add(
+              LancamentoItemDetails(
+                numero: standard.numero,
+                centroCusto: CentroCustoDetails(
+                  id: cc.id,
+                  descricao: cc.descricao,
+                  ativo: cc.ativo,
+                ),
+                categoria: cat,
+                valor: standard.valor,
+              ),
+            );
+          }
+        },
+        transferencia: (t) {
+          final detailSaida = _buildOrigem(
+            t.origemSaida,
+            contaDetailsMap,
+            cartaoDetailsMap,
+          );
+          final detailEntrada = _buildOrigem(
+            t.origemEntrada,
+            contaDetailsMap,
+            cartaoDetailsMap,
+          );
+          if (detailSaida != null && detailEntrada != null) {
+            itemDetails.add(
+              LancamentoItemDetails.transferencia(
+                numero: t.numero,
+                origemSaida: detailSaida,
+                origemEntrada: detailEntrada,
+                valor: t.valor,
+              ),
+            );
+          }
+        },
+      );
     }
     return itemDetails;
   }
@@ -213,9 +249,7 @@ class LancamentoDetailsUseCase {
             : null,
       LancamentoOrigemCartao(cartaoId: final cartaoId) =>
         cartaoDetailsMap[cartaoId] != null
-            ? LancamentoOrigemDetail.cartao(
-                cartao: cartaoDetailsMap[cartaoId]!,
-              )
+            ? LancamentoOrigemDetail.cartao(cartao: cartaoDetailsMap[cartaoId]!)
             : null,
     };
   }
@@ -232,6 +266,8 @@ class LancamentoDetailsUseCase {
       l.itens,
       centroCustoMap,
       categoryDetailsMap,
+      contaDetailsMap,
+      cartaoDetailsMap,
     );
 
     final extratoFaturaDetail = extratoFaturaDetailsMap[l.extratoFaturaId];

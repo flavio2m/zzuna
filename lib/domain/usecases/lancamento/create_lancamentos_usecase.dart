@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_lote_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
@@ -25,19 +26,36 @@ class CreateLancamentosUseCase {
       final validation = _validator.validate(dto);
       if (!validation.isValid) {
         return Failure(
-          LocalStorageException(validation.exceptions.first.message, StackTrace.current),
+          LocalStorageException(
+            validation.exceptions.first.message,
+            StackTrace.current,
+          ),
         );
       }
     }
 
     // 2. Montar ResolveExtratoFaturaLoteDto e resolver extratos
     final resolveItems = dtos.map((dto) {
-      final valorTotal = dto.itens.fold<double>(0.0, (sum, item) => sum + item.valor);
+      final valorTotal = dto.itens.fold<double>(
+        0.0,
+        (sum, item) => sum + item.valor,
+      );
+      final firstItem = dto.itens.isNotEmpty ? dto.itens.first : null;
+      final isTransferenciaEntrada =
+          dto.tipo == LancamentoTipo.transferencia &&
+          firstItem != null &&
+          (switch (firstItem) {
+            LancamentoItemTransferencia(:final origemEntrada) =>
+              dto.origem == origemEntrada,
+            _ => false,
+          });
+
       return ResolveExtratoFaturaItemDto(
         origem: dto.origem,
         data: dto.data,
         valor: valorTotal,
         tipo: dto.tipo,
+        isTransferenciaEntrada: isTransferenciaEntrada,
       );
     }).toList();
 
@@ -60,7 +78,8 @@ class CreateLancamentosUseCase {
       if (matchingExtratoIdx == -1) {
         return Failure(
           LocalStorageException(
-            'Extrato correspondente não encontrado para o lançamento em ${dto.data.day}/${dto.data.month}/${dto.data.year}',
+            'Extrato correspondente não encontrado para o lançamento em '
+            '${dto.data.day}/${dto.data.month}/${dto.data.year}',
             StackTrace.current,
           ),
         );
@@ -80,18 +99,22 @@ class CreateLancamentosUseCase {
     }
 
     // 5. Retornar a lista de entidades criadas
-    final lancamentos = dtos.map((dto) => Lancamento(
-      id: dto.id!,
-      tipo: dto.tipo,
-      data: dto.data,
-      descricao: dto.descricao,
-      extratoFaturaId: dto.extratoFaturaId,
-      origem: dto.origem,
-      itens: dto.itens,
-      conciliado: dto.conciliado,
-      grupo: dto.grupo,
-      observacao: dto.observacao,
-    )).toList();
+    final lancamentos = dtos
+        .map(
+          (dto) => Lancamento(
+            id: dto.id!,
+            tipo: dto.tipo,
+            data: dto.data,
+            descricao: dto.descricao,
+            extratoFaturaId: dto.extratoFaturaId,
+            origem: dto.origem,
+            itens: dto.itens,
+            conciliado: dto.conciliado,
+            grupo: dto.grupo,
+            observacao: dto.observacao,
+          ),
+        )
+        .toList();
 
     return Success(lancamentos);
   }
