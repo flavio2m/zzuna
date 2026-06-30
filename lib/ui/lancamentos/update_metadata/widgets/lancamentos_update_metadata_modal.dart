@@ -14,24 +14,32 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class LancamentosUpdateMetadataModal extends ConsumerStatefulWidget {
-  final List<String> selectedIds;
+  final String lancamentoId;
+  final String currentDescricao;
+  final String? currentObservacao;
   final VoidCallback? onSuccess;
 
   const LancamentosUpdateMetadataModal({
     super.key,
-    required this.selectedIds,
+    required this.lancamentoId,
+    required this.currentDescricao,
+    this.currentObservacao,
     this.onSuccess,
   });
 
   static void show({
     required BuildContext context,
-    required List<String> selectedIds,
+    required String lancamentoId,
+    required String currentDescricao,
+    String? currentObservacao,
     VoidCallback? onSuccess,
   }) {
     AppDialog.show(
       context: context,
       child: LancamentosUpdateMetadataModal(
-        selectedIds: selectedIds,
+        lancamentoId: lancamentoId,
+        currentDescricao: currentDescricao,
+        currentObservacao: currentObservacao,
         onSuccess: onSuccess,
       ),
     );
@@ -55,6 +63,8 @@ class _LancamentosUpdateMetadataModalState
   void initState() {
     super.initState();
     _viewModel.updateMetadataCommand.addListener(_commandListener);
+    _descricaoController.text = widget.currentDescricao;
+    _observacaoController.text = widget.currentObservacao ?? '';
   }
 
   @override
@@ -91,22 +101,14 @@ class _LancamentosUpdateMetadataModalState
     final desc = _descricaoController.text.trim();
     final obs = _observacaoController.text.trim();
 
-    if (desc.isEmpty && obs.isEmpty) {
-      AppSnackBar.showWarning(
-        context,
-        'Informe ao menos um campo para alteração.',
-      );
-      return;
-    }
-
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isExecuting = true;
       });
       _viewModel.updateMetadataCommand.execute(
         UpdateLancamentosMetadataDto(
-          ids: widget.selectedIds,
-          descricao: desc.isEmpty ? null : desc,
+          id: widget.lancamentoId,
+          descricao: desc,
           observacao: obs.isEmpty ? null : obs,
         ),
       );
@@ -121,9 +123,7 @@ class _LancamentosUpdateMetadataModalState
         title: 'Alterar Descrição / Observação',
         type: AppFormType.modal,
         actions: [
-          ButtonCancel(
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          ButtonCancel(onPressed: () => Navigator.of(context).pop()),
           ListenableBuilder(
             listenable: _viewModel.updateMetadataCommand,
             builder: (context, _) {
@@ -143,7 +143,8 @@ class _LancamentosUpdateMetadataModalState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Preencha apenas os campos que deseja alterar nos lançamentos selecionados:',
+              'Ajuste os dados para alterar a descrição/observação deste '
+              'lançamento e dos posteriores do grupo:',
               style: TextStyle(fontSize: 14, color: AppColors.slate600),
             ),
             const AppSpacing(size: AppSpacingSize.md),
@@ -151,7 +152,10 @@ class _LancamentosUpdateMetadataModalState
               label: 'Nova Descrição',
               controller: _descricaoController,
               validator: (v) {
-                if (v != null && v.trim().isNotEmpty && v.trim().length < 3) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Descrição é obrigatória';
+                }
+                if (v.trim().length < 3) {
                   return 'Mínimo de 3 caracteres';
                 }
                 return null;

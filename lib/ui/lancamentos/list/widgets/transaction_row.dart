@@ -23,6 +23,7 @@ class TransactionRow extends StatelessWidget {
     this.onView,
     this.onEdit,
     this.onSelect,
+    this.onUpdateMetadata,
   });
 
   final String description;
@@ -40,6 +41,7 @@ class TransactionRow extends StatelessWidget {
   final VoidCallback? onView;
   final VoidCallback? onEdit;
   final ValueChanged<bool>? onSelect;
+  final VoidCallback? onUpdateMetadata;
 
   @override
   Widget build(BuildContext context) {
@@ -226,8 +228,11 @@ class TransactionRow extends StatelessWidget {
             const SizedBox(width: 8),
             IconAcoesButton(
               conciliado: conciliado,
+              grupo: grupo,
+              tipo: tipo,
               onView: onView ?? onTap,
               onEdit: onEdit,
+              onUpdateMetadata: onUpdateMetadata,
             ),
           ],
         ),

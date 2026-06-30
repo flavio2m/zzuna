@@ -1,11 +1,11 @@
 class UpdateLancamentosMetadataDto {
-  final List<String> ids;
-  final String? descricao;
+  final String id;
+  final String descricao;
   final String? observacao;
 
   UpdateLancamentosMetadataDto({
-    required this.ids,
-    this.descricao,
+    required this.id,
+    required this.descricao,
     this.observacao,
   });
 }

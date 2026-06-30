@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
+import 'package:zzuna/ui/lancamentos/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
@@ -121,6 +122,14 @@ class TransactionDayCard extends StatelessWidget {
           },
           onSelect: (_) {
             ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
+          },
+          onUpdateMetadata: () {
+            LancamentosUpdateMetadataModal.show(
+              context: context,
+              lancamentoId: l.id,
+              currentDescricao: l.descricao,
+              currentObservacao: l.observacao,
+            );
           },
         );
       },

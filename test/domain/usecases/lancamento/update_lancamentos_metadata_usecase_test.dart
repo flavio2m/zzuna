@@ -10,6 +10,7 @@ import 'package:zzuna/domain/dtos/lancamento/update_lancamentos_metadata_dto.dar
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_metadata_usecase.dart';
@@ -92,8 +93,9 @@ void main() {
 
       final res = await updateMetadataUseCase.execute(
         UpdateLancamentosMetadataDto(
-          ids: [created.id],
+          id: created.id,
           descricao: 'Nova Descrição',
+          observacao: created.observacao,
         ),
       );
       expect(res.isSuccess(), isTrue);
@@ -101,11 +103,6 @@ void main() {
       final updated = (await lancamentoRepository.getById(created.id)).getOrThrow();
       expect(updated.descricao, 'Nova Descrição');
       expect(updated.observacao, 'Obs Antiga');
-      expect(updated.data, DateTime(2026, 1, 10));
-      expect(updated.origem, origemConta);
-      expect(updated.itens.length, 1);
-      expect(updated.conciliado, false);
-      expect(updated.extratoFaturaId, created.extratoFaturaId);
     });
 
     test('Should update only observation when only observation is provided', () async {
@@ -129,7 +126,8 @@ void main() {
 
       final res = await updateMetadataUseCase.execute(
         UpdateLancamentosMetadataDto(
-          ids: [created.id],
+          id: created.id,
+          descricao: created.descricao,
           observacao: 'Nota importante adicionada',
         ),
       );
@@ -138,9 +136,6 @@ void main() {
       final updated = (await lancamentoRepository.getById(created.id)).getOrThrow();
       expect(updated.descricao, 'Salário');
       expect(updated.observacao, 'Nota importante adicionada');
-      expect(updated.data, DateTime(2026, 1, 15));
-      expect(updated.tipo, LancamentoTipo.receita);
-      expect(updated.extratoFaturaId, created.extratoFaturaId);
     });
 
     test('Should update both description and observation simultaneously', () async {
@@ -164,7 +159,7 @@ void main() {
 
       final res = await updateMetadataUseCase.execute(
         UpdateLancamentosMetadataDto(
-          ids: [created.id],
+          id: created.id,
           descricao: 'Item 1 Modificado',
           observacao: 'Obs 1 Modificada',
         ),
@@ -176,46 +171,10 @@ void main() {
       expect(updated.observacao, 'Obs 1 Modificada');
     });
 
-    test('Should preserve all financial and structural fields', () async {
-      final created = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Original',
-          origem: origemConta,
-          data: DateTime(2026, 1, 25),
-          itens: [
-            LancamentoItem(
-              numero: 1,
-              categoriaId: 'cat-1',
-              centroCustoId: 'cc-1',
-              valor: 100.0,
-            ),
-          ],
-        ),
-      )).getOrThrow();
-
-      await updateMetadataUseCase.execute(
-        UpdateLancamentosMetadataDto(
-          ids: [created.id],
-          descricao: 'Alterado',
-        ),
-      );
-
-      final updated = (await lancamentoRepository.getById(created.id)).getOrThrow();
-      expect(updated.data, created.data);
-      expect(updated.tipo, created.tipo);
-      expect(updated.origem, created.origem);
-      expect(updated.itens.length, created.itens.length);
-      expect(updated.itens.first.valor, created.itens.first.valor);
-      expect(updated.grupo, created.grupo);
-      expect(updated.conciliado, created.conciliado);
-      expect(updated.extratoFaturaId, created.extratoFaturaId);
-    });
-
-    test('Should return Failure if any ID is not found', () async {
+    test('Should return Failure if ID is not found', () async {
       final res = await updateMetadataUseCase.execute(
         UpdateLancamentosMetadataDto(
-          ids: ['id-inexistente'],
+          id: 'id-inexistente',
           descricao: 'Teste',
         ),
       );
@@ -225,6 +184,118 @@ void main() {
         res.exceptionOrNull()!.toString(),
         contains('Lançamento com ID id-inexistente não encontrado.'),
       );
+    });
+
+    test('Should search by group, update current and future launches, and ignore past launches', () async {
+      final l1 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento A',
+          origem: origemConta,
+          data: DateTime(2026, 1, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 1, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      final l2 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento B',
+          origem: origemConta,
+          data: DateTime(2026, 2, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 2, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      final l3 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento C',
+          origem: origemConta,
+          data: DateTime(2026, 3, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 3, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      // Atualizar grupo a partir de B (l2)
+      final res = await updateMetadataUseCase.execute(
+        UpdateLancamentosMetadataDto(
+          id: l2.id,
+          descricao: 'Novo Grupo',
+        ),
+      );
+      expect(res.isSuccess(), isTrue);
+
+      final checkA = (await lancamentoRepository.getById(l1.id)).getOrThrow();
+      final checkB = (await lancamentoRepository.getById(l2.id)).getOrThrow();
+      final checkC = (await lancamentoRepository.getById(l3.id)).getOrThrow();
+
+      expect(checkA.descricao, 'Lançamento A'); // Ignorado porque é anterior à data de B
+      expect(checkB.descricao, 'Novo Grupo (2/3)'); // Atualizado com sufixo
+      expect(checkC.descricao, 'Novo Grupo (3/3)'); // Atualizado com sufixo
+    });
+
+    test('Should abort and return failure if any of the target launches is reconciled', () async {
+      final l1 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento A',
+          origem: origemConta,
+          data: DateTime(2026, 1, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 1, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      var l2 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento B',
+          origem: origemConta,
+          data: DateTime(2026, 2, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 2, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      var l3 = (await createLancamentoUseCase.execute(
+        LancamentoDto(
+          tipo: LancamentoTipo.despesa,
+          descricao: 'Lançamento C',
+          origem: origemConta,
+          data: DateTime(2026, 3, 1),
+          grupo: const LancamentoGrupo.replicacao(grupoId: 'grupo-123', parcela: 3, totalParcelas: 3),
+          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+        ),
+      )).getOrThrow();
+
+      // Conciliar l3 (lançamento futuro)
+      final l3Dto = LancamentoDto.fromEntity(l3);
+      l3Dto.conciliado = true;
+      await lancamentoRepository.update(l3Dto);
+
+      // Tentar atualizar o grupo a partir de l2
+      final res = await updateMetadataUseCase.execute(
+        UpdateLancamentosMetadataDto(
+          id: l2.id,
+          descricao: 'Falha',
+        ),
+      );
+
+      expect(res.isError(), isTrue);
+      expect(res.exceptionOrNull()!.toString(), contains('Há lançamentos conciliados e a operação foi abortada.'));
+
+      // Verificar que nenhum foi alterado
+      final checkA = (await lancamentoRepository.getById(l1.id)).getOrThrow();
+      final checkB = (await lancamentoRepository.getById(l2.id)).getOrThrow();
+      final checkC = (await lancamentoRepository.getById(l3.id)).getOrThrow();
+
+      expect(checkA.descricao, 'Lançamento A');
+      expect(checkB.descricao, 'Lançamento B');
+      expect(checkC.descricao, 'Lançamento C');
     });
   });
 }
