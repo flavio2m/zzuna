@@ -1,6 +1,7 @@
 import 'package:lucid_validation/lucid_validation.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 
 class LancamentoValidator<T extends LancamentoDto> extends LucidValidator<T> {
   LancamentoValidator() {
@@ -39,13 +40,23 @@ class LancamentoValidator<T extends LancamentoDto> extends LucidValidator<T> {
     );
 
     ruleFor((dto) => dto.itens, key: 'itensCategorias').must(
-      (itens) => itens.every((item) => item.categoriaId.isNotEmpty),
+      (itens) => itens.every(
+        (item) => switch (item) {
+          LancamentoItemTransferencia() => true,
+          _ => item.categoriaId.isNotEmpty,
+        },
+      ),
       'Todos os itens devem ter uma categoria',
       'categoriaObrigatoria',
     );
 
     ruleFor((dto) => dto.itens, key: 'itensCentrosCusto').must(
-      (itens) => itens.every((item) => item.centroCustoId.isNotEmpty),
+      (itens) => itens.every(
+        (item) => switch (item) {
+          LancamentoItemTransferencia() => true,
+          _ => item.centroCustoId.isNotEmpty,
+        },
+      ),
       'Todos os itens devem ter um centro de custo',
       'centroCustoObrigatorio',
     );

@@ -68,12 +68,11 @@ void main() {
       );
     }
 
-    test('calculates correct monthly totals for receipts, expenses and investments', () {
+    test('calculates correct monthly totals for receipts, expenses and transfers', () {
       final list = [
         buildLancamento(id: '1', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 15), valor: 1000.0),
         buildLancamento(id: '2', tipo: LancamentoTipo.receita, data: DateTime(2026, 6, 16), valor: 500.0),
         buildLancamento(id: '3', tipo: LancamentoTipo.despesa, data: DateTime(2026, 6, 17), valor: 300.0),
-        buildLancamento(id: '4', tipo: LancamentoTipo.investimento, data: DateTime(2026, 6, 18), valor: 200.0),
         buildLancamento(id: '5', tipo: LancamentoTipo.transferencia, data: DateTime(2026, 6, 19), valor: 100.0),
       ];
 
@@ -90,7 +89,6 @@ void main() {
       expect(result.receitas, 1500.0);
       expect(result.despesas, 300.0);
       expect(result.transferencias, 100.0);
-      expect(result.investimentos, 200.0);
       expect(result.mes, Mes.junho);
       expect(result.ano, 2026);
     });
@@ -201,7 +199,6 @@ void main() {
 
       expect(result.receitas, 0.0);
       expect(result.despesas, 0.0);
-      expect(result.investimentos, 0.0);
       expect(result.dias, isEmpty);
       expect(result.mes, currentMes);
       expect(result.ano, currentAno);

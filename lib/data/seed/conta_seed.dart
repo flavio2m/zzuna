@@ -14,14 +14,15 @@ class ContaSeed {
 
     final bancos = Bancos.items.take(10).toList();
 
-    for (var i = 0; i < bancos.length; i++) {
-      await repository.create(
-        CreateContaDto(
-          descricao: 'Conta ${bancos[i].descricao}',
-          bancoSigla: bancos[i].sigla,
-          ativo: i != 9,
-        ),
-      );
-    }
+    final dtos = List.generate(
+      bancos.length,
+      (i) => CreateContaDto(
+        descricao: 'Conta ${bancos[i].descricao}',
+        bancoSigla: bancos[i].sigla,
+        ativo: i != 9,
+      ),
+    );
+
+    await repository.createAll(dtos);
   }
 }

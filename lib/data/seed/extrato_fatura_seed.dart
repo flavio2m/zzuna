@@ -5,6 +5,8 @@ import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
+
 class ExtratoFaturaSeed {
   final ExtratoFaturaRepository repository;
   final ContaRepository contaRepository;
@@ -17,16 +19,20 @@ class ExtratoFaturaSeed {
   });
 
   Future<void> execute() async {
-    final result = await repository.getAll();
+    final result = await repository.search(
+      ExtratoFaturaFilterDto(mes: Mes.maio, ano: 2026),
+    );
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
     final contas = (await contaRepository.getAll()).getOrElse((_) => []);
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
 
+    final dtos = <ExtratoFaturaDto>[];
+
     for (final c in cartoes) {
       for (final m in [Mes.maio, Mes.junho]) {
-        await repository.create(
+        dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.cartao(cartaoId: c.id),
             ano: 2026,
@@ -43,7 +49,7 @@ class ExtratoFaturaSeed {
 
     for (final c in contas) {
       for (final m in [Mes.maio, Mes.junho]) {
-        await repository.create(
+        dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.conta(contaId: c.id),
             ano: 2026,
@@ -56,6 +62,10 @@ class ExtratoFaturaSeed {
           ),
         );
       }
+    }
+
+    if (dtos.isNotEmpty) {
+      await repository.createAll(dtos);
     }
   }
 }

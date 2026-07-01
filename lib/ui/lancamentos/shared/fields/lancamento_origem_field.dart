@@ -9,6 +9,7 @@ class LancamentoOrigemField extends StatelessWidget {
   final LancamentoOrigem? value;
   final ValueChanged<LancamentoOrigem?>? onChanged;
   final String? Function(LancamentoOrigem?)? validator;
+  final String label;
 
   const LancamentoOrigemField({
     super.key,
@@ -16,19 +17,25 @@ class LancamentoOrigemField extends StatelessWidget {
     this.value,
     this.onChanged,
     this.validator,
+    this.label = 'Conta / Cartão',
   });
 
   String _labelFor(LancamentoOrigemDetail detalhe) {
     return switch (detalhe) {
       LancamentoOrigemContaDetail(:final conta) => 'Conta  ${conta.descricao}',
-      LancamentoOrigemCartaoDetail(:final cartao) => 'Cartão  ${cartao.descricao}',
+      LancamentoOrigemCartaoDetail(:final cartao) =>
+        'Cartão  ${cartao.descricao}',
     };
   }
 
   LancamentoOrigem _origemFor(LancamentoOrigemDetail detalhe) {
     return switch (detalhe) {
-      LancamentoOrigemContaDetail(:final conta) => LancamentoOrigem.conta(contaId: conta.id),
-      LancamentoOrigemCartaoDetail(:final cartao) => LancamentoOrigem.cartao(cartaoId: cartao.id),
+      LancamentoOrigemContaDetail(:final conta) => LancamentoOrigem.conta(
+        contaId: conta.id,
+      ),
+      LancamentoOrigemCartaoDetail(:final cartao) => LancamentoOrigem.cartao(
+        cartaoId: cartao.id,
+      ),
     };
   }
 
@@ -42,7 +49,8 @@ class LancamentoOrigemField extends StatelessWidget {
       bool match = false;
       if (current is LancamentoOrigemConta && origem is LancamentoOrigemConta) {
         match = current.contaId == origem.contaId;
-      } else if (current is LancamentoOrigemCartao && origem is LancamentoOrigemCartao) {
+      } else if (current is LancamentoOrigemCartao &&
+          origem is LancamentoOrigemCartao) {
         match = current.cartaoId == origem.cartaoId;
       }
       if (match) return origem;
@@ -53,7 +61,7 @@ class LancamentoOrigemField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppDropdownFormField<LancamentoOrigem>(
-      label: 'Conta / Cartão',
+      label: label,
       value: _matchedValue(),
       validator: validator,
       items: origens

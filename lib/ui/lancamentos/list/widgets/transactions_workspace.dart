@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_card.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/transactions_actions_bar.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -33,25 +34,49 @@ class TransactionsWorkspace extends ConsumerWidget {
             );
           }
 
+          final selectedIds = viewModel.selectedLancamentoIds.toList();
+
+          final actionsBar = TransactionsActionsBar(
+            selectedIds: selectedIds,
+            onClearSelection: () => viewModel.clearSelection(),
+          );
+
           if (resumoMensal == null || resumoMensal.dias.isEmpty) {
-            return const Center(
-              child: Text(
-                'Nenhum lançamento encontrado.',
-                style: TextStyle(color: AppColors.slate500),
-              ),
+            return Column(
+              children: [
+                actionsBar,
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Nenhum lançamento encontrado.',
+                      style: TextStyle(
+                        color: AppColors.slate500, //
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           }
 
           final dias = resumoMensal.dias;
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(24),
-            itemCount: dias.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final dia = dias[index];
-              return TransactionDayCard(dia: dia);
-            },
+          return Column(
+            children: [
+              actionsBar,
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: dias.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final dia = dias[index];
+                    return TransactionDayCard(dia: dia);
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),

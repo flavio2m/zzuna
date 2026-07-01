@@ -38,6 +38,7 @@ class LancamentoRepository
       origem: dto.origem,
       itens: dto.itens,
       conciliado: dto.conciliado,
+      grupo: dto.grupo,
       observacao: dto.observacao,
     );
 
@@ -46,6 +47,7 @@ class LancamentoRepository
     });
   }
 
+  @override
   AsyncResult<Unit> createAll(List<LancamentoDto> dtos) async {
     final entities = dtos
         .map(
@@ -58,6 +60,7 @@ class LancamentoRepository
             origem: dto.origem,
             itens: dto.itens,
             conciliado: dto.conciliado,
+            grupo: dto.grupo,
             observacao: dto.observacao,
           ),
         )
@@ -82,6 +85,7 @@ class LancamentoRepository
       origem: dto.origem,
       itens: dto.itens,
       conciliado: dto.conciliado,
+      grupo: dto.grupo,
       observacao: dto.observacao,
     );
 
@@ -90,6 +94,7 @@ class LancamentoRepository
     });
   }
 
+  @override
   AsyncResult<Unit> updateAll(List<LancamentoDto> dtos) async {
     final entities = dtos
         .map(
@@ -102,6 +107,7 @@ class LancamentoRepository
             origem: dto.origem,
             itens: dto.itens,
             conciliado: dto.conciliado,
+            grupo: dto.grupo,
             observacao: dto.observacao,
           ),
         )
@@ -122,9 +128,16 @@ class LancamentoRepository
     });
   }
 
-  @override
-  AsyncResult<List<Lancamento>> getAll() async {
-    return _storage.getAll();
+  AsyncResult<List<Lancamento>> getByGrupoId(String grupoId) async {
+    final listResult = await _storage.getAll();
+    if (listResult.isError()) {
+      return Failure(listResult.exceptionOrNull()!);
+    }
+    final list = listResult.getOrThrow();
+    final groupLaunches = list
+        .where((l) => l.grupo?.grupoId == grupoId)
+        .toList();
+    return Success(groupLaunches);
   }
 
   AsyncResult<List<Lancamento>> searchByPeriodo({
@@ -170,7 +183,15 @@ class LancamentoRepository
     }
 
     final firstDay = DateTime(filter.ano!, filter.mes!.numero, 1);
-    final lastDay = DateTime(filter.ano!, filter.mes!.numero + 1, 0, 23, 59, 59, 999);
+    final lastDay = DateTime(
+      filter.ano!,
+      filter.mes!.numero + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     final searchFields = [
       SearchField(
@@ -181,15 +202,33 @@ class LancamentoRepository
     ];
 
     if (filter.descricao.isNotEmpty) {
-      searchFields.add(SearchField(fieldName: 'descricao', value: filter.descricao, type: SearchFieldType.string));
+      searchFields.add(
+        SearchField(
+          fieldName: 'descricao',
+          value: filter.descricao,
+          type: SearchFieldType.string,
+        ),
+      );
     }
 
     if (filter.tipo != null) {
-      searchFields.add(SearchField(fieldName: 'tipo', value: filter.tipo!.name, type: SearchFieldType.string));
+      searchFields.add(
+        SearchField(
+          fieldName: 'tipo',
+          value: filter.tipo!.name,
+          type: SearchFieldType.string,
+        ),
+      );
     }
 
     if (filter.conciliado != null) {
-      searchFields.add(SearchField(fieldName: 'conciliado', value: filter.conciliado, type: SearchFieldType.boolean));
+      searchFields.add(
+        SearchField(
+          fieldName: 'conciliado',
+          value: filter.conciliado,
+          type: SearchFieldType.boolean,
+        ),
+      );
     }
 
     final result = await _storage.searchByFields(searchFields);

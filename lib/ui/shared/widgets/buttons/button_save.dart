@@ -6,13 +6,15 @@ class ButtonSave extends StatelessWidget {
   final FocusNode? focusNode;
   final bool small;
   final String label;
+  final bool loading;
 
   const ButtonSave({
     super.key,
     this.onPressed,
     this.focusNode,
     this.small = false,
-    this.label = 'Salvar', //
+    this.label = 'Salvar',
+    this.loading = false,
   });
 
   @override
@@ -22,10 +24,11 @@ class ButtonSave extends StatelessWidget {
       focusNode: focusNode,
       small: small,
       label: label,
+      loading: loading,
       icon: Icon(Icons.save, color: Theme.of(context).colorScheme.primary),
       textStyle: TextStyle(
         color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.bold, //
+        fontWeight: FontWeight.bold,
       ),
     );
   }

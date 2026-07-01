@@ -536,15 +536,37 @@ Adicionar as regras de negócio complexas em etapas (documento automático, parc
 Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e permite validar o domínio antes de adicionar comportamentos mais sofisticados. Além disso, ela combina com a arquitetura simples que você já consolidou nas demais features do projeto.
 
 
-A ordem que considero mais produtiva seria:
+```md
+# Backlog - ZZuna Finance
 
-✅ Entities
-✅ DTOs
-✅ Repository
-✅ Repository Tests
-FaturaRepository
-ExtratoRepository
-UseCases de geração de Faturas/Extratos
-UseCases de Parcelamento
-UseCases de Rateio
-Tela de Lançamentos
+## 🐞 Correções
+| Status | Item |
+|--------|------|
+| ☐ | Corrigir cálculo do saldo inicial e saldo final do resumo financeiro (considerar todas as contas/cartões selecionados, mesmo sem lançamentos). |
+
+---
+
+## ✨ Melhorias
+| Status | Item |
+|--------|------|
+| ☐ | Padronizar loading no botão **Salvar** de todos os CRUDs. |
+| ☐ | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o formulário estiver inválido. |
+| ☐ | Substituir o seletor de **Despesa/Receita/Investimento/Transferência** por um componente mais intuitivo. |
+| ☐ | Implementar navegação entre campos do formulário ao pressionar **Enter** (FocusNode / nextFocus). |
+| ☐ | Ao fazer um novo lançamento, se tiver marcado uma única Conta ou um único Cartão, deve preencher esse campo automaticamente no formulário. |
+| ☐ | Refatorar as views que utilizam Dropdown Conta/Cartão para utilizar um useCase para load(). |
+
+
+---
+
+## 🚀 Funcionalidades
+| Status | Item |
+|--------|------|
+| OK | Implementar Transferência de lançamentos. |
+| OK | Alterar descrição e observação para aplicar automaticamente ao grupo de lançamentos (parcelamento, replicação e transferência). |
+| OK | Alterar data para todo o grupo de lançamentos. |
+| OK | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
+| OK | Alterar Conta/Cartão para todo o grupo de lançamentos. |
+| OK | Alterar Conta/Cartão para todos os lançamentos selecionados. |
+| ☐ | Implementar Lançamentos por Recorrência. |
+```

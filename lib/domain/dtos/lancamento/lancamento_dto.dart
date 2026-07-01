@@ -1,6 +1,8 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
 class LancamentoDto {
   String? id;
@@ -12,6 +14,7 @@ class LancamentoDto {
   String extratoFaturaId;
   List<LancamentoItem> itens;
   bool conciliado;
+  LancamentoGrupo? grupo;
   String? observacao;
 
   LancamentoDto({
@@ -23,6 +26,7 @@ class LancamentoDto {
     this.extratoFaturaId = '',
     this.itens = const [],
     this.conciliado = false,
+    this.grupo,
     this.observacao,
   }) : data = data ?? DateTime.now(),
        origem = origem ?? const LancamentoOrigem.conta(contaId: '');
@@ -36,6 +40,7 @@ class LancamentoDto {
     String? extratoFaturaId,
     List<LancamentoItem>? itens,
     bool? conciliado,
+    LancamentoGrupo? grupo,
     String? observacao,
   }) {
     return LancamentoDto(
@@ -47,6 +52,7 @@ class LancamentoDto {
       extratoFaturaId: extratoFaturaId ?? this.extratoFaturaId,
       itens: itens ?? this.itens,
       conciliado: conciliado ?? this.conciliado,
+      grupo: grupo ?? this.grupo,
       observacao: observacao ?? this.observacao,
     );
   }
@@ -91,6 +97,10 @@ class LancamentoDto {
     this.conciliado = conciliado;
   }
 
+  void setGrupo(LancamentoGrupo? grupo) {
+    this.grupo = grupo;
+  }
+
   void setObservacao(String? observacao) {
     this.observacao = observacao;
   }
@@ -104,6 +114,7 @@ class LancamentoDto {
     'extratoFaturaId': extratoFaturaId,
     'itens': itens.map((e) => e.toJson()).toList(),
     'conciliado': conciliado,
+    'grupo': grupo?.toJson(),
     'observacao': observacao,
   };
 
@@ -121,7 +132,83 @@ class LancamentoDto {
           .map((e) => LancamentoItem.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       conciliado: json['conciliado'] ?? false,
+      grupo: json['grupo'] != null
+          ? LancamentoGrupo.fromJson(Map<String, dynamic>.from(json['grupo']))
+          : null,
       observacao: json['observacao'],
+    );
+  }
+
+  factory LancamentoDto.fromDetails(LancamentoDetails details) {
+    return LancamentoDto(
+      id: details.id,
+      tipo: details.tipo,
+      data: details.data,
+      descricao: details.descricao,
+      origem: switch (details.origem) {
+        LancamentoOrigemContaDetail(conta: final c) => LancamentoOrigem.conta(
+          contaId: c.id,
+        ),
+        LancamentoOrigemCartaoDetail(cartao: final c) =>
+          LancamentoOrigem.cartao(cartaoId: c.id),
+      },
+      extratoFaturaId: details.extratoFatura.id,
+      itens: details.itens
+          .map(
+            (item) => switch (item) {
+              LancamentoItemDetailsStandard(
+                :final numero,
+                :final centroCusto,
+                :final categoria,
+                :final valor,
+              ) =>
+                LancamentoItem(
+                  numero: numero,
+                  centroCustoId: centroCusto.id,
+                  categoriaId: categoria.id,
+                  valor: valor,
+                ),
+              LancamentoItemDetailsTransferencia(
+                :final numero,
+                :final origemEntrada,
+                :final origemSaida,
+                :final valor,
+              ) =>
+                LancamentoItem.transferencia(
+                  numero: numero,
+                  origemEntrada: origemEntrada.map(
+                    conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                    cartao: (c) =>
+                        LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                  ),
+                  origemSaida: origemSaida.map(
+                    conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                    cartao: (c) =>
+                        LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                  ),
+                  valor: valor,
+                ),
+            },
+          )
+          .toList(),
+      conciliado: details.conciliado,
+      grupo: details.grupo,
+      observacao: details.observacao,
+    );
+  }
+
+  factory LancamentoDto.fromEntity(Lancamento entity) {
+    return LancamentoDto(
+      id: entity.id,
+      tipo: entity.tipo,
+      data: entity.data,
+      descricao: entity.descricao,
+      origem: entity.origem,
+      extratoFaturaId: entity.extratoFaturaId,
+      itens: entity.itens,
+      conciliado: entity.conciliado,
+      grupo: entity.grupo,
+      observacao: entity.observacao,
     );
   }
 }

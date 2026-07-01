@@ -2,6 +2,8 @@ import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import '../../models/lancamento_resumo_dia.dart';
 import '../../models/lancamento_resumo_mensal.dart';
 
@@ -51,7 +53,6 @@ class LancamentoResumoMensalUseCase {
       receitas: totals.receitas,
       despesas: totals.despesas,
       transferencias: totals.transferencias,
-      investimentos: totals.investimentos,
       exibirResumoFinanceiro: exibirResumoFinanceiro,
       dias: dias,
     );
@@ -61,7 +62,6 @@ class LancamentoResumoMensalUseCase {
     double receitas = 0;
     double despesas = 0;
     double transferencias = 0;
-    double investimentos = 0;
 
     for (final l in lancamentos) {
       switch (l.tipo) {
@@ -70,9 +70,6 @@ class LancamentoResumoMensalUseCase {
           break;
         case LancamentoTipo.despesa:
           despesas += l.valor;
-          break;
-        case LancamentoTipo.investimento:
-          investimentos += l.valor;
           break;
         case LancamentoTipo.transferencia:
           transferencias += l.valor;
@@ -84,7 +81,6 @@ class LancamentoResumoMensalUseCase {
       receitas: receitas,
       despesas: despesas,
       transferencias: transferencias,
-      investimentos: investimentos,
     );
   }
 
@@ -111,8 +107,36 @@ class LancamentoResumoMensalUseCase {
       for (final l in items) {
         if (l.tipo == LancamentoTipo.receita) {
           saldoDia += l.valor;
-        } else {
+        } else if (l.tipo == LancamentoTipo.despesa) {
           saldoDia -= l.valor;
+        } else if (l.tipo == LancamentoTipo.transferencia) {
+          final currentOrigem = l.origem.map(
+            conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+            cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+          );
+          for (final item in l.itens) {
+            switch (item) {
+              case LancamentoItemDetailsTransferencia(
+                :final origemEntrada,
+                :final origemSaida,
+              ):
+                final entryOrigem = origemEntrada.map(
+                  conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                  cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                );
+                final exitOrigem = origemSaida.map(
+                  conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+                  cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+                );
+                if (currentOrigem == entryOrigem) {
+                  saldoDia += item.valor;
+                } else if (currentOrigem == exitOrigem) {
+                  saldoDia -= item.valor;
+                }
+              default:
+                break;
+            }
+          }
         }
       }
 
@@ -136,12 +160,10 @@ class _Totais {
   final double receitas;
   final double despesas;
   final double transferencias;
-  final double investimentos;
 
   const _Totais({
     required this.receitas,
     required this.despesas,
     required this.transferencias,
-    required this.investimentos,
   });
 }

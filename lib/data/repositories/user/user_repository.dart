@@ -44,6 +44,26 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
   }
 
   @override
+  AsyncResult<Unit> createAll(List<RegisterUserDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => LoadedUser(
+            id: dto.id!,
+            email: dto.email,
+            name: dto.name,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<LoadedUser> getById(String id) async {
     return _storage.getById(id);
   }
@@ -57,13 +77,32 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
   }
 
   @override
+  AsyncResult<Unit> updateAll(List<LoadedUserDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => LoadedUser(
+            id: dto.id,
+            email: dto.email,
+            name: dto.name,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<Unit> delete(String id) async {
     return _storage.delete(id).onSuccess((_) {
       _streamController.add(RepositoryDeleted(id));
     });
   }
 
-  @override
   AsyncResult<List<LoadedUser>> getAll() async {
     return _storage.getAll();
   }

@@ -6,14 +6,18 @@ import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
+import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
 void main() {
   late ExtratoFaturaRepository repository;
+  late LocalStorage<ExtratoFatura> storage;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    repository = ExtratoFaturaRepository(createTestExtratoFaturaStorage());
+    storage = createTestExtratoFaturaStorage();
+    repository = ExtratoFaturaRepository(storage);
   });
 
   tearDown(() {
@@ -34,7 +38,7 @@ void main() {
       );
 
       final result = await repository.create(dto);
-      final list = await repository.getAll();
+      final list = await storage.getAll();
 
       expect(result.isSuccess(), isTrue);
       expect(list.getOrThrow(), hasLength(1));
@@ -71,7 +75,7 @@ void main() {
         ),
       );
 
-      final updatedList = await repository.getAll();
+      final updatedList = await storage.getAll();
 
       expect(result.isSuccess(), isTrue);
       expect(updatedList.getOrThrow().first.saldoInicial, 150.0);
@@ -89,7 +93,7 @@ void main() {
 
       final model = created.getOrThrow();
       final deleteResult = await repository.delete(model.id);
-      final list = await repository.getAll();
+      final list = await storage.getAll();
 
       expect(deleteResult.isSuccess(), isTrue);
       expect(list.getOrThrow(), isEmpty);

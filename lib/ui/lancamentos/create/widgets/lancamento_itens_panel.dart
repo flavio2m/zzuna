@@ -5,7 +5,6 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_item_card.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_item_form.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
-import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 
 class LancamentoItensPanel extends StatelessWidget {
@@ -13,6 +12,7 @@ class LancamentoItensPanel extends StatelessWidget {
   final double totalValor;
   final List<CategoriaDetails> categorias;
   final List<CentroCusto> centros;
+  final bool allowEditItem1;
 
   final Function(String ccId, String catId, double val) onSaveNewItem;
   final Function(int numero, String ccId, String catId, double val) onSaveEditItem;
@@ -27,6 +27,7 @@ class LancamentoItensPanel extends StatelessWidget {
     required this.onSaveNewItem,
     required this.onSaveEditItem,
     required this.onDeleteItem,
+    this.allowEditItem1 = false,
   });
 
   Map<String, String> _getCategoriaLabels(List<CategoriaDetails> nodes, String prefix) {
@@ -85,7 +86,7 @@ class LancamentoItensPanel extends StatelessWidget {
                     );
                   }
                 : null,
-            onEdit: item.numero == 1
+            onEdit: (item.numero == 1 && !allowEditItem1)
                 ? null
                 : () {
                     AppDialog.show(

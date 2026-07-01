@@ -29,6 +29,7 @@ class ExtratoFaturaRepository
     });
   }
 
+  @override
   AsyncResult<Unit> createAll(List<ExtratoFaturaDto> dtos) async {
     final entities = dtos.map(_toEntity).toList();
     final result = await _storage.createAll(entities);
@@ -48,6 +49,7 @@ class ExtratoFaturaRepository
     });
   }
 
+  @override
   AsyncResult<Unit> updateAll(List<ExtratoFaturaDto> dtos) async {
     final entities = dtos.map(_toEntity).toList();
 
@@ -66,10 +68,6 @@ class ExtratoFaturaRepository
     });
   }
 
-  @override
-  AsyncResult<List<ExtratoFatura>> getAll() async {
-    return _storage.getAll();
-  }
 
   @override
   AsyncResult<ExtratoFatura> getById(String id) async {

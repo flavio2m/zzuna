@@ -14,11 +14,13 @@ class ResolveExtratoFaturaItemDto {
   final DateTime data;
   final double valor;
   final LancamentoTipo tipo;
+  final bool? isTransferenciaEntrada;
 
   const ResolveExtratoFaturaItemDto({
     required this.origem,
     required this.data,
     required this.valor,
     required this.tipo,
+    this.isTransferenciaEntrada,
   });
 }

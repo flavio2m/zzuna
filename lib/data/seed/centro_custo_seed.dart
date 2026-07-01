@@ -24,13 +24,14 @@ class CentroCustoSeed {
       'Terceiros',
     ];
 
-    for (var i = 0; i < descricoes.length; i++) {
-      await repository.create(
-        CentroCustoDto(
-          descricao: descricoes[i],
-          ativo: i != 9,
-        ),
-      );
-    }
+    final dtos = List.generate(
+      descricoes.length,
+      (i) => CentroCustoDto(
+        descricao: descricoes[i],
+        ativo: i != 9,
+      ),
+    );
+
+    await repository.createAll(dtos);
   }
 }

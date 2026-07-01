@@ -1,5 +1,6 @@
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
 class LancamentoFilterUseCase {
@@ -60,7 +61,11 @@ class LancamentoFilterUseCase {
       // 6. Centros de Custo
       if (filter.centrosSelecionados.isNotEmpty) {
         final hasMatch = item.itens.any(
-          (i) => filter.centrosSelecionados.contains(i.centroCusto.id), //
+          (i) => switch (i) {
+            LancamentoItemDetailsStandard(:final centroCusto) =>
+              filter.centrosSelecionados.contains(centroCusto.id),
+            _ => false,
+          },
         );
         if (!hasMatch) {
           return false;
@@ -70,7 +75,11 @@ class LancamentoFilterUseCase {
       // 7. Categorias
       if (filter.categoriasSelecionadas.isNotEmpty) {
         final hasMatch = item.itens.any(
-          (i) => filter.categoriasSelecionadas.contains(i.categoria.id), //
+          (i) => switch (i) {
+            LancamentoItemDetailsStandard(:final categoria) =>
+              filter.categoriasSelecionadas.contains(categoria.id),
+            _ => false,
+          },
         );
         if (!hasMatch) {
           return false;

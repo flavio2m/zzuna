@@ -11,33 +11,30 @@ part of 'lancamento_item.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$LancamentoItem {
 
- int get numero; String get centroCustoId; String get categoriaId; double get valor;
+ int get numero; double get valor;
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $LancamentoItemCopyWith<LancamentoItem> get copyWith => _$LancamentoItemCopyWithImpl<LancamentoItem>(this as LancamentoItem, _$identity);
 
-  /// Serializes this LancamentoItem to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
-int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
+int get hashCode => Object.hash(runtimeType,numero,valor);
 
 @override
 String toString() {
-  return 'LancamentoItem(numero: $numero, centroCustoId: $centroCustoId, categoriaId: $categoriaId, valor: $valor)';
+  return 'LancamentoItem(numero: $numero, valor: $valor)';
 }
 
 
@@ -48,7 +45,7 @@ abstract mixin class $LancamentoItemCopyWith<$Res>  {
   factory $LancamentoItemCopyWith(LancamentoItem value, $Res Function(LancamentoItem) _then) = _$LancamentoItemCopyWithImpl;
 @useResult
 $Res call({
- int numero, String centroCustoId, String categoriaId, double valor
+ int numero, double valor
 });
 
 
@@ -65,12 +62,10 @@ class _$LancamentoItemCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? valor = null,}) {
   return _then(_self.copyWith(
 numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
-as int,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
-as String,categoriaId: null == categoriaId ? _self.categoriaId : categoriaId // ignore: cast_nullable_to_non_nullable
-as String,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
+as int,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }
@@ -92,11 +87,12 @@ extension LancamentoItemPatterns on LancamentoItem {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _LancamentoItem value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( LancamentoItemStandard value)?  $default,{TResult Function( LancamentoItemTransferencia value)?  transferencia,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _LancamentoItem() when $default != null:
-return $default(_that);case _:
+case LancamentoItemStandard() when $default != null:
+return $default(_that);case LancamentoItemTransferencia() when transferencia != null:
+return transferencia(_that);case _:
   return orElse();
 
 }
@@ -114,11 +110,12 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _LancamentoItem value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( LancamentoItemStandard value)  $default,{required TResult Function( LancamentoItemTransferencia value)  transferencia,}){
 final _that = this;
 switch (_that) {
-case _LancamentoItem():
-return $default(_that);}
+case LancamentoItemStandard():
+return $default(_that);case LancamentoItemTransferencia():
+return transferencia(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -132,11 +129,12 @@ return $default(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _LancamentoItem value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( LancamentoItemStandard value)?  $default,{TResult? Function( LancamentoItemTransferencia value)?  transferencia,}){
 final _that = this;
 switch (_that) {
-case _LancamentoItem() when $default != null:
-return $default(_that);case _:
+case LancamentoItemStandard() when $default != null:
+return $default(_that);case LancamentoItemTransferencia() when transferencia != null:
+return transferencia(_that);case _:
   return null;
 
 }
@@ -153,10 +151,11 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,{TResult Function( int numero,  LancamentoOrigem origemEntrada,  LancamentoOrigem origemSaida,  double valor)?  transferencia,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _LancamentoItem() when $default != null:
-return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
+case LancamentoItemStandard() when $default != null:
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case LancamentoItemTransferencia() when transferencia != null:
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);case _:
   return orElse();
 
 }
@@ -174,10 +173,11 @@ return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  String centroCustoId,  String categoriaId,  double valor)  $default,{required TResult Function( int numero,  LancamentoOrigem origemEntrada,  LancamentoOrigem origemSaida,  double valor)  transferencia,}) {final _that = this;
 switch (_that) {
-case _LancamentoItem():
-return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);}
+case LancamentoItemStandard():
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case LancamentoItemTransferencia():
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +191,11 @@ return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  String centroCustoId,  String categoriaId,  double valor)?  $default,{TResult? Function( int numero,  LancamentoOrigem origemEntrada,  LancamentoOrigem origemSaida,  double valor)?  transferencia,}) {final _that = this;
 switch (_that) {
-case _LancamentoItem() when $default != null:
-return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case _:
+case LancamentoItemStandard() when $default != null:
+return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);case LancamentoItemTransferencia() when transferencia != null:
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);case _:
   return null;
 
 }
@@ -203,34 +204,31 @@ return $default(_that.numero,_that.centroCustoId,_that.categoriaId,_that.valor);
 }
 
 /// @nodoc
-@JsonSerializable()
 
-class _LancamentoItem implements LancamentoItem {
-  const _LancamentoItem({required this.numero, required this.centroCustoId, required this.categoriaId, required this.valor});
-  factory _LancamentoItem.fromJson(Map<String, dynamic> json) => _$LancamentoItemFromJson(json);
+
+class LancamentoItemStandard extends LancamentoItem {
+  const LancamentoItemStandard({required this.numero, required this.centroCustoId, required this.categoriaId, required this.valor}): super._();
+  
 
 @override final  int numero;
-@override final  String centroCustoId;
-@override final  String categoriaId;
+ final  String centroCustoId;
+ final  String categoriaId;
 @override final  double valor;
 
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$LancamentoItemCopyWith<_LancamentoItem> get copyWith => __$LancamentoItemCopyWithImpl<_LancamentoItem>(this, _$identity);
+$LancamentoItemStandardCopyWith<LancamentoItemStandard> get copyWith => _$LancamentoItemStandardCopyWithImpl<LancamentoItemStandard>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$LancamentoItemToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItem&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemStandard&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCustoId, centroCustoId) || other.centroCustoId == centroCustoId)&&(identical(other.categoriaId, categoriaId) || other.categoriaId == categoriaId)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,numero,centroCustoId,categoriaId,valor);
 
@@ -243,8 +241,8 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class _$LancamentoItemCopyWith<$Res> implements $LancamentoItemCopyWith<$Res> {
-  factory _$LancamentoItemCopyWith(_LancamentoItem value, $Res Function(_LancamentoItem) _then) = __$LancamentoItemCopyWithImpl;
+abstract mixin class $LancamentoItemStandardCopyWith<$Res> implements $LancamentoItemCopyWith<$Res> {
+  factory $LancamentoItemStandardCopyWith(LancamentoItemStandard value, $Res Function(LancamentoItemStandard) _then) = _$LancamentoItemStandardCopyWithImpl;
 @override @useResult
 $Res call({
  int numero, String centroCustoId, String categoriaId, double valor
@@ -255,17 +253,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$LancamentoItemCopyWithImpl<$Res>
-    implements _$LancamentoItemCopyWith<$Res> {
-  __$LancamentoItemCopyWithImpl(this._self, this._then);
+class _$LancamentoItemStandardCopyWithImpl<$Res>
+    implements $LancamentoItemStandardCopyWith<$Res> {
+  _$LancamentoItemStandardCopyWithImpl(this._self, this._then);
 
-  final _LancamentoItem _self;
-  final $Res Function(_LancamentoItem) _then;
+  final LancamentoItemStandard _self;
+  final $Res Function(LancamentoItemStandard) _then;
 
 /// Create a copy of LancamentoItem
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? centroCustoId = null,Object? categoriaId = null,Object? valor = null,}) {
-  return _then(_LancamentoItem(
+  return _then(LancamentoItemStandard(
 numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
 as int,centroCustoId: null == centroCustoId ? _self.centroCustoId : centroCustoId // ignore: cast_nullable_to_non_nullable
 as String,categoriaId: null == categoriaId ? _self.categoriaId : categoriaId // ignore: cast_nullable_to_non_nullable
@@ -278,9 +276,99 @@ as double,
 }
 
 /// @nodoc
+
+
+class LancamentoItemTransferencia extends LancamentoItem {
+  const LancamentoItemTransferencia({required this.numero, required this.origemEntrada, required this.origemSaida, required this.valor}): super._();
+  
+
+@override final  int numero;
+ final  LancamentoOrigem origemEntrada;
+ final  LancamentoOrigem origemSaida;
+@override final  double valor;
+
+/// Create a copy of LancamentoItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LancamentoItemTransferenciaCopyWith<LancamentoItemTransferencia> get copyWith => _$LancamentoItemTransferenciaCopyWithImpl<LancamentoItemTransferencia>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemTransferencia&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.origemEntrada, origemEntrada) || other.origemEntrada == origemEntrada)&&(identical(other.origemSaida, origemSaida) || other.origemSaida == origemSaida)&&(identical(other.valor, valor) || other.valor == valor));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,numero,origemEntrada,origemSaida,valor);
+
+@override
+String toString() {
+  return 'LancamentoItem.transferencia(numero: $numero, origemEntrada: $origemEntrada, origemSaida: $origemSaida, valor: $valor)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LancamentoItemTransferenciaCopyWith<$Res> implements $LancamentoItemCopyWith<$Res> {
+  factory $LancamentoItemTransferenciaCopyWith(LancamentoItemTransferencia value, $Res Function(LancamentoItemTransferencia) _then) = _$LancamentoItemTransferenciaCopyWithImpl;
+@override @useResult
+$Res call({
+ int numero, LancamentoOrigem origemEntrada, LancamentoOrigem origemSaida, double valor
+});
+
+
+$LancamentoOrigemCopyWith<$Res> get origemEntrada;$LancamentoOrigemCopyWith<$Res> get origemSaida;
+
+}
+/// @nodoc
+class _$LancamentoItemTransferenciaCopyWithImpl<$Res>
+    implements $LancamentoItemTransferenciaCopyWith<$Res> {
+  _$LancamentoItemTransferenciaCopyWithImpl(this._self, this._then);
+
+  final LancamentoItemTransferencia _self;
+  final $Res Function(LancamentoItemTransferencia) _then;
+
+/// Create a copy of LancamentoItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? origemEntrada = null,Object? origemSaida = null,Object? valor = null,}) {
+  return _then(LancamentoItemTransferencia(
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,origemEntrada: null == origemEntrada ? _self.origemEntrada : origemEntrada // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigem,origemSaida: null == origemSaida ? _self.origemSaida : origemSaida // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigem,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+/// Create a copy of LancamentoItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$LancamentoOrigemCopyWith<$Res> get origemEntrada {
+  
+  return $LancamentoOrigemCopyWith<$Res>(_self.origemEntrada, (value) {
+    return _then(_self.copyWith(origemEntrada: value));
+  });
+}/// Create a copy of LancamentoItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$LancamentoOrigemCopyWith<$Res> get origemSaida {
+  
+  return $LancamentoOrigemCopyWith<$Res>(_self.origemSaida, (value) {
+    return _then(_self.copyWith(origemSaida: value));
+  });
+}
+}
+
+/// @nodoc
 mixin _$LancamentoItemDetails {
 
- int get numero; CentroCustoDetails get centroCusto; CategoriaDetails get categoria; double get valor;
+ int get numero; double get valor;
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,16 +379,16 @@ $LancamentoItemDetailsCopyWith<LancamentoItemDetails> get copyWith => _$Lancamen
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetails&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetails&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,numero,centroCusto,categoria,valor);
+int get hashCode => Object.hash(runtimeType,numero,valor);
 
 @override
 String toString() {
-  return 'LancamentoItemDetails(numero: $numero, centroCusto: $centroCusto, categoria: $categoria, valor: $valor)';
+  return 'LancamentoItemDetails(numero: $numero, valor: $valor)';
 }
 
 
@@ -311,11 +399,11 @@ abstract mixin class $LancamentoItemDetailsCopyWith<$Res>  {
   factory $LancamentoItemDetailsCopyWith(LancamentoItemDetails value, $Res Function(LancamentoItemDetails) _then) = _$LancamentoItemDetailsCopyWithImpl;
 @useResult
 $Res call({
- int numero, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
+ int numero, double valor
 });
 
 
-$CentroCustoDetailsCopyWith<$Res> get centroCusto;$CategoriaDetailsCopyWith<$Res> get categoria;
+
 
 }
 /// @nodoc
@@ -328,34 +416,14 @@ class _$LancamentoItemDetailsCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? numero = null,Object? valor = null,}) {
   return _then(_self.copyWith(
 numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
-as int,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
-as CentroCustoDetails,categoria: null == categoria ? _self.categoria : categoria // ignore: cast_nullable_to_non_nullable
-as CategoriaDetails,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
+as int,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }
-/// Create a copy of LancamentoItemDetails
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$CentroCustoDetailsCopyWith<$Res> get centroCusto {
-  
-  return $CentroCustoDetailsCopyWith<$Res>(_self.centroCusto, (value) {
-    return _then(_self.copyWith(centroCusto: value));
-  });
-}/// Create a copy of LancamentoItemDetails
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$CategoriaDetailsCopyWith<$Res> get categoria {
-  
-  return $CategoriaDetailsCopyWith<$Res>(_self.categoria, (value) {
-    return _then(_self.copyWith(categoria: value));
-  });
-}
+
 }
 
 
@@ -373,11 +441,12 @@ extension LancamentoItemDetailsPatterns on LancamentoItemDetails {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _LancamentoItemDetails value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( LancamentoItemDetailsStandard value)?  $default,{TResult Function( LancamentoItemDetailsTransferencia value)?  transferencia,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _LancamentoItemDetails() when $default != null:
-return $default(_that);case _:
+case LancamentoItemDetailsStandard() when $default != null:
+return $default(_that);case LancamentoItemDetailsTransferencia() when transferencia != null:
+return transferencia(_that);case _:
   return orElse();
 
 }
@@ -395,11 +464,12 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _LancamentoItemDetails value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( LancamentoItemDetailsStandard value)  $default,{required TResult Function( LancamentoItemDetailsTransferencia value)  transferencia,}){
 final _that = this;
 switch (_that) {
-case _LancamentoItemDetails():
-return $default(_that);}
+case LancamentoItemDetailsStandard():
+return $default(_that);case LancamentoItemDetailsTransferencia():
+return transferencia(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -413,11 +483,12 @@ return $default(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _LancamentoItemDetails value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( LancamentoItemDetailsStandard value)?  $default,{TResult? Function( LancamentoItemDetailsTransferencia value)?  transferencia,}){
 final _that = this;
 switch (_that) {
-case _LancamentoItemDetails() when $default != null:
-return $default(_that);case _:
+case LancamentoItemDetailsStandard() when $default != null:
+return $default(_that);case LancamentoItemDetailsTransferencia() when transferencia != null:
+return transferencia(_that);case _:
   return null;
 
 }
@@ -434,10 +505,11 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,{TResult Function( int numero,  LancamentoOrigemDetail origemEntrada,  LancamentoOrigemDetail origemSaida,  double valor)?  transferencia,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _LancamentoItemDetails() when $default != null:
-return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case _:
+case LancamentoItemDetailsStandard() when $default != null:
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case LancamentoItemDetailsTransferencia() when transferencia != null:
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);case _:
   return orElse();
 
 }
@@ -455,10 +527,11 @@ return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)  $default,{required TResult Function( int numero,  LancamentoOrigemDetail origemEntrada,  LancamentoOrigemDetail origemSaida,  double valor)  transferencia,}) {final _that = this;
 switch (_that) {
-case _LancamentoItemDetails():
-return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);}
+case LancamentoItemDetailsStandard():
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case LancamentoItemDetailsTransferencia():
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -472,10 +545,11 @@ return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int numero,  CentroCustoDetails centroCusto,  CategoriaDetails categoria,  double valor)?  $default,{TResult? Function( int numero,  LancamentoOrigemDetail origemEntrada,  LancamentoOrigemDetail origemSaida,  double valor)?  transferencia,}) {final _that = this;
 switch (_that) {
-case _LancamentoItemDetails() when $default != null:
-return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case _:
+case LancamentoItemDetailsStandard() when $default != null:
+return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case LancamentoItemDetailsTransferencia() when transferencia != null:
+return transferencia(_that.numero,_that.origemEntrada,_that.origemSaida,_that.valor);case _:
   return null;
 
 }
@@ -486,26 +560,26 @@ return $default(_that.numero,_that.centroCusto,_that.categoria,_that.valor);case
 /// @nodoc
 
 
-class _LancamentoItemDetails implements LancamentoItemDetails {
-  const _LancamentoItemDetails({required this.numero, required this.centroCusto, required this.categoria, required this.valor});
+class LancamentoItemDetailsStandard extends LancamentoItemDetails {
+  const LancamentoItemDetailsStandard({required this.numero, required this.centroCusto, required this.categoria, required this.valor}): super._();
   
 
 @override final  int numero;
-@override final  CentroCustoDetails centroCusto;
-@override final  CategoriaDetails categoria;
+ final  CentroCustoDetails centroCusto;
+ final  CategoriaDetails categoria;
 @override final  double valor;
 
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$LancamentoItemDetailsCopyWith<_LancamentoItemDetails> get copyWith => __$LancamentoItemDetailsCopyWithImpl<_LancamentoItemDetails>(this, _$identity);
+$LancamentoItemDetailsStandardCopyWith<LancamentoItemDetailsStandard> get copyWith => _$LancamentoItemDetailsStandardCopyWithImpl<LancamentoItemDetailsStandard>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LancamentoItemDetails&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetailsStandard&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.centroCusto, centroCusto) || other.centroCusto == centroCusto)&&(identical(other.categoria, categoria) || other.categoria == categoria)&&(identical(other.valor, valor) || other.valor == valor));
 }
 
 
@@ -521,29 +595,29 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class _$LancamentoItemDetailsCopyWith<$Res> implements $LancamentoItemDetailsCopyWith<$Res> {
-  factory _$LancamentoItemDetailsCopyWith(_LancamentoItemDetails value, $Res Function(_LancamentoItemDetails) _then) = __$LancamentoItemDetailsCopyWithImpl;
+abstract mixin class $LancamentoItemDetailsStandardCopyWith<$Res> implements $LancamentoItemDetailsCopyWith<$Res> {
+  factory $LancamentoItemDetailsStandardCopyWith(LancamentoItemDetailsStandard value, $Res Function(LancamentoItemDetailsStandard) _then) = _$LancamentoItemDetailsStandardCopyWithImpl;
 @override @useResult
 $Res call({
  int numero, CentroCustoDetails centroCusto, CategoriaDetails categoria, double valor
 });
 
 
-@override $CentroCustoDetailsCopyWith<$Res> get centroCusto;@override $CategoriaDetailsCopyWith<$Res> get categoria;
+$CentroCustoDetailsCopyWith<$Res> get centroCusto;$CategoriaDetailsCopyWith<$Res> get categoria;
 
 }
 /// @nodoc
-class __$LancamentoItemDetailsCopyWithImpl<$Res>
-    implements _$LancamentoItemDetailsCopyWith<$Res> {
-  __$LancamentoItemDetailsCopyWithImpl(this._self, this._then);
+class _$LancamentoItemDetailsStandardCopyWithImpl<$Res>
+    implements $LancamentoItemDetailsStandardCopyWith<$Res> {
+  _$LancamentoItemDetailsStandardCopyWithImpl(this._self, this._then);
 
-  final _LancamentoItemDetails _self;
-  final $Res Function(_LancamentoItemDetails) _then;
+  final LancamentoItemDetailsStandard _self;
+  final $Res Function(LancamentoItemDetailsStandard) _then;
 
 /// Create a copy of LancamentoItemDetails
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? centroCusto = null,Object? categoria = null,Object? valor = null,}) {
-  return _then(_LancamentoItemDetails(
+  return _then(LancamentoItemDetailsStandard(
 numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
 as int,centroCusto: null == centroCusto ? _self.centroCusto : centroCusto // ignore: cast_nullable_to_non_nullable
 as CentroCustoDetails,categoria: null == categoria ? _self.categoria : categoria // ignore: cast_nullable_to_non_nullable
@@ -569,6 +643,96 @@ $CategoriaDetailsCopyWith<$Res> get categoria {
   
   return $CategoriaDetailsCopyWith<$Res>(_self.categoria, (value) {
     return _then(_self.copyWith(categoria: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class LancamentoItemDetailsTransferencia extends LancamentoItemDetails {
+  const LancamentoItemDetailsTransferencia({required this.numero, required this.origemEntrada, required this.origemSaida, required this.valor}): super._();
+  
+
+@override final  int numero;
+ final  LancamentoOrigemDetail origemEntrada;
+ final  LancamentoOrigemDetail origemSaida;
+@override final  double valor;
+
+/// Create a copy of LancamentoItemDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LancamentoItemDetailsTransferenciaCopyWith<LancamentoItemDetailsTransferencia> get copyWith => _$LancamentoItemDetailsTransferenciaCopyWithImpl<LancamentoItemDetailsTransferencia>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoItemDetailsTransferencia&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.origemEntrada, origemEntrada) || other.origemEntrada == origemEntrada)&&(identical(other.origemSaida, origemSaida) || other.origemSaida == origemSaida)&&(identical(other.valor, valor) || other.valor == valor));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,numero,origemEntrada,origemSaida,valor);
+
+@override
+String toString() {
+  return 'LancamentoItemDetails.transferencia(numero: $numero, origemEntrada: $origemEntrada, origemSaida: $origemSaida, valor: $valor)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LancamentoItemDetailsTransferenciaCopyWith<$Res> implements $LancamentoItemDetailsCopyWith<$Res> {
+  factory $LancamentoItemDetailsTransferenciaCopyWith(LancamentoItemDetailsTransferencia value, $Res Function(LancamentoItemDetailsTransferencia) _then) = _$LancamentoItemDetailsTransferenciaCopyWithImpl;
+@override @useResult
+$Res call({
+ int numero, LancamentoOrigemDetail origemEntrada, LancamentoOrigemDetail origemSaida, double valor
+});
+
+
+$LancamentoOrigemDetailCopyWith<$Res> get origemEntrada;$LancamentoOrigemDetailCopyWith<$Res> get origemSaida;
+
+}
+/// @nodoc
+class _$LancamentoItemDetailsTransferenciaCopyWithImpl<$Res>
+    implements $LancamentoItemDetailsTransferenciaCopyWith<$Res> {
+  _$LancamentoItemDetailsTransferenciaCopyWithImpl(this._self, this._then);
+
+  final LancamentoItemDetailsTransferencia _self;
+  final $Res Function(LancamentoItemDetailsTransferencia) _then;
+
+/// Create a copy of LancamentoItemDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? numero = null,Object? origemEntrada = null,Object? origemSaida = null,Object? valor = null,}) {
+  return _then(LancamentoItemDetailsTransferencia(
+numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,origemEntrada: null == origemEntrada ? _self.origemEntrada : origemEntrada // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigemDetail,origemSaida: null == origemSaida ? _self.origemSaida : origemSaida // ignore: cast_nullable_to_non_nullable
+as LancamentoOrigemDetail,valor: null == valor ? _self.valor : valor // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+/// Create a copy of LancamentoItemDetails
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$LancamentoOrigemDetailCopyWith<$Res> get origemEntrada {
+  
+  return $LancamentoOrigemDetailCopyWith<$Res>(_self.origemEntrada, (value) {
+    return _then(_self.copyWith(origemEntrada: value));
+  });
+}/// Create a copy of LancamentoItemDetails
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$LancamentoOrigemDetailCopyWith<$Res> get origemSaida {
+  
+  return $LancamentoOrigemDetailCopyWith<$Res>(_self.origemSaida, (value) {
+    return _then(_self.copyWith(origemSaida: value));
   });
 }
 }

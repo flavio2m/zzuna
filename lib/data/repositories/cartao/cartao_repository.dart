@@ -53,6 +53,30 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
   }
 
   @override
+  AsyncResult<Unit> createAll(List<CartaoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Cartao(
+            id: dto.id ?? const Uuid().v4(),
+            descricao: dto.descricao,
+            limite: dto.limite,
+            bancoSigla: dto.bancoSigla,
+            ativo: dto.ativo,
+            diaFechamento: dto.diaFechamento,
+            dataInicial: dto.dataInicial ?? DateTime(DateTime.now().year, DateTime.now().month, 1),
+          ),
+        )
+        .toList();
+
+    final result = await _storage.createAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryCreated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<Cartao> update(CartaoDto dto) async {
     final cartao = Cartao(
       id: dto.id!,
@@ -69,13 +93,36 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
   }
 
   @override
+  AsyncResult<Unit> updateAll(List<CartaoDto> dtos) async {
+    final entities = dtos
+        .map(
+          (dto) => Cartao(
+            id: dto.id!,
+            descricao: dto.descricao,
+            limite: dto.limite,
+            bancoSigla: dto.bancoSigla,
+            ativo: dto.ativo,
+            diaFechamento: dto.diaFechamento,
+            dataInicial: dto.dataInicial!,
+          ),
+        )
+        .toList();
+
+    final result = await _storage.updateAll(entities);
+    return result.onSuccess((_) {
+      for (final e in entities) {
+        _streamController.add(RepositoryUpdated(e));
+      }
+    });
+  }
+
+  @override
   AsyncResult<Unit> delete(String id) async {
     return _storage.delete(id).onSuccess((_) {
       _streamController.add(RepositoryDeleted(id));
     });
   }
 
-  @override
   AsyncResult<List<Cartao>> getAll() async {
     return _storage.getAll();
   }

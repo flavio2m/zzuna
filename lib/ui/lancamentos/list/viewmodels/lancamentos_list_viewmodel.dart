@@ -33,6 +33,66 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   LancamentoResumoMensal? resumoMensal;
 
+  final Set<String> _selectedLancamentoIds = {};
+  Set<String> get selectedLancamentoIds => _selectedLancamentoIds;
+
+  void toggleSelection(String id) {
+    if (_selectedLancamentoIds.contains(id)) {
+      _selectedLancamentoIds.remove(id);
+    } else {
+      _selectedLancamentoIds.add(id);
+    }
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedLancamentoIds.clear();
+    notifyListeners();
+  }
+
+  void toggleSelectionForList(List<String> ids, bool select) {
+    if (select) {
+      _selectedLancamentoIds.addAll(ids);
+    } else {
+      _selectedLancamentoIds.removeAll(ids);
+    }
+    notifyListeners();
+  }
+
+  bool get allSelected {
+    final visibleIds = resumoMensal?.dias
+            .expand((dia) => dia.lancamentos)
+            .map((l) => l.id)
+            .toList() ??
+        [];
+    if (visibleIds.isEmpty) return false;
+    return visibleIds.every((id) => _selectedLancamentoIds.contains(id));
+  }
+
+  void selectAll() {
+    final visibleIds = resumoMensal?.dias
+            .expand((dia) => dia.lancamentos)
+            .map((l) => l.id)
+            .toList() ??
+        [];
+    _selectedLancamentoIds.addAll(visibleIds);
+    notifyListeners();
+  }
+
+  void toggleSelectAll() {
+    if (allSelected) {
+      final visibleIds = resumoMensal?.dias
+              .expand((dia) => dia.lancamentos)
+              .map((l) => l.id)
+              .toList() ??
+          [];
+      _selectedLancamentoIds.removeAll(visibleIds);
+    } else {
+      selectAll();
+    }
+    notifyListeners();
+  }
+
   LancamentosListViewModel(
     this._detailsUseCase,
     this._filterUseCase,
@@ -48,22 +108,23 @@ class LancamentosListViewModel extends ChangeNotifier {
   late final loadCommand = Command0(_load);
 
   AsyncResult<LancamentoResumoMensal> _load() async {
-    try {
-      final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
-      final ano = _currentFilter.ano ?? DateTime.now().year;
+    _selectedLancamentoIds.clear(); // Clear selection when period loads/changes
 
-      final extratoResult = await _extratoFaturaRepository.search(
-        ExtratoFaturaFilterDto(mes: mes, ano: ano), //
-      );
-      _currentExtratos = extratoResult.getOrElse((_) => []);
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
 
-      final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
-      _allLancamentos = allDetails;
-      _applyFilter();
-      return Success(resumoMensal!);
-    } catch (e) {
-      return Failure(Exception('Erro ao carregar lançamentos: $e'));
+    final extratoResult = await _extratoFaturaRepository.search(
+      ExtratoFaturaFilterDto(mes: mes, ano: ano), //
+    );
+    if (extratoResult.isError()) {
+      return Failure(extratoResult.exceptionOrNull()!);
     }
+    _currentExtratos = extratoResult.getOrThrow();
+
+    final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
+    _allLancamentos = allDetails;
+    _applyFilter();
+    return Success(resumoMensal!);
   }
 
   void _applyFilter() {

@@ -10,6 +10,8 @@ class TransactionDayHeader extends StatelessWidget {
     required this.extractBalance,
     this.positive = false,
     this.positiveExtract = false,
+    this.selected = false,
+    this.onSelectAll,
   });
 
   final String date;
@@ -17,6 +19,8 @@ class TransactionDayHeader extends StatelessWidget {
   final String extractBalance;
   final bool positive;
   final bool positiveExtract;
+  final bool selected;
+  final VoidCallback? onSelectAll;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +33,26 @@ class TransactionDayHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.check_box_outline_blank, size: 16, color: AppColors.slate300),
+          GestureDetector(
+            onTap: onSelectAll,
+            child: Container(
+              color: Colors.transparent, // Amplia a área de toque
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                selected ? Icons.check_box : Icons.check_box_outline_blank,
+                size: 16,
+                color: selected ? AppColors.primary : AppColors.slate300, //
+              ),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
-            child: AppText(date, variant: AppTextVariant.body, color: AppColors.slate800, fontWeight: FontWeight.w800),
+            child: AppText(
+              date,
+              variant: AppTextVariant.body,
+              color: AppColors.slate800,
+              fontWeight: FontWeight.w800, //
+            ),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,

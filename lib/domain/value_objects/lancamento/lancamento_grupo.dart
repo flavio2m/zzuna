@@ -16,7 +16,9 @@ sealed class LancamentoGrupo with _$LancamentoGrupo {
   }) = LancamentoGrupoTransferencia;
 
   const factory LancamentoGrupo.replicacao({
-    required String grupoId, //
+    required String grupoId,
+    required int parcela,
+    required int totalParcelas,
   }) = LancamentoGrupoReplicacao;
 
   factory LancamentoGrupo.fromJson(
