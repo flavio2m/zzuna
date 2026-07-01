@@ -8,7 +8,8 @@ enum TipoAcoes {
   editar,
   alterarMetadata,
   alterarDataGrupo,
-  alterarValorGrupo;
+  alterarValorGrupo,
+  alterarOrigemGrupo;
 
   String get label => switch (this) {
     TipoAcoes.visualizar => 'Visualizar',
@@ -16,6 +17,7 @@ enum TipoAcoes {
     TipoAcoes.alterarMetadata => 'Alterar Descrição em Lote',
     TipoAcoes.alterarDataGrupo => 'Alterar Data em Lote',
     TipoAcoes.alterarValorGrupo => 'Alterar Valor em Lote',
+    TipoAcoes.alterarOrigemGrupo => 'Alterar Conta/Cartão em Lote',
   };
 }
 
@@ -28,6 +30,7 @@ class IconAcoesButton extends StatelessWidget {
   final VoidCallback? onUpdateMetadata;
   final VoidCallback? onUpdateDataGrupo;
   final VoidCallback? onUpdateValorGrupo;
+  final VoidCallback? onUpdateOrigemGrupo;
 
   const IconAcoesButton({
     super.key,
@@ -39,6 +42,7 @@ class IconAcoesButton extends StatelessWidget {
     this.onUpdateMetadata,
     this.onUpdateDataGrupo,
     this.onUpdateValorGrupo,
+    this.onUpdateOrigemGrupo,
   });
 
   @override
@@ -73,6 +77,8 @@ class IconAcoesButton extends StatelessWidget {
             onUpdateDataGrupo?.call();
           case TipoAcoes.alterarValorGrupo:
             onUpdateValorGrupo?.call();
+          case TipoAcoes.alterarOrigemGrupo:
+            onUpdateOrigemGrupo?.call();
         }
       },
       itemBuilder: (context) => [
@@ -202,6 +208,28 @@ class IconAcoesButton extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     TipoAcoes.alterarValorGrupo.label,
+                    style: const TextStyle(
+                      color: AppColors.slate700,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<TipoAcoes>(
+              value: TipoAcoes.alterarOrigemGrupo,
+              height: 36,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.account_balance_wallet_outlined,
+                    size: 16,
+                    color: AppColors.slate600,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    TipoAcoes.alterarOrigemGrupo.label,
                     style: const TextStyle(
                       color: AppColors.slate700,
                       fontSize: 13,

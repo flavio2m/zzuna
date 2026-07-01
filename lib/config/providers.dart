@@ -68,6 +68,8 @@ import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_metadata_use
 import 'package:zzuna/ui/lancamentos/update_metadata/viewmodels/lancamento_update_metadata_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_itens_grupo_usecase.dart';
 import 'package:zzuna/ui/lancamentos/update_valor_grupo/viewmodels/lancamentos_update_valor_grupo_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_origem_grupo_usecase.dart';
+import 'package:zzuna/ui/lancamentos/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
@@ -295,6 +297,23 @@ final lancamentosUpdateValorGrupoViewModelProvider = ChangeNotifierProvider<Lanc
     ref.watch(categoriaTreeUseCaseProvider),
     ref.watch(centroCustoRepositoryProvider),
     ref.watch(categoriaRepositoryProvider),
+  ),
+);
+
+final updateLancamentosOrigemGrupoUseCaseProvider = Provider<UpdateLancamentosOrigemGrupoUseCase>((ref) {
+  return UpdateLancamentosOrigemGrupoUseCase(
+    ref.watch(resolveExtratoFaturaUseCaseProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+  );
+});
+
+final lancamentosUpdateOrigemGrupoViewModelProvider = ChangeNotifierProvider<LancamentosUpdateOrigemGrupoViewModel>(
+  (ref) => LancamentosUpdateOrigemGrupoViewModel(
+    ref.watch(updateLancamentosOrigemGrupoUseCaseProvider),
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
   ),
 );
 

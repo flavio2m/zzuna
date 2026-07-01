@@ -563,6 +563,7 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Implementar Transferência de lançamentos. |
 | OK | Alterar descrição e observação para aplicar automaticamente ao grupo de lançamentos (parcelamento, replicação e transferência). |
 | OK | Alterar data para todo o grupo de lançamentos. |
-| ☐ | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
+| OK | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
+| OK | Alterar Conta/Cartão para todo o grupo de lançamentos. |
 | ☐ | Implementar Lançamentos por Recorrência. |
 ```
