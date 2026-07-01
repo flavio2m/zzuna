@@ -6,6 +6,8 @@ import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/update_data/widgets/lancamentos_update_data_button.dart';
 import 'package:zzuna/ui/lancamentos/update_data/widgets/lancamentos_update_data_modal.dart';
+import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_button.dart';
+import 'package:zzuna/ui/lancamentos/update_origem/widgets/lancamentos_update_origem_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 
@@ -74,6 +76,16 @@ class TransactionsActionsBar extends ConsumerWidget {
             LancamentosUpdateDataButton(
               onPressed: () {
                 LancamentosUpdateDataModal.show(
+                  context: context,
+                  selectedIds: selectedIds,
+                  onSuccess: onClearSelection,
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+            LancamentosUpdateOrigemButton(
+              onPressed: () {
+                LancamentosUpdateOrigemModal.show(
                   context: context,
                   selectedIds: selectedIds,
                   onSuccess: onClearSelection,

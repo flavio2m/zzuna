@@ -15,6 +15,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_date_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -52,6 +53,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
       bancoSigla: widget.cartao.bancoSigla,
       ativo: widget.cartao.ativo,
       diaFechamento: widget.cartao.diaFechamento,
+      dataInicial: widget.cartao.dataInicial,
     );
 
     viewModel = ref.read(cartaoUpdateViewModelProvider);
@@ -103,7 +105,11 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
         ListenableBuilder(
           listenable: viewModel.updateCommand,
           builder: (_, _) {
-            return ButtonSave(onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
+            return ButtonSave(
+              onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
+            );
           },
         ),
       ],
@@ -127,10 +133,15 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
               Expanded(
                 child: AppCurrencyFormField(
                   label: 'Limite',
-                  initialValue: UtilBrasilFields.obterReal(dto.limite, moeda: true),
+                  initialValue: UtilBrasilFields.obterReal(
+                    dto.limite,
+                    moeda: true,
+                  ),
                   onChanged: (value) {
                     if (value.isNotEmpty) {
-                      final valor = UtilBrasilFields.converterMoedaParaDouble(value);
+                      final valor = UtilBrasilFields.converterMoedaParaDouble(
+                        value,
+                      );
                       dto.setLimite(valor);
                     } else {
                       dto.setLimite(0);
@@ -177,6 +188,18 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
               dto.setAtivo(value);
 
               setState(() {});
+            },
+          ),
+
+          const AppSpacing(size: AppSpacingSize.md),
+
+          AppDateFormField(
+            label: 'Data Inicial',
+            initialValue: dto.dataInicial != null
+                ? UtilData.obterDataDDMMAAAA(dto.dataInicial!)
+                : '',
+            onDateSelected: (date) {
+              dto.setDataInicial(date);
             },
           ),
         ],

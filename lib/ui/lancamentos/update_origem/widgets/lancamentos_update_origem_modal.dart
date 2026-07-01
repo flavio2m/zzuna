@@ -2,73 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update_origem/viewmodels/lancamentos_update_origem_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
-class LancamentosUpdateOrigemGrupoModal extends ConsumerStatefulWidget {
-  final String lancamentoId;
-  final LancamentoOrigem currentOrigem;
+class LancamentosUpdateOrigemModal extends ConsumerStatefulWidget {
+  final List<String> selectedIds;
   final VoidCallback? onSuccess;
 
-  const LancamentosUpdateOrigemGrupoModal({
+  const LancamentosUpdateOrigemModal({
     super.key,
-    required this.lancamentoId,
-    required this.currentOrigem,
+    required this.selectedIds,
     this.onSuccess,
   });
 
   static void show({
     required BuildContext context,
-    required String lancamentoId,
-    required LancamentoOrigem currentOrigem,
+    required List<String> selectedIds,
     VoidCallback? onSuccess,
   }) {
     AppDialog.show(
       context: context,
-      child: LancamentosUpdateOrigemGrupoModal(
-        lancamentoId: lancamentoId,
-        currentOrigem: currentOrigem,
+      child: LancamentosUpdateOrigemModal(
+        selectedIds: selectedIds,
         onSuccess: onSuccess,
       ),
     );
   }
 
   @override
-  ConsumerState<LancamentosUpdateOrigemGrupoModal> createState() =>
-      _LancamentosUpdateOrigemGrupoModalState();
+  ConsumerState<LancamentosUpdateOrigemModal> createState() =>
+      _LancamentosUpdateOrigemModalState();
 }
 
-class _LancamentosUpdateOrigemGrupoModalState
-    extends ConsumerState<LancamentosUpdateOrigemGrupoModal> {
-  late final LancamentosUpdateOrigemGrupoViewModel _viewModel;
+class _LancamentosUpdateOrigemModalState
+    extends ConsumerState<LancamentosUpdateOrigemModal> {
+  late final LancamentosUpdateOrigemViewModel _viewModel;
   bool _isExecuting = false;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = ref.read(lancamentosUpdateOrigemGrupoViewModelProvider);
-    _viewModel.updateOrigemGrupoCommand.addListener(_commandListener);
+    _viewModel = ref.read(lancamentosUpdateOrigemViewModelProvider);
+    _viewModel.updateOrigemSelectedCommand.addListener(_commandListener);
     _viewModel.load();
   }
 
   @override
   void dispose() {
-    _viewModel.updateOrigemGrupoCommand.removeListener(_commandListener);
+    _viewModel.updateOrigemSelectedCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final commandValue = _viewModel.updateOrigemGrupoCommand.value;
+    final commandValue = _viewModel.updateOrigemSelectedCommand.value;
 
     commandValue.onSuccess((_) {
       if (_isExecuting) {
         _isExecuting = false;
         AppSnackBar.showSuccess(
           context,
-          'Conta/Cartão dos lançamentos do grupo alterados com sucesso',
+          'Conta/Cartão dos lançamentos alterados com sucesso',
         );
         widget.onSuccess?.call();
         Navigator.pop(context);
@@ -87,8 +83,8 @@ class _LancamentosUpdateOrigemGrupoModalState
     setState(() {
       _isExecuting = true;
     });
-    _viewModel.updateOrigemGrupoCommand.execute((
-      lancamentoId: widget.lancamentoId,
+    _viewModel.updateOrigemSelectedCommand.execute((
+      lancamentoIds: widget.selectedIds,
       novaOrigem: novaOrigem,
     ));
   }
@@ -98,15 +94,14 @@ class _LancamentosUpdateOrigemGrupoModalState
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final isRunning = _viewModel.updateOrigemGrupoCommand.value.isRunning;
+        final isRunning = _viewModel.updateOrigemSelectedCommand.value.isRunning;
         final isLoading = isRunning && _isExecuting;
 
         return LancamentosUpdateOrigemDialog(
-          title: 'Alterar Conta/Cartão do Grupo',
-          subtitle:
-              'Escolha a nova conta ou cartão para os lançamentos do grupo a partir deste mês:',
+          title: 'Alterar Conta/Cartão',
+          subtitle: 'Escolha a nova conta ou cartão para os lançamentos selecionados:',
           origens: _viewModel.origens,
-          initialOrigem: widget.currentOrigem,
+          initialOrigem: const LancamentoOrigem.conta(contaId: ''),
           isLoading: isLoading,
           onSave: _handleSubmit,
         );

@@ -1,3 +1,4 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
@@ -14,6 +15,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_date_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -46,6 +48,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
       descricao: widget.conta.descricao,
       bancoSigla: widget.conta.bancoSigla,
       ativo: widget.conta.ativo,
+      dataInicial: widget.conta.dataInicial,
     );
     viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
@@ -133,6 +136,14 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
             onChanged: (value) {
               dto.setAtivo(value);
               setState(() {});
+            },
+          ),
+          const AppSpacing(size: AppSpacingSize.md),
+          AppDateFormField(
+            label: 'Data Inicial',
+            initialValue: UtilData.obterDataDDMMAAAA(dto.dataInicial),
+            onDateSelected: (date) {
+              dto.setDataInicial(date);
             },
           ),
         ],

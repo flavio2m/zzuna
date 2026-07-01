@@ -554,6 +554,8 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | ☐ | Substituir o seletor de **Despesa/Receita/Investimento/Transferência** por um componente mais intuitivo. |
 | ☐ | Implementar navegação entre campos do formulário ao pressionar **Enter** (FocusNode / nextFocus). |
 | ☐ | Ao fazer um novo lançamento, se tiver marcado uma única Conta ou um único Cartão, deve preencher esse campo automaticamente no formulário. |
+| ☐ | Refatorar as views que utilizam Dropdown Conta/Cartão para utilizar um useCase para load(). |
+
 
 ---
 
@@ -565,5 +567,6 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Alterar data para todo o grupo de lançamentos. |
 | OK | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
 | OK | Alterar Conta/Cartão para todo o grupo de lançamentos. |
+| OK | Alterar Conta/Cartão para todos os lançamentos selecionados. |
 | ☐ | Implementar Lançamentos por Recorrência. |
 ```
