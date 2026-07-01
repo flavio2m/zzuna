@@ -7,13 +7,15 @@ enum TipoAcoes {
   visualizar,
   editar,
   alterarMetadata,
-  alterarDataGrupo;
+  alterarDataGrupo,
+  alterarValorGrupo;
 
   String get label => switch (this) {
     TipoAcoes.visualizar => 'Visualizar',
     TipoAcoes.editar => 'Editar',
-    TipoAcoes.alterarMetadata => 'Alterar Descrição/Obs em Lote',
+    TipoAcoes.alterarMetadata => 'Alterar Descrição em Lote',
     TipoAcoes.alterarDataGrupo => 'Alterar Data em Lote',
+    TipoAcoes.alterarValorGrupo => 'Alterar Valor em Lote',
   };
 }
 
@@ -25,6 +27,7 @@ class IconAcoesButton extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onUpdateMetadata;
   final VoidCallback? onUpdateDataGrupo;
+  final VoidCallback? onUpdateValorGrupo;
 
   const IconAcoesButton({
     super.key,
@@ -35,6 +38,7 @@ class IconAcoesButton extends StatelessWidget {
     this.onEdit,
     this.onUpdateMetadata,
     this.onUpdateDataGrupo,
+    this.onUpdateValorGrupo,
   });
 
   @override
@@ -67,6 +71,8 @@ class IconAcoesButton extends StatelessWidget {
             onUpdateMetadata?.call();
           case TipoAcoes.alterarDataGrupo:
             onUpdateDataGrupo?.call();
+          case TipoAcoes.alterarValorGrupo:
+            onUpdateValorGrupo?.call();
         }
       },
       itemBuilder: (context) => [
@@ -174,6 +180,28 @@ class IconAcoesButton extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     TipoAcoes.alterarDataGrupo.label,
+                    style: const TextStyle(
+                      color: AppColors.slate700,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<TipoAcoes>(
+              value: TipoAcoes.alterarValorGrupo,
+              height: 36,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.list_alt_outlined,
+                    size: 16,
+                    color: AppColors.slate600,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    TipoAcoes.alterarValorGrupo.label,
                     style: const TextStyle(
                       color: AppColors.slate700,
                       fontSize: 13,

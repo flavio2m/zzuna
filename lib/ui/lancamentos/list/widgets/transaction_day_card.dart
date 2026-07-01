@@ -19,6 +19,8 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
 import 'package:zzuna/ui/lancamentos/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
+import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
@@ -136,6 +138,13 @@ class TransactionDayCard extends StatelessWidget {
             LancamentosUpdateDataGrupoModal.show(
               context: context,
               lancamentoId: l.id,
+            );
+          },
+          onUpdateValorGrupo: () {
+            LancamentosUpdateValorGrupoModal.show(
+              context: context,
+              lancamentoId: l.id,
+              initialItens: LancamentoDto.fromDetails(l).itens,
             );
           },
         );
