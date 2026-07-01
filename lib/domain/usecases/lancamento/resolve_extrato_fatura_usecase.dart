@@ -1,3 +1,4 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
@@ -25,17 +26,21 @@ class ResolveExtratoFaturaUseCase {
     final origem = dto.origem;
 
     // 1. Localizar Conta/Cartão e obter dataInicial
-    final dataInicialRes = await _getDataInicial(origem);
-    if (dataInicialRes.isError()) {
-      return Failure(dataInicialRes.exceptionOrNull()!);
+    final infoRes = await _getDataInicial(origem);
+    if (infoRes.isError()) {
+      return Failure(infoRes.exceptionOrNull()!);
     }
-    final dataInicial = dataInicialRes.getOrThrow();
+    final info = infoRes.getOrThrow();
+    final dataInicial = info.dataInicial;
 
     final targetMonth = DateTime(dto.data.year, dto.data.month, 1);
     if (targetMonth.isBefore(dataInicial)) {
+      final dateStr = UtilData.obterDataDDMMAAAA(dto.data);
+      final dataInicialStr = UtilData.obterDataDDMMAAAA(dataInicial);
       return Failure(
         DomainException(
-          'Data do lançamento não pode ser anterior à data inicial do cartão/conta', //
+          'A data do lançamento ($dateStr) não pode ser anterior à data '
+          'inicial ($dataInicialStr) do(a) "${info.nomeOrigem}".',
         ),
       );
     }
@@ -74,14 +79,24 @@ class ResolveExtratoFaturaUseCase {
         );
       }
       final List<ExtratoFatura> prevExtratos = prevRes.getOrThrow();
-      final saldoInicial = prevExtratos.isEmpty ? 0.0 : prevExtratos.first.saldoFinal;
+      final saldoInicial = prevExtratos.isEmpty
+          ? 0.0
+          : prevExtratos.first.saldoFinal;
 
       final newExtratoDto = ExtratoFaturaDto(
         origem: origem,
         ano: dto.data.year,
         mes: mes,
         dataInicio: DateTime(dto.data.year, dto.data.month, 1),
-        dataFim: DateTime(dto.data.year, dto.data.month + 1, 0, 23, 59, 59, 999),
+        dataFim: DateTime(
+          dto.data.year,
+          dto.data.month + 1,
+          0,
+          23,
+          59,
+          59,
+          999,
+        ),
         saldoInicial: saldoInicial,
         saldoFinal: saldoInicial,
         fechado: false,
@@ -115,7 +130,8 @@ class ResolveExtratoFaturaUseCase {
     // 6. Atualizar o saldoFinal do mês do lançamento (em memória)
     final updatedAlvo = _updateSaldoFinal(extratoAlvo, delta);
 
-    // 7. Propagar esse mesmo delta para todos os extratos posteriores da mesma origem (em memória)
+    // 7. Propagar esse mesmo delta para todos os extratos posteriores da
+    // mesma origem (em memória)
     final propagatedRes = await _propagateDelta(origem, targetMonth, delta);
     if (propagatedRes.isError()) {
       return Failure(propagatedRes.exceptionOrNull()!);
@@ -141,24 +157,38 @@ class ResolveExtratoFaturaUseCase {
     return Success(updatedAlvo);
   }
 
-  Future<Result<DateTime>> _getDataInicial(LancamentoOrigem origem) async {
+  Future<Result<({DateTime dataInicial, String nomeOrigem})>> _getDataInicial(
+    LancamentoOrigem origem,
+  ) async {
     DateTime dataInicial;
+    String nomeOrigem;
     if (origem is LancamentoOrigemConta) {
       final contaRes = await _contaRepository.getById(origem.contaId);
       if (contaRes.isError()) {
-        return Failure(DomainException('Conta não encontrada: ${origem.contaId}'));
+        return Failure(
+          DomainException('Conta não encontrada: ${origem.contaId}'),
+        );
       }
-      dataInicial = contaRes.getOrThrow().dataInicial;
+      final conta = contaRes.getOrThrow();
+      dataInicial = conta.dataInicial;
+      nomeOrigem = conta.descricao;
     } else if (origem is LancamentoOrigemCartao) {
       final cartaoRes = await _cartaoRepository.getById(origem.cartaoId);
       if (cartaoRes.isError()) {
-        return Failure(DomainException('Cartão não encontrado: ${origem.cartaoId}'));
+        return Failure(
+          DomainException('Cartão não encontrado: ${origem.cartaoId}'),
+        );
       }
-      dataInicial = cartaoRes.getOrThrow().dataInicial;
+      final cartao = cartaoRes.getOrThrow();
+      dataInicial = cartao.dataInicial;
+      nomeOrigem = cartao.descricao;
     } else {
       return Failure(DomainException('Origem de lançamento desconhecida'));
     }
-    return Success(DateTime(dataInicial.year, dataInicial.month, 1));
+    return Success((
+      dataInicial: DateTime(dataInicial.year, dataInicial.month, 1),
+      nomeOrigem: nomeOrigem,
+    ));
   }
 
   double _calculateDelta(LancamentoTipo tipo, double valor) {

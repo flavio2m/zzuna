@@ -24,6 +24,7 @@ class TransactionRow extends StatelessWidget {
     this.onEdit,
     this.onSelect,
     this.onUpdateMetadata,
+    this.onUpdateDataGrupo,
   });
 
   final String description;
@@ -42,6 +43,7 @@ class TransactionRow extends StatelessWidget {
   final VoidCallback? onEdit;
   final ValueChanged<bool>? onSelect;
   final VoidCallback? onUpdateMetadata;
+  final VoidCallback? onUpdateDataGrupo;
 
   @override
   Widget build(BuildContext context) {
@@ -233,6 +235,7 @@ class TransactionRow extends StatelessWidget {
               onView: onView ?? onTap,
               onEdit: onEdit,
               onUpdateMetadata: onUpdateMetadata,
+              onUpdateDataGrupo: onUpdateDataGrupo,
             ),
           ],
         ),

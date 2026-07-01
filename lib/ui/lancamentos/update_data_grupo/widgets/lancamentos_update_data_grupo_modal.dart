@@ -6,61 +6,61 @@ import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
-class LancamentosUpdateDataModal extends ConsumerStatefulWidget {
-  final List<String> selectedIds;
+class LancamentosUpdateDataGrupoModal extends ConsumerStatefulWidget {
+  final String lancamentoId;
   final VoidCallback? onSuccess;
 
-  const LancamentosUpdateDataModal({
+  const LancamentosUpdateDataGrupoModal({
     super.key,
-    required this.selectedIds,
+    required this.lancamentoId,
     this.onSuccess,
   });
 
   static void show({
     required BuildContext context,
-    required List<String> selectedIds,
+    required String lancamentoId,
     VoidCallback? onSuccess,
   }) {
     AppDialog.show(
       context: context,
-      child: LancamentosUpdateDataModal(
-        selectedIds: selectedIds,
+      child: LancamentosUpdateDataGrupoModal(
+        lancamentoId: lancamentoId,
         onSuccess: onSuccess,
       ),
     );
   }
 
   @override
-  ConsumerState<LancamentosUpdateDataModal> createState() =>
-      _LancamentosUpdateDataModalState();
+  ConsumerState<LancamentosUpdateDataGrupoModal> createState() =>
+      _LancamentosUpdateDataGrupoModalState();
 }
 
-class _LancamentosUpdateDataModalState
-    extends ConsumerState<LancamentosUpdateDataModal> {
+class _LancamentosUpdateDataGrupoModalState
+    extends ConsumerState<LancamentosUpdateDataGrupoModal> {
   bool _isExecuting = false;
 
-  late final _viewModel = ref.read(lancamentoUpdateDataViewModelProvider);
+  late final _viewModel = ref.read(lancamentosUpdateDataGrupoViewModelProvider);
 
   @override
   void initState() {
     super.initState();
-    _viewModel.updateDataCommand.addListener(_commandListener);
+    _viewModel.updateDataGrupoCommand.addListener(_commandListener);
   }
 
   @override
   void dispose() {
-    _viewModel.updateDataCommand.removeListener(_commandListener);
+    _viewModel.updateDataGrupoCommand.removeListener(_commandListener);
     super.dispose();
   }
 
   void _commandListener() {
-    final commandValue = _viewModel.updateDataCommand.value;
+    final commandValue = _viewModel.updateDataGrupoCommand.value;
     commandValue.onSuccess((_) {
       if (_isExecuting) {
         _isExecuting = false;
         AppSnackBar.showSuccess(
           context,
-          'Data dos lançamentos alterada com sucesso',
+          'Data dos lançamentos do grupo alterada com sucesso',
         );
         widget.onSuccess?.call();
         Navigator.of(context).pop();
@@ -79,8 +79,8 @@ class _LancamentosUpdateDataModalState
     setState(() {
       _isExecuting = true;
     });
-    _viewModel.updateDataCommand.execute((
-      ids: widget.selectedIds,
+    _viewModel.updateDataGrupoCommand.execute((
+      lancamentoId: widget.lancamentoId,
       novaData: selectedData,
     ));
   }
@@ -88,14 +88,14 @@ class _LancamentosUpdateDataModalState
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _viewModel.updateDataCommand,
+      listenable: _viewModel.updateDataGrupoCommand,
       builder: (context, _) {
-        final isRunning = _viewModel.updateDataCommand.value.isRunning;
+        final isRunning = _viewModel.updateDataGrupoCommand.value.isRunning;
         final isLoading = isRunning && _isExecuting;
 
         return LancamentoUpdateDataBaseModal(
-          title: 'Alterar Data',
-          description: 'Escolha a nova data para os lançamentos selecionados:',
+          title: 'Alterar Data em Lote',
+          description: 'Escolha a nova data para os lançamentos do grupo:',
           isExecuting: isLoading,
           onSave: _handleSave,
         );

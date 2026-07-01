@@ -3,6 +3,20 @@ import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
+enum TipoAcoes {
+  visualizar,
+  editar,
+  alterarMetadata,
+  alterarDataGrupo;
+
+  String get label => switch (this) {
+    TipoAcoes.visualizar => 'Visualizar',
+    TipoAcoes.editar => 'Editar',
+    TipoAcoes.alterarMetadata => 'Alterar Descrição/Obs em Lote',
+    TipoAcoes.alterarDataGrupo => 'Alterar Data em Lote',
+  };
+}
+
 class IconAcoesButton extends StatelessWidget {
   final bool conciliado;
   final LancamentoGrupo? grupo;
@@ -10,6 +24,7 @@ class IconAcoesButton extends StatelessWidget {
   final VoidCallback? onView;
   final VoidCallback? onEdit;
   final VoidCallback? onUpdateMetadata;
+  final VoidCallback? onUpdateDataGrupo;
 
   const IconAcoesButton({
     super.key,
@@ -19,13 +34,17 @@ class IconAcoesButton extends StatelessWidget {
     this.onView,
     this.onEdit,
     this.onUpdateMetadata,
+    this.onUpdateDataGrupo,
   });
 
   @override
   Widget build(BuildContext context) {
-    final showUpdateMetadata = !conciliado && grupo?.grupoId != null && tipo != LancamentoTipo.transferencia;
+    final showUpdateMetadata =
+        !conciliado &&
+        grupo?.grupoId != null &&
+        tipo != LancamentoTipo.transferencia;
 
-    return PopupMenuButton<String>(
+    return PopupMenuButton<TipoAcoes>(
       tooltip: 'Ações',
       icon: const Icon(
         Icons.more_vert_rounded,
@@ -39,30 +58,33 @@ class IconAcoesButton extends StatelessWidget {
       ),
       elevation: 3,
       onSelected: (value) {
-        if (value == 'visualizar') {
-          onView?.call();
-        } else if (value == 'editar') {
-          onEdit?.call();
-        } else if (value == 'alterar_grupo') {
-          onUpdateMetadata?.call();
+        switch (value) {
+          case TipoAcoes.visualizar:
+            onView?.call();
+          case TipoAcoes.editar:
+            onEdit?.call();
+          case TipoAcoes.alterarMetadata:
+            onUpdateMetadata?.call();
+          case TipoAcoes.alterarDataGrupo:
+            onUpdateDataGrupo?.call();
         }
       },
       itemBuilder: (context) => [
         if (conciliado) ...[
-          const PopupMenuItem<String>(
-            value: 'visualizar',
+          PopupMenuItem<TipoAcoes>(
+            value: TipoAcoes.visualizar,
             height: 36,
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.visibility_outlined,
                   size: 16,
                   color: AppColors.slate600,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Visualizar',
-                  style: TextStyle(
+                  TipoAcoes.visualizar.label,
+                  style: const TextStyle(
                     color: AppColors.slate700,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -72,16 +94,20 @@ class IconAcoesButton extends StatelessWidget {
             ),
           ),
         ] else ...[
-          const PopupMenuItem<String>(
-            value: 'editar',
+          PopupMenuItem<TipoAcoes>(
+            value: TipoAcoes.editar,
             height: 36,
             child: Row(
               children: [
-                Icon(Icons.edit_outlined, size: 16, color: AppColors.slate600),
-                SizedBox(width: 8),
+                const Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                  color: AppColors.slate600,
+                ),
+                const SizedBox(width: 8),
                 Text(
-                  'Editar',
-                  style: TextStyle(
+                  TipoAcoes.editar.label,
+                  style: const TextStyle(
                     color: AppColors.slate700,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -90,20 +116,20 @@ class IconAcoesButton extends StatelessWidget {
               ],
             ),
           ),
-          const PopupMenuItem<String>(
-            value: 'visualizar',
+          PopupMenuItem<TipoAcoes>(
+            value: TipoAcoes.visualizar,
             height: 36,
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.visibility_outlined,
                   size: 16,
                   color: AppColors.slate600,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Visualizar',
-                  style: TextStyle(
+                  TipoAcoes.visualizar.label,
+                  style: const TextStyle(
                     color: AppColors.slate700,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -112,21 +138,21 @@ class IconAcoesButton extends StatelessWidget {
               ],
             ),
           ),
-          if (showUpdateMetadata)
-            const PopupMenuItem<String>(
-              value: 'alterar_grupo',
+          if (showUpdateMetadata) ...[
+            PopupMenuItem<TipoAcoes>(
+              value: TipoAcoes.alterarMetadata,
               height: 36,
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.description_outlined,
                     size: 16,
                     color: AppColors.slate600,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'Alterar Descrição/Obs',
-                    style: TextStyle(
+                    TipoAcoes.alterarMetadata.label,
+                    style: const TextStyle(
                       color: AppColors.slate700,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -135,6 +161,29 @@ class IconAcoesButton extends StatelessWidget {
                 ],
               ),
             ),
+            PopupMenuItem<TipoAcoes>(
+              value: TipoAcoes.alterarDataGrupo,
+              height: 36,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.date_range_outlined,
+                    size: 16,
+                    color: AppColors.slate600,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    TipoAcoes.alterarDataGrupo.label,
+                    style: const TextStyle(
+                      color: AppColors.slate700,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ],
     );

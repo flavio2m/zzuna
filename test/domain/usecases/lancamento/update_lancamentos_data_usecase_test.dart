@@ -286,7 +286,7 @@ void main() {
       expect(res.isError(), isTrue);
       expect(
         res.exceptionOrNull()!.toString(),
-        contains('Data do lançamento não pode ser anterior à data inicial do cartão/conta'),
+        contains('não pode ser anterior à data inicial'),
       );
     });
 

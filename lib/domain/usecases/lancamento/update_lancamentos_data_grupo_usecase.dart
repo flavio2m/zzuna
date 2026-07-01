@@ -2,7 +2,7 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
-import '../../../data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
@@ -13,7 +13,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'recalculate_extrato_fatura_balance_usecase.dart';
 import 'resolve_extrato_fatura_usecase.dart';
 
-class UpdateLancamentosDataUseCase {
+class UpdateLancamentosDataGrupoUseCase {
   final ResolveExtratoFaturaUseCase _resolveUseCase;
   final RecalculateExtratoFaturaBalanceUseCase _recalculateUseCase;
   final LancamentoRepository _repository;
@@ -21,7 +21,7 @@ class UpdateLancamentosDataUseCase {
   final ContaRepository _contaRepository;
   final CartaoRepository _cartaoRepository;
 
-  UpdateLancamentosDataUseCase(
+  UpdateLancamentosDataGrupoUseCase(
     this._resolveUseCase,
     this._recalculateUseCase,
     this._repository,
@@ -30,47 +30,68 @@ class UpdateLancamentosDataUseCase {
     this._cartaoRepository,
   );
 
+  int _getMonthDifference(DateTime d1, DateTime d2) {
+    return (d1.year - d2.year) * 12 + d1.month - d2.month;
+  }
+
+  DateTime _addMonthsAndClampDay(DateTime baseDate, int monthsToAdd) {
+    int targetYear = baseDate.year;
+    int targetMonth = baseDate.month + monthsToAdd;
+
+    final firstOfDay = DateTime(targetYear, targetMonth, 1);
+    final actualYear = firstOfDay.year;
+    final actualMonth = firstOfDay.month;
+
+    final lastDayOfMonth = DateTime(actualYear, actualMonth + 1, 0).day;
+
+    int actualDay = baseDate.day;
+    if (actualDay > lastDayOfMonth) {
+      actualDay = lastDayOfMonth;
+    }
+
+    return DateTime(
+      actualYear,
+      actualMonth,
+      actualDay,
+      baseDate.hour,
+      baseDate.minute,
+      baseDate.second,
+    );
+  }
+
   AsyncResult<Unit> execute({
-    required List<String> ids,
+    required String lancamentoId,
     required DateTime novaData,
   }) async {
-    if (ids.isEmpty) {
-      return const Success(unit);
+    // 1. Buscar lançamento de referência
+    final refRes = await _repository.getById(lancamentoId);
+    if (refRes.isError()) {
+      return Failure(
+        DomainException('Lançamento com ID $lancamentoId não encontrado.'),
+      );
     }
+    final refLaunch = refRes.getOrThrow();
 
-    // 1. Carregar todos os lançamentos originais e seus companheiros de transferência
-    final Map<String, Lancamento> uniqueLancamentos = {};
-    for (final id in ids) {
-      final res = await _repository.getById(id);
-      if (res.isError()) {
-        return Failure(
-          DomainException('Lançamento com ID $id não encontrado.'),
-        );
+    final grupoId = refLaunch.grupo?.grupoId;
+    List<Lancamento> targetLaunches = [refLaunch];
+
+    if (grupoId != null) {
+      // Buscar companheiros do grupo
+      final companionsRes = await _repository.getByGrupoId(grupoId);
+      if (companionsRes.isError()) {
+        return Failure(companionsRes.exceptionOrNull()!);
       }
-      final l = res.getOrThrow();
-      uniqueLancamentos[l.id] = l;
-    }
+      final allGroupLaunches = companionsRes.getOrThrow();
 
-    final List<Lancamento> initialLancamentos =
-        uniqueLancamentos //
-            .values
-            .toList();
-    for (final l in initialLancamentos) {
-      if (l.tipo == LancamentoTipo.transferencia && l.grupo?.grupoId != null) {
-        final grupoId = l.grupo!.grupoId;
-        final companionsRes = await _repository.getByGrupoId(grupoId);
-        if (companionsRes.isSuccess()) {
-          for (final comp in companionsRes.getOrThrow()) {
-            uniqueLancamentos[comp.id] = comp;
-          }
-        }
-      }
+      // Filtrar desconsiderando lançamentos com data anterior à data do
+      // lançamento de referência
+      targetLaunches = allGroupLaunches
+          .where((l) => !l.data.isBefore(refLaunch.data))
+          .toList();
     }
-
-    final List<Lancamento> lancamentos = uniqueLancamentos.values.toList();
 
     // 2. Validar se o período original de cada lançamento está aberto
-    for (final l in lancamentos) {
+    for (final l in targetLaunches) {
       final oldExtratoResult = await _extratoRepository.getById(
         l.extratoFaturaId,
       );
@@ -91,20 +112,27 @@ class UpdateLancamentosDataUseCase {
       }
     }
 
-    // 3. Validar limite da nova data (não superior a 24 meses do dia atual)
+    // 3. Resolver novas datas, validar limites e períodos fechados de destino
+    final List<LancamentoDto> dtosToUpdate = [];
     final limit = DateTime.now().add(const Duration(days: 730));
-    if (novaData.isAfter(limit)) {
-      return Failure(
-        DomainException('Data não pode ser superior a 24 meses da data atual'),
+
+    for (final l in targetLaunches) {
+      final int monthsDiff = _getMonthDifference(l.data, refLaunch.data);
+      final DateTime targetNewDate = _addMonthsAndClampDay(
+        novaData,
+        monthsDiff,
       );
-    }
 
-    // 4. Validar se a data destino é anterior à data inicial da conta/cartão
-    // e se o extrato destino está aberto
-    final targetMonth = DateTime(novaData.year, novaData.month, 1);
-    final mes = Mes.values.firstWhere((m) => m.numero == novaData.month);
+      // Validar limite de 24 meses
+      if (targetNewDate.isAfter(limit)) {
+        return Failure(
+          DomainException(
+            'Data não pode ser superior a 24 meses da data atual',
+          ),
+        );
+      }
 
-    for (final l in lancamentos) {
+      // Validar dataInicial da conta/cartão
       final DateTime dataInicial;
       final String nomeOrigem;
       final origem = l.origem;
@@ -138,8 +166,9 @@ class UpdateLancamentosDataUseCase {
         dataInicial.month,
         1,
       );
+      final targetMonth = DateTime(targetNewDate.year, targetNewDate.month, 1);
       if (targetMonth.isBefore(dataInicialCompare)) {
-        final dateStr = UtilData.obterDataDDMMAAAA(novaData);
+        final dateStr = UtilData.obterDataDDMMAAAA(targetNewDate);
         final dataInicialStr = UtilData.obterDataDDMMAAAA(dataInicial);
         return Failure(
           DomainException(
@@ -149,9 +178,11 @@ class UpdateLancamentosDataUseCase {
         );
       }
 
+      // Validar se o extrato de destino está fechado
+      final mes = Mes.values.firstWhere((m) => m.numero == targetNewDate.month);
       final targetExtratosRes = await _extratoRepository.searchByPeriodo(
         origem,
-        novaData.year,
+        targetNewDate.year,
         mes,
       );
       if (targetExtratosRes.isError()) {
@@ -165,14 +196,11 @@ class UpdateLancamentosDataUseCase {
           ),
         );
       }
-    }
 
-    // 5. Resolver os novos extratos e mapear para DTOs
-    final List<LancamentoDto> dtosToUpdate = [];
-    for (final l in lancamentos) {
+      // Resolver o extrato correspondente
       final resolveDto = ResolveExtratoFaturaDto(
         origem: l.origem,
-        data: novaData,
+        data: targetNewDate,
         valor: l.itens.fold<double>(0.0, (sum, item) => sum + item.valor),
         tipo: l.tipo,
       );
@@ -186,7 +214,7 @@ class UpdateLancamentosDataUseCase {
         LancamentoDto(
           id: l.id,
           tipo: l.tipo,
-          data: novaData,
+          data: targetNewDate,
           descricao: l.descricao,
           extratoFaturaId: targetExtrato.id,
           origem: l.origem,
@@ -198,14 +226,14 @@ class UpdateLancamentosDataUseCase {
       );
     }
 
-    // 6. Atualizar os lançamentos no repositório em lote
+    // 4. Salvar tudo em lote
     final updateRes = await _repository.updateAll(dtosToUpdate);
     if (updateRes.isError()) {
       return Failure(updateRes.exceptionOrNull()!);
     }
 
-    // 7. Recalcular os saldos de todas as origens únicas afetadas
-    final Set<LancamentoOrigem> origensAfetadas = lancamentos
+    // 5. Recalcular saldos de todas as origens únicas afetadas
+    final Set<LancamentoOrigem> origensAfetadas = targetLaunches
         .map((l) => l.origem)
         .toSet();
     for (final origem in origensAfetadas) {
