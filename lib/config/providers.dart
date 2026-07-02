@@ -682,6 +682,8 @@ final lancamentosListViewModelProvider =
         ref.watch(lancamentoResumoMensalUseCaseProvider),
         ref.watch(lancamentoRepositoryProvider),
         ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
       );
       ref.listen(lancamentoFilterProvider, (previous, next) {
         vm.updateFilter(next);

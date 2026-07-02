@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
@@ -22,10 +24,12 @@ class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoResumoMensalUseCase _resumoMensalUseCase;
   final LancamentoRepository _repository;
   final ExtratoFaturaRepository _extratoFaturaRepository;
+  final ContaRepository _contaRepository;
+  final CartaoRepository _cartaoRepository;
   StreamSubscription? _repositorySubscription;
 
   List<LancamentoDetails> _allLancamentos = [];
-  List<ExtratoFatura> _currentExtratos = [];
+  final List<ExtratoFatura> _currentExtratos = [];
   LancamentoFilterDto _currentFilter = LancamentoFilterDto(
     mes: Mes.fromDate(DateTime.now()),
     ano: DateTime.now().year, //
@@ -102,6 +106,8 @@ class LancamentosListViewModel extends ChangeNotifier {
     this._resumoMensalUseCase,
     this._repository,
     this._extratoFaturaRepository,
+    this._contaRepository,
+    this._cartaoRepository,
   ) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
@@ -116,13 +122,36 @@ class LancamentosListViewModel extends ChangeNotifier {
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
 
-    final extratoResult = await _extratoFaturaRepository.search(
-      ExtratoFaturaFilterDto(mes: mes, ano: ano), //
-    );
-    if (extratoResult.isError()) {
-      return Failure(extratoResult.exceptionOrNull()!);
+    final contasResult = await _contaRepository.getAll();
+    final cartoesResult = await _cartaoRepository.getAll();
+    if (contasResult.isError()) {
+      return Failure(contasResult.exceptionOrNull()!);
     }
-    _currentExtratos = extratoResult.getOrThrow();
+    if (cartoesResult.isError()) {
+      return Failure(cartoesResult.exceptionOrNull()!);
+    }
+
+    final origens = [
+      ...contasResult.getOrThrow().map(
+        (c) => LancamentoOrigem.conta(contaId: c.id),
+      ),
+      ...cartoesResult.getOrThrow().map(
+        (c) => LancamentoOrigem.cartao(cartaoId: c.id),
+      ),
+    ];
+
+    _currentExtratos.clear();
+    for (final origem in origens) {
+      final extratoResult = await _extratoFaturaRepository
+          .searchLatestBeforeOrAt(origem, ano, mes);
+      if (extratoResult.isError()) {
+        return Failure(extratoResult.exceptionOrNull()!);
+      }
+      final extratos = extratoResult.getOrThrow();
+      if (extratos.isNotEmpty) {
+        _currentExtratos.add(extratos.first);
+      }
+    }
 
     final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
     _allLancamentos = allDetails;

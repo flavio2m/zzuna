@@ -542,7 +542,7 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 ## 🐞 Correções
 | Status | Item |
 |--------|------|
-| ☐ | Corrigir cálculo do saldo inicial e saldo final do resumo financeiro (considerar todas as contas/cartões selecionados, mesmo sem lançamentos). |
+| OK | Corrigir cálculo do saldo inicial e saldo final do resumo financeiro (considerar todas as contas/cartões selecionados, mesmo sem lançamentos). |
 
 ---
 
@@ -568,5 +568,5 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Alterar Centro de Custo, Categoria e Valor para todo o grupo de lançamentos. |
 | OK | Alterar Conta/Cartão para todo o grupo de lançamentos. |
 | OK | Alterar Conta/Cartão para todos os lançamentos selecionados. |
-| ☐ | Implementar Lançamentos por Recorrência. |
+| OK | Implementar Lançamentos por Recorrência. |
 ```

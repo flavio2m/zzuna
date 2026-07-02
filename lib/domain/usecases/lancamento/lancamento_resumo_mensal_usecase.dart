@@ -36,9 +36,16 @@ class LancamentoResumoMensalUseCase {
         return false;
       });
 
+      final currentPeriodo = ano * 100 + mes.numero;
+
       for (final ef in considerados) {
-        saldoInicial += ef.saldoInicial;
-        saldoFinal += ef.saldoFinal;
+        if (ef.periodo == currentPeriodo) {
+          saldoInicial += ef.saldoInicial;
+          saldoFinal += ef.saldoFinal;
+        } else if (ef.periodo < currentPeriodo) {
+          saldoInicial += ef.saldoFinal;
+          saldoFinal += ef.saldoFinal;
+        }
       }
     }
 
