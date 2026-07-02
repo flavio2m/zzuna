@@ -46,7 +46,8 @@ class LancamentoFilterState {
       contasSelecionadas: contasSelecionadas ?? this.contasSelecionadas,
       cartoesSelecionados: cartoesSelecionados ?? this.cartoesSelecionados,
       centrosSelecionados: centrosSelecionados ?? this.centrosSelecionados,
-      categoriasSelecionadas: categoriasSelecionadas ?? this.categoriasSelecionadas,
+      categoriasSelecionadas:
+          categoriasSelecionadas ?? this.categoriasSelecionadas,
     );
   }
 }

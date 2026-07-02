@@ -14,7 +14,10 @@ class SidebarSearch extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppMenuText('FILTRAR OPCOES', variant: AppMenuTextVariant.section),
+          const AppMenuText(
+            'FILTRAR OPCOES',
+            variant: AppMenuTextVariant.section,
+          ),
           const SizedBox(height: 7),
           SizedBox(
             child: AppTextFormField(

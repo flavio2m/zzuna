@@ -25,10 +25,8 @@ class CentroCustoField extends StatelessWidget {
       validator: validator,
       items: centros
           .map(
-            (cc) => AppDropdownMenuItem<String>(
-              value: cc.id,
-              label: cc.descricao,
-            ),
+            (cc) =>
+                AppDropdownMenuItem<String>(value: cc.id, label: cc.descricao),
           )
           .toList(),
       onChanged: onChanged,

@@ -28,6 +28,8 @@ class LancamentoDetailsModal extends StatelessWidget {
           return 'Replicado ($parcela de $totalParcelas)';
         case LancamentoGrupoTransferencia():
           return 'Transferência';
+        case LancamentoGrupoRecorrencia(:final ativo):
+          return ativo ? 'Recorrente (Ativo)' : 'Recorrência Inativa';
       }
     }
 

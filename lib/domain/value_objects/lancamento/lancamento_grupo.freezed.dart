@@ -27,6 +27,10 @@ LancamentoGrupo _$LancamentoGrupoFromJson(
           return LancamentoGrupoReplicacao.fromJson(
             json
           );
+                case 'recorrencia':
+          return LancamentoGrupoRecorrencia.fromJson(
+            json
+          );
         
           default:
             throw CheckedFromJsonException(
@@ -116,13 +120,14 @@ extension LancamentoGrupoPatterns on LancamentoGrupo {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LancamentoGrupoParcelamento value)?  parcelamento,TResult Function( LancamentoGrupoTransferencia value)?  transferencia,TResult Function( LancamentoGrupoReplicacao value)?  replicacao,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LancamentoGrupoParcelamento value)?  parcelamento,TResult Function( LancamentoGrupoTransferencia value)?  transferencia,TResult Function( LancamentoGrupoReplicacao value)?  replicacao,TResult Function( LancamentoGrupoRecorrencia value)?  recorrencia,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that);case _:
+return replicacao(_that);case LancamentoGrupoRecorrencia() when recorrencia != null:
+return recorrencia(_that);case _:
   return orElse();
 
 }
@@ -140,13 +145,14 @@ return replicacao(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LancamentoGrupoParcelamento value)  parcelamento,required TResult Function( LancamentoGrupoTransferencia value)  transferencia,required TResult Function( LancamentoGrupoReplicacao value)  replicacao,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LancamentoGrupoParcelamento value)  parcelamento,required TResult Function( LancamentoGrupoTransferencia value)  transferencia,required TResult Function( LancamentoGrupoReplicacao value)  replicacao,required TResult Function( LancamentoGrupoRecorrencia value)  recorrencia,}){
 final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento():
 return parcelamento(_that);case LancamentoGrupoTransferencia():
 return transferencia(_that);case LancamentoGrupoReplicacao():
-return replicacao(_that);}
+return replicacao(_that);case LancamentoGrupoRecorrencia():
+return recorrencia(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -160,13 +166,14 @@ return replicacao(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LancamentoGrupoParcelamento value)?  parcelamento,TResult? Function( LancamentoGrupoTransferencia value)?  transferencia,TResult? Function( LancamentoGrupoReplicacao value)?  replicacao,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LancamentoGrupoParcelamento value)?  parcelamento,TResult? Function( LancamentoGrupoTransferencia value)?  transferencia,TResult? Function( LancamentoGrupoReplicacao value)?  replicacao,TResult? Function( LancamentoGrupoRecorrencia value)?  recorrencia,}){
 final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that);case _:
+return replicacao(_that);case LancamentoGrupoRecorrencia() when recorrencia != null:
+return recorrencia(_that);case _:
   return null;
 
 }
@@ -183,12 +190,13 @@ return replicacao(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)?  recorrencia,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case _:
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia() when recorrencia != null:
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);case _:
   return orElse();
 
 }
@@ -206,12 +214,13 @@ return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId,  int parcela,  int totalParcelas)  replicacao,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId,  int parcela,  int totalParcelas)  replicacao,required TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)  recorrencia,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento():
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia():
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao():
-return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);}
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia():
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -225,12 +234,13 @@ return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult? Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)?  recorrencia,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
-return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case _:
+return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia() when recorrencia != null:
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);case _:
   return null;
 
 }
@@ -459,6 +469,85 @@ grupoId: null == grupoId ? _self.grupoId : grupoId // ignore: cast_nullable_to_n
 as String,parcela: null == parcela ? _self.parcela : parcela // ignore: cast_nullable_to_non_nullable
 as int,totalParcelas: null == totalParcelas ? _self.totalParcelas : totalParcelas // ignore: cast_nullable_to_non_nullable
 as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class LancamentoGrupoRecorrencia implements LancamentoGrupo {
+  const LancamentoGrupoRecorrencia({required this.grupoId, required this.ativo, required this.diaDoMes, required this.tipo, final  String? $type}): $type = $type ?? 'recorrencia';
+  factory LancamentoGrupoRecorrencia.fromJson(Map<String, dynamic> json) => _$LancamentoGrupoRecorrenciaFromJson(json);
+
+@override final  String grupoId;
+ final  bool ativo;
+ final  int diaDoMes;
+ final  TipoRecorrencia tipo;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of LancamentoGrupo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LancamentoGrupoRecorrenciaCopyWith<LancamentoGrupoRecorrencia> get copyWith => _$LancamentoGrupoRecorrenciaCopyWithImpl<LancamentoGrupoRecorrencia>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$LancamentoGrupoRecorrenciaToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoGrupoRecorrencia&&(identical(other.grupoId, grupoId) || other.grupoId == grupoId)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaDoMes, diaDoMes) || other.diaDoMes == diaDoMes)&&(identical(other.tipo, tipo) || other.tipo == tipo));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,grupoId,ativo,diaDoMes,tipo);
+
+@override
+String toString() {
+  return 'LancamentoGrupo.recorrencia(grupoId: $grupoId, ativo: $ativo, diaDoMes: $diaDoMes, tipo: $tipo)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LancamentoGrupoRecorrenciaCopyWith<$Res> implements $LancamentoGrupoCopyWith<$Res> {
+  factory $LancamentoGrupoRecorrenciaCopyWith(LancamentoGrupoRecorrencia value, $Res Function(LancamentoGrupoRecorrencia) _then) = _$LancamentoGrupoRecorrenciaCopyWithImpl;
+@override @useResult
+$Res call({
+ String grupoId, bool ativo, int diaDoMes, TipoRecorrencia tipo
+});
+
+
+
+
+}
+/// @nodoc
+class _$LancamentoGrupoRecorrenciaCopyWithImpl<$Res>
+    implements $LancamentoGrupoRecorrenciaCopyWith<$Res> {
+  _$LancamentoGrupoRecorrenciaCopyWithImpl(this._self, this._then);
+
+  final LancamentoGrupoRecorrencia _self;
+  final $Res Function(LancamentoGrupoRecorrencia) _then;
+
+/// Create a copy of LancamentoGrupo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? grupoId = null,Object? ativo = null,Object? diaDoMes = null,Object? tipo = null,}) {
+  return _then(LancamentoGrupoRecorrencia(
+grupoId: null == grupoId ? _self.grupoId : grupoId // ignore: cast_nullable_to_non_nullable
+as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
+as bool,diaDoMes: null == diaDoMes ? _self.diaDoMes : diaDoMes // ignore: cast_nullable_to_non_nullable
+as int,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
+as TipoRecorrencia,
   ));
 }
 

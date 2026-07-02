@@ -60,7 +60,8 @@ class LancamentosListViewModel extends ChangeNotifier {
   }
 
   bool get allSelected {
-    final visibleIds = resumoMensal?.dias
+    final visibleIds =
+        resumoMensal?.dias
             .expand((dia) => dia.lancamentos)
             .map((l) => l.id)
             .toList() ??
@@ -70,7 +71,8 @@ class LancamentosListViewModel extends ChangeNotifier {
   }
 
   void selectAll() {
-    final visibleIds = resumoMensal?.dias
+    final visibleIds =
+        resumoMensal?.dias
             .expand((dia) => dia.lancamentos)
             .map((l) => l.id)
             .toList() ??
@@ -81,7 +83,8 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   void toggleSelectAll() {
     if (allSelected) {
-      final visibleIds = resumoMensal?.dias
+      final visibleIds =
+          resumoMensal?.dias
               .expand((dia) => dia.lancamentos)
               .map((l) => l.id)
               .toList() ??
@@ -130,7 +133,8 @@ class LancamentosListViewModel extends ChangeNotifier {
   void _applyFilter() {
     final filtered = _filterUseCase.execute(_allLancamentos, _currentFilter);
     final temFiltroRestritivo =
-        _currentFilter.categoriasSelecionadas.isNotEmpty || _currentFilter.centrosSelecionados.isNotEmpty;
+        _currentFilter.categoriasSelecionadas.isNotEmpty ||
+        _currentFilter.centrosSelecionados.isNotEmpty;
 
     resumoMensal = _resumoMensalUseCase.execute(
       filtered,
@@ -158,7 +162,8 @@ class LancamentosListViewModel extends ChangeNotifier {
     );
 
     final periodChanged = //
-        newFilter.mes != _currentFilter.mes || newFilter.ano != _currentFilter.ano;
+        newFilter.mes != _currentFilter.mes ||
+        newFilter.ano != _currentFilter.ano;
 
     _currentFilter = newFilter;
 

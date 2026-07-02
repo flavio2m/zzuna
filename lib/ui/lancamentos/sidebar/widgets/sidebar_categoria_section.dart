@@ -50,7 +50,15 @@ class SidebarCategoriaSection extends ConsumerWidget {
         child: Column(
           children:
               items //
-                  .map((categoria) => _buildNode(ref, categoria, state, filterState, level: 0))
+                  .map(
+                    (categoria) => _buildNode(
+                      ref,
+                      categoria,
+                      state,
+                      filterState,
+                      level: 0,
+                    ),
+                  )
                   .toList(), //
         ),
       ),
@@ -115,7 +123,15 @@ class SidebarCategoriaSection extends ConsumerWidget {
             ),
             child: Column(
               children: categoria.subcategorias
-                  .map((child) => _buildNode(ref, child, state, filterState, level: level + 1))
+                  .map(
+                    (child) => _buildNode(
+                      ref,
+                      child,
+                      state,
+                      filterState,
+                      level: level + 1,
+                    ),
+                  )
                   .toList(),
             ),
           ),

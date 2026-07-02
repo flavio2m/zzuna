@@ -47,7 +47,9 @@ class LancamentoCreateViewModel extends ChangeNotifier {
 
   bool isLoading = false;
 
-  late final createCommand = Command1<List<Lancamento>, List<LancamentoDto>>(_createAll);
+  late final createCommand = Command1<List<Lancamento>, List<LancamentoDto>>(
+    _createAll,
+  );
 
   /// Carrega todas as listas necessárias para o formulário de cadastro.
   Future<void> load() async {
@@ -105,8 +107,10 @@ class LancamentoCreateViewModel extends ChangeNotifier {
     final categoriasList = categoriasResult.getOrElse((_) => <Categoria>[]);
     categorias = _categoriaTreeUseCase.build(categoriasList);
 
-    centros =
-        centrosResult.getOrElse((_) => <CentroCusto>[]).where((cc) => cc.ativo).toList();
+    centros = centrosResult
+        .getOrElse((_) => <CentroCusto>[])
+        .where((cc) => cc.ativo)
+        .toList();
 
     isLoading = false;
     notifyListeners();

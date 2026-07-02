@@ -38,7 +38,9 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
         final filteredContas = viewModel.filteredContas(sidebarState.filtro);
         final filteredCartoes = viewModel.filteredCartoes(sidebarState.filtro);
         final filteredCentros = viewModel.filteredCentros(sidebarState.filtro);
-        final filteredCategorias = viewModel.filteredCategorias(sidebarState.filtro);
+        final filteredCategorias = viewModel.filteredCategorias(
+          sidebarState.filtro,
+        );
 
         return Container(
           width: 280,
@@ -63,9 +65,15 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
                         child: Column(
                           children: [
                             SidebarContaSection(items: filteredContas),
-                            const Divider(height: 18, color: AppColors.slate100),
+                            const Divider(
+                              height: 18,
+                              color: AppColors.slate100,
+                            ),
                             SidebarCartaoSection(items: filteredCartoes),
-                            const Divider(height: 18, color: AppColors.slate100),
+                            const Divider(
+                              height: 18,
+                              color: AppColors.slate100,
+                            ),
                             SidebarCentroCustoSection(items: filteredCentros),
                           ],
                         ),

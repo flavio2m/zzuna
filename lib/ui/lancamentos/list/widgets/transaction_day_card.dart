@@ -10,18 +10,13 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/formatters/date_formatter.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamento_update_modal.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_update_modal.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
-import 'package:zzuna/ui/lancamentos/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/widgets/lancamentos_update_origem_grupo_modal.dart';
-import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});
@@ -74,6 +69,7 @@ class TransactionDayCard extends StatelessWidget {
         );
 
         return TransactionRow(
+          lancamentoId: l.id,
           description: l.descricao,
           category: categoryPath,
           origem: l.origem,
@@ -84,6 +80,7 @@ class TransactionDayCard extends StatelessWidget {
           grupo: l.grupo,
           conciliado: l.conciliado,
           selected: selected,
+          lancamento: l,
           reconcileButton: LancamentoReconcileButton(
             lancamentoId: l.id,
             conciliado: l.conciliado,
@@ -108,52 +105,8 @@ class TransactionDayCard extends StatelessWidget {
               }
             }
           },
-          onView: () {
-            AppDialog.show(
-              context: context,
-              child: LancamentoDetailsModal(lancamento: l),
-            );
-          },
-          onEdit: () {
-            if (l.tipo == LancamentoTipo.transferencia && l.grupo != null) {
-              TransferenciaUpdateModal.show(context, grupoId: l.grupo!.grupoId);
-            } else {
-              AppDialog.show(
-                context: context,
-                child: LancamentoUpdateModal(lancamento: l),
-              );
-            }
-          },
           onSelect: (_) {
             ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
-          },
-          onUpdateMetadata: () {
-            LancamentosUpdateMetadataModal.show(
-              context: context,
-              lancamentoId: l.id,
-              currentDescricao: l.descricao,
-              currentObservacao: l.observacao,
-            );
-          },
-          onUpdateDataGrupo: () {
-            LancamentosUpdateDataGrupoModal.show(
-              context: context,
-              lancamentoId: l.id,
-            );
-          },
-          onUpdateValorGrupo: () {
-            LancamentosUpdateValorGrupoModal.show(
-              context: context,
-              lancamentoId: l.id,
-              initialItens: LancamentoDto.fromDetails(l).itens,
-            );
-          },
-          onUpdateOrigemGrupo: () {
-            LancamentosUpdateOrigemGrupoModal.show(
-              context: context,
-              lancamentoId: l.id,
-              currentOrigem: LancamentoDto.fromDetails(l).origem,
-            );
           },
         );
       },

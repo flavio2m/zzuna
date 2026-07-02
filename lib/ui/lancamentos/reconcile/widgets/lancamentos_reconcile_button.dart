@@ -10,13 +10,20 @@ class LancamentosReconcileButton extends ConsumerStatefulWidget {
   final List<String> selectedIds;
   final VoidCallback? onSuccess;
 
-  const LancamentosReconcileButton({super.key, required this.conciliado, required this.selectedIds, this.onSuccess});
+  const LancamentosReconcileButton({
+    super.key,
+    required this.conciliado,
+    required this.selectedIds,
+    this.onSuccess,
+  });
 
   @override
-  ConsumerState<LancamentosReconcileButton> createState() => _LancamentosReconcileButtonState();
+  ConsumerState<LancamentosReconcileButton> createState() =>
+      _LancamentosReconcileButtonState();
 }
 
-class _LancamentosReconcileButtonState extends ConsumerState<LancamentosReconcileButton> {
+class _LancamentosReconcileButtonState
+    extends ConsumerState<LancamentosReconcileButton> {
   bool _isExecuting = false;
 
   @override
@@ -25,7 +32,9 @@ class _LancamentosReconcileButtonState extends ConsumerState<LancamentosReconcil
 
     ref.listen(
       //
-      lancamentoReconcileViewModelProvider.select((vm) => vm.reconcileCommand.value),
+      lancamentoReconcileViewModelProvider.select(
+        (vm) => vm.reconcileCommand.value,
+      ),
       (previous, next) {
         if (next.isSuccess && _isExecuting) {
           _isExecuting = false;
@@ -33,7 +42,8 @@ class _LancamentosReconcileButtonState extends ConsumerState<LancamentosReconcil
         } else if (next.isFailure && _isExecuting) {
           _isExecuting = false;
           final errorMessage = //
-              next.getExceptionOrNull()?.toString() ?? 'Erro ao conciliar lançamentos';
+              next.getExceptionOrNull()?.toString() ??
+              'Erro ao conciliar lançamentos';
           AppSnackBar.showError(context, errorMessage);
         }
       },
@@ -62,7 +72,10 @@ class _LancamentosReconcileButtonState extends ConsumerState<LancamentosReconcil
                   _isExecuting = true;
                   viewModel //
                       .reconcileCommand
-                      .execute((ids: widget.selectedIds, conciliado: widget.conciliado));
+                      .execute((
+                        ids: widget.selectedIds,
+                        conciliado: widget.conciliado,
+                      ));
                 },
         );
       },

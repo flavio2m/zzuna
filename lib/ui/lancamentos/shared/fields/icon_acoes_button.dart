@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
+
+import 'package:zzuna/ui/lancamentos/list/widgets/lancamentos_visualizar_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamentos_editar_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_metadata/widgets/lancamentos_update_metadata_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/widgets/lancamentos_update_data_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/widgets/lancamentos_update_valor_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/widgets/lancamentos_update_origem_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/criar/widgets/lancamentos_criar_recorrencia_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/widgets/lancamentos_finalizar_recorrencia_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/reativar/widgets/lancamentos_reativar_recorrencia_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/widgets/lancamentos_atualizar_data_recorrencia_menu_item.dart';
 
 enum TipoAcoes {
   visualizar,
@@ -9,7 +21,11 @@ enum TipoAcoes {
   alterarMetadata,
   alterarDataGrupo,
   alterarValorGrupo,
-  alterarOrigemGrupo;
+  alterarOrigemGrupo,
+  criarRecorrencia,
+  atualizarDataRecorrencia,
+  finalizarRecorrencia,
+  reativarRecorrencia;
 
   String get label => switch (this) {
     TipoAcoes.visualizar => 'Visualizar',
@@ -18,39 +34,43 @@ enum TipoAcoes {
     TipoAcoes.alterarDataGrupo => 'Alterar Data em Lote',
     TipoAcoes.alterarValorGrupo => 'Alterar Valor em Lote',
     TipoAcoes.alterarOrigemGrupo => 'Alterar Conta/Cartão em Lote',
+    TipoAcoes.criarRecorrencia => 'Criar Recorrência',
+    TipoAcoes.atualizarDataRecorrencia => 'Atualizar Data da Recorrência',
+    TipoAcoes.finalizarRecorrencia => 'Finalizar Recorrência',
+    TipoAcoes.reativarRecorrencia => 'Reativar Recorrência',
   };
 }
 
-class IconAcoesButton extends StatelessWidget {
-  final bool conciliado;
-  final LancamentoGrupo? grupo;
-  final LancamentoTipo? tipo;
-  final VoidCallback? onView;
-  final VoidCallback? onEdit;
-  final VoidCallback? onUpdateMetadata;
-  final VoidCallback? onUpdateDataGrupo;
-  final VoidCallback? onUpdateValorGrupo;
-  final VoidCallback? onUpdateOrigemGrupo;
+class IconAcoesButton extends ConsumerWidget {
+  final LancamentoDetails lancamento;
 
-  const IconAcoesButton({
-    super.key,
-    required this.conciliado,
-    this.grupo,
-    this.tipo,
-    this.onView,
-    this.onEdit,
-    this.onUpdateMetadata,
-    this.onUpdateDataGrupo,
-    this.onUpdateValorGrupo,
-    this.onUpdateOrigemGrupo,
-  });
+  const IconAcoesButton({super.key, required this.lancamento});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final conciliado = lancamento.conciliado;
+    final grupo = lancamento.grupo;
+    final tipo = lancamento.tipo;
+    final dataDay = lancamento.data.day;
     final showUpdateMetadata =
         !conciliado &&
         grupo?.grupoId != null &&
         tipo != LancamentoTipo.transferencia;
+
+    // Recorrência: visibilidade das ações
+    final isNotTransferencia = tipo != LancamentoTipo.transferencia;
+    final recorrenciaGrupo = grupo is LancamentoGrupoRecorrencia ? grupo : null;
+    final showCriarRecorrencia =
+        !conciliado && isNotTransferencia && recorrenciaGrupo == null;
+    final showFinalizarRecorrencia =
+        !conciliado && recorrenciaGrupo != null && recorrenciaGrupo.ativo;
+    final showReativarRecorrencia =
+        !conciliado && recorrenciaGrupo != null && !recorrenciaGrupo.ativo;
+    final showAtualizarDataRecorrencia =
+        !conciliado &&
+        recorrenciaGrupo != null &&
+        recorrenciaGrupo.ativo &&
+        dataDay != recorrenciaGrupo.diaDoMes;
 
     return PopupMenuButton<TipoAcoes>(
       tooltip: 'Ações',
@@ -65,182 +85,64 @@ class IconAcoesButton extends StatelessWidget {
         side: const BorderSide(color: AppColors.border),
       ),
       elevation: 3,
-      onSelected: (value) {
-        switch (value) {
-          case TipoAcoes.visualizar:
-            onView?.call();
-          case TipoAcoes.editar:
-            onEdit?.call();
-          case TipoAcoes.alterarMetadata:
-            onUpdateMetadata?.call();
-          case TipoAcoes.alterarDataGrupo:
-            onUpdateDataGrupo?.call();
-          case TipoAcoes.alterarValorGrupo:
-            onUpdateValorGrupo?.call();
-          case TipoAcoes.alterarOrigemGrupo:
-            onUpdateOrigemGrupo?.call();
-        }
-      },
+      onSelected: (_) {}, // The items themselves handle the taps now.
       itemBuilder: (context) => [
         if (conciliado) ...[
-          PopupMenuItem<TipoAcoes>(
-            value: TipoAcoes.visualizar,
-            height: 36,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.visibility_outlined,
-                  size: 16,
-                  color: AppColors.slate600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  TipoAcoes.visualizar.label,
-                  style: const TextStyle(
-                    color: AppColors.slate700,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+          LancamentosVisualizarMenuItem(
+            context: context,
+            lancamento: lancamento,
           ),
         ] else ...[
-          PopupMenuItem<TipoAcoes>(
-            value: TipoAcoes.editar,
-            height: 36,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.edit_outlined,
-                  size: 16,
-                  color: AppColors.slate600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  TipoAcoes.editar.label,
-                  style: const TextStyle(
-                    color: AppColors.slate700,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem<TipoAcoes>(
-            value: TipoAcoes.visualizar,
-            height: 36,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.visibility_outlined,
-                  size: 16,
-                  color: AppColors.slate600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  TipoAcoes.visualizar.label,
-                  style: const TextStyle(
-                    color: AppColors.slate700,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+          LancamentosEditarMenuItem(context: context, lancamento: lancamento),
+          LancamentosVisualizarMenuItem(
+            context: context,
+            lancamento: lancamento,
           ),
           if (showUpdateMetadata) ...[
-            PopupMenuItem<TipoAcoes>(
-              value: TipoAcoes.alterarMetadata,
-              height: 36,
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.description_outlined,
-                    size: 16,
-                    color: AppColors.slate600,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    TipoAcoes.alterarMetadata.label,
-                    style: const TextStyle(
-                      color: AppColors.slate700,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            LancamentosUpdateMetadataMenuItem(
+              context: context,
+              lancamento: lancamento,
             ),
-            PopupMenuItem<TipoAcoes>(
-              value: TipoAcoes.alterarDataGrupo,
-              height: 36,
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.date_range_outlined,
-                    size: 16,
-                    color: AppColors.slate600,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    TipoAcoes.alterarDataGrupo.label,
-                    style: const TextStyle(
-                      color: AppColors.slate700,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            LancamentosUpdateDataGrupoMenuItem(
+              context: context,
+              lancamento: lancamento,
             ),
-            PopupMenuItem<TipoAcoes>(
-              value: TipoAcoes.alterarValorGrupo,
-              height: 36,
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.list_alt_outlined,
-                    size: 16,
-                    color: AppColors.slate600,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    TipoAcoes.alterarValorGrupo.label,
-                    style: const TextStyle(
-                      color: AppColors.slate700,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            LancamentosUpdateValorGrupoMenuItem(
+              context: context,
+              lancamento: lancamento,
             ),
-            PopupMenuItem<TipoAcoes>(
-              value: TipoAcoes.alterarOrigemGrupo,
-              height: 36,
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 16,
-                    color: AppColors.slate600,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    TipoAcoes.alterarOrigemGrupo.label,
-                    style: const TextStyle(
-                      color: AppColors.slate700,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            LancamentosUpdateOrigemGrupoMenuItem(
+              context: context,
+              lancamento: lancamento,
             ),
           ],
         ],
+        if (showCriarRecorrencia)
+          LancamentosCriarRecorrenciaMenuItem(
+            context: context,
+            ref: ref,
+            lancamentoId: lancamento.id,
+          ),
+        if (showAtualizarDataRecorrencia)
+          LancamentosAtualizarDataRecorrenciaMenuItem(
+            context: context,
+            ref: ref,
+            lancamentoId: lancamento.id,
+            diaDoMesRecorrencia: recorrenciaGrupo.diaDoMes,
+            diaDoLancamento: dataDay,
+          ),
+        if (showFinalizarRecorrencia)
+          LancamentosFinalizarRecorrenciaMenuItem(
+            context: context,
+            ref: ref,
+            lancamentoId: lancamento.id,
+          ),
+        if (showReativarRecorrencia)
+          LancamentosReativarRecorrenciaMenuItem(
+            context: context,
+            ref: ref,
+            lancamentoId: lancamento.id,
+          ),
       ],
     );
   }

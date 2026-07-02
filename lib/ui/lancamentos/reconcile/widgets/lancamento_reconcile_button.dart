@@ -7,13 +7,19 @@ class LancamentoReconcileButton extends ConsumerStatefulWidget {
   final String lancamentoId;
   final bool conciliado;
 
-  const LancamentoReconcileButton({super.key, required this.lancamentoId, required this.conciliado});
+  const LancamentoReconcileButton({
+    super.key,
+    required this.lancamentoId,
+    required this.conciliado,
+  });
 
   @override
-  ConsumerState<LancamentoReconcileButton> createState() => _LancamentoReconcileButtonState();
+  ConsumerState<LancamentoReconcileButton> createState() =>
+      _LancamentoReconcileButtonState();
 }
 
-class _LancamentoReconcileButtonState extends ConsumerState<LancamentoReconcileButton> {
+class _LancamentoReconcileButtonState
+    extends ConsumerState<LancamentoReconcileButton> {
   bool _isExecuting = false;
 
   @override
@@ -38,7 +44,10 @@ class _LancamentoReconcileButtonState extends ConsumerState<LancamentoReconcileB
                   _isExecuting = true;
                   viewModel //
                       .reconcileCommand
-                      .execute((ids: [widget.lancamentoId], conciliado: !widget.conciliado));
+                      .execute((
+                        ids: [widget.lancamentoId],
+                        conciliado: !widget.conciliado,
+                      ));
                 },
         );
       },

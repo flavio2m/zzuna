@@ -55,7 +55,9 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
       _centroCustoId = widget.initialItem!.centroCustoId;
       _categoriaId = widget.initialItem!.categoriaId;
       final valor = widget.initialItem!.valor;
-      final pct = widget.totalValor > 0 ? (valor / widget.totalValor) * 100 : 0.0;
+      final pct = widget.totalValor > 0
+          ? (valor / widget.totalValor) * 100
+          : 0.0;
 
       _percentController = TextEditingController(
         text: pct.toStringAsFixed(3).replaceAll('.', ','), //

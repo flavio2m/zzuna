@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:zzuna/domain/enums/tipo_recorrencia.dart';
+export 'package:zzuna/domain/enums/tipo_recorrencia.dart';
 
 part 'lancamento_grupo.freezed.dart';
 part 'lancamento_grupo.g.dart';
@@ -20,6 +22,13 @@ sealed class LancamentoGrupo with _$LancamentoGrupo {
     required int parcela,
     required int totalParcelas,
   }) = LancamentoGrupoReplicacao;
+
+  const factory LancamentoGrupo.recorrencia({
+    required String grupoId,
+    required bool ativo,
+    required int diaDoMes,
+    required TipoRecorrencia tipo,
+  }) = LancamentoGrupoRecorrencia;
 
   factory LancamentoGrupo.fromJson(
     Map<String, dynamic> json, //

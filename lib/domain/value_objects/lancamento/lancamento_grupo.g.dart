@@ -55,3 +55,25 @@ Map<String, dynamic> _$LancamentoGrupoReplicacaoToJson(
   'totalParcelas': instance.totalParcelas,
   'runtimeType': instance.$type,
 };
+
+LancamentoGrupoRecorrencia _$LancamentoGrupoRecorrenciaFromJson(
+  Map<String, dynamic> json,
+) => LancamentoGrupoRecorrencia(
+  grupoId: json['grupoId'] as String,
+  ativo: json['ativo'] as bool,
+  diaDoMes: (json['diaDoMes'] as num).toInt(),
+  tipo: $enumDecode(_$TipoRecorrenciaEnumMap, json['tipo']),
+  $type: json['runtimeType'] as String?,
+);
+
+Map<String, dynamic> _$LancamentoGrupoRecorrenciaToJson(
+  LancamentoGrupoRecorrencia instance,
+) => <String, dynamic>{
+  'grupoId': instance.grupoId,
+  'ativo': instance.ativo,
+  'diaDoMes': instance.diaDoMes,
+  'tipo': _$TipoRecorrenciaEnumMap[instance.tipo]!,
+  'runtimeType': instance.$type,
+};
+
+const _$TipoRecorrenciaEnumMap = {TipoRecorrencia.mensal: 'mensal'};

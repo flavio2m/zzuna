@@ -44,7 +44,9 @@ class ModoSelector extends StatelessWidget {
             child: Icon(
               icon,
               size: 20,
-              color: isSelected ? theme.colorScheme.primary : theme.hintColor, //
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.hintColor, //
             ),
           ),
         ),
@@ -68,7 +70,10 @@ class ModoSelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: Row(
               children: [
-                const AppText('Modo de Lançamento', variant: AppTextVariant.body),
+                const AppText(
+                  'Modo de Lançamento',
+                  variant: AppTextVariant.body,
+                ),
                 const Spacer(),
                 _buildModoButton(
                   context,
@@ -98,7 +103,9 @@ class ModoSelector extends StatelessWidget {
         // Detalhamento do Valor agrupado à direita
         Expanded(
           child: Tooltip(
-            message: showItens ? 'Ocultar Detalhamento' : 'Mostrar Detalhamento',
+            message: showItens
+                ? 'Ocultar Detalhamento'
+                : 'Mostrar Detalhamento',
             child: InkWell(
               onTap: () => onShowItensChanged(!showItens),
               borderRadius: BorderRadius.circular(8),
@@ -107,7 +114,10 @@ class ModoSelector extends StatelessWidget {
                   border: Border.all(color: theme.dividerColor),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     AppText(

@@ -10,17 +10,20 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 
 class ResolveExtratoFaturasUseCase {
   final ExtratoFaturaRepository _extratoRepository;
   final ContaRepository _contaRepository;
   final CartaoRepository _cartaoRepository;
+  final ApplyRecorrenciasUseCase? _applyRecorrenciasUseCase;
 
   ResolveExtratoFaturasUseCase(
     this._extratoRepository,
     this._contaRepository,
-    this._cartaoRepository, //
-  );
+    this._cartaoRepository, {
+    ApplyRecorrenciasUseCase? applyRecorrenciasUseCase,
+  }) : _applyRecorrenciasUseCase = applyRecorrenciasUseCase;
 
   AsyncResult<List<ExtratoFatura>> execute(
     ResolveExtratoFaturaLoteDto dto,
@@ -261,6 +264,19 @@ class ResolveExtratoFaturasUseCase {
           DomainException(
             'Falha ao atualizar extratos em lote: ${updateRes.exceptionOrNull()}',
           ),
+        );
+      }
+    }
+
+    // 9. Hook: aplicar recorrências nos novos extratos criados
+    if (_applyRecorrenciasUseCase != null) {
+      final novosExtratosEntidades = allResolvedExtratos
+          .where((e) => allNewExtratos.any((dto) => dto.id == e.id))
+          .toList();
+      for (final novoExtrato in novosExtratosEntidades) {
+        await _applyRecorrenciasUseCase.execute(
+          novoExtrato.origem,
+          novoExtrato,
         );
       }
     }

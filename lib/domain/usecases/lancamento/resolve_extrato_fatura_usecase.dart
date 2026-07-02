@@ -10,17 +10,20 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 
 class ResolveExtratoFaturaUseCase {
   final ExtratoFaturaRepository _extratoRepository;
   final ContaRepository _contaRepository;
   final CartaoRepository _cartaoRepository;
+  final ApplyRecorrenciasUseCase? _applyRecorrenciasUseCase;
 
   ResolveExtratoFaturaUseCase(
     this._extratoRepository,
     this._contaRepository,
-    this._cartaoRepository, //
-  );
+    this._cartaoRepository, {
+    ApplyRecorrenciasUseCase? applyRecorrenciasUseCase,
+  }) : _applyRecorrenciasUseCase = applyRecorrenciasUseCase;
 
   AsyncResult<ExtratoFatura> execute(ResolveExtratoFaturaDto dto) async {
     final origem = dto.origem;
@@ -111,6 +114,11 @@ class ResolveExtratoFaturaUseCase {
         );
       }
       extratoAlvo = createRes.getOrThrow();
+
+      // Hook: aplicar recorrências do extrato anterior no novo extrato
+      if (_applyRecorrenciasUseCase != null) {
+        await _applyRecorrenciasUseCase.execute(origem, extratoAlvo);
+      }
     } else {
       extratoAlvo = existingExtratos.first;
     }
