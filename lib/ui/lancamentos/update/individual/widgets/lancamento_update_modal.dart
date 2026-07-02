@@ -9,7 +9,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
-import 'package:zzuna/ui/lancamentos/update/viewmodels/lancamento_update_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/viewmodels/lancamento_update_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_itens_panel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/categoria_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/centro_custo_field.dart';

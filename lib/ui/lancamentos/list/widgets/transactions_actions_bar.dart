@@ -4,10 +4,10 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
-import 'package:zzuna/ui/lancamentos/update_data/widgets/lancamentos_update_data_button.dart';
-import 'package:zzuna/ui/lancamentos/update_data/widgets/lancamentos_update_data_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_data/widgets/lancamentos_update_data_button.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_data/widgets/lancamentos_update_data_modal.dart';
 import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_button.dart';
-import 'package:zzuna/ui/lancamentos/update_origem/widgets/lancamentos_update_origem_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/widgets/lancamentos_update_origem_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 

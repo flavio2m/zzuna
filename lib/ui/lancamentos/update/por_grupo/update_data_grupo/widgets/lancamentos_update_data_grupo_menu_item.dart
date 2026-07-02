@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
-import 'package:zzuna/ui/lancamentos/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class LancamentosUpdateDataGrupoMenuItem extends PopupMenuItem<TipoAcoes> {

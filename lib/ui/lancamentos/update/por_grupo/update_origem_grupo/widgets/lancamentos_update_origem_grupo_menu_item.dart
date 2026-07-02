@@ -2,27 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/widgets/lancamentos_update_origem_grupo_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
-class LancamentosUpdateValorGrupoMenuItem extends PopupMenuItem<TipoAcoes> {
-  LancamentosUpdateValorGrupoMenuItem({
+class LancamentosUpdateOrigemGrupoMenuItem extends PopupMenuItem<TipoAcoes> {
+  LancamentosUpdateOrigemGrupoMenuItem({
     super.key,
     required BuildContext context,
     required LancamentoDetails lancamento,
   }) : super(
-         value: TipoAcoes.alterarValorGrupo,
+         value: TipoAcoes.alterarOrigemGrupo,
          height: 36,
          child: Row(
            children: [
              const Icon(
-               Icons.list_alt_outlined,
+               Icons.account_balance_wallet_outlined,
                size: 16,
                color: AppColors.slate600,
              ),
              const SizedBox(width: 8),
              Text(
-               TipoAcoes.alterarValorGrupo.label,
+               TipoAcoes.alterarOrigemGrupo.label,
                style: const TextStyle(
                  color: AppColors.slate700,
                  fontSize: 13,
@@ -33,10 +33,10 @@ class LancamentosUpdateValorGrupoMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () {
-             LancamentosUpdateValorGrupoModal.show(
+             LancamentosUpdateOrigemGrupoModal.show(
                context: context,
                lancamentoId: lancamento.id,
-               initialItens: LancamentoDto.fromDetails(lancamento).itens,
+               currentOrigem: LancamentoDto.fromDetails(lancamento).origem,
              );
            });
          },

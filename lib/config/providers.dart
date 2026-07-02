@@ -59,19 +59,19 @@ import 'package:zzuna/domain/usecases/lancamento/reconcile_lancamentos_usecase.d
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_data_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
-import 'package:zzuna/ui/lancamentos/update/viewmodels/lancamento_update_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/viewmodels/lancamento_update_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/viewmodels/lancamento_reconcile_viewmodel.dart';
-import 'package:zzuna/ui/lancamentos/update_data/viewmodels/lancamento_update_data_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_data/viewmodels/lancamento_update_data_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_data_grupo_usecase.dart';
-import 'package:zzuna/ui/lancamentos/update_data_grupo/viewmodels/lancamentos_update_data_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/viewmodels/lancamentos_update_data_grupo_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_metadata_usecase.dart';
-import 'package:zzuna/ui/lancamentos/update_metadata/viewmodels/lancamento_update_metadata_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_metadata/viewmodels/lancamento_update_metadata_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_itens_grupo_usecase.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/viewmodels/lancamentos_update_valor_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/viewmodels/lancamentos_update_valor_grupo_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_origem_grupo_usecase.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_origem_usecase.dart';
-import 'package:zzuna/ui/lancamentos/update_origem/viewmodels/lancamentos_update_origem_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/viewmodels/lancamentos_update_origem_viewmodel.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
@@ -241,31 +241,31 @@ final atualizarDataRecorrenciaUseCaseProvider =
 
 final lancamentosCriarRecorrenciaViewModelProvider =
     ChangeNotifierProvider<LancamentosCriarRecorrenciaViewModel>((ref) {
-  return LancamentosCriarRecorrenciaViewModel(
-    ref.read(criarRecorrenciaUseCaseProvider),
-  );
-});
+      return LancamentosCriarRecorrenciaViewModel(
+        ref.read(criarRecorrenciaUseCaseProvider),
+      );
+    });
 
 final lancamentosFinalizarRecorrenciaViewModelProvider =
     ChangeNotifierProvider<LancamentosFinalizarRecorrenciaViewModel>((ref) {
-  return LancamentosFinalizarRecorrenciaViewModel(
-    ref.read(finalizarRecorrenciaUseCaseProvider),
-  );
-});
+      return LancamentosFinalizarRecorrenciaViewModel(
+        ref.read(finalizarRecorrenciaUseCaseProvider),
+      );
+    });
 
 final lancamentosReativarRecorrenciaViewModelProvider =
     ChangeNotifierProvider<LancamentosReativarRecorrenciaViewModel>((ref) {
-  return LancamentosReativarRecorrenciaViewModel(
-    ref.read(reativarRecorrenciaUseCaseProvider),
-  );
-});
+      return LancamentosReativarRecorrenciaViewModel(
+        ref.read(reativarRecorrenciaUseCaseProvider),
+      );
+    });
 
 final lancamentosAtualizarDataRecorrenciaViewModelProvider =
     ChangeNotifierProvider<LancamentosAtualizarDataRecorrenciaViewModel>((ref) {
-  return LancamentosAtualizarDataRecorrenciaViewModel(
-    ref.read(atualizarDataRecorrenciaUseCaseProvider),
-  );
-});
+      return LancamentosAtualizarDataRecorrenciaViewModel(
+        ref.read(atualizarDataRecorrenciaUseCaseProvider),
+      );
+    });
 
 final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
   final repository = LancamentoRepository(ref.watch(lancamentoStorageProvider));

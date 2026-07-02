@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_update_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamento_update_modal.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 

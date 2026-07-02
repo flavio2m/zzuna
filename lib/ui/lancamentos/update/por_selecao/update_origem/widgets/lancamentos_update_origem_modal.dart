@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/ui/lancamentos/update_origem/viewmodels/lancamentos_update_origem_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/viewmodels/lancamentos_update_origem_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
@@ -94,12 +94,14 @@ class _LancamentosUpdateOrigemModalState
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final isRunning = _viewModel.updateOrigemSelectedCommand.value.isRunning;
+        final isRunning =
+            _viewModel.updateOrigemSelectedCommand.value.isRunning;
         final isLoading = isRunning && _isExecuting;
 
         return LancamentosUpdateOrigemDialog(
           title: 'Alterar Conta/Cartão',
-          subtitle: 'Escolha a nova conta ou cartão para os lançamentos selecionados:',
+          subtitle:
+              'Escolha a nova conta ou cartão para os lançamentos selecionados:',
           origens: _viewModel.origens,
           initialOrigem: const LancamentoOrigem.conta(contaId: ''),
           isLoading: isLoading,

@@ -6,11 +6,11 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamentos_visualizar_menu_item.dart';
-import 'package:zzuna/ui/lancamentos/update/widgets/lancamentos_editar_menu_item.dart';
-import 'package:zzuna/ui/lancamentos/update_metadata/widgets/lancamentos_update_metadata_menu_item.dart';
-import 'package:zzuna/ui/lancamentos/update_data_grupo/widgets/lancamentos_update_data_grupo_menu_item.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/widgets/lancamentos_update_valor_grupo_menu_item.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/widgets/lancamentos_update_origem_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamentos_editar_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_metadata/widgets/lancamentos_update_metadata_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/widgets/lancamentos_update_data_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/widgets/lancamentos_update_valor_grupo_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/widgets/lancamentos_update_origem_grupo_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/criar/widgets/lancamentos_criar_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/widgets/lancamentos_finalizar_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/reativar/widgets/lancamentos_reativar_recorrencia_menu_item.dart';

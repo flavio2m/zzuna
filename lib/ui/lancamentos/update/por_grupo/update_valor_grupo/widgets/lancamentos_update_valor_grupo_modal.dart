@@ -5,7 +5,7 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/viewmodels/lancamentos_update_valor_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/viewmodels/lancamentos_update_valor_grupo_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_itens_panel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/categoria_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/centro_custo_field.dart';

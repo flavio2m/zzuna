@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/viewmodels/lancamentos_update_origem_grupo_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';

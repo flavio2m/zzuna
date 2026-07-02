@@ -10,17 +10,17 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/formatters/date_formatter.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_details_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/widgets/lancamento_update_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamento_update_modal.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_update_modal.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
-import 'package:zzuna/ui/lancamentos/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update_origem_grupo/widgets/lancamentos_update_origem_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
+import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/widgets/lancamentos_update_origem_grupo_modal.dart';
 import 'package:zzuna/ui/shared/feedback/app_confirmation_dialog.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
