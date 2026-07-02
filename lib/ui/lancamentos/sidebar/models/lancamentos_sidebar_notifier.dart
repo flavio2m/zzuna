@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.dart';
 
-class LancamentosSidebarNotifier extends StateNotifier<LancamentosSidebarState> {
+class LancamentosSidebarNotifier
+    extends StateNotifier<LancamentosSidebarState> {
   LancamentosSidebarNotifier() : super(const LancamentosSidebarState());
 
   void setFiltro(String value) {

@@ -233,8 +233,6 @@ final atualizarDataRecorrenciaUseCaseProvider =
     Provider<AtualizarDataRecorrenciaUseCase>((ref) {
       return AtualizarDataRecorrenciaUseCase(
         ref.watch(lancamentoRepositoryProvider),
-        ref.watch(lancamentoStorageProvider),
-        ref.watch(extratoFaturaRepositoryProvider),
         ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
       );
     });

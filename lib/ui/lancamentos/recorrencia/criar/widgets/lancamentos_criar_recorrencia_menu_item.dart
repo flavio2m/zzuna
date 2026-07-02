@@ -34,6 +34,7 @@ class LancamentosCriarRecorrenciaMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () async {
+             if (!context.mounted) return;
              final confirm = await AppConfirmationDialog.show(
                context: context,
                title: 'Criar Recorrência',

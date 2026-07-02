@@ -34,6 +34,7 @@ class LancamentosEditarMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () {
+             if (!context.mounted) return;
              if (lancamento.tipo == LancamentoTipo.transferencia &&
                  lancamento.grupo != null) {
                TransferenciaUpdateModal.show(

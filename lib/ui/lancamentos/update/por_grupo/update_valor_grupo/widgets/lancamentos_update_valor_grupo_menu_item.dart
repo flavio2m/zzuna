@@ -33,6 +33,7 @@ class LancamentosUpdateValorGrupoMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () {
+             if (!context.mounted) return;
              LancamentosUpdateValorGrupoModal.show(
                context: context,
                lancamentoId: lancamento.id,

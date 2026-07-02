@@ -70,7 +70,11 @@ class ReplicadoPanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const AppText('Lançamentos a gerar:', variant: AppTextVariant.body, fontWeight: FontWeight.normal),
+              const AppText(
+                'Lançamentos a gerar:',
+                variant: AppTextVariant.body,
+                fontWeight: FontWeight.normal,
+              ),
               AppText('$count lançamentos', variant: AppTextVariant.body),
             ],
           ),
@@ -78,7 +82,11 @@ class ReplicadoPanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const AppText('Compromisso total:', variant: AppTextVariant.body, fontWeight: FontWeight.normal),
+              const AppText(
+                'Compromisso total:',
+                variant: AppTextVariant.body,
+                fontWeight: FontWeight.normal,
+              ),
               AppText(
                 'R\$ ${totalCompromisso.toStringAsFixed(2)}',
                 variant: AppTextVariant.body,

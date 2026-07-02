@@ -8,7 +8,8 @@ class LancamentoReconcileViewModel extends ChangeNotifier {
 
   LancamentoReconcileViewModel(this._useCase);
 
-  late final reconcileCommand = Command1<Unit, ({List<String> ids, bool conciliado})>(_reconcile);
+  late final reconcileCommand =
+      Command1<Unit, ({List<String> ids, bool conciliado})>(_reconcile);
 
   AsyncResult<Unit> _reconcile(
     ({List<String> ids, bool conciliado}) params, //

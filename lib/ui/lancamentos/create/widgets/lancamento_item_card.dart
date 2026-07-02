@@ -81,7 +81,10 @@ class LancamentoItemCard extends StatelessWidget {
                 if (centroCustoDescricao.isNotEmpty)
                   AppTag(centroCustoDescricao, variant: AppTagVariant.neutral)
                 else
-                  const AppTag('Sem Centro de Custo', variant: AppTagVariant.error),
+                  const AppTag(
+                    'Sem Centro de Custo',
+                    variant: AppTagVariant.error,
+                  ),
                 if (categoriaDescricao.isNotEmpty)
                   AppTag(categoriaDescricao, variant: AppTagVariant.info)
                 else

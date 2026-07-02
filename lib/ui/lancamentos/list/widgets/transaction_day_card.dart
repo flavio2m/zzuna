@@ -17,13 +17,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
-import 'package:zzuna/ui/lancamentos/update/por_grupo/update_metadata/widgets/lancamentos_update_metadata_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/por_grupo/update_data_grupo/widgets/lancamentos_update_data_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/por_grupo/update_valor_grupo/widgets/lancamentos_update_valor_grupo_modal.dart';
-import 'package:zzuna/ui/lancamentos/update/por_grupo/update_origem_grupo/widgets/lancamentos_update_origem_grupo_modal.dart';
-import 'package:zzuna/ui/shared/feedback/app_confirmation_dialog.dart';
-import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 
 class TransactionDayCard extends StatelessWidget {
   const TransactionDayCard({super.key, required this.dia});

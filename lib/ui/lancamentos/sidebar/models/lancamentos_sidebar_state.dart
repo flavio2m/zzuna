@@ -31,7 +31,8 @@ class LancamentosSidebarState {
       cartoesExpandidos: cartoesExpandidos ?? this.cartoesExpandidos,
       centrosExpandidos: centrosExpandidos ?? this.centrosExpandidos,
       categoriasExpandidas: categoriasExpandidas ?? this.categoriasExpandidas,
-      categoriasExpandidasIds: categoriasExpandidasIds ?? this.categoriasExpandidasIds,
+      categoriasExpandidasIds:
+          categoriasExpandidasIds ?? this.categoriasExpandidasIds,
     );
   }
 }

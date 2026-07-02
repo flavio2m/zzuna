@@ -43,7 +43,9 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
 
   bool isLoading = false;
 
-  late final updateCommand = Command1<Lancamento, LancamentoDto>(_useCase.execute);
+  late final updateCommand = Command1<Lancamento, LancamentoDto>(
+    _useCase.execute,
+  );
 
   /// Carrega todas as listas necessárias para o formulário de atualização.
   Future<void> load() async {

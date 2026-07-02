@@ -32,6 +32,7 @@ class LancamentosUpdateMetadataMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () {
+             if (!context.mounted) return;
              LancamentosUpdateMetadataModal.show(
                context: context,
                lancamentoId: lancamento.id,

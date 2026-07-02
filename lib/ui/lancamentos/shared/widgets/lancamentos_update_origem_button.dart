@@ -4,10 +4,7 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 class LancamentosUpdateOrigemButton extends StatelessWidget {
   final VoidCallback? onPressed;
 
-  const LancamentosUpdateOrigemButton({
-    super.key,
-    this.onPressed,
-  });
+  const LancamentosUpdateOrigemButton({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {

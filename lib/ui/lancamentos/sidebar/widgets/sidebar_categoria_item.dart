@@ -45,7 +45,9 @@ class SidebarCategoryItem extends StatelessWidget {
                 onTap: hasChildren ? onExpand : null,
                 child: Icon(
                   hasChildren //
-                      ? (expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right)
+                      ? (expanded
+                            ? Icons.keyboard_arrow_down
+                            : Icons.keyboard_arrow_right)
                       : Icons.remove,
                   size: 17,
                   color: hasChildren ? AppColors.slate500 : Colors.transparent,
@@ -65,7 +67,9 @@ class SidebarCategoryItem extends StatelessWidget {
               Expanded(
                 child: AppMenuText(
                   descricao,
-                  variant: level == 0 ? AppMenuTextVariant.item : AppMenuTextVariant.subitem,
+                  variant: level == 0
+                      ? AppMenuTextVariant.item
+                      : AppMenuTextVariant.subitem,
                   selected: checked,
                 ),
               ),

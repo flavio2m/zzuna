@@ -1,9 +1,6 @@
 import 'package:result_dart/result_dart.dart';
-import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
@@ -15,14 +12,10 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 /// Recalcula a [data] de todos os lançamentos futuros do grupo usando o novo dia.
 class AtualizarDataRecorrenciaUseCase {
   final LancamentoRepository _lancamentoRepository;
-  final LocalStorage<Lancamento> _lancamentoStorage;
-  final ExtratoFaturaRepository _extratoRepository;
   final RecalculateExtratoFaturaBalanceUseCase _recalculateUseCase;
 
   AtualizarDataRecorrenciaUseCase(
     this._lancamentoRepository,
-    this._lancamentoStorage,
-    this._extratoRepository,
     this._recalculateUseCase,
   );
 

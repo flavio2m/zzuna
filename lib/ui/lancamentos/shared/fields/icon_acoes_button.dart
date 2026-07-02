@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 

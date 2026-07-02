@@ -37,6 +37,7 @@ class LancamentosAtualizarDataRecorrenciaMenuItem
          ),
          onTap: () {
            Future.delayed(Duration.zero, () async {
+             if (!context.mounted) return;
              final confirm = await AppConfirmationDialog.show(
                context: context,
                title: 'Atualizar Recorrência',

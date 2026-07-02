@@ -15,7 +15,8 @@ class LancamentoItensPanel extends StatelessWidget {
   final bool allowEditItem1;
 
   final Function(String ccId, String catId, double val) onSaveNewItem;
-  final Function(int numero, String ccId, String catId, double val) onSaveEditItem;
+  final Function(int numero, String ccId, String catId, double val)
+  onSaveEditItem;
   final Function(int numero) onDeleteItem;
 
   const LancamentoItensPanel({
@@ -30,10 +31,15 @@ class LancamentoItensPanel extends StatelessWidget {
     this.allowEditItem1 = false,
   });
 
-  Map<String, String> _getCategoriaLabels(List<CategoriaDetails> nodes, String prefix) {
+  Map<String, String> _getCategoriaLabels(
+    List<CategoriaDetails> nodes,
+    String prefix,
+  ) {
     final result = <String, String>{};
     for (final node in nodes) {
-      final label = prefix.isEmpty ? node.descricao : '$prefix > ${node.descricao}';
+      final label = prefix.isEmpty
+          ? node.descricao
+          : '$prefix > ${node.descricao}';
       result[node.id] = label;
       if (node.subcategorias.isNotEmpty) {
         result.addAll(_getCategoriaLabels(node.subcategorias, label));

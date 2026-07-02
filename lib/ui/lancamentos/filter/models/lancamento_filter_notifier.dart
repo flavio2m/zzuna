@@ -5,12 +5,12 @@ import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart'
 
 class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
   LancamentoFilterNotifier()
-      : super(
-          LancamentoFilterState(
-            mes: Mes.fromDate(DateTime.now()),
-            ano: DateTime.now().year,
-          ),
-        );
+    : super(
+        LancamentoFilterState(
+          mes: Mes.fromDate(DateTime.now()),
+          ano: DateTime.now().year,
+        ),
+      );
 
   void setDescricao(String value) {
     state = state.copyWith(descricao: value);
@@ -29,17 +29,11 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
   }
 
   void setTipo(LancamentoTipo? value) {
-    state = state.copyWith(
-      tipo: value,
-      clearTipo: value == null,
-    );
+    state = state.copyWith(tipo: value, clearTipo: value == null);
   }
 
   void setConciliado(bool? value) {
-    state = state.copyWith(
-      conciliado: value,
-      clearConciliado: value == null,
-    );
+    state = state.copyWith(conciliado: value, clearConciliado: value == null);
   }
 
   void toggleConta(String id) {
@@ -72,10 +66,7 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
     state = state.copyWith(centrosSelecionados: current);
   }
 
-  void toggleCategoria(
-    String id, {
-    List<String> subcategoriesIds = const [],
-  }) {
+  void toggleCategoria(String id, {List<String> subcategoriesIds = const []}) {
     final current = {...state.categoriasSelecionadas};
     final select = !current.contains(id);
     if (select) {
@@ -140,14 +131,9 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
       return;
     }
     if (state.mes == Mes.janeiro) {
-      state = state.copyWith(
-        mes: state.mes.anterior,
-        ano: state.ano - 1,
-      );
+      state = state.copyWith(mes: state.mes.anterior, ano: state.ano - 1);
     } else {
-      state = state.copyWith(
-        mes: state.mes.anterior,
-      );
+      state = state.copyWith(mes: state.mes.anterior);
     }
   }
 
@@ -157,14 +143,9 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
       return;
     }
     if (state.mes == Mes.dezembro) {
-      state = state.copyWith(
-        mes: state.mes.proximo,
-        ano: state.ano + 1,
-      );
+      state = state.copyWith(mes: state.mes.proximo, ano: state.ano + 1);
     } else {
-      state = state.copyWith(
-        mes: state.mes.proximo,
-      );
+      state = state.copyWith(mes: state.mes.proximo);
     }
   }
 }

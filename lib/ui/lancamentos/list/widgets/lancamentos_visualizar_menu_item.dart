@@ -33,6 +33,7 @@ class LancamentosVisualizarMenuItem extends PopupMenuItem<TipoAcoes> {
          ),
          onTap: () {
            Future.delayed(Duration.zero, () {
+             if (!context.mounted) return;
              AppDialog.show(
                context: context,
                child: LancamentoDetailsModal(lancamento: lancamento),

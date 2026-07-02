@@ -32,7 +32,9 @@ class SidebarOriginSection extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                  expanded
+                      ? Icons.keyboard_arrow_down
+                      : Icons.keyboard_arrow_right,
                   size: 16,
                   color: AppColors.slate400,
                 ),
