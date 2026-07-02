@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
     super.key,
+    required this.lancamentoId,
     required this.description,
     required this.category,
     required this.origem,
@@ -19,16 +21,12 @@ class TransactionRow extends StatelessWidget {
     this.conciliado = false,
     this.selected = false,
     required this.reconcileButton,
+    required this.lancamento,
     this.onTap,
-    this.onView,
-    this.onEdit,
     this.onSelect,
-    this.onUpdateMetadata,
-    this.onUpdateDataGrupo,
-    this.onUpdateValorGrupo,
-    this.onUpdateOrigemGrupo,
   });
 
+  final String lancamentoId;
   final String description;
   final String category;
   final LancamentoOrigemDetail origem;
@@ -40,14 +38,9 @@ class TransactionRow extends StatelessWidget {
   final bool conciliado;
   final bool selected;
   final Widget reconcileButton;
+  final LancamentoDetails lancamento;
   final VoidCallback? onTap;
-  final VoidCallback? onView;
-  final VoidCallback? onEdit;
   final ValueChanged<bool>? onSelect;
-  final VoidCallback? onUpdateMetadata;
-  final VoidCallback? onUpdateDataGrupo;
-  final VoidCallback? onUpdateValorGrupo;
-  final VoidCallback? onUpdateOrigemGrupo;
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +185,10 @@ class TransactionRow extends StatelessWidget {
                             ) =>
                               'Replicado ($parcela de $totalParcelas)',
                             LancamentoGrupoTransferencia() => 'Transferência',
+                            LancamentoGrupoRecorrencia(:final ativo) =>
+                              ativo
+                                  ? 'Recorrente (Ativo)'
+                                  : 'Recorrência Inativa',
                           },
                           child: Icon(
                             switch (grupo!) {
@@ -201,9 +198,17 @@ class TransactionRow extends StatelessWidget {
                                 Icons.repeat_outlined,
                               LancamentoGrupoTransferencia() =>
                                 Icons.swap_horiz_outlined,
+                              LancamentoGrupoRecorrencia(:final ativo) =>
+                                ativo
+                                    ? Icons.repeat_rounded
+                                    : Icons.repeat_one_outlined,
                             },
                             size: 13,
-                            color: AppColors.primary,
+                            color:
+                                grupo is LancamentoGrupoRecorrencia &&
+                                    !(grupo as LancamentoGrupoRecorrencia).ativo
+                                ? AppColors.slate400
+                                : AppColors.primary,
                           ),
                         ),
                       ],
@@ -232,17 +237,7 @@ class TransactionRow extends StatelessWidget {
             const SizedBox(width: 8),
             reconcileButton,
             const SizedBox(width: 8),
-            IconAcoesButton(
-              conciliado: conciliado,
-              grupo: grupo,
-              tipo: tipo,
-              onView: onView ?? onTap,
-              onEdit: onEdit,
-              onUpdateMetadata: onUpdateMetadata,
-              onUpdateDataGrupo: onUpdateDataGrupo,
-              onUpdateValorGrupo: onUpdateValorGrupo,
-              onUpdateOrigemGrupo: onUpdateOrigemGrupo,
-            ),
+            IconAcoesButton(lancamento: lancamento),
           ],
         ),
       ),

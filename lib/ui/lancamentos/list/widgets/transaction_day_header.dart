@@ -87,7 +87,9 @@ class TransactionDayHeader extends StatelessWidget {
                   AppText(
                     extractBalance,
                     variant: AppTextVariant.caption,
-                    color: positiveExtract ? AppColors.primary : AppColors.danger,
+                    color: positiveExtract
+                        ? AppColors.primary
+                        : AppColors.danger,
                     fontWeight: FontWeight.w900,
                   ),
                 ],

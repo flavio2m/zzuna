@@ -21,7 +21,9 @@ class CategoriaField extends StatelessWidget {
   List<_FlatCategoria> _flatten(List<CategoriaDetails> nodes, String prefix) {
     final result = <_FlatCategoria>[];
     for (final node in nodes) {
-      final label = prefix.isEmpty ? node.descricao : '$prefix > ${node.descricao}';
+      final label = prefix.isEmpty
+          ? node.descricao
+          : '$prefix > ${node.descricao}';
       result.add(_FlatCategoria(id: node.id, label: label));
       if (node.subcategorias.isNotEmpty) {
         result.addAll(_flatten(node.subcategorias, label));
@@ -40,10 +42,8 @@ class CategoriaField extends StatelessWidget {
       validator: validator,
       items: flat
           .map(
-            (cat) => AppDropdownMenuItem<String>(
-              value: cat.id,
-              label: cat.label,
-            ),
+            (cat) =>
+                AppDropdownMenuItem<String>(value: cat.id, label: cat.label),
           )
           .toList(),
       onChanged: onChanged,

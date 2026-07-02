@@ -77,6 +77,15 @@ import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.da
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_transferencia_usecase.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_update_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/criar_recorrencia_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/finalizar_recorrencia_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reativar_recorrencia_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/atualizar_data_recorrencia_usecase.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/criar/viewmodels/lancamentos_criar_recorrencia_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/viewmodels/lancamentos_finalizar_recorrencia_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/reativar/viewmodels/lancamentos_reativar_recorrencia_viewmodel.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/viewmodels/lancamentos_atualizar_data_recorrencia_viewmodel.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
@@ -136,7 +145,9 @@ final cartaoRepositoryProvider = Provider<CartaoRepository>((ref) {
 });
 
 final centroCustoRepositoryProvider = Provider<CentroCustoRepository>((ref) {
-  final repository = CentroCustoRepository(ref.watch(centroCustoStorageProvider));
+  final repository = CentroCustoRepository(
+    ref.watch(centroCustoStorageProvider),
+  );
 
   ref.onDispose(repository.dispose);
 
@@ -149,26 +160,110 @@ final categoriaRepositoryProvider = Provider<CategoriaRepository>((ref) {
   return repository;
 });
 
-final recalculateExtratoFaturaBalanceUseCaseProvider = Provider<RecalculateExtratoFaturaBalanceUseCase>((ref) {
-  return RecalculateExtratoFaturaBalanceUseCase(
-    ref.watch(extratoFaturaStorageProvider),
+final recalculateExtratoFaturaBalanceUseCaseProvider =
+    Provider<RecalculateExtratoFaturaBalanceUseCase>((ref) {
+      return RecalculateExtratoFaturaBalanceUseCase(
+        ref.watch(extratoFaturaStorageProvider),
+        ref.watch(lancamentoStorageProvider),
+      );
+    });
+
+final resolveExtratoFaturaUseCaseProvider =
+    Provider<ResolveExtratoFaturaUseCase>((ref) {
+      return ResolveExtratoFaturaUseCase(
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        applyRecorrenciasUseCase: ref.watch(applyRecorrenciasUseCaseProvider),
+      );
+    });
+
+final resolveExtratoFaturasUseCaseProvider =
+    Provider<ResolveExtratoFaturasUseCase>((ref) {
+      return ResolveExtratoFaturasUseCase(
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        applyRecorrenciasUseCase: ref.watch(applyRecorrenciasUseCaseProvider),
+      );
+    });
+
+final applyRecorrenciasUseCaseProvider = Provider<ApplyRecorrenciasUseCase>((
+  ref,
+) {
+  return ApplyRecorrenciasUseCase(
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(lancamentoRepositoryProvider),
     ref.watch(lancamentoStorageProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
   );
 });
 
-final resolveExtratoFaturaUseCaseProvider = Provider<ResolveExtratoFaturaUseCase>((ref) {
-  return ResolveExtratoFaturaUseCase(
+final criarRecorrenciaUseCaseProvider = Provider<CriarRecorrenciaUseCase>((
+  ref,
+) {
+  return CriarRecorrenciaUseCase(
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(lancamentoStorageProvider),
     ref.watch(extratoFaturaRepositoryProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
   );
 });
 
-final resolveExtratoFaturasUseCaseProvider = Provider<ResolveExtratoFaturasUseCase>((ref) {
-  return ResolveExtratoFaturasUseCase(
-    ref.watch(extratoFaturaRepositoryProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
+final finalizarRecorrenciaUseCaseProvider =
+    Provider<FinalizarRecorrenciaUseCase>((ref) {
+      return FinalizarRecorrenciaUseCase(
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+      );
+    });
+
+final reativarRecorrenciaUseCaseProvider = Provider<ReativarRecorrenciaUseCase>(
+  (ref) {
+    return ReativarRecorrenciaUseCase(
+      ref.watch(lancamentoRepositoryProvider),
+      ref.watch(lancamentoStorageProvider),
+      ref.watch(extratoFaturaRepositoryProvider),
+      ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+    );
+  },
+);
+
+final atualizarDataRecorrenciaUseCaseProvider =
+    Provider<AtualizarDataRecorrenciaUseCase>((ref) {
+      return AtualizarDataRecorrenciaUseCase(
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(lancamentoStorageProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+      );
+    });
+
+final lancamentosCriarRecorrenciaViewModelProvider =
+    ChangeNotifierProvider<LancamentosCriarRecorrenciaViewModel>((ref) {
+  return LancamentosCriarRecorrenciaViewModel(
+    ref.read(criarRecorrenciaUseCaseProvider),
+  );
+});
+
+final lancamentosFinalizarRecorrenciaViewModelProvider =
+    ChangeNotifierProvider<LancamentosFinalizarRecorrenciaViewModel>((ref) {
+  return LancamentosFinalizarRecorrenciaViewModel(
+    ref.read(finalizarRecorrenciaUseCaseProvider),
+  );
+});
+
+final lancamentosReativarRecorrenciaViewModelProvider =
+    ChangeNotifierProvider<LancamentosReativarRecorrenciaViewModel>((ref) {
+  return LancamentosReativarRecorrenciaViewModel(
+    ref.read(reativarRecorrenciaUseCaseProvider),
+  );
+});
+
+final lancamentosAtualizarDataRecorrenciaViewModelProvider =
+    ChangeNotifierProvider<LancamentosAtualizarDataRecorrenciaViewModel>((ref) {
+  return LancamentosAtualizarDataRecorrenciaViewModel(
+    ref.read(atualizarDataRecorrenciaUseCaseProvider),
   );
 });
 
@@ -178,7 +273,9 @@ final lancamentoRepositoryProvider = Provider<LancamentoRepository>((ref) {
   return repository;
 });
 
-final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) {
+final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((
+  ref,
+) {
   return CreateLancamentoUseCase(
     ref.watch(resolveExtratoFaturaUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
@@ -186,7 +283,9 @@ final createLancamentoUseCaseProvider = Provider<CreateLancamentoUseCase>((ref) 
   );
 });
 
-final createLancamentosUseCaseProvider = Provider<CreateLancamentosUseCase>((ref) {
+final createLancamentosUseCaseProvider = Provider<CreateLancamentosUseCase>((
+  ref,
+) {
   return CreateLancamentosUseCase(
     ref.watch(resolveExtratoFaturasUseCaseProvider),
     ref.watch(lancamentoRepositoryProvider),
@@ -206,7 +305,9 @@ final lancamentoCreateViewModelProvider = Provider<LancamentoCreateViewModel>(
   ),
 );
 
-final updateLancamentoUseCaseProvider = Provider<UpdateLancamentoUseCase>((ref) {
+final updateLancamentoUseCaseProvider = Provider<UpdateLancamentoUseCase>((
+  ref,
+) {
   return UpdateLancamentoUseCase(
     ref.watch(resolveExtratoFaturaUseCaseProvider),
     ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
@@ -227,152 +328,176 @@ final lancamentoUpdateViewModelProvider = Provider<LancamentoUpdateViewModel>(
   ),
 );
 
-final reconcileLancamentosUseCaseProvider = Provider<ReconcileLancamentosUseCase>((ref) {
-  return ReconcileLancamentosUseCase(
-    ref.watch(lancamentoRepositoryProvider),
-  );
-});
+final reconcileLancamentosUseCaseProvider =
+    Provider<ReconcileLancamentosUseCase>((ref) {
+      return ReconcileLancamentosUseCase(
+        ref.watch(lancamentoRepositoryProvider),
+      );
+    });
 
-final lancamentoReconcileViewModelProvider = ChangeNotifierProvider<LancamentoReconcileViewModel>(
-  (ref) => LancamentoReconcileViewModel(
-    ref.watch(reconcileLancamentosUseCaseProvider),
-  ),
+final lancamentoReconcileViewModelProvider =
+    ChangeNotifierProvider<LancamentoReconcileViewModel>(
+      (ref) => LancamentoReconcileViewModel(
+        ref.watch(reconcileLancamentosUseCaseProvider),
+      ),
+    );
+
+final updateLancamentosDataUseCaseProvider =
+    Provider<UpdateLancamentosDataUseCase>((ref) {
+      return UpdateLancamentosDataUseCase(
+        ref.watch(resolveExtratoFaturaUseCaseProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+      );
+    });
+
+final lancamentoUpdateDataViewModelProvider =
+    ChangeNotifierProvider<LancamentoUpdateDataViewModel>(
+      (ref) => LancamentoUpdateDataViewModel(
+        ref.watch(updateLancamentosDataUseCaseProvider),
+      ),
+    );
+
+final updateLancamentosDataGrupoUseCaseProvider =
+    Provider<UpdateLancamentosDataGrupoUseCase>((ref) {
+      return UpdateLancamentosDataGrupoUseCase(
+        ref.watch(resolveExtratoFaturaUseCaseProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+      );
+    });
+
+final lancamentosUpdateDataGrupoViewModelProvider =
+    ChangeNotifierProvider<LancamentosUpdateDataGrupoViewModel>(
+      (ref) => LancamentosUpdateDataGrupoViewModel(
+        ref.watch(updateLancamentosDataGrupoUseCaseProvider),
+      ),
+    );
+
+final updateLancamentosMetadataUseCaseProvider =
+    Provider<UpdateLancamentosMetadataUseCase>((ref) {
+      return UpdateLancamentosMetadataUseCase(
+        ref.watch(lancamentoRepositoryProvider),
+      );
+    });
+
+final lancamentoUpdateMetadataViewModelProvider =
+    ChangeNotifierProvider<LancamentoUpdateMetadataViewModel>(
+      (ref) => LancamentoUpdateMetadataViewModel(
+        ref.watch(updateLancamentosMetadataUseCaseProvider),
+      ),
+    );
+
+final updateLancamentosItensGrupoUseCaseProvider =
+    Provider<UpdateLancamentosItensGrupoUseCase>((ref) {
+      return UpdateLancamentosItensGrupoUseCase(
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+      );
+    });
+
+final lancamentosUpdateValorGrupoViewModelProvider =
+    ChangeNotifierProvider<LancamentosUpdateValorGrupoViewModel>(
+      (ref) => LancamentosUpdateValorGrupoViewModel(
+        ref.watch(updateLancamentosItensGrupoUseCaseProvider),
+        ref.watch(categoriaTreeUseCaseProvider),
+        ref.watch(centroCustoRepositoryProvider),
+        ref.watch(categoriaRepositoryProvider),
+      ),
+    );
+
+final updateLancamentosOrigemGrupoUseCaseProvider =
+    Provider<UpdateLancamentosOrigemGrupoUseCase>((ref) {
+      return UpdateLancamentosOrigemGrupoUseCase(
+        ref.watch(resolveExtratoFaturaUseCaseProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+      );
+    });
+
+final lancamentosUpdateOrigemGrupoViewModelProvider =
+    ChangeNotifierProvider<LancamentosUpdateOrigemGrupoViewModel>(
+      (ref) => LancamentosUpdateOrigemGrupoViewModel(
+        ref.watch(updateLancamentosOrigemGrupoUseCaseProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+      ),
+    );
+
+final updateLancamentosOrigemUseCaseProvider =
+    Provider<UpdateLancamentosOrigemUseCase>((ref) {
+      return UpdateLancamentosOrigemUseCase(
+        ref.watch(resolveExtratoFaturaUseCaseProvider),
+        ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+      );
+    });
+
+final lancamentosUpdateOrigemViewModelProvider =
+    ChangeNotifierProvider<LancamentosUpdateOrigemViewModel>(
+      (ref) => LancamentosUpdateOrigemViewModel(
+        ref.watch(updateLancamentosOrigemUseCaseProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+      ),
+    );
+
+final createTransferenciaUseCaseProvider = Provider<CreateTransferenciaUseCase>(
+  (ref) {
+    return CreateTransferenciaUseCase(
+      ref.watch(createLancamentosUseCaseProvider),
+      TransferenciaValidator(),
+    );
+  },
 );
 
-final updateLancamentosDataUseCaseProvider = Provider<UpdateLancamentosDataUseCase>((ref) {
-  return UpdateLancamentosDataUseCase(
-    ref.watch(resolveExtratoFaturaUseCaseProvider),
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-  );
-});
+final transferenciaCreateViewModelProvider =
+    ChangeNotifierProvider<TransferenciaCreateViewModel>(
+      (ref) => TransferenciaCreateViewModel(
+        ref.watch(createTransferenciaUseCaseProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+      ),
+    );
 
-final lancamentoUpdateDataViewModelProvider = ChangeNotifierProvider<LancamentoUpdateDataViewModel>(
-  (ref) => LancamentoUpdateDataViewModel(
-    ref.watch(updateLancamentosDataUseCaseProvider),
-  ),
+final updateTransferenciaUseCaseProvider = Provider<UpdateTransferenciaUseCase>(
+  (ref) {
+    return UpdateTransferenciaUseCase(
+      ref.watch(resolveExtratoFaturasUseCaseProvider),
+      ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+      ref.watch(lancamentoRepositoryProvider),
+      ref.watch(extratoFaturaRepositoryProvider),
+      TransferenciaValidator(),
+    );
+  },
 );
 
-final updateLancamentosDataGrupoUseCaseProvider = Provider<UpdateLancamentosDataGrupoUseCase>((ref) {
-  return UpdateLancamentosDataGrupoUseCase(
-    ref.watch(resolveExtratoFaturaUseCaseProvider),
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
+final transferenciaUpdateViewModelProvider =
+    ChangeNotifierProvider.family<TransferenciaUpdateViewModel, String>(
+      (ref, grupoId) => TransferenciaUpdateViewModel(
+        ref.watch(updateTransferenciaUseCaseProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        grupoId,
+      ),
+    );
+
+final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((
+  ref,
+) {
+  final repository = ExtratoFaturaRepository(
+    ref.watch(extratoFaturaStorageProvider),
   );
-});
-
-final lancamentosUpdateDataGrupoViewModelProvider = ChangeNotifierProvider<LancamentosUpdateDataGrupoViewModel>(
-  (ref) => LancamentosUpdateDataGrupoViewModel(
-    ref.watch(updateLancamentosDataGrupoUseCaseProvider),
-  ),
-);
-
-final updateLancamentosMetadataUseCaseProvider = Provider<UpdateLancamentosMetadataUseCase>((ref) {
-  return UpdateLancamentosMetadataUseCase(
-    ref.watch(lancamentoRepositoryProvider),
-  );
-});
-
-final lancamentoUpdateMetadataViewModelProvider = ChangeNotifierProvider<LancamentoUpdateMetadataViewModel>(
-  (ref) => LancamentoUpdateMetadataViewModel(
-    ref.watch(updateLancamentosMetadataUseCaseProvider),
-  ),
-);
-
-final updateLancamentosItensGrupoUseCaseProvider = Provider<UpdateLancamentosItensGrupoUseCase>((ref) {
-  return UpdateLancamentosItensGrupoUseCase(
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-  );
-});
-
-final lancamentosUpdateValorGrupoViewModelProvider = ChangeNotifierProvider<LancamentosUpdateValorGrupoViewModel>(
-  (ref) => LancamentosUpdateValorGrupoViewModel(
-    ref.watch(updateLancamentosItensGrupoUseCaseProvider),
-    ref.watch(categoriaTreeUseCaseProvider),
-    ref.watch(centroCustoRepositoryProvider),
-    ref.watch(categoriaRepositoryProvider),
-  ),
-);
-
-final updateLancamentosOrigemGrupoUseCaseProvider = Provider<UpdateLancamentosOrigemGrupoUseCase>((ref) {
-  return UpdateLancamentosOrigemGrupoUseCase(
-    ref.watch(resolveExtratoFaturaUseCaseProvider),
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-  );
-});
-
-final lancamentosUpdateOrigemGrupoViewModelProvider = ChangeNotifierProvider<LancamentosUpdateOrigemGrupoViewModel>(
-  (ref) => LancamentosUpdateOrigemGrupoViewModel(
-    ref.watch(updateLancamentosOrigemGrupoUseCaseProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-  ),
-);
-
-final updateLancamentosOrigemUseCaseProvider = Provider<UpdateLancamentosOrigemUseCase>((ref) {
-  return UpdateLancamentosOrigemUseCase(
-    ref.watch(resolveExtratoFaturaUseCaseProvider),
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-  );
-});
-
-final lancamentosUpdateOrigemViewModelProvider = ChangeNotifierProvider<LancamentosUpdateOrigemViewModel>(
-  (ref) => LancamentosUpdateOrigemViewModel(
-    ref.watch(updateLancamentosOrigemUseCaseProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-  ),
-);
-
-final createTransferenciaUseCaseProvider = Provider<CreateTransferenciaUseCase>((ref) {
-  return CreateTransferenciaUseCase(
-    ref.watch(createLancamentosUseCaseProvider),
-    TransferenciaValidator(),
-  );
-});
-
-final transferenciaCreateViewModelProvider = ChangeNotifierProvider<TransferenciaCreateViewModel>(
-  (ref) => TransferenciaCreateViewModel(
-    ref.watch(createTransferenciaUseCaseProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-  ),
-);
-
-final updateTransferenciaUseCaseProvider = Provider<UpdateTransferenciaUseCase>((ref) {
-  return UpdateTransferenciaUseCase(
-    ref.watch(resolveExtratoFaturasUseCaseProvider),
-    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-    TransferenciaValidator(),
-  );
-});
-
-final transferenciaUpdateViewModelProvider = ChangeNotifierProvider.family<TransferenciaUpdateViewModel, String>(
-  (ref, grupoId) => TransferenciaUpdateViewModel(
-    ref.watch(updateTransferenciaUseCaseProvider),
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    grupoId,
-  ),
-);
-
-final extratoFaturaRepositoryProvider = Provider<ExtratoFaturaRepository>((ref) {
-  final repository = ExtratoFaturaRepository(ref.watch(extratoFaturaStorageProvider));
   ref.onDispose(repository.dispose);
   return repository;
 });
@@ -388,7 +513,9 @@ final categoriaTreeUseCaseProvider = Provider<CategoriaTreeUseCase>(
   (ref) => CategoriaTreeUseCase(), //
 );
 
-final lancamentoDetailsUseCaseProvider = Provider<LancamentoDetailsUseCase>((ref) {
+final lancamentoDetailsUseCaseProvider = Provider<LancamentoDetailsUseCase>((
+  ref,
+) {
   return LancamentoDetailsUseCase(
     ref.watch(lancamentoRepositoryProvider),
     ref.watch(contaRepositoryProvider),
@@ -400,7 +527,9 @@ final lancamentoDetailsUseCaseProvider = Provider<LancamentoDetailsUseCase>((ref
   );
 });
 
-final lancamentoFilterUseCaseProvider = Provider<LancamentoFilterUseCase>((ref) {
+final lancamentoFilterUseCaseProvider = Provider<LancamentoFilterUseCase>((
+  ref,
+) {
   return LancamentoFilterUseCase();
 });
 
@@ -422,7 +551,9 @@ final registerViewModelProvider = Provider<RegisterViewModel>(
 );
 
 // CONTA
-final contaListViewModelProvider = Provider.autoDispose<ContaListViewModel>((ref) {
+final contaListViewModelProvider = Provider.autoDispose<ContaListViewModel>((
+  ref,
+) {
   final vm = ContaListViewModel(ref.watch(contaRepositoryProvider));
 
   ref.onDispose(vm.dispose);
@@ -443,7 +574,9 @@ final contaDeleteViewModelProvider = Provider<ContaDeleteViewModel>(
 );
 
 // CARTAO
-final cartaoListViewModelProvider = Provider.autoDispose<CartaoListViewModel>((ref) {
+final cartaoListViewModelProvider = Provider.autoDispose<CartaoListViewModel>((
+  ref,
+) {
   final vm = CartaoListViewModel(ref.watch(cartaoRepositoryProvider));
 
   ref.onDispose(vm.dispose);
@@ -467,13 +600,16 @@ final cartaoDeleteViewModelProvider = Provider<CartaoDeleteViewModel>(
 // CENTRO DE CUSTO
 // ============================================================================
 
-final centroCustoListViewModelProvider = Provider.autoDispose<CentroCustoListViewModel>((ref) {
-  final vm = CentroCustoListViewModel(ref.watch(centroCustoRepositoryProvider));
+final centroCustoListViewModelProvider =
+    Provider.autoDispose<CentroCustoListViewModel>((ref) {
+      final vm = CentroCustoListViewModel(
+        ref.watch(centroCustoRepositoryProvider),
+      );
 
-  ref.onDispose(vm.dispose);
+      ref.onDispose(vm.dispose);
 
-  return vm;
-});
+      return vm;
+    });
 
 final centroCustoCreateViewModelProvider = Provider<CentroCustoCreateViewModel>(
   (ref) => CentroCustoCreateViewModel(ref.watch(centroCustoRepositoryProvider)),
@@ -488,13 +624,14 @@ final centroCustoDeleteViewModelProvider = Provider<CentroCustoDeleteViewModel>(
 );
 
 // CATEGORIA
-final categoriaListViewModelProvider = ChangeNotifierProvider<CategoriaListViewModel>(
-  (ref) => CategoriaListViewModel(
-    ref.watch(categoriaRepositoryProvider),
-    ref.watch(categoriaFilterUseCaseProvider),
-    ref.watch(categoriaTreeUseCaseProvider),
-  ),
-);
+final categoriaListViewModelProvider =
+    ChangeNotifierProvider<CategoriaListViewModel>(
+      (ref) => CategoriaListViewModel(
+        ref.watch(categoriaRepositoryProvider),
+        ref.watch(categoriaFilterUseCaseProvider),
+        ref.watch(categoriaTreeUseCaseProvider),
+      ),
+    );
 
 final categoriaCreateViewModelProvider = Provider<CategoriaCreateViewModel>(
   (ref) => CategoriaCreateViewModel(ref.watch(categoriaRepositoryProvider)),
@@ -509,45 +646,52 @@ final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
 );
 
 final lancamentosSidebarStateProvider =
-    StateNotifierProvider.autoDispose<LancamentosSidebarNotifier, LancamentosSidebarState>(
-      (ref) => LancamentosSidebarNotifier(),
-    );
+    StateNotifierProvider.autoDispose<
+      LancamentosSidebarNotifier,
+      LancamentosSidebarState
+    >((ref) => LancamentosSidebarNotifier());
 
-final lancamentosSidebarViewModelProvider = Provider.autoDispose<LancamentosSidebarViewModel>((ref) {
-  final vm = LancamentosSidebarViewModel(
-    ref.watch(contaRepositoryProvider),
-    ref.watch(cartaoRepositoryProvider),
-    ref.watch(centroCustoRepositoryProvider),
-    ref.watch(categoriaRepositoryProvider),
-    ref.watch(categoriaTreeUseCaseProvider),
-  );
-  ref.onDispose(vm.dispose);
-  return vm;
-});
+final lancamentosSidebarViewModelProvider =
+    Provider.autoDispose<LancamentosSidebarViewModel>((ref) {
+      final vm = LancamentosSidebarViewModel(
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        ref.watch(centroCustoRepositoryProvider),
+        ref.watch(categoriaRepositoryProvider),
+        ref.watch(categoriaTreeUseCaseProvider),
+      );
+      ref.onDispose(vm.dispose);
+      return vm;
+    });
 
-final lancamentoFilterProvider = StateNotifierProvider<LancamentoFilterNotifier, LancamentoFilterState>((ref) {
-  return LancamentoFilterNotifier();
-});
+final lancamentoFilterProvider =
+    StateNotifierProvider<LancamentoFilterNotifier, LancamentoFilterState>((
+      ref,
+    ) {
+      return LancamentoFilterNotifier();
+    });
 
-final lancamentoResumoMensalUseCaseProvider = Provider<LancamentoResumoMensalUseCase>((ref) {
-  return LancamentoResumoMensalUseCase();
-});
+final lancamentoResumoMensalUseCaseProvider =
+    Provider<LancamentoResumoMensalUseCase>((ref) {
+      return LancamentoResumoMensalUseCase();
+    });
 
-final lancamentosListViewModelProvider = ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
-  final vm = LancamentosListViewModel(
-    ref.watch(lancamentoDetailsUseCaseProvider),
-    ref.watch(lancamentoFilterUseCaseProvider),
-    ref.watch(lancamentoResumoMensalUseCaseProvider),
-    ref.watch(lancamentoRepositoryProvider),
-    ref.watch(extratoFaturaRepositoryProvider),
-  );
-  ref.listen(lancamentoFilterProvider, (previous, next) {
-    vm.updateFilter(next);
-  });
-  vm.updateFilter(ref.read(lancamentoFilterProvider));
-  ref.onDispose(vm.dispose);
-  return vm;
-});
+final lancamentosListViewModelProvider =
+    ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
+      final vm = LancamentosListViewModel(
+        ref.watch(lancamentoDetailsUseCaseProvider),
+        ref.watch(lancamentoFilterUseCaseProvider),
+        ref.watch(lancamentoResumoMensalUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+      );
+      ref.listen(lancamentoFilterProvider, (previous, next) {
+        vm.updateFilter(next);
+      });
+      vm.updateFilter(ref.read(lancamentoFilterProvider));
+      ref.onDispose(vm.dispose);
+      return vm;
+    });
 
 // ============================================================================
 // STATE PROVIDERS - Estado Global da Aplicação

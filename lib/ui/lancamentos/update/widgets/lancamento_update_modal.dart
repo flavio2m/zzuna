@@ -179,6 +179,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
       LancamentoGrupoReplicacao(:final parcela, :final totalParcelas) =>
         'Replicado ($parcela de $totalParcelas)',
       LancamentoGrupoTransferencia() => 'Transferência',
+      LancamentoGrupoRecorrencia(:final ativo) =>
+        ativo ? 'Recorrente (Ativo)' : 'Recorrência Inativa',
     };
   }
 
