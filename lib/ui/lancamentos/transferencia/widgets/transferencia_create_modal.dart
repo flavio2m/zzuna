@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/create_transferencia_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/lancamento_origem_field.dart';
@@ -49,7 +50,40 @@ class _TransferenciaCreateModalState
     super.initState();
     viewModel = ref.read(transferenciaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
-    viewModel.load();
+
+    _loadData();
+  }
+
+  void _loadData() {
+    viewModel.load().then((_) {
+      if (!mounted) return;
+      _preencherOrigensDoFiltro();
+    });
+  }
+
+  void _preencherOrigensDoFiltro() {
+    if (_origemSaida != null || _origemEntrada != null) return;
+
+    final filter = ref.read(lancamentoFilterProvider);
+    final contas = filter.contasSelecionadas;
+    final cartoes = filter.cartoesSelecionados;
+
+    if (contas.isEmpty && cartoes.isEmpty) return;
+
+    final selectedOrigens = viewModel.origens.where((d) => switch (d) {
+      LancamentoOrigemContaDetail(:final conta) => contas.contains(conta.id),
+      LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(cartao.id),
+    }).toList();
+
+    if (selectedOrigens.isNotEmpty) {
+      setState(() {
+        _origemSaida = selectedOrigens[0].origem;
+
+        if (selectedOrigens.length > 1) {
+          _origemEntrada = selectedOrigens[1].origem;
+        }
+      });
+    }
   }
 
   @override

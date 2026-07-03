@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
@@ -69,8 +71,56 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     super.initState();
     viewModel = ref.read(lancamentoCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
-    viewModel.load();
+
+    _loadData();
     _syncItem1();
+  }
+
+  void _loadData() {
+    viewModel.load().then((_) {
+      if (!mounted) return;
+      _preencherCamposPadrao();
+    });
+  }
+
+  void _preencherCamposPadrao() {
+    bool needsUpdate = false;
+
+    final isOrigemDefault = switch (dto.origem) {
+      LancamentoOrigemConta(:final contaId) => contaId.isEmpty,
+      LancamentoOrigemCartao() => false,
+    };
+    if (isOrigemDefault) {
+      final filter = ref.read(lancamentoFilterProvider);
+      final contas = filter.contasSelecionadas;
+      final cartoes = filter.cartoesSelecionados;
+
+      LancamentoOrigemDetail? detailToSelect;
+      
+      if (contas.isNotEmpty || cartoes.isNotEmpty) {
+        detailToSelect = viewModel.origens.where((d) => switch (d) {
+          LancamentoOrigemContaDetail(:final conta) => contas.contains(conta.id),
+          LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(cartao.id),
+        }).firstOrNull;
+      } else if (viewModel.origens.length == 1) {
+        detailToSelect = viewModel.origens.first;
+      }
+
+      if (detailToSelect != null) {
+        dto.setOrigem(detailToSelect.origem);
+        needsUpdate = true;
+      }
+    }
+
+    if (_centroCustoId.isEmpty && viewModel.centros.isNotEmpty) {
+      _centroCustoId = viewModel.centros.first.id;
+      _syncItem1();
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      setState(() {});
+    }
   }
 
   void _syncItem1() {
