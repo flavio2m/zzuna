@@ -25,7 +25,8 @@ class CategoriaCreateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CategoriaCreateModal> createState() => _CategoriaCreateModalState();
+  ConsumerState<CategoriaCreateModal> createState() =>
+      _CategoriaCreateModalState();
 }
 
 class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
@@ -55,7 +56,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Categoria criada com sucesso');
+      AppSnackBar.showSuccess(context, 'Categoria criada com sucesso.');
 
       Navigator.pop(context);
     });
@@ -75,7 +76,6 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final createVM = ref.watch(categoriaCreateViewModelProvider);
@@ -92,7 +92,10 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
           listenable: createVM.createCommand,
           builder: (_, _) {
             return ButtonSave(
-              onPressed: createVM.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
+              loading: createVM.createCommand.value.isRunning,
+              onPressed: createVM.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
             );
           },
         ),
@@ -124,7 +127,9 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
               ),
             ],
             onChanged: (value) {
-              dto.setCategoriaPaiId(value == null || value.isEmpty ? null : value);
+              dto.setCategoriaPaiId(
+                value == null || value.isEmpty ? null : value,
+              );
               setState(() {});
             },
           ),

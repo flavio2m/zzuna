@@ -203,13 +203,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               listenable: viewModel.updateCommand,
               builder: (_, _) {
                 return ButtonSave(
-                  onPressed:
-                      viewModel //
-                          .updateCommand
-                          .value
-                          .isRunning
-                      ? null
-                      : _handleSubmit, //
+                  loading: viewModel.updateCommand.value.isRunning,
+                  onPressed: viewModel.updateCommand.value.isRunning ? null : _handleSubmit,
                 );
               },
             ),

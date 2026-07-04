@@ -42,7 +42,8 @@ class CategoriaUpdateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CategoriaUpdateModal> createState() => _CategoriaUpdateModalState();
+  ConsumerState<CategoriaUpdateModal> createState() =>
+      _CategoriaUpdateModalState();
 }
 
 class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
@@ -79,7 +80,7 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
     final commandValue = viewModel.updateCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Categoria atualizada com sucesso');
+      AppSnackBar.showSuccess(context, 'Categoria atualizada com sucesso.');
 
       Navigator.pop(context);
     });
@@ -104,7 +105,9 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
     final updateVM = ref.watch(categoriaUpdateViewModelProvider);
     final listVM = ref.watch(categoriaListViewModelProvider);
     // Exclui a própria categoria do dropdown para não criar ciclo
-    final categoriasPai = listVM.categoriasPai.where((c) => c.id != dto.id).toList();
+    final categoriasPai = listVM.categoriasPai
+        .where((c) => c.id != dto.id)
+        .toList();
 
     return AppForm(
       title: 'Editar Categoria',
@@ -116,8 +119,8 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
           listenable: updateVM.updateCommand,
           builder: (_, _) {
             return ButtonSave(
-              onPressed: //
-              updateVM.updateCommand.value.isRunning || !_canSubmit
+              loading: updateVM.updateCommand.value.isRunning,
+              onPressed: updateVM.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
             );
@@ -153,7 +156,9 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
                 ),
               ],
               onChanged: (value) {
-                dto.setCategoriaPaiId(value == null || value.isEmpty ? null : value);
+                dto.setCategoriaPaiId(
+                  value == null || value.isEmpty ? null : value,
+                );
                 setState(() {});
               },
             ),

@@ -82,8 +82,8 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           listenable: viewModel.createCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: //
-              viewModel.createCommand.value.isRunning || !_canSubmit
+              loading: viewModel.createCommand.value.isRunning,
+              onPressed: viewModel.createCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
             );

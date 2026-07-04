@@ -172,9 +172,8 @@ class _TransferenciaCreateModalState
               listenable: viewModel.createCommand,
               builder: (_, _) {
                 return ButtonSave(
-                  onPressed: viewModel.createCommand.value.isRunning
-                      ? null
-                      : _handleSubmit,
+                  loading: viewModel.createCommand.value.isRunning,
+                  onPressed: viewModel.createCommand.value.isRunning ? null : _handleSubmit,
                 );
               },
             ),

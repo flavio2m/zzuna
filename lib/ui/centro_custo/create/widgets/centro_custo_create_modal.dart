@@ -16,10 +16,6 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 /// Modal para criação de um Centro de Custo.
-///
-/// A estrutura e o fluxo são idênticos ao [CartaoCreateModal] –
-/// apenas os DTOs, validadores e providers são substituídos pelos
-/// correspondentes a Centro de Custo.
 class CentroCustoCreateModal extends ConsumerStatefulWidget {
   const CentroCustoCreateModal({super.key});
 
@@ -28,10 +24,12 @@ class CentroCustoCreateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CentroCustoCreateModal> createState() => _CentroCustoCreateModalState();
+  ConsumerState<CentroCustoCreateModal> createState() =>
+      _CentroCustoCreateModalState();
 }
 
-class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal> {
+class _CentroCustoCreateModalState
+    extends ConsumerState<CentroCustoCreateModal> {
   final dto = CentroCustoDto();
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoCreateViewModel viewModel;
@@ -52,7 +50,7 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
   void _commandListener() {
     final commandValue = viewModel.createCommand.value;
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Centro de Custo criado com sucesso');
+      AppSnackBar.showSuccess(context, 'Centro de Custo criado com sucesso.');
       Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
@@ -80,7 +78,10 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
           listenable: vm.createCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: vm.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
+              loading: vm.createCommand.value.isRunning,
+              onPressed: vm.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
             );
           },
         ),

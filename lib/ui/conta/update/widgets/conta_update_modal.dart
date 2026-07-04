@@ -64,7 +64,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
     final commandValue = viewModel.updateCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Conta atualizada com sucesso');
+      AppSnackBar.showSuccess(context, 'Conta atualizada com sucesso.');
       Navigator.pop(context);
     });
 
@@ -96,8 +96,8 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           listenable: viewModel.updateCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: //
-              viewModel.updateCommand.value.isRunning || !_canSubmit
+              loading: viewModel.updateCommand.value.isRunning,
+              onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
             );

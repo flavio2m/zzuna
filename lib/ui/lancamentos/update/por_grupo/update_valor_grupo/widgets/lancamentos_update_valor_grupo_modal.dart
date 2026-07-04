@@ -197,7 +197,7 @@ class _LancamentosUpdateValorGrupoModalState
           type: AppFormType.modal,
           actions: [
             ButtonCancel(onPressed: () => Navigator.of(context).pop()),
-            ButtonSave(onPressed: isLoading ? null : _handleSubmit),
+            ButtonSave(loading: isLoading, onPressed: isLoading ? null : _handleSubmit),
           ],
           child: Column(
             mainAxisSize: MainAxisSize.min,

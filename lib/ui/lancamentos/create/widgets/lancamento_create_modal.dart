@@ -98,12 +98,20 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
       final cartoes = filter.cartoesSelecionados;
 
       LancamentoOrigemDetail? detailToSelect;
-      
+
       if (contas.isNotEmpty || cartoes.isNotEmpty) {
-        detailToSelect = viewModel.origens.where((d) => switch (d) {
-          LancamentoOrigemContaDetail(:final conta) => contas.contains(conta.id),
-          LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(cartao.id),
-        }).firstOrNull;
+        detailToSelect = viewModel.origens
+            .where(
+              (d) => switch (d) {
+                LancamentoOrigemContaDetail(:final conta) => contas.contains(
+                  conta.id,
+                ),
+                LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(
+                  cartao.id,
+                ),
+              },
+            )
+            .firstOrNull;
       } else if (viewModel.origens.length == 1) {
         detailToSelect = viewModel.origens.first;
       }
@@ -315,10 +323,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               listenable: viewModel.createCommand,
               builder: (_, _) {
                 return ButtonSave(
-                  onPressed: //
-                  viewModel.createCommand.value.isRunning
+                  loading: viewModel.createCommand.value.isRunning,
+                  onPressed: viewModel.createCommand.value.isRunning
                       ? null
-                      : _handleSubmit, //
+                      : _handleSubmit,
                 );
               },
             ),

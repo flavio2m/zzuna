@@ -127,13 +127,9 @@ class _LancamentosUpdateMetadataModalState
           ListenableBuilder(
             listenable: _viewModel.updateMetadataCommand,
             builder: (context, _) {
-              final isRunning =
-                  _viewModel.updateMetadataCommand.value.isRunning;
-              final isLoading = isRunning && _isExecuting;
-
               return ButtonSave(
-                loading: isLoading,
-                onPressed: isRunning ? null : _handleSubmit,
+                loading: _viewModel.updateMetadataCommand.value.isRunning,
+                onPressed: _viewModel.updateMetadataCommand.value.isRunning ? null : _handleSubmit,
               );
             },
           ),

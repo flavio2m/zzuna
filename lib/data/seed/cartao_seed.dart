@@ -20,6 +20,7 @@ class CartaoSeed {
         descricao: 'Cartão ${bancos[i].descricao}',
         limite: (i + 1) * 1000.0,
         bancoSigla: bancos[i].sigla,
+        dataInicial: DateTime(DateTime.now().year, 1, 1),
         ativo: i != 9,
         diaFechamento: 5 + i,
       ),

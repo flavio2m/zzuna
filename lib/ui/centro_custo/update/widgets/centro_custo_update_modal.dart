@@ -16,10 +16,6 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 /// Modal para edição de um Centro de Custo.
-///
-/// Essa implementação replica exatamente o comportamento do
-/// `CartaoUpdateModal`, substituindo apenas os tipos de DTO, validator
-/// e provider por aqueles relacionados a Centro de Custo.
 class CentroCustoUpdateModal extends ConsumerStatefulWidget {
   final CentroCustoDto centroCusto;
 
@@ -33,10 +29,12 @@ class CentroCustoUpdateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CentroCustoUpdateModal> createState() => _CentroCustoUpdateModalState();
+  ConsumerState<CentroCustoUpdateModal> createState() =>
+      _CentroCustoUpdateModalState();
 }
 
-class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal> {
+class _CentroCustoUpdateModalState
+    extends ConsumerState<CentroCustoUpdateModal> {
   late final CentroCustoDto dto;
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoUpdateViewModel viewModel;
@@ -63,7 +61,10 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
   void _commandListener() {
     final commandValue = viewModel.updateCommand.value;
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Centro de Custo atualizado com sucesso');
+      AppSnackBar.showSuccess(
+        context,
+        'Centro de Custo atualizado com sucesso.',
+      );
       Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
@@ -91,6 +92,7 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
           listenable: vm.updateCommand,
           builder: (_, _) {
             return ButtonSave(
+              loading: vm.updateCommand.value.isRunning,
               onPressed: //
               vm.updateCommand.value.isRunning || !_canSubmit
                   ? null

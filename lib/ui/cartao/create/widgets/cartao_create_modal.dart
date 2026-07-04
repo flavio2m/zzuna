@@ -56,7 +56,7 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Cartão criado com sucesso');
+      AppSnackBar.showSuccess(context, 'Cartão criado com sucesso.');
 
       Navigator.pop(context);
     });
@@ -89,7 +89,13 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
         ListenableBuilder(
           listenable: viewModel.createCommand,
           builder: (_, _) {
-            return ButtonSave(onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
+            return ButtonSave(
+              loading: viewModel.createCommand.value.isRunning,
+              onPressed: //
+              viewModel.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
+            );
           },
         ),
       ],
@@ -112,10 +118,15 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
               Expanded(
                 child: AppCurrencyFormField(
                   label: 'Limite',
-                  initialValue: UtilBrasilFields.obterReal(dto.limite, moeda: true),
+                  initialValue: UtilBrasilFields.obterReal(
+                    dto.limite,
+                    moeda: true,
+                  ),
                   onChanged: (value) {
                     if (value.isNotEmpty) {
-                      final valor = UtilBrasilFields.converterMoedaParaDouble(value);
+                      final valor = UtilBrasilFields.converterMoedaParaDouble(
+                        value,
+                      );
                       dto.setLimite(valor);
                     } else {
                       dto.setLimite(0);

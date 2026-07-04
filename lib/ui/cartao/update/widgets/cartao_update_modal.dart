@@ -72,7 +72,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
     final commandValue = viewModel.updateCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Cartão atualizado com sucesso');
+      AppSnackBar.showSuccess(context, 'Cartão atualizado com sucesso.');
 
       Navigator.pop(context);
     });
@@ -106,6 +106,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
           listenable: viewModel.updateCommand,
           builder: (_, _) {
             return ButtonSave(
+              loading: viewModel.updateCommand.value.isRunning,
               onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
