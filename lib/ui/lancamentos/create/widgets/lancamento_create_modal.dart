@@ -77,9 +77,11 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   }
 
   void _loadData() {
-    viewModel.load().then((_) {
-      if (!mounted) return;
-      _preencherCamposPadrao();
+    Future(() {
+      viewModel.load().then((_) {
+        if (!mounted) return;
+        _preencherCamposPadrao();
+      });
     });
   }
 

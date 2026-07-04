@@ -2,9 +2,7 @@ import 'package:result_dart/result_dart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
@@ -17,13 +15,11 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 ///   usando o [diaDoMes] armazenado no grupo.
 class ReativarRecorrenciaUseCase {
   final LancamentoRepository _lancamentoRepository;
-  final LocalStorage<Lancamento> _lancamentoStorage;
   final ExtratoFaturaRepository _extratoRepository;
   final RecalculateExtratoFaturaBalanceUseCase _recalculateUseCase;
 
   ReativarRecorrenciaUseCase(
     this._lancamentoRepository,
-    this._lancamentoStorage,
     this._extratoRepository,
     this._recalculateUseCase,
   );
@@ -102,19 +98,20 @@ class ReativarRecorrenciaUseCase {
 
     // 6. Para cada extrato futuro, criar o lançamento recorrente
     if (futureExtratos.isNotEmpty) {
-      final updatedLancRes = await _lancamentoStorage.getAll();
+      final updatedLancRes = await _lancamentoRepository.getById(lancamentoId);
       if (updatedLancRes.isError()) return const Success(unit);
 
-      final lancAtualizado = updatedLancRes.getOrThrow().firstWhere(
-        (l) => l.id == lancamentoId,
-      );
+      final lancAtualizado = updatedLancRes.getOrThrow();
 
       final List<LancamentoDto> dtos = [];
       for (final extrato in futureExtratos) {
         // Verificar se já existe lançamento desse grupo neste extrato (evitar duplicatas)
-        final jaExiste = updatedLancRes.getOrThrow().any(
+        final extratoLancRes = await _lancamentoRepository
+            .searchByExtratoFaturaId(extrato.id);
+        if (extratoLancRes.isError()) continue;
+
+        final jaExiste = extratoLancRes.getOrThrow().any(
           (l) =>
-              l.extratoFaturaId == extrato.id &&
               l.grupo is LancamentoGrupoRecorrencia &&
               (l.grupo as LancamentoGrupoRecorrencia).grupoId == grupo.grupoId,
         );
@@ -157,6 +154,10 @@ class ReativarRecorrenciaUseCase {
     }
 
     // 7. Recalcular saldos
-    return _recalculateUseCase.execute(lanc.origem);
+    return _recalculateUseCase.execute(
+      lanc.origem,
+      startingAno: currentExtrato.ano,
+      startingMes: currentExtrato.mes,
+    );
   }
 }

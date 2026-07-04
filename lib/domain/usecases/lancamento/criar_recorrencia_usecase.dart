@@ -2,9 +2,7 @@ import 'package:result_dart/result_dart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
@@ -18,13 +16,11 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 ///   para a mesma origem.
 class CriarRecorrenciaUseCase {
   final LancamentoRepository _lancamentoRepository;
-  final LocalStorage<Lancamento> _lancamentoStorage;
   final ExtratoFaturaRepository _extratoRepository;
   final RecalculateExtratoFaturaBalanceUseCase _recalculateUseCase;
 
   CriarRecorrenciaUseCase(
     this._lancamentoRepository,
-    this._lancamentoStorage,
     this._extratoRepository,
     this._recalculateUseCase,
   );
@@ -101,12 +97,10 @@ class CriarRecorrenciaUseCase {
     // Simulamos a lógica do ApplyRecorrenciasUseCase, mas a partir do lançamento
     // original (não do extrato anterior, pois acabamos de criar o grupo)
     if (futureExtratos.isNotEmpty) {
-      final updatedLancRes = await _lancamentoStorage.getAll();
+      final updatedLancRes = await _lancamentoRepository.getById(lancamentoId);
       if (updatedLancRes.isError()) return const Success(unit);
 
-      final lancAtualizado = updatedLancRes.getOrThrow().firstWhere(
-        (l) => l.id == lancamentoId,
-      );
+      final lancAtualizado = updatedLancRes.getOrThrow();
 
       final List<LancamentoDto> dtos = [];
       for (final extrato in futureExtratos) {
@@ -142,8 +136,12 @@ class CriarRecorrenciaUseCase {
       }
     }
 
-    // 8. Recalcular saldos
-    final recalcRes = await _recalculateUseCase.execute(lanc.origem);
+    // 8. Recalcular saldos a partir do mês atual
+    final recalcRes = await _recalculateUseCase.execute(
+      lanc.origem,
+      startingAno: currentExtrato.ano,
+      startingMes: currentExtrato.mes,
+    );
     if (recalcRes.isError()) return Failure(recalcRes.exceptionOrNull()!);
 
     return const Success(unit);

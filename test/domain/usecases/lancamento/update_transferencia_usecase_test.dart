@@ -57,8 +57,8 @@ void main() {
     );
 
     recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(
-      extratoStorage,
-      lancamentoStorage,
+      extratoRepository,
+      lancamentoRepository,
     );
 
     createLancamentosUseCase = CreateLancamentosUseCase(
@@ -170,8 +170,7 @@ void main() {
       expect(updateRes.isSuccess(), isTrue);
 
       // 3. Verificar atualizações
-      final updatedLaunches = (await lancamentoStorage.getAll())
-          .getOrThrow();
+      final updatedLaunches = (await lancamentoStorage.getAll()).getOrThrow();
       expect(updatedLaunches.length, 2);
 
       final saida = updatedLaunches.firstWhere((l) => l.id == originalSaidaId);

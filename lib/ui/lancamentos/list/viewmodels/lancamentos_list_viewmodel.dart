@@ -17,6 +17,7 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart'
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_mensal.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
 
 class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoDetailsUseCase _detailsUseCase;
@@ -26,6 +27,7 @@ class LancamentosListViewModel extends ChangeNotifier {
   final ExtratoFaturaRepository _extratoFaturaRepository;
   final ContaRepository _contaRepository;
   final CartaoRepository _cartaoRepository;
+  final SyncRecorrenciasMesUseCase _syncRecorrenciasMesUseCase;
   StreamSubscription? _repositorySubscription;
 
   List<LancamentoDetails> _allLancamentos = [];
@@ -108,6 +110,7 @@ class LancamentosListViewModel extends ChangeNotifier {
     this._extratoFaturaRepository,
     this._contaRepository,
     this._cartaoRepository,
+    this._syncRecorrenciasMesUseCase,
   ) {
     _repositorySubscription = _repository.observer().listen((_) {
       loadCommand.execute();
@@ -121,6 +124,8 @@ class LancamentosListViewModel extends ChangeNotifier {
 
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
+
+    await _syncRecorrenciasMesUseCase.execute(mes, ano);
 
     final contasResult = await _contaRepository.getAll();
     final cartoesResult = await _cartaoRepository.getAll();

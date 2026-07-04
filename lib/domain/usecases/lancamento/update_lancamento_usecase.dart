@@ -4,6 +4,7 @@ import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/resolve_extrato_fatura_dto.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
@@ -111,18 +112,32 @@ class UpdateLancamentoUseCase {
     final oldOrigem = original.origem;
     final newOrigem = dto.origem;
 
-    // Recalcular saldo da origem original
-    final oldRecalcRes = await _recalculateUseCase.execute(oldOrigem);
-    if (oldRecalcRes.isError()) {
-      return Failure(oldRecalcRes.exceptionOrNull()!);
-    }
+    if (oldOrigem == newOrigem) {
+      final oldestDate = original.data.isBefore(dto.data)
+          ? original.data
+          : dto.data;
+      final recalcRes = await _recalculateUseCase.execute(
+        oldOrigem,
+        startingAno: oldestDate.year,
+        startingMes: Mes.fromDate(oldestDate),
+      );
+      if (recalcRes.isError()) return Failure(recalcRes.exceptionOrNull()!);
+    } else {
+      final oldRecalcRes = await _recalculateUseCase.execute(
+        oldOrigem,
+        startingAno: original.data.year,
+        startingMes: Mes.fromDate(original.data),
+      );
+      if (oldRecalcRes.isError())
+        return Failure(oldRecalcRes.exceptionOrNull()!);
 
-    // Se a conta/cartão de origem mudou, recalcular a nova também
-    if (oldOrigem != newOrigem) {
-      final newRecalcRes = await _recalculateUseCase.execute(newOrigem);
-      if (newRecalcRes.isError()) {
+      final newRecalcRes = await _recalculateUseCase.execute(
+        newOrigem,
+        startingAno: dto.data.year,
+        startingMes: Mes.fromDate(dto.data),
+      );
+      if (newRecalcRes.isError())
         return Failure(newRecalcRes.exceptionOrNull()!);
-      }
     }
 
     return updateRes;

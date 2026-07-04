@@ -20,6 +20,15 @@ import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
+import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
+
+class FakeSyncRecorrenciasMesUseCase implements SyncRecorrenciasMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
   int executeCallCount = 0;
@@ -191,6 +200,7 @@ void main() {
         FakeExtratoFaturaRepository(),
         FakeContaRepository(),
         FakeCartaoRepository(),
+        FakeSyncRecorrenciasMesUseCase(),
       );
     });
 
@@ -253,6 +263,7 @@ void main() {
         FakeExtratoFaturaRepository(),
         FakeContaRepository(),
         FakeCartaoRepository(),
+        FakeSyncRecorrenciasMesUseCase(),
       );
     });
 

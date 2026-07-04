@@ -55,9 +55,11 @@ class _TransferenciaCreateModalState
   }
 
   void _loadData() {
-    viewModel.load().then((_) {
-      if (!mounted) return;
-      _preencherOrigensDoFiltro();
+    Future(() {
+      viewModel.load().then((_) {
+        if (!mounted) return;
+        _preencherOrigensDoFiltro();
+      });
     });
   }
 
@@ -143,6 +145,16 @@ class _TransferenciaCreateModalState
     return '$d/$m/$y';
   }
 
+  void _swapOrigens() {
+    if (_origemSaida != null && _origemEntrada != null) {
+      setState(() {
+        final temp = _origemSaida;
+        _origemSaida = _origemEntrada;
+        _origemEntrada = temp;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width > 600;
@@ -202,6 +214,16 @@ class _TransferenciaCreateModalState
                     if (origem != null) setState(() => _origemSaida = origem);
                   },
                 ),
+                middle: Padding(
+                  padding: EdgeInsets.only(top: isDesktop ? 4.0 : 0.0),
+                  child: IconButton(
+                    icon: Icon(isDesktop ? Icons.swap_horiz : Icons.swap_vert),
+                    onPressed: (_origemSaida != null && _origemEntrada != null)
+                        ? _swapOrigens
+                        : null,
+                    tooltip: 'Inverter contas',
+                  ),
+                ),
                 right: LancamentoOrigemField(
                   label: 'Conta/Cartão de Destino',
                   origens: viewModel.origens,
@@ -246,6 +268,7 @@ class _TransferenciaCreateModalState
 class _FormRow extends StatelessWidget {
   final Widget left;
   final Widget right;
+  final Widget? middle;
   final bool isDesktop;
   final int leftFlex;
   final int rightFlex;
@@ -253,6 +276,7 @@ class _FormRow extends StatelessWidget {
   const _FormRow({
     required this.left,
     required this.right,
+    this.middle,
     required this.isDesktop,
     this.leftFlex = 1,
     this.rightFlex = 1,
@@ -263,7 +287,14 @@ class _FormRow extends StatelessWidget {
     if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [left, const SizedBox(height: 16), right],
+        children: [
+          left,
+          if (middle != null)
+            Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: middle))
+          else
+            const SizedBox(height: 16),
+          right,
+        ],
       );
     }
 
@@ -271,7 +302,10 @@ class _FormRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(flex: leftFlex, child: left),
-        const SizedBox(width: 16),
+        if (middle != null)
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: middle)
+        else
+          const SizedBox(width: 16),
         Expanded(flex: rightFlex, child: right),
       ],
     );

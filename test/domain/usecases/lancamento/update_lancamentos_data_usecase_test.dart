@@ -56,13 +56,31 @@ void main() {
     extratoRepository = ExtratoFaturaRepository(extratoStorage);
     lancamentoRepository = LancamentoRepository(lancamentoStorage);
 
-    resolveUseCase = ResolveExtratoFaturaUseCase(extratoRepository, contaRepository, cartaoRepository);
-    resolveLoteUseCase = ResolveExtratoFaturasUseCase(extratoRepository, contaRepository, cartaoRepository);
+    resolveUseCase = ResolveExtratoFaturaUseCase(
+      extratoRepository,
+      contaRepository,
+      cartaoRepository,
+    );
+    resolveLoteUseCase = ResolveExtratoFaturasUseCase(
+      extratoRepository,
+      contaRepository,
+      cartaoRepository,
+    );
 
-    recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(extratoStorage, lancamentoStorage);
-
-    createLancamentoUseCase = CreateLancamentoUseCase(resolveUseCase, lancamentoRepository, LancamentoValidator());
-    createLancamentosUseCase = CreateLancamentosUseCase(resolveLoteUseCase, lancamentoRepository, LancamentoValidator());
+    recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(
+      extratoRepository,
+      lancamentoRepository,
+    );
+    createLancamentoUseCase = CreateLancamentoUseCase(
+      resolveUseCase,
+      lancamentoRepository,
+      LancamentoValidator(),
+    );
+    createLancamentosUseCase = CreateLancamentosUseCase(
+      resolveLoteUseCase,
+      lancamentoRepository,
+      LancamentoValidator(),
+    );
     createTransferenciaUseCase = CreateTransferenciaUseCase(
       createLancamentosUseCase,
       TransferenciaValidator(),
@@ -80,12 +98,22 @@ void main() {
     dataInicialConta = DateTime(2026, 1, 1);
 
     final conta = await contaRepository.create(
-      CreateContaDto(descricao: 'Conta Principal', bancoSigla: 'BB', ativo: true, dataInicial: dataInicialConta),
+      CreateContaDto(
+        descricao: 'Conta Principal',
+        bancoSigla: 'BB',
+        ativo: true,
+        dataInicial: dataInicialConta,
+      ),
     );
     origemConta = LancamentoOrigem.conta(contaId: conta.getOrThrow().id);
 
     final conta2 = await contaRepository.create(
-      CreateContaDto(descricao: 'Conta Secundária', bancoSigla: 'NU', ativo: true, dataInicial: dataInicialConta),
+      CreateContaDto(
+        descricao: 'Conta Secundária',
+        bancoSigla: 'NU',
+        ativo: true,
+        dataInicial: dataInicialConta,
+      ),
     );
     origemConta2 = LancamentoOrigem.conta(contaId: conta2.getOrThrow().id);
   });
@@ -106,134 +134,210 @@ void main() {
           descricao: 'Padaria',
           origem: origemConta,
           data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 20.0,
+            ),
+          ],
         ),
       )).getOrThrow();
 
       // 2. Mover para 20/01/2026
       final novaData = DateTime(2026, 1, 20);
-      final res = await updateDataUseCase.execute(ids: [created.id], novaData: novaData);
+      final res = await updateDataUseCase.execute(
+        ids: [created.id],
+        novaData: novaData,
+      );
       expect(res.isSuccess(), isTrue);
 
       // 3. Verificar se a data foi atualizada no repositório
-      final updated = (await lancamentoRepository.getById(created.id)).getOrThrow();
+      final updated = (await lancamentoRepository.getById(
+        created.id,
+      )).getOrThrow();
       expect(updated.data, novaData);
     });
 
-    test('Should successfully move multiple launches to a different month and recalculate balances', () async {
-      // 1. Criar dois lançamentos em janeiro de 2026
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Mercado',
-          origem: origemConta,
-          data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 100.0)],
-        ),
-      )).getOrThrow();
+    test(
+      'Should successfully move multiple launches to a different month and recalculate balances',
+      () async {
+        // 1. Criar dois lançamentos em janeiro de 2026
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Mercado',
+            origem: origemConta,
+            data: DateTime(2026, 1, 5),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 100.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
 
-      final l2 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.receita,
-          descricao: 'Salário',
-          origem: origemConta,
-          data: DateTime(2026, 1, 10),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 1000.0)],
-        ),
-      )).getOrThrow();
+        final l2 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.receita,
+            descricao: 'Salário',
+            origem: origemConta,
+            data: DateTime(2026, 1, 10),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 1000.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
 
-      // Verificar saldos iniciais/finais de Janeiro/2026
-      final extratoJaneiro = (await extratoRepository.searchByPeriodo(
-        origemConta,
-        2026,
-        Mes.janeiro,
-      )).getOrThrow().first;
-      expect(extratoJaneiro.saldoFinal, 900.0); // +1000 - 100
+        // Verificar saldos iniciais/finais de Janeiro/2026
+        final extratoJaneiro = (await extratoRepository.searchByPeriodo(
+          origemConta,
+          2026,
+          Mes.janeiro,
+        )).getOrThrow().first;
+        expect(extratoJaneiro.saldoFinal, 900.0); // +1000 - 100
 
-      // 2. Mover ambos para Fevereiro/2026
-      final novaData = DateTime(2026, 2, 15);
-      final res = await updateDataUseCase.execute(ids: [l1.id, l2.id], novaData: novaData);
-      expect(res.isSuccess(), isTrue);
+        // 2. Mover ambos para Fevereiro/2026
+        final novaData = DateTime(2026, 2, 15);
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id, l2.id],
+          novaData: novaData,
+        );
+        expect(res.isSuccess(), isTrue);
 
-      // 3. Verificar que as datas foram atualizadas no repositório
-      final checkL1 = (await lancamentoRepository.getById(l1.id)).getOrThrow();
-      final checkL2 = (await lancamentoRepository.getById(l2.id)).getOrThrow();
-      expect(checkL1.data, novaData);
-      expect(checkL2.data, novaData);
+        // 3. Verificar que as datas foram atualizadas no repositório
+        final checkL1 = (await lancamentoRepository.getById(
+          l1.id,
+        )).getOrThrow();
+        final checkL2 = (await lancamentoRepository.getById(
+          l2.id,
+        )).getOrThrow();
+        expect(checkL1.data, novaData);
+        expect(checkL2.data, novaData);
 
-      // 4. Verificar os saldos recalculados
-      final recalcJaneiro = (await extratoRepository.searchByPeriodo(
-        origemConta,
-        2026,
-        Mes.janeiro,
-      )).getOrThrow().first;
-      final recalcFevereiro = (await extratoRepository.searchByPeriodo(
-        origemConta,
-        2026,
-        Mes.fevereiro,
-      )).getOrThrow().first;
+        // 4. Verificar os saldos recalculados
+        final recalcJaneiro = (await extratoRepository.searchByPeriodo(
+          origemConta,
+          2026,
+          Mes.janeiro,
+        )).getOrThrow().first;
+        final recalcFevereiro = (await extratoRepository.searchByPeriodo(
+          origemConta,
+          2026,
+          Mes.fevereiro,
+        )).getOrThrow().first;
 
-      expect(recalcJaneiro.saldoFinal, 0.0); // Zerado pois os lançamentos saíram de janeiro
-      expect(recalcFevereiro.saldoFinal, 900.0); // Os lançamentos foram somados em fevereiro
-    });
+        expect(
+          recalcJaneiro.saldoFinal,
+          0.0,
+        ); // Zerado pois os lançamentos saíram de janeiro
+        expect(
+          recalcFevereiro.saldoFinal,
+          900.0,
+        ); // Os lançamentos foram somados em fevereiro
+      },
+    );
 
-    test('Should return Failure if any ID is not found and make no changes', () async {
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Padaria',
-          origem: origemConta,
-          data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
-        ),
-      )).getOrThrow();
+    test(
+      'Should return Failure if any ID is not found and make no changes',
+      () async {
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Padaria',
+            origem: origemConta,
+            data: DateTime(2026, 1, 5),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 20.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
 
-      final res = await updateDataUseCase.execute(ids: [l1.id, 'id-inexistente'], novaData: DateTime(2026, 1, 20));
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id, 'id-inexistente'],
+          novaData: DateTime(2026, 1, 20),
+        );
 
-      expect(res.isError(), isTrue);
-      expect(res.exceptionOrNull()!.toString(), contains('Lançamento com ID id-inexistente não encontrado.'));
+        expect(res.isError(), isTrue);
+        expect(
+          res.exceptionOrNull()!.toString(),
+          contains('Lançamento com ID id-inexistente não encontrado.'),
+        );
 
-      // Garantir que l1 não foi alterado
-      final check = (await lancamentoRepository.getById(l1.id)).getOrThrow();
-      expect(check.data, DateTime(2026, 1, 5));
-    });
+        // Garantir que l1 não foi alterado
+        final check = (await lancamentoRepository.getById(l1.id)).getOrThrow();
+        expect(check.data, DateTime(2026, 1, 5));
+      },
+    );
 
-    test('Should return Failure if the launch original period is closed', () async {
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Padaria',
-          origem: origemConta,
-          data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
-        ),
-      )).getOrThrow();
+    test(
+      'Should return Failure if the launch original period is closed',
+      () async {
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Padaria',
+            origem: origemConta,
+            data: DateTime(2026, 1, 5),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 20.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
 
-      // Fechar o extrato de Janeiro/2026
-      final extratoJaneiro = (await extratoRepository.searchByPeriodo(
-        origemConta,
-        2026,
-        Mes.janeiro,
-      )).getOrThrow().first;
-      await extratoRepository.update(
-        ExtratoFaturaDto(
-          id: extratoJaneiro.id,
-          origem: extratoJaneiro.origem,
-          ano: extratoJaneiro.ano,
-          mes: extratoJaneiro.mes,
-          dataInicio: extratoJaneiro.dataInicio,
-          dataFim: extratoJaneiro.dataFim,
-          saldoInicial: extratoJaneiro.saldoInicial,
-          saldoFinal: extratoJaneiro.saldoFinal,
-          fechado: true,
-        ),
-      );
+        // Fechar o extrato de Janeiro/2026
+        final extratoJaneiro = (await extratoRepository.searchByPeriodo(
+          origemConta,
+          2026,
+          Mes.janeiro,
+        )).getOrThrow().first;
+        await extratoRepository.update(
+          ExtratoFaturaDto(
+            id: extratoJaneiro.id,
+            origem: extratoJaneiro.origem,
+            ano: extratoJaneiro.ano,
+            mes: extratoJaneiro.mes,
+            dataInicio: extratoJaneiro.dataInicio,
+            dataFim: extratoJaneiro.dataFim,
+            saldoInicial: extratoJaneiro.saldoInicial,
+            saldoFinal: extratoJaneiro.saldoFinal,
+            fechado: true,
+          ),
+        );
 
-      final res = await updateDataUseCase.execute(ids: [l1.id], novaData: DateTime(2026, 1, 20));
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id],
+          novaData: DateTime(2026, 1, 20),
+        );
 
-      expect(res.isError(), isTrue);
-      expect(res.exceptionOrNull()!.toString(), contains('Não é possível editar lançamentos de um período encerrado.'));
-    });
+        expect(res.isError(), isTrue);
+        expect(
+          res.exceptionOrNull()!.toString(),
+          contains(
+            'Não é possível editar lançamentos de um período encerrado.',
+          ),
+        );
+      },
+    );
 
     test('Should return Failure if the destination period is closed', () async {
       final l1 = (await createLancamentoUseCase.execute(
@@ -242,7 +346,14 @@ void main() {
           descricao: 'Padaria',
           origem: origemConta,
           data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 20.0,
+            ),
+          ],
         ),
       )).getOrThrow();
 
@@ -260,88 +371,131 @@ void main() {
         ),
       );
 
-      final res = await updateDataUseCase.execute(ids: [l1.id], novaData: DateTime(2026, 2, 15));
-
-      expect(res.isError(), isTrue);
-      expect(
-        res.exceptionOrNull()!.toString(),
-        contains('Não é possível registrar lançamentos em um período encerrado.'),
-      );
-    });
-
-    test('Should return Failure if new date is before the account/card start date', () async {
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Padaria',
-          origem: origemConta,
-          data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
-        ),
-      )).getOrThrow();
-
-      // Mover para Dezembro/2025 (data inicial da conta é 01/01/2026)
-      final res = await updateDataUseCase.execute(ids: [l1.id], novaData: DateTime(2025, 12, 15));
-
-      expect(res.isError(), isTrue);
-      expect(
-        res.exceptionOrNull()!.toString(),
-        contains('não pode ser anterior à data inicial'),
-      );
-    });
-
-    test('Should return Failure if new date is further than 24 months from today', () async {
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Padaria',
-          origem: origemConta,
-          data: DateTime(2026, 1, 5),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 20.0)],
-        ),
-      )).getOrThrow();
-
-      // Mover para 3 anos no futuro
-      final futureDate = DateTime.now().add(const Duration(days: 3 * 365));
-      final res = await updateDataUseCase.execute(ids: [l1.id], novaData: futureDate);
-
-      expect(res.isError(), isTrue);
-      expect(res.exceptionOrNull()!.toString(), contains('Data não pode ser superior a 24 meses da data atual'));
-    });
-
-    test('Should update the date of both transactions in a transfer by group ID', () async {
-      // 1. Criar transferência (Conta Principal -> Conta Secundária)
-      final transferRes = await createTransferenciaUseCase.execute(
-        CreateTransferenciaDto(
-          data: DateTime(2026, 1, 10),
-          descricao: 'Transferência Pix',
-          valor: 150.0,
-          origemSaida: origemConta,
-          origemEntrada: origemConta2,
-          observacao: 'Pix de teste',
-        ),
-      );
-      expect(transferRes.isSuccess(), isTrue);
-
-      // 2. Localizar as duas transações criadas
-      final launches = (await lancamentoStorage.getAll()).getOrThrow();
-      expect(launches.length, 2);
-      final idSaida = launches.firstWhere((l) => l.origem == origemConta).id;
-      final idEntrada = launches.firstWhere((l) => l.origem == origemConta2).id;
-
-      // 3. Chamar updateDataUseCase passando apenas o ID da saída
-      final novaData = DateTime(2026, 1, 25);
       final res = await updateDataUseCase.execute(
-        ids: [idSaida],
-        novaData: novaData,
+        ids: [l1.id],
+        novaData: DateTime(2026, 2, 15),
       );
-      expect(res.isSuccess(), isTrue);
 
-      // 4. Verificar que a data de ambas as transações foi atualizada
-      final updatedSaida = (await lancamentoRepository.getById(idSaida)).getOrThrow();
-      final updatedEntrada = (await lancamentoRepository.getById(idEntrada)).getOrThrow();
-      expect(updatedSaida.data, novaData);
-      expect(updatedEntrada.data, novaData);
+      expect(res.isError(), isTrue);
+      expect(
+        res.exceptionOrNull()!.toString(),
+        contains(
+          'Não é possível registrar lançamentos em um período encerrado.',
+        ),
+      );
     });
+
+    test(
+      'Should return Failure if new date is before the account/card start date',
+      () async {
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Padaria',
+            origem: origemConta,
+            data: DateTime(2026, 1, 5),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 20.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        // Mover para Dezembro/2025 (data inicial da conta é 01/01/2026)
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id],
+          novaData: DateTime(2025, 12, 15),
+        );
+
+        expect(res.isError(), isTrue);
+        expect(
+          res.exceptionOrNull()!.toString(),
+          contains('não pode ser anterior à data inicial'),
+        );
+      },
+    );
+
+    test(
+      'Should return Failure if new date is further than 24 months from today',
+      () async {
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Padaria',
+            origem: origemConta,
+            data: DateTime(2026, 1, 5),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 20.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        // Mover para 3 anos no futuro
+        final futureDate = DateTime.now().add(const Duration(days: 3 * 365));
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id],
+          novaData: futureDate,
+        );
+
+        expect(res.isError(), isTrue);
+        expect(
+          res.exceptionOrNull()!.toString(),
+          contains('Data não pode ser superior a 24 meses da data atual'),
+        );
+      },
+    );
+
+    test(
+      'Should update the date of both transactions in a transfer by group ID',
+      () async {
+        // 1. Criar transferência (Conta Principal -> Conta Secundária)
+        final transferRes = await createTransferenciaUseCase.execute(
+          CreateTransferenciaDto(
+            data: DateTime(2026, 1, 10),
+            descricao: 'Transferência Pix',
+            valor: 150.0,
+            origemSaida: origemConta,
+            origemEntrada: origemConta2,
+            observacao: 'Pix de teste',
+          ),
+        );
+        expect(transferRes.isSuccess(), isTrue);
+
+        // 2. Localizar as duas transações criadas
+        final launches = (await lancamentoStorage.getAll()).getOrThrow();
+        expect(launches.length, 2);
+        final idSaida = launches.firstWhere((l) => l.origem == origemConta).id;
+        final idEntrada = launches
+            .firstWhere((l) => l.origem == origemConta2)
+            .id;
+
+        // 3. Chamar updateDataUseCase passando apenas o ID da saída
+        final novaData = DateTime(2026, 1, 25);
+        final res = await updateDataUseCase.execute(
+          ids: [idSaida],
+          novaData: novaData,
+        );
+        expect(res.isSuccess(), isTrue);
+
+        // 4. Verificar que a data de ambas as transações foi atualizada
+        final updatedSaida = (await lancamentoRepository.getById(
+          idSaida,
+        )).getOrThrow();
+        final updatedEntrada = (await lancamentoRepository.getById(
+          idEntrada,
+        )).getOrThrow();
+        expect(updatedSaida.data, novaData);
+        expect(updatedEntrada.data, novaData);
+      },
+    );
   });
 }

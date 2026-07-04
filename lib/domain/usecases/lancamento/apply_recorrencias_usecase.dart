@@ -2,10 +2,8 @@ import 'package:result_dart/result_dart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
-import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
@@ -26,13 +24,10 @@ int clampDayToMonth(int diaDoMes, int month, int year) {
 class ApplyRecorrenciasUseCase {
   final ExtratoFaturaRepository _extratoRepository;
   final LancamentoRepository _lancamentoRepository;
-  final LocalStorage<Lancamento> _lancamentoStorage;
   final RecalculateExtratoFaturaBalanceUseCase _recalculateUseCase;
-
   ApplyRecorrenciasUseCase(
     this._extratoRepository,
     this._lancamentoRepository,
-    this._lancamentoStorage,
     this._recalculateUseCase,
   );
 
@@ -52,12 +47,14 @@ class ApplyRecorrenciasUseCase {
     if (prevList.isEmpty) return const Success(unit);
     final prevExtrato = prevList.first;
 
-    // 2. Carregar todos os lançamentos e filtrar os recorrentes ativos do extrato anterior
-    final allRes = await _lancamentoStorage.getAll();
-    if (allRes.isError()) return const Success(unit);
+    // 2. Carregar apenas os lançamentos do extrato anterior e filtrar os
+    // recorrentes ativos
+    final lancRes = await _lancamentoRepository.searchByExtratoFaturaId(
+      prevExtrato.id,
+    );
+    if (lancRes.isError()) return const Success(unit);
 
-    final recorrentes = allRes.getOrThrow().where((l) {
-      if (l.extratoFaturaId != prevExtrato.id) return false;
+    final recorrentes = lancRes.getOrThrow().where((l) {
       final g = l.grupo;
       return g is LancamentoGrupoRecorrencia && g.ativo;
     }).toList();
@@ -103,6 +100,10 @@ class ApplyRecorrenciasUseCase {
     }
 
     // 4. Recalcular saldo do novo extrato
-    return _recalculateUseCase.execute(origem);
+    return _recalculateUseCase.execute(
+      origem,
+      startingAno: novoExtrato.ano,
+      startingMes: novoExtrato.mes,
+    );
   }
 }

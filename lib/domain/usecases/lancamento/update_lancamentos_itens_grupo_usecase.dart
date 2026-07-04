@@ -5,6 +5,7 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 import 'recalculate_extrato_fatura_balance_usecase.dart';
 
 class UpdateLancamentosItensGrupoUseCase {
@@ -133,7 +134,18 @@ class UpdateLancamentosItensGrupoUseCase {
           .map((l) => l.origem)
           .toSet();
       for (final origem in origensAfetadas) {
-        final recalcRes = await _recalculateUseCase.execute(origem);
+        final lancamentosDaOrigem = targetLaunches.where(
+          (l) => l.origem == origem,
+        );
+        final oldestDate = lancamentosDaOrigem
+            .map((l) => l.data)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
+
+        final recalcRes = await _recalculateUseCase.execute(
+          origem,
+          startingAno: oldestDate.year,
+          startingMes: Mes.fromDate(oldestDate),
+        );
         if (recalcRes.isError()) {
           return Failure(recalcRes.exceptionOrNull()!);
         }

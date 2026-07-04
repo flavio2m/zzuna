@@ -551,8 +551,9 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | Status | Item |
 |--------|------|
 | OK | Refatorar a injeção de dependência por feature |
-| ☐ | Ao fazer um novo lançamento, se tiver marcado uma única Conta ou um único
+| OK | Ao fazer um novo lançamento, se tiver marcado uma única Conta ou um único
       Cartão, deve preencher esse campo automaticamente no formulário. |
+| OK | Colocar uma opção para inverter contas na transferencia |
 | ☐ | Padronizar loading no botão **Salvar** de todos os CRUDs. |
 | ☐ | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o 
       formulário estiver inválido. |
@@ -562,7 +563,7 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
       (FocusNode / nextFocus). |
 | ☐ | Refatorar as views que utilizam Dropdown Conta/Cartão para utilizar um
       useCase para load(). |
-
+| ☐ | Refatorar Centro de Custo e colocar uma flag Padrão para ser selecionado por padrão |
 
 ---
 

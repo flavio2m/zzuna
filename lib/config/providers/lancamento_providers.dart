@@ -3,8 +3,8 @@ part of '../providers.dart';
 final recalculateExtratoFaturaBalanceUseCaseProvider =
     Provider<RecalculateExtratoFaturaBalanceUseCase>((ref) {
       return RecalculateExtratoFaturaBalanceUseCase(
-        ref.watch(extratoFaturaStorageProvider),
-        ref.watch(lancamentoStorageProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(lancamentoRepositoryProvider),
       );
     });
 
@@ -34,7 +34,6 @@ final applyRecorrenciasUseCaseProvider = Provider<ApplyRecorrenciasUseCase>((
   return ApplyRecorrenciasUseCase(
     ref.watch(extratoFaturaRepositoryProvider),
     ref.watch(lancamentoRepositoryProvider),
-    ref.watch(lancamentoStorageProvider),
     ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
   );
 });
@@ -44,7 +43,6 @@ final criarRecorrenciaUseCaseProvider = Provider<CriarRecorrenciaUseCase>((
 ) {
   return CriarRecorrenciaUseCase(
     ref.watch(lancamentoRepositoryProvider),
-    ref.watch(lancamentoStorageProvider),
     ref.watch(extratoFaturaRepositoryProvider),
     ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
   );
@@ -62,7 +60,6 @@ final reativarRecorrenciaUseCaseProvider = Provider<ReativarRecorrenciaUseCase>(
   (ref) {
     return ReativarRecorrenciaUseCase(
       ref.watch(lancamentoRepositoryProvider),
-      ref.watch(lancamentoStorageProvider),
       ref.watch(extratoFaturaRepositoryProvider),
       ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
     );
@@ -382,6 +379,17 @@ final lancamentoResumoMensalUseCaseProvider =
       return LancamentoResumoMensalUseCase();
     });
 
+final syncRecorrenciasMesUseCaseProvider =
+    Provider<SyncRecorrenciasMesUseCase>((ref) {
+      return SyncRecorrenciasMesUseCase(
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(applyRecorrenciasUseCaseProvider),
+      );
+    });
+
 final lancamentosListViewModelProvider =
     ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
       final vm = LancamentosListViewModel(
@@ -392,6 +400,7 @@ final lancamentosListViewModelProvider =
         ref.watch(extratoFaturaRepositoryProvider),
         ref.watch(contaRepositoryProvider),
         ref.watch(cartaoRepositoryProvider),
+        ref.watch(syncRecorrenciasMesUseCaseProvider),
       );
       ref.listen(lancamentoFilterProvider, (previous, next) {
         vm.updateFilter(next);

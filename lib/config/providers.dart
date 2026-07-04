@@ -86,6 +86,7 @@ import 'package:zzuna/ui/lancamentos/recorrencia/criar/viewmodels/lancamentos_cr
 import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/viewmodels/lancamentos_finalizar_recorrencia_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/reativar/viewmodels/lancamentos_reativar_recorrencia_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/viewmodels/lancamentos_atualizar_data_recorrencia_viewmodel.dart';
+import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
 
 
 part 'providers/conta_providers.dart';

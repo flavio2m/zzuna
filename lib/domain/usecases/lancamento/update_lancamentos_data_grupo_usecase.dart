@@ -237,7 +237,27 @@ class UpdateLancamentosDataGrupoUseCase {
         .map((l) => l.origem)
         .toSet();
     for (final origem in origensAfetadas) {
-      final recalcRes = await _recalculateUseCase.execute(origem);
+      final lancamentosDaOrigem = targetLaunches.where(
+        (l) => l.origem == origem,
+      );
+      final dtosDaOrigem = dtosToUpdate.where((d) => d.origem == origem);
+
+      final oldestOldDate = lancamentosDaOrigem
+          .map((l) => l.data)
+          .reduce((a, b) => a.isBefore(b) ? a : b);
+      final oldestNewDate = dtosDaOrigem
+          .map((d) => d.data)
+          .reduce((a, b) => a.isBefore(b) ? a : b);
+
+      final oldestDate = oldestOldDate.isBefore(oldestNewDate)
+          ? oldestOldDate
+          : oldestNewDate;
+
+      final recalcRes = await _recalculateUseCase.execute(
+        origem,
+        startingAno: oldestDate.year,
+        startingMes: Mes.fromDate(oldestDate),
+      );
       if (recalcRes.isError()) {
         return Failure(recalcRes.exceptionOrNull()!);
       }

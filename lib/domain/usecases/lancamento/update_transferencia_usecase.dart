@@ -12,6 +12,7 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 class UpdateTransferenciaUseCase {
   final ResolveExtratoFaturasUseCase _resolveUseCase;
@@ -216,9 +217,33 @@ class UpdateTransferenciaUseCase {
     };
 
     for (final origem in affectedOrigins) {
-      final recalcRes = await _recalculateUseCase.execute(origem);
-      if (recalcRes.isError()) {
-        return Failure(recalcRes.exceptionOrNull()!);
+      DateTime? oldestDate;
+      if (origem == originalSaida.origem || origem == originalEntrada.origem) {
+        if (origem == originalSaida.origem) {
+          oldestDate = originalSaida.data;
+        }
+        if (origem == originalEntrada.origem) {
+          final d = originalEntrada.data;
+          if (oldestDate == null || d.isBefore(oldestDate)) {
+            oldestDate = d;
+          }
+        }
+      }
+      if (origem == dto.origemSaida || origem == dto.origemEntrada) {
+        if (oldestDate == null || dto.data.isBefore(oldestDate)) {
+          oldestDate = dto.data;
+        }
+      }
+
+      if (oldestDate != null) {
+        final recalcRes = await _recalculateUseCase.execute(
+          origem,
+          startingAno: oldestDate.year,
+          startingMes: Mes.fromDate(oldestDate),
+        );
+        if (recalcRes.isError()) {
+          return Failure(recalcRes.exceptionOrNull()!);
+        }
       }
     }
 

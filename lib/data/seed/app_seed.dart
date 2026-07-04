@@ -12,6 +12,7 @@ import 'package:zzuna/data/seed/extrato_fatura_seed.dart';
 import 'package:zzuna/data/seed/lancamento_seed.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 class AppSeed {
   final ContaRepository contaRepository;
@@ -55,12 +56,20 @@ class AppSeed {
     // Recalcular os saldos dos extratos/faturas para todas as origens inseridas
     final contas = (await contaRepository.getAll()).getOrElse((_) => []);
     for (final c in contas) {
-      await recalculateBalanceUseCase.execute(LancamentoOrigem.conta(contaId: c.id));
+      await recalculateBalanceUseCase.execute(
+        LancamentoOrigem.conta(contaId: c.id),
+        startingAno: 2020,
+        startingMes: Mes.janeiro,
+      );
     }
 
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
     for (final c in cartoes) {
-      await recalculateBalanceUseCase.execute(LancamentoOrigem.cartao(cartaoId: c.id));
+      await recalculateBalanceUseCase.execute(
+        LancamentoOrigem.cartao(cartaoId: c.id),
+        startingAno: 2020,
+        startingMes: Mes.janeiro,
+      );
     }
   }
 }
