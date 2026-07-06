@@ -35,6 +35,11 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   final validator = CategoriaValidator<CategoriaDto>();
 
   late final CategoriaCreateViewModel viewModel;
+  
+  final _descFocus = FocusNode();
+  final _paiFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
 
   @override
   void initState() {
@@ -48,6 +53,11 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+    
+    _descFocus.dispose();
+    _paiFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
 
     super.dispose();
   }
@@ -92,6 +102,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
           listenable: createVM.createCommand,
           builder: (_, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
               loading: createVM.createCommand.value.isRunning,
               onPressed: createVM.createCommand.value.isRunning || !_canSubmit
                   ? null
@@ -105,6 +116,9 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
         children: [
           AppTextFormField(
             label: 'Descrição',
+            autofocus: true,
+            focusNode: _descFocus,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -116,6 +130,8 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
 
           AppDropdownFormField<String>(
             label: 'Categoria Pai',
+            focusNode: _paiFocus,
+            onEnterPressed: () => _ativoFocus.requestFocus(),
             value: dto.categoriaPaiId,
             items: [
               AppDropdownMenuItem<String>(value: '', label: 'Selecione...'),
@@ -138,6 +154,8 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
 
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

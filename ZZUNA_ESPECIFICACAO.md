@@ -554,13 +554,13 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Ao fazer um novo lançamento, se tiver marcado uma única Conta ou um único
       Cartão, deve preencher esse campo automaticamente no formulário. |
 | OK | Colocar uma opção para inverter contas na transferencia |
-| ☐ | Padronizar loading no botão **Salvar** de todos os CRUDs. |
+| OK | Padronizar loading no botão **Salvar** de todos os CRUDs. |
+| ☐ | Implementar navegação entre campos do formulário ao pressionar **Enter**
+      (FocusNode / nextFocus). |
 | ☐ | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o 
       formulário estiver inválido. |
 | ☐ | Substituir o seletor de **Despesa/Receita/Investimento/Transferência** por
       um componente mais intuitivo. |
-| ☐ | Implementar navegação entre campos do formulário ao pressionar **Enter**
-      (FocusNode / nextFocus). |
 | ☐ | Refatorar as views que utilizam Dropdown Conta/Cartão para utilizar um
       useCase para load(). |
 | ☐ | Refatorar Centro de Custo e colocar uma flag Padrão para ser selecionado por padrão |

@@ -406,7 +406,6 @@ final lancamentosListViewModelProvider =
         vm.updateFilter(next);
       });
       vm.updateFilter(ref.read(lancamentoFilterProvider));
-      ref.onDispose(vm.dispose);
       return vm;
     });
 
