@@ -33,6 +33,11 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
   final dto = CreateContaDto();
   final validator = ContaValidator<CreateContaDto>();
 
+  final _descFocus = FocusNode();
+  final _bancoFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +48,12 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+
+    _descFocus.dispose();
+    _bancoFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -82,6 +93,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           listenable: viewModel.createCommand,
           builder: (context, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
               loading: viewModel.createCommand.value.isRunning,
               onPressed: viewModel.createCommand.value.isRunning || !_canSubmit
                   ? null
@@ -95,6 +107,9 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
         children: [
           AppTextFormField(
             label: 'Descrição',
+            autofocus: true,
+            focusNode: _descFocus,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -104,6 +119,8 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           const AppSpacing(size: AppSpacingSize.md),
           AppDropdownFormField<String>(
             label: 'Banco',
+            focusNode: _bancoFocus,
+            onEnterPressed: () => _ativoFocus.requestFocus(),
             items: Bancos.items.map((b) {
               return AppDropdownMenuItem(value: b.sigla, label: b.descricao);
             }).toList(),
@@ -116,6 +133,8 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

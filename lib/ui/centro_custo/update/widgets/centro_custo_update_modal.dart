@@ -39,6 +39,11 @@ class _CentroCustoUpdateModalState
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoUpdateViewModel viewModel;
 
+  late final TextEditingController _descController;
+  final _descFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -50,11 +55,27 @@ class _CentroCustoUpdateModalState
     );
     viewModel = ref.read(centroCustoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
+
+    _descController = TextEditingController(text: dto.descricao);
+    _descFocus.addListener(() {
+      if (_descFocus.hasFocus && _descController.text.isNotEmpty) {
+        _descController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _descController.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
+    
+    _descController.dispose();
+    _descFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -92,9 +113,9 @@ class _CentroCustoUpdateModalState
           listenable: vm.updateCommand,
           builder: (_, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
               loading: vm.updateCommand.value.isRunning,
-              onPressed: //
-              vm.updateCommand.value.isRunning || !_canSubmit
+              onPressed: vm.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
             );
@@ -106,7 +127,10 @@ class _CentroCustoUpdateModalState
         children: [
           AppTextFormField(
             label: 'Descrição',
-            initialValue: dto.descricao,
+            autofocus: true,
+            focusNode: _descFocus,
+            controller: _descController,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -116,6 +140,8 @@ class _CentroCustoUpdateModalState
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

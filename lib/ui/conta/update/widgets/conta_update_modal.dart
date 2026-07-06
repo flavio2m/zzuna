@@ -40,6 +40,13 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
   late final LoadedContaDto dto;
   final validator = ContaValidator<LoadedContaDto>();
 
+  late final TextEditingController _descController;
+  final _descFocus = FocusNode();
+  final _bancoFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _dataFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -52,11 +59,29 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
     );
     viewModel = ref.read(contaUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
+
+    _descController = TextEditingController(text: dto.descricao);
+    _descFocus.addListener(() {
+      if (_descFocus.hasFocus && _descController.text.isNotEmpty) {
+        _descController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _descController.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
+
+    _descController.dispose();
+    _descFocus.dispose();
+    _bancoFocus.dispose();
+    _ativoFocus.dispose();
+    _dataFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -96,6 +121,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           listenable: viewModel.updateCommand,
           builder: (context, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
               loading: viewModel.updateCommand.value.isRunning,
               onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit
                   ? null
@@ -109,7 +135,10 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
         children: [
           AppTextFormField(
             label: 'Descrição',
-            initialValue: dto.descricao,
+            autofocus: true,
+            focusNode: _descFocus,
+            controller: _descController,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -120,6 +149,8 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           AppDropdownFormField<String>(
             value: dto.bancoSigla,
             label: 'Banco',
+            focusNode: _bancoFocus,
+            onEnterPressed: () => _ativoFocus.requestFocus(),
             items: Bancos.items.map((b) {
               return AppDropdownMenuItem(value: b.sigla, label: b.descricao);
             }).toList(),
@@ -132,6 +163,8 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _dataFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);
@@ -141,6 +174,8 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
           const AppSpacing(size: AppSpacingSize.md),
           AppDateFormField(
             label: 'Data Inicial',
+            focusNode: _dataFocus,
+            textInputAction: TextInputAction.next,
             initialValue: UtilData.obterDataDDMMAAAA(dto.dataInicial),
             onDateSelected: (date) {
               dto.setDataInicial(date);

@@ -14,6 +14,8 @@ class AppIntegerFormField extends StatefulWidget {
   final bool autofocus;
   final int? min;
   final int? max;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppIntegerFormField({
     super.key,
@@ -27,6 +29,8 @@ class AppIntegerFormField extends StatefulWidget {
     this.autofocus = false,
     this.min,
     this.max,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -36,13 +40,16 @@ class AppIntegerFormField extends StatefulWidget {
 class _AppIntegerFormFieldState extends State<AppIntegerFormField> {
   TextEditingController? _internalController;
 
-  TextEditingController get _effectiveController => widget.controller ?? _internalController!;
+  TextEditingController get _effectiveController =>
+      widget.controller ?? _internalController!;
 
   @override
   void initState() {
     super.initState();
     if (widget.controller == null) {
-      _internalController = TextEditingController(text: widget.initialValue ?? '');
+      _internalController = TextEditingController(
+        text: widget.initialValue ?? '',
+      );
     }
     _effectiveController.addListener(_handleControllerChanged);
   }
@@ -102,8 +109,10 @@ class _AppIntegerFormFieldState extends State<AppIntegerFormField> {
     final valueText = _effectiveController.text;
     final value = int.tryParse(valueText);
 
-    final canDecrement = value == null || widget.min == null || value > widget.min!;
-    final canIncrement = value == null || widget.max == null || value < widget.max!;
+    final canDecrement =
+        value == null || widget.min == null || value > widget.min!;
+    final canIncrement =
+        value == null || widget.max == null || value < widget.max!;
 
     return AppTextFormField(
       label: widget.label,
@@ -133,23 +142,29 @@ class _AppIntegerFormFieldState extends State<AppIntegerFormField> {
       controller: _effectiveController,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
+      textInputAction: widget.textInputAction,
+      onFieldSubmitted: widget.onFieldSubmitted,
       suffixIcon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            iconSize: 16,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            icon: const Icon(Icons.remove, color: AppColors.slate600),
-            onPressed: canDecrement ? () => _changeValue(-1) : null,
+          ExcludeFocus(
+            child: IconButton(
+              iconSize: 16,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: const Icon(Icons.remove, color: AppColors.slate600),
+              onPressed: canDecrement ? () => _changeValue(-1) : null,
+            ),
           ),
           Container(width: 1, height: 20, color: AppColors.border),
-          IconButton(
-            iconSize: 16,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            icon: const Icon(Icons.add, color: AppColors.slate600),
-            onPressed: canIncrement ? () => _changeValue(1) : null,
+          ExcludeFocus(
+            child: IconButton(
+              iconSize: 16,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: const Icon(Icons.add, color: AppColors.slate600),
+              onPressed: canIncrement ? () => _changeValue(1) : null,
+            ),
           ),
           const SizedBox(width: 4),
         ],

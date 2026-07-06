@@ -34,6 +34,10 @@ class _CentroCustoCreateModalState
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoCreateViewModel viewModel;
 
+  final _descFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +48,11 @@ class _CentroCustoCreateModalState
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+    
+    _descFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -78,6 +87,7 @@ class _CentroCustoCreateModalState
           listenable: vm.createCommand,
           builder: (context, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
               loading: vm.createCommand.value.isRunning,
               onPressed: vm.createCommand.value.isRunning || !_canSubmit
                   ? null
@@ -91,6 +101,9 @@ class _CentroCustoCreateModalState
         children: [
           AppTextFormField(
             label: 'Descrição',
+            autofocus: true,
+            focusNode: _descFocus,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -100,6 +113,8 @@ class _CentroCustoCreateModalState
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);
