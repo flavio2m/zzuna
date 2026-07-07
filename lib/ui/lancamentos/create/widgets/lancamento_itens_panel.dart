@@ -19,6 +19,9 @@ class LancamentoItensPanel extends StatelessWidget {
   onSaveEditItem;
   final Function(int numero) onDeleteItem;
 
+  final FocusNode? focusDividir;
+  final VoidCallback? onDividirEnter;
+
   const LancamentoItensPanel({
     super.key,
     required this.items,
@@ -29,6 +32,8 @@ class LancamentoItensPanel extends StatelessWidget {
     required this.onSaveEditItem,
     required this.onDeleteItem,
     this.allowEditItem1 = false,
+    this.focusDividir,
+    this.onDividirEnter,
   });
 
   Map<String, String> _getCategoriaLabels(
@@ -92,6 +97,8 @@ class LancamentoItensPanel extends StatelessWidget {
                     );
                   }
                 : null,
+            focusDividir: item.numero == 1 ? focusDividir : null,
+            onDividirEnter: item.numero == 1 ? onDividirEnter : null,
             onEdit: (item.numero == 1 && !allowEditItem1)
                 ? null
                 : () {

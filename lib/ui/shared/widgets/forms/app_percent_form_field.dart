@@ -13,6 +13,8 @@ class AppPercentFormField extends StatelessWidget {
   final bool autofocus;
   final double min;
   final double max;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppPercentFormField({
     super.key,
@@ -26,6 +28,8 @@ class AppPercentFormField extends StatelessWidget {
     this.autofocus = false,
     this.min = 0.0,
     this.max = 100.0,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -60,13 +64,13 @@ class AppPercentFormField extends StatelessWidget {
         return null;
       },
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
       initialValue: initialValue,
       controller: controller,
       focusNode: focusNode,
       autofocus: autofocus,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
       suffixIcon: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
         child: Text(

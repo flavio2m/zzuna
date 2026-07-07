@@ -62,6 +62,17 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
   // Controller para o campo Valor que ficará desabilitado
   final _valorController = TextEditingController();
 
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _tipoFocus = FocusNode();
+  final _origemFocus = FocusNode();
+  final _catFocus = FocusNode();
+  final _ccFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _dividirFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final LancamentoUpdateViewModel viewModel;
   late final LancamentoDto dto;
 
@@ -89,6 +100,18 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
     _valorController.dispose();
+
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _tipoFocus.dispose();
+    _origemFocus.dispose();
+    _catFocus.dispose();
+    _ccFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+    _dividirFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -203,8 +226,11 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               listenable: viewModel.updateCommand,
               builder: (_, _) {
                 return ButtonSave(
+                  focusNode: _saveFocus,
                   loading: viewModel.updateCommand.value.isRunning,
-                  onPressed: viewModel.updateCommand.value.isRunning ? null : _handleSubmit,
+                  onPressed: viewModel.updateCommand.value.isRunning
+                      ? null
+                      : _handleSubmit,
                 );
               },
             ),
@@ -220,13 +246,19 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _formatDate(dto.data),
                   validator: validator.byField(dto, 'data'),
                   onDateSelected: (date) => setState(() => dto.setData(date)),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  icon: Icons.description_outlined,
+                  autofocus: true,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _tipoFocus.requestFocus(),
                   initialValue: dto.descricao,
                   validator: validator.byField(dto, 'descricao'),
                   onChanged: (value) {
@@ -242,12 +274,16 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: LancamentoTipoField(
+                  focusNode: _tipoFocus,
+                  onEnterPressed: () => _origemFocus.requestFocus(),
                   value: dto.tipo,
                   onChanged: (tipo) {
                     if (tipo != null) setState(() => dto.setTipo(tipo));
                   },
                 ),
                 right: LancamentoOrigemField(
+                  focusNode: _origemFocus,
+                  onEnterPressed: () => _catFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: dto.origem,
                   validator: (_) => validator.byField(dto, 'origem')(null),
@@ -263,6 +299,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: CategoriaField(
+                  focusNode: _catFocus,
+                  onEnterPressed: () => _ccFocus.requestFocus(),
                   categorias: viewModel.categorias,
                   value: _categoriaId.isNotEmpty ? _categoriaId : null,
                   validator: validator.byField(dto, 'itensCategorias'),
@@ -274,6 +312,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                   },
                 ),
                 right: CentroCustoField(
+                  focusNode: _ccFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   centros: viewModel.centros,
                   value: _centroCustoId.isNotEmpty ? _centroCustoId : null,
                   validator: validator.byField(dto, 'itensCentrosCusto'),
@@ -295,6 +335,9 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   controller: _valorController,
                   validator: validator.byField(dto, 'itensValores'),
                   onChanged: (raw) {
@@ -307,6 +350,9 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _dividirFocus.requestFocus(),
                   initialValue: dto.observacao,
                   onChanged: (value) => dto.setObservacao(
                     value.isEmpty ? null : value, //
@@ -386,6 +432,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 categorias: viewModel.categorias,
                 centros: viewModel.centros,
                 allowEditItem1: false,
+                focusDividir: _dividirFocus,
+                onDividirEnter: () => _saveFocus.requestFocus(),
                 onSaveNewItem: (ccId, catId, val) {
                   final res = _distributionUseCase.addItem(
                     currentItems: _itens,

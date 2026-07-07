@@ -12,6 +12,8 @@ class AppTextAreaFormField extends StatelessWidget {
   final int maxLines;
   final int? maxLength;
   final bool showCounter;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppTextAreaFormField({
     super.key,
@@ -26,6 +28,8 @@ class AppTextAreaFormField extends StatelessWidget {
     this.maxLines = 5,
     this.maxLength,
     this.showCounter = false,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -36,11 +40,20 @@ class AppTextAreaFormField extends StatelessWidget {
       minLines: minLines,
       maxLines: maxLines,
       maxLength: maxLength,
+      keyboardType: TextInputType.multiline,
+      textInputAction: textInputAction ?? TextInputAction.newline,
       style: const TextStyle(fontSize: 14),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: validator,
       initialValue: controller == null ? initialValue : null,
-      buildCounter: showCounter ? null : (context, {required currentLength, required isFocused, maxLength}) => null,
+      buildCounter: showCounter
+          ? null
+          : (
+              context, {
+              required currentLength,
+              required isFocused,
+              maxLength,
+            }) => null,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
@@ -48,6 +61,13 @@ class AppTextAreaFormField extends StatelessWidget {
         alignLabelWithHint: true,
       ),
       onChanged: onChanged,
+      onFieldSubmitted: (value) {
+        if (onFieldSubmitted != null) {
+          onFieldSubmitted!(value);
+        } else if (textInputAction == TextInputAction.next) {
+          FocusScope.of(context).nextFocus();
+        }
+      },
     );
   }
 }

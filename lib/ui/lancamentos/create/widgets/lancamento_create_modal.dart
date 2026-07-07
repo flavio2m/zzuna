@@ -64,6 +64,27 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   List<LancamentoItem> _itens = [];
   final _distributionUseCase = LancamentoItemDistributionUseCase();
 
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _tipoFocus = FocusNode();
+  final _origemFocus = FocusNode();
+  final _catFocus = FocusNode();
+  final _ccFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+
+  final _simplesFocus = FocusNode();
+  final _parceladoFocus = FocusNode();
+  final _replicadoFocus = FocusNode();
+  final _detalhamentoFocus = FocusNode();
+
+  final _parcelasFocus = FocusNode();
+  final _parcelaIniFocus = FocusNode();
+  final _parcelaFimFocus = FocusNode();
+
+  final _dividirFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final LancamentoCreateViewModel viewModel;
 
   @override
@@ -159,6 +180,28 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _tipoFocus.dispose();
+    _origemFocus.dispose();
+    _catFocus.dispose();
+    _ccFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+
+    _simplesFocus.dispose();
+    _parceladoFocus.dispose();
+    _replicadoFocus.dispose();
+    _detalhamentoFocus.dispose();
+
+    _parcelasFocus.dispose();
+    _parcelaIniFocus.dispose();
+    _parcelaFimFocus.dispose();
+
+    _dividirFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -323,6 +366,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               listenable: viewModel.createCommand,
               builder: (_, _) {
                 return ButtonSave(
+                  focusNode: _saveFocus,
                   loading: viewModel.createCommand.value.isRunning,
                   onPressed: viewModel.createCommand.value.isRunning
                       ? null
@@ -342,12 +386,19 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _formatDate(dto.data),
                   validator: validator.byField(dto, 'data'),
                   onDateSelected: (date) => setState(() => dto.setData(date)),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
+                  autofocus: true,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _tipoFocus.requestFocus(),
                   icon: Icons.description_outlined,
                   validator: validator.byField(dto, 'descricao'),
                   onChanged: (value) {
@@ -363,12 +414,16 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: LancamentoTipoField(
+                  focusNode: _tipoFocus,
+                  onEnterPressed: () => _origemFocus.requestFocus(),
                   value: dto.tipo,
                   onChanged: (tipo) {
                     if (tipo != null) setState(() => dto.setTipo(tipo));
                   },
                 ),
                 right: LancamentoOrigemField(
+                  focusNode: _origemFocus,
+                  onEnterPressed: () => _catFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: dto.origem,
                   validator: (_) => validator.byField(dto, 'origem')(null),
@@ -384,6 +439,8 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: CategoriaField(
+                  focusNode: _catFocus,
+                  onEnterPressed: () => _ccFocus.requestFocus(),
                   categorias: viewModel.categorias,
                   value: _categoriaId.isNotEmpty ? _categoriaId : null,
                   validator: validator.byField(dto, 'itensCategorias'),
@@ -395,6 +452,8 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   },
                 ),
                 right: CentroCustoField(
+                  focusNode: _ccFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   centros: viewModel.centros,
                   value: _centroCustoId.isNotEmpty ? _centroCustoId : null,
                   validator: validator.byField(dto, 'itensCentrosCusto'),
@@ -416,6 +475,9 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   validator: validator.byField(dto, 'itensValores'),
                   onChanged: (raw) {
                     final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
@@ -427,6 +489,9 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _simplesFocus.requestFocus(),
                   onChanged: (value) => dto.setObservacao(
                     value.isEmpty ? null : value, //
                   ),
@@ -438,6 +503,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
               ModoSelector(
                 selected: _modo,
                 showItens: _showItens,
+                focusSimples: _simplesFocus,
+                focusParcelado: _parceladoFocus,
+                focusReplicado: _replicadoFocus,
+                focusDetalhamento: _detalhamentoFocus,
                 onModoChanged: (modo) {
                   setState(() {
                     _modo = modo;
@@ -445,10 +514,32 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                     _syncItem1();
                   });
                 },
+                onModoSubmitted: (modo) {
+                  setState(() {
+                    _modo = modo;
+                    _showItens = false;
+                    _syncItem1();
+                  });
+                  if (modo == ModoLancamento.simples) {
+                    _detalhamentoFocus.requestFocus();
+                  } else if (modo == ModoLancamento.parcelado) {
+                    _parcelasFocus.requestFocus();
+                  } else if (modo == ModoLancamento.replicado) {
+                    _parcelaIniFocus.requestFocus();
+                  }
+                },
                 onShowItensChanged: (show) {
                   setState(() {
                     _showItens = show;
                   });
+                },
+                onDetalhamentoSubmitted: () {
+                  setState(() {
+                    _showItens = !_showItens;
+                  });
+                  if (!_showItens) {
+                    _saveFocus.requestFocus();
+                  }
                 },
               ),
 
@@ -459,6 +550,8 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 if (_modo == ModoLancamento.parcelado)
                   ParceladoPanel(
                     numParcelas: _numParcelas,
+                    focusNode: _parcelasFocus,
+                    onFieldSubmitted: (_) => _detalhamentoFocus.requestFocus(),
                     onNumParcelasChanged: (val) => setState(
                       () => _numParcelas = val, //
                     ),
@@ -469,6 +562,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   ReplicadoPanel(
                     parcelaInicial: _parcelaInicial,
                     parcelaFinal: _parcelaFinal,
+                    focusInicial: _parcelaIniFocus,
+                    focusFinal: _parcelaFimFocus,
+                    onInicialSubmitted: (_) => _parcelaFimFocus.requestFocus(),
+                    onFinalSubmitted: (_) => _detalhamentoFocus.requestFocus(),
                     onParcelaInicialChanged: (val) => setState(
                       () => _parcelaInicial = val, //
                     ),
@@ -498,6 +595,8 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
       totalValor: _valor,
       categorias: viewModel.categorias,
       centros: viewModel.centros,
+      focusDividir: _dividirFocus,
+      onDividirEnter: () => _saveFocus.requestFocus(),
       onSaveNewItem: (ccId, catId, val) {
         final res = _distributionUseCase.addItem(
           currentItems: _itens,

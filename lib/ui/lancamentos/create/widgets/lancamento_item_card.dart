@@ -16,6 +16,8 @@ class LancamentoItemCard extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onDivide;
+  final FocusNode? focusDividir;
+  final VoidCallback? onDividirEnter;
 
   const LancamentoItemCard({
     super.key,
@@ -26,6 +28,8 @@ class LancamentoItemCard extends StatelessWidget {
     this.onEdit,
     this.onDelete,
     this.onDivide,
+    this.focusDividir,
+    this.onDividirEnter,
   });
 
   @override
@@ -108,6 +112,8 @@ class LancamentoItemCard extends StatelessWidget {
               if (onDivide != null) ...[
                 const SizedBox(width: 8),
                 IconDividirButton(
+                  focusNode: focusDividir,
+                  onEnterPressed: onDividirEnter,
                   onPressed: onDivide!, //
                 ),
               ],

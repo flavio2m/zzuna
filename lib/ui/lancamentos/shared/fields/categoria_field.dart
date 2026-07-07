@@ -8,6 +8,8 @@ class CategoriaField extends StatelessWidget {
   final String? value;
   final ValueChanged<String?>? onChanged;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const CategoriaField({
     super.key,
@@ -15,6 +17,8 @@ class CategoriaField extends StatelessWidget {
     this.value,
     this.onChanged,
     this.validator,
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   /// Flattens the category tree into a sorted list with full path labels.
@@ -40,6 +44,8 @@ class CategoriaField extends StatelessWidget {
       label: 'Categoria',
       value: value,
       validator: validator,
+      focusNode: focusNode,
+      onEnterPressed: onEnterPressed,
       items: flat
           .map(
             (cat) =>
