@@ -399,7 +399,6 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   focusNode: _descFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _tipoFocus.requestFocus(),
-                  icon: Icons.description_outlined,
                   validator: validator.byField(dto, 'descricao'),
                   onChanged: (value) {
                     dto.setDescricao(value);
@@ -534,12 +533,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                   });
                 },
                 onDetalhamentoSubmitted: () {
-                  setState(() {
-                    _showItens = !_showItens;
-                  });
-                  if (!_showItens) {
-                    _saveFocus.requestFocus();
-                  }
+                  _saveFocus.requestFocus();
                 },
               ),
 
