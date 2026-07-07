@@ -30,6 +30,26 @@ class _LancamentoUpdateDataBaseModalState
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedData = DateTime.now();
 
+  final _dataFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _dataFocus.dispose();
+    _saveFocus.dispose();
+    super.dispose();
+  }
+
   String _formatDate(DateTime date) {
     final d = date.day.toString().padLeft(2, '0');
     final m = date.month.toString().padLeft(2, '0');
@@ -52,6 +72,7 @@ class _LancamentoUpdateDataBaseModalState
         actions: [
           ButtonCancel(onPressed: () => Navigator.of(context).pop()),
           ButtonSave(
+            focusNode: _saveFocus,
             loading: widget.isExecuting,
             onPressed: widget.isExecuting ? null : _handleSubmit,
           ),
@@ -67,6 +88,9 @@ class _LancamentoUpdateDataBaseModalState
             const AppSpacing(size: AppSpacingSize.md),
             AppDateFormField(
               label: 'Nova Data',
+              focusNode: _dataFocus,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _saveFocus.requestFocus(),
               initialValue: _formatDate(_selectedData),
               onDateSelected: (date) {
                 setState(() {

@@ -57,6 +57,10 @@ class _LancamentosUpdateMetadataModalState
   final _observacaoController = TextEditingController();
   bool _isExecuting = false;
 
+  final _descFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final _viewModel = ref.read(lancamentoUpdateMetadataViewModelProvider);
 
   @override
@@ -65,6 +69,12 @@ class _LancamentosUpdateMetadataModalState
     _viewModel.updateMetadataCommand.addListener(_commandListener);
     _descricaoController.text = widget.currentDescricao;
     _observacaoController.text = widget.currentObservacao ?? '';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _descFocus.requestFocus();
+      }
+    });
   }
 
   @override
@@ -72,6 +82,9 @@ class _LancamentosUpdateMetadataModalState
     _viewModel.updateMetadataCommand.removeListener(_commandListener);
     _descricaoController.dispose();
     _observacaoController.dispose();
+    _descFocus.dispose();
+    _obsFocus.dispose();
+    _saveFocus.dispose();
     super.dispose();
   }
 
@@ -128,6 +141,7 @@ class _LancamentosUpdateMetadataModalState
             listenable: _viewModel.updateMetadataCommand,
             builder: (context, _) {
               return ButtonSave(
+                focusNode: _saveFocus,
                 loading: _viewModel.updateMetadataCommand.value.isRunning,
                 onPressed: _viewModel.updateMetadataCommand.value.isRunning ? null : _handleSubmit,
               );
@@ -147,6 +161,9 @@ class _LancamentosUpdateMetadataModalState
             AppTextFormField(
               label: 'Nova Descrição',
               controller: _descricaoController,
+              focusNode: _descFocus,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _obsFocus.requestFocus(),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) {
                   return 'Descrição é obrigatória';
@@ -161,6 +178,9 @@ class _LancamentosUpdateMetadataModalState
             AppTextAreaFormField(
               label: 'Nova Observação',
               controller: _observacaoController,
+              focusNode: _obsFocus,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _saveFocus.requestFocus(),
               minLines: 2,
               maxLines: 4,
             ),

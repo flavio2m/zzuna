@@ -81,6 +81,13 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
     super.initState();
     viewModel = ref.read(lancamentoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
+    
     viewModel.load();
 
     // Inicializar o DTO localmente a partir dos detalhes do lançamento
