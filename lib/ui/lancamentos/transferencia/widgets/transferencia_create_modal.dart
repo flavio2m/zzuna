@@ -43,6 +43,14 @@ class _TransferenciaCreateModalState
   LancamentoOrigem? _origemEntrada;
   String? _observacao;
 
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _origemSaidaFocus = FocusNode();
+  final _origemEntradaFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final TransferenciaCreateViewModel viewModel;
 
   @override
@@ -50,6 +58,12 @@ class _TransferenciaCreateModalState
     super.initState();
     viewModel = ref.read(transferenciaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
 
     _loadData();
   }
@@ -72,10 +86,18 @@ class _TransferenciaCreateModalState
 
     if (contas.isEmpty && cartoes.isEmpty) return;
 
-    final selectedOrigens = viewModel.origens.where((d) => switch (d) {
-      LancamentoOrigemContaDetail(:final conta) => contas.contains(conta.id),
-      LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(cartao.id),
-    }).toList();
+    final selectedOrigens = viewModel.origens
+        .where(
+          (d) => switch (d) {
+            LancamentoOrigemContaDetail(:final conta) => contas.contains(
+              conta.id,
+            ),
+            LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(
+              cartao.id,
+            ),
+          },
+        )
+        .toList();
 
     if (selectedOrigens.isNotEmpty) {
       setState(() {
@@ -91,6 +113,13 @@ class _TransferenciaCreateModalState
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _origemSaidaFocus.dispose();
+    _origemEntradaFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+    _saveFocus.dispose();
     super.dispose();
   }
 
@@ -172,8 +201,11 @@ class _TransferenciaCreateModalState
               listenable: viewModel.createCommand,
               builder: (_, _) {
                 return ButtonSave(
+                  focusNode: _saveFocus,
                   loading: viewModel.createCommand.value.isRunning,
-                  onPressed: viewModel.createCommand.value.isRunning ? null : _handleSubmit,
+                  onPressed: viewModel.createCommand.value.isRunning
+                      ? null
+                      : _handleSubmit,
                 );
               },
             ),
@@ -189,12 +221,17 @@ class _TransferenciaCreateModalState
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _formatDate(_data),
                   onDateSelected: (date) => setState(() => _data = date),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  icon: Icons.description_outlined,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _origemSaidaFocus.requestFocus(),
                   initialValue: _descricao,
                   onChanged: (value) => setState(() => _descricao = value),
                 ),
@@ -207,6 +244,8 @@ class _TransferenciaCreateModalState
                 isDesktop: isDesktop,
                 left: LancamentoOrigemField(
                   label: 'Conta/Cartão de Origem',
+                  focusNode: _origemSaidaFocus,
+                  onEnterPressed: () => _origemEntradaFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemSaida,
                   onChanged: (origem) {
@@ -225,6 +264,8 @@ class _TransferenciaCreateModalState
                 ),
                 right: LancamentoOrigemField(
                   label: 'Conta/Cartão de Destino',
+                  focusNode: _origemEntradaFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemEntrada,
                   onChanged: (origem) {
@@ -242,6 +283,9 @@ class _TransferenciaCreateModalState
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   onChanged: (raw) {
                     final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
                     setState(() {
@@ -251,6 +295,9 @@ class _TransferenciaCreateModalState
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _saveFocus.requestFocus(),
                   onChanged: (value) => setState(() {
                     _observacao = value.isEmpty ? null : value;
                   }),
@@ -289,7 +336,12 @@ class _FormRow extends StatelessWidget {
         children: [
           left,
           if (middle != null)
-            Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: middle))
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: middle,
+              ),
+            )
           else
             const SizedBox(height: 16),
           right,
@@ -302,7 +354,10 @@ class _FormRow extends StatelessWidget {
       children: [
         Expanded(flex: leftFlex, child: left),
         if (middle != null)
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: middle)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: middle,
+          )
         else
           const SizedBox(width: 16),
         Expanded(flex: rightFlex, child: right),

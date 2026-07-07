@@ -47,8 +47,16 @@ class _TransferenciaUpdateModalState
   LancamentoOrigem? _origemSaida;
   LancamentoOrigem? _origemEntrada;
   String? _observacao;
-
   bool _initialized = false;
+
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _origemSaidaFocus = FocusNode();
+  final _origemEntradaFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final TransferenciaUpdateViewModel viewModel;
 
   @override
@@ -56,6 +64,13 @@ class _TransferenciaUpdateModalState
     super.initState();
     viewModel = ref.read(transferenciaUpdateViewModelProvider(widget.grupoId));
     viewModel.updateCommand.addListener(_commandListener);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
+
     viewModel.load().then((_) {
       if (mounted) {
         setState(() {
@@ -74,6 +89,13 @@ class _TransferenciaUpdateModalState
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _origemSaidaFocus.dispose();
+    _origemEntradaFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+    _saveFocus.dispose();
     super.dispose();
   }
 
@@ -152,8 +174,11 @@ class _TransferenciaUpdateModalState
               listenable: viewModel.updateCommand,
               builder: (_, _) {
                 return ButtonSave(
+                  focusNode: _saveFocus,
                   loading: viewModel.updateCommand.value.isRunning,
-                  onPressed: viewModel.updateCommand.value.isRunning ? null : _handleSubmit,
+                  onPressed: viewModel.updateCommand.value.isRunning
+                      ? null
+                      : _handleSubmit,
                 );
               },
             ),
@@ -169,12 +194,17 @@ class _TransferenciaUpdateModalState
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _data != null ? _formatDate(_data!) : '',
                   onDateSelected: (date) => setState(() => _data = date),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  icon: Icons.description_outlined,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _origemSaidaFocus.requestFocus(),
                   initialValue: _descricao,
                   onChanged: (value) => setState(() => _descricao = value),
                 ),
@@ -187,6 +217,8 @@ class _TransferenciaUpdateModalState
                 isDesktop: isDesktop,
                 left: LancamentoOrigemField(
                   label: 'Conta/Cartão de Origem',
+                  focusNode: _origemSaidaFocus,
+                  onEnterPressed: () => _origemEntradaFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemSaida,
                   onChanged: (origem) {
@@ -195,6 +227,8 @@ class _TransferenciaUpdateModalState
                 ),
                 right: LancamentoOrigemField(
                   label: 'Conta/Cartão de Destino',
+                  focusNode: _origemEntradaFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemEntrada,
                   onChanged: (origem) {
@@ -212,6 +246,9 @@ class _TransferenciaUpdateModalState
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   initialValue: _valor != null
                       ? UtilBrasilFields.obterReal(_valor!)
                       : null,
@@ -224,6 +261,9 @@ class _TransferenciaUpdateModalState
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _saveFocus.requestFocus(),
                   initialValue: _observacao,
                   onChanged: (value) => setState(() {
                     _observacao = value.isEmpty ? null : value;

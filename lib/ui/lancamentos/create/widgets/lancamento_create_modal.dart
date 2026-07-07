@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
@@ -92,6 +93,26 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     super.initState();
     viewModel = ref.read(lancamentoCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
+
+    _parcelasFocus.onKeyEvent = (node, event) {
+      if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+        if (!HardwareKeyboard.instance.isShiftPressed) {
+          _detalhamentoFocus.requestFocus();
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    };
+
+    _parcelaFimFocus.onKeyEvent = (node, event) {
+      if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+        if (!HardwareKeyboard.instance.isShiftPressed) {
+          _detalhamentoFocus.requestFocus();
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    };
 
     _loadData();
     _syncItem1();
