@@ -41,8 +41,8 @@ class LancamentosFinalizarRecorrenciaMenuItem extends PopupMenuItem<TipoAcoes> {
                message:
                    'Tem certeza que deseja finalizar esta recorrência? \n'
                    'Todos os lançamentos futuros vinculados a ela serão '
-                   'excluídos e recalculados.',
-               actions: const {'confirm': 'Finalizar', 'cancel': 'Cancelar'},
+                   'excluídos.',
+               actions: const {'cancel': 'Cancelar', 'confirm': 'Finalizar'},
              );
              if (confirm == 'confirm') {
                ref

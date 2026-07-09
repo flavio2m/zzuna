@@ -56,6 +56,15 @@ class _LancamentosUpdateOrigemDialogState
     super.dispose();
   }
 
+  bool get _canSubmit {
+    final origem = _novaOrigem;
+    if (origem == null) return false;
+    return switch (origem) {
+      LancamentoOrigemConta(:final contaId) => contaId.isNotEmpty,
+      LancamentoOrigemCartao(:final cartaoId) => cartaoId.isNotEmpty,
+    };
+  }
+
   void _handleSubmit() {
     if (_novaOrigem == null) {
       return;
@@ -76,8 +85,8 @@ class _LancamentosUpdateOrigemDialogState
         ButtonCancel(onPressed: () => Navigator.of(context).pop()),
         ButtonSave(
           focusNode: _saveFocus,
-          loading: widget.isLoading, 
-          onPressed: widget.isLoading ? null : _handleSubmit,
+          loading: widget.isLoading,
+          onPressed: widget.isLoading || !_canSubmit ? null : _handleSubmit,
         ),
       ],
       child: Column(
@@ -98,11 +107,9 @@ class _LancamentosUpdateOrigemDialogState
             validator: (val) =>
                 val == null ? 'Selecione a conta ou cartão' : null,
             onChanged: (origem) {
-              if (origem != null) {
-                setState(() {
-                  _novaOrigem = origem;
-                });
-              }
+              setState(() {
+                _novaOrigem = origem;
+              });
             },
           ),
           const AppSpacing(size: AppSpacingSize.md),

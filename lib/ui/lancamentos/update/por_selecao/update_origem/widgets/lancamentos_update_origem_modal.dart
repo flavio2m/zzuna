@@ -47,7 +47,9 @@ class _LancamentosUpdateOrigemModalState
     super.initState();
     _viewModel = ref.read(lancamentosUpdateOrigemViewModelProvider);
     _viewModel.updateOrigemSelectedCommand.addListener(_commandListener);
-    _viewModel.load();
+    Future(() {
+      _viewModel.load();
+    });
   }
 
   @override

@@ -38,11 +38,7 @@ class LancamentosCriarRecorrenciaMenuItem extends PopupMenuItem<TipoAcoes> {
              final confirm = await AppConfirmationDialog.show(
                context: context,
                title: 'Criar Recorrência',
-               message:
-                   'Deseja criar uma recorrência para este lançamento? \n'
-                   'Lançamentos futuros serão gerados automaticamente '
-                   'baseados na data de vencimento dos seus cartões/contas e '
-                   'para as faturas já existentes.',
+               message: 'Deseja criar uma recorrência para este lançamento?',
              );
              if (confirm == 'confirm') {
                ref

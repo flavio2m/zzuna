@@ -81,14 +81,16 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
     super.initState();
     viewModel = ref.read(lancamentoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _dataFocus.requestFocus();
       }
     });
-    
-    viewModel.load();
+
+    Future(() {
+      viewModel.load();
+    });
 
     // Inicializar o DTO localmente a partir dos detalhes do lançamento
     dto = LancamentoDto.fromDetails(widget.lancamento);
@@ -157,29 +159,27 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
       valor: valorItem1,
     );
 
-    setState(() {
-      if (item1Idx == -1) {
-        _itens.insert(0, updatedItem1);
-      } else {
-        _itens[item1Idx] = updatedItem1;
-      }
-    });
+    if (item1Idx == -1) {
+      _itens.insert(0, updatedItem1);
+    } else {
+      _itens[item1Idx] = updatedItem1;
+    }
   }
 
-  void _handleSubmit() {
+  bool get _canSubmit {
     _syncItem1();
     dto.setItens(_itens);
 
+    if (!validator.validate(dto).isValid) return false;
+
     final total = _itens.fold<double>(0.0, (sum, item) => sum + item.valor);
     final valRes = _distributionUseCase.validateDistribution(_itens, total);
-    if (valRes.isError()) {
-      AppSnackBar.showError(
-        context,
-        (valRes.exceptionOrNull() as DomainException).message, //
-      );
-      return;
-    }
+    if (valRes.isError()) return false;
 
+    return true;
+  }
+
+  void _handleSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
       viewModel.updateCommand.execute(dto);
     }
@@ -235,7 +235,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 return ButtonSave(
                   focusNode: _saveFocus,
                   loading: viewModel.updateCommand.value.isRunning,
-                  onPressed: viewModel.updateCommand.value.isRunning
+                  onPressed:
+                      viewModel.updateCommand.value.isRunning || !_canSubmit
                       ? null
                       : _handleSubmit,
                 );

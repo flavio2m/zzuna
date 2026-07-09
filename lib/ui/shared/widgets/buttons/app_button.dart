@@ -14,6 +14,7 @@ class AppButton extends StatelessWidget {
   final bool small;
   final String? tooltip;
   final bool loading;
+  final bool autofocus;
 
   const AppButton({
     super.key,
@@ -27,6 +28,7 @@ class AppButton extends StatelessWidget {
     this.small = false,
     this.tooltip,
     this.loading = false,
+    this.autofocus = false,
   });
 
   @override
@@ -50,6 +52,7 @@ class AppButton extends StatelessWidget {
       AppButtonType.elevated => ElevatedButton.icon(
         onPressed: onPressed,
         focusNode: focusNode,
+        autofocus: autofocus,
         style: style,
         icon: _buildIcon(context, isDisabled),
         label: _buildLabel(isDisabled),
@@ -57,6 +60,7 @@ class AppButton extends StatelessWidget {
       AppButtonType.filled => FilledButton.icon(
         onPressed: onPressed,
         focusNode: focusNode,
+        autofocus: autofocus,
         style: style,
         icon: _buildIcon(context, isDisabled),
         label: _buildLabel(isDisabled),

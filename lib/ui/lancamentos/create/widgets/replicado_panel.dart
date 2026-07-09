@@ -54,7 +54,7 @@ class ReplicadoPanel extends StatelessWidget {
                   initialValue: parcelaInicial.toString(),
                   onChanged: (val) {
                     final parsed = int.tryParse(val);
-                    if (parsed != null && parsed >= 2) {
+                    if (parsed != null && parsed >= 1) {
                       onParcelaInicialChanged(parsed);
                     }
                   },
@@ -102,7 +102,7 @@ class ReplicadoPanel extends StatelessWidget {
                 fontWeight: FontWeight.normal,
               ),
               AppText(
-                'R\$ ${totalCompromisso.toStringAsFixed(2)}',
+                totalCompromisso.toStringAsFixed(2),
                 variant: AppTextVariant.body,
                 color: theme.colorScheme.primary,
               ),

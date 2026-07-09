@@ -110,6 +110,12 @@ class _LancamentosUpdateMetadataModalState
     });
   }
 
+  bool get _canSubmit {
+    final desc = _descricaoController.text.trim();
+    if (desc.isEmpty || desc.length < 3) return false;
+    return true;
+  }
+
   void _handleSubmit() {
     final desc = _descricaoController.text.trim();
     final obs = _observacaoController.text.trim();
@@ -143,7 +149,11 @@ class _LancamentosUpdateMetadataModalState
               return ButtonSave(
                 focusNode: _saveFocus,
                 loading: _viewModel.updateMetadataCommand.value.isRunning,
-                onPressed: _viewModel.updateMetadataCommand.value.isRunning ? null : _handleSubmit,
+                onPressed:
+                    _viewModel.updateMetadataCommand.value.isRunning ||
+                        !_canSubmit
+                    ? null
+                    : _handleSubmit,
               );
             },
           ),
@@ -164,6 +174,7 @@ class _LancamentosUpdateMetadataModalState
               focusNode: _descFocus,
               textInputAction: TextInputAction.next,
               onFieldSubmitted: (_) => _obsFocus.requestFocus(),
+              onChanged: (_) => setState(() {}),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) {
                   return 'Descrição é obrigatória';

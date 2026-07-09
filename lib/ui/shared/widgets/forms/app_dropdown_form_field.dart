@@ -176,11 +176,15 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
                         _isSearching = false;
                         _syncLabel();
 
-                        if (widget.onEnterPressed != null) {
-                          widget.onEnterPressed!();
-                        } else {
-                          FocusScope.of(context).nextFocus();
-                        }
+                        final focusScope = FocusScope.of(context);
+                        Future.delayed(Duration.zero, () {
+                          if (!mounted) return;
+                          if (widget.onEnterPressed != null) {
+                            widget.onEnterPressed!();
+                          } else {
+                            focusScope.nextFocus();
+                          }
+                        });
                       }
                     : null,
               ),

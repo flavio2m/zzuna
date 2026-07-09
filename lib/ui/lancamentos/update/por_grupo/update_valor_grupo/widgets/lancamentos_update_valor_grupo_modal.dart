@@ -77,7 +77,9 @@ class _LancamentosUpdateValorGrupoModalState
     super.initState();
     _viewModel = ref.read(lancamentosUpdateValorGrupoViewModelProvider);
     _viewModel.updateValorGrupoCommand.addListener(_commandListener);
-    _viewModel.load();
+    Future(() {
+      _viewModel.load();
+    });
 
     // Carregar itens originais
     _itens = List.from(widget.initialItens);
@@ -152,13 +154,25 @@ class _LancamentosUpdateValorGrupoModalState
       valor: valorItem1,
     );
 
-    setState(() {
-      if (item1Idx == -1) {
-        _itens.insert(0, updatedItem1);
-      } else {
-        _itens[item1Idx] = updatedItem1;
-      }
-    });
+    if (item1Idx == -1) {
+      _itens.insert(0, updatedItem1);
+    } else {
+      _itens[item1Idx] = updatedItem1;
+    }
+  }
+
+  bool get _canSubmit {
+    _syncItem1();
+
+    if (_valor <= 0) return false;
+    if (_itens.any((item) => item.categoriaId.isEmpty)) return false;
+    if (_itens.any((item) => item.centroCustoId.isEmpty)) return false;
+
+    final total = _itens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final valRes = _distributionUseCase.validateDistribution(_itens, total);
+    if (valRes.isError()) return false;
+
+    return true;
   }
 
   void _handleSubmit() {
@@ -216,8 +230,8 @@ class _LancamentosUpdateValorGrupoModalState
             ButtonCancel(onPressed: () => Navigator.of(context).pop()),
             ButtonSave(
               focusNode: _saveFocus,
-              loading: isLoading, 
-              onPressed: isLoading ? null : _handleSubmit,
+              loading: isLoading,
+              onPressed: isLoading || !_canSubmit ? null : _handleSubmit,
             ),
           ],
           child: Column(

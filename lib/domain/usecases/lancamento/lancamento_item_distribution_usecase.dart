@@ -4,12 +4,18 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 
 class LancamentoItemDistributionUseCase {
   // Recalcular o item principal (Item 1) com base no valor total e nos outros itens
-  List<LancamentoItem> _recalculateItemPrincipal(List<LancamentoItem> itens, double totalValor) {
+  List<LancamentoItem> _recalculateItemPrincipal(
+    List<LancamentoItem> itens,
+    double totalValor,
+  ) {
     if (itens.isEmpty) return [];
 
     // Filtra todos os itens exceto o número 1
     final outrosItens = itens.where((item) => item.numero != 1).toList();
-    final somaOutros = outrosItens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final somaOutros = outrosItens.fold<double>(
+      0.0,
+      (sum, item) => sum + item.valor,
+    );
 
     // O valor do item 1 é a diferença do total com os outros
     // Usamos arredondamento de centavos para evitar problemas de ponto flutuante
@@ -33,7 +39,10 @@ class LancamentoItemDistributionUseCase {
   }
 
   // Validar se os percentuais de todos os itens estão dentro dos limites
-  Result<Unit> _validarPercentuais(List<LancamentoItem> itens, double totalValor) {
+  Result<Unit> _validarPercentuais(
+    List<LancamentoItem> itens,
+    double totalValor,
+  ) {
     if (totalValor <= 0) {
       return Failure(
         DomainException(
@@ -76,7 +85,7 @@ class LancamentoItemDistributionUseCase {
       if (valorArredondado < 1.00) {
         return Failure(
           DomainException(
-            'Nenhum item pode ter valor inferior a R\$ 1,00.', //
+            'Nenhum item pode ter valor inferior a 1,00.', //
           ),
         );
       }
@@ -293,7 +302,8 @@ class LancamentoItemDistributionUseCase {
       if (diferencaCentavos != 0) {
         final ultimoIdx = itensParcela.length - 1;
         final ultimoItem = itensParcela[ultimoIdx];
-        final novoValorCentavos = (ultimoItem.valor * 100).round() + diferencaCentavos; //
+        final novoValorCentavos =
+            (ultimoItem.valor * 100).round() + diferencaCentavos; //
         itensParcela[ultimoIdx] = ultimoItem.copyWith(
           valor: novoValorCentavos / 100.0, //
         );
@@ -352,7 +362,10 @@ class LancamentoItemDistributionUseCase {
   }
 
   // Validar a distribuição completa
-  Result<Unit> validateDistribution(List<LancamentoItem> itens, double totalValor) {
+  Result<Unit> validateDistribution(
+    List<LancamentoItem> itens,
+    double totalValor,
+  ) {
     final valValores = _validarValoresMinimos(itens);
     if (valValores.isError()) return Failure(valValores.exceptionOrNull()!);
 

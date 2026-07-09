@@ -330,41 +330,27 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     }
   }
 
-  void _handleSubmit() {
+  bool get _canSubmit {
     _syncItem1();
     dto.setItens(_itens);
 
+    if (!validator.validate(dto).isValid) return false;
+
     final valRes = _distributionUseCase.validateDistribution(_itens, _valor);
-    if (valRes.isError()) {
-      AppSnackBar.showError(
-        context,
-        (valRes.exceptionOrNull() as DomainException).message, //
-      );
-      return;
+    if (valRes.isError()) return false;
+
+    if (_modo == ModoLancamento.parcelado) {
+      if (_numParcelas < 2) return false;
+    } else if (_modo == ModoLancamento.replicado) {
+      if (_parcelaFinal < _parcelaInicial) return false;
+      if ((_parcelaFinal - _parcelaInicial + 1) < 2) return false;
     }
 
+    return true;
+  }
+
+  void _handleSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
-      if (_modo == ModoLancamento.parcelado) {
-        if (_numParcelas < 2) {
-          AppSnackBar.showError(context, 'Informe pelo menos 2 parcelas.');
-          return;
-        }
-      } else if (_modo == ModoLancamento.replicado) {
-        if (_parcelaFinal < _parcelaInicial) {
-          AppSnackBar.showError(
-            context,
-            'A parcela final não pode ser menor que a inicial.', //
-          );
-          return;
-        }
-        if ((_parcelaFinal - _parcelaInicial + 1) < 2) {
-          AppSnackBar.showError(
-            context,
-            'A replicação deve gerar pelo menos 2 lançamentos.', //
-          );
-          return;
-        }
-      }
       final dtos = _buildDtos();
       viewModel.createCommand.execute(dtos);
     }
@@ -389,7 +375,8 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 return ButtonSave(
                   focusNode: _saveFocus,
                   loading: viewModel.createCommand.value.isRunning,
-                  onPressed: viewModel.createCommand.value.isRunning
+                  onPressed:
+                      viewModel.createCommand.value.isRunning || !_canSubmit
                       ? null
                       : _handleSubmit,
                 );

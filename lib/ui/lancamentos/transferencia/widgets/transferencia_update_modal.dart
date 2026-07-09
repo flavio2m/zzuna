@@ -71,18 +71,20 @@ class _TransferenciaUpdateModalState
       }
     });
 
-    viewModel.load().then((_) {
-      if (mounted) {
-        setState(() {
-          _data = viewModel.data;
-          _descricao = viewModel.descricao;
-          _valor = viewModel.valor;
-          _origemSaida = viewModel.origemSaida;
-          _origemEntrada = viewModel.origemEntrada;
-          _observacao = viewModel.observacao;
-          _initialized = true;
-        });
-      }
+    Future(() {
+      viewModel.load().then((_) {
+        if (mounted) {
+          setState(() {
+            _data = viewModel.data;
+            _descricao = viewModel.descricao;
+            _valor = viewModel.valor;
+            _origemSaida = viewModel.origemSaida;
+            _origemEntrada = viewModel.origemEntrada;
+            _observacao = viewModel.observacao;
+            _initialized = true;
+          });
+        }
+      });
     });
   }
 
@@ -110,6 +112,21 @@ class _TransferenciaUpdateModalState
     commandValue.onFailure((exception) {
       AppSnackBar.showError(context, exception.toString());
     });
+  }
+
+  bool get _canSubmit {
+    if (_origemSaida == null || _origemEntrada == null) return false;
+    if (_origemSaida == _origemEntrada) return false;
+
+    final dto = CreateTransferenciaDto(
+      data: _data ?? DateTime.now(),
+      descricao: _descricao ?? 'Transferência',
+      valor: _valor ?? 0,
+      origemSaida: _origemSaida!,
+      origemEntrada: _origemEntrada!,
+      observacao: _observacao,
+    );
+    return validator.validate(dto).isValid;
   }
 
   void _handleSubmit() {
@@ -176,7 +193,8 @@ class _TransferenciaUpdateModalState
                 return ButtonSave(
                   focusNode: _saveFocus,
                   loading: viewModel.updateCommand.value.isRunning,
-                  onPressed: viewModel.updateCommand.value.isRunning
+                  onPressed:
+                      viewModel.updateCommand.value.isRunning || !_canSubmit
                       ? null
                       : _handleSubmit,
                 );

@@ -77,7 +77,7 @@ class ParceladoPanel extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                         ),
                         AppText(
-                          'R\$ ${previewValores[i].toStringAsFixed(2)}',
+                          previewValores[i].toStringAsFixed(2),
                           variant: AppTextVariant.caption, //
                         ),
                       ],

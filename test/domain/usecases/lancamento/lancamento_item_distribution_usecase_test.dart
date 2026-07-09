@@ -82,11 +82,25 @@ void main() {
 
     test('Should remove item and return value to Item 1', () {
       final currentItems = [
-        const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 70.0),
-        const LancamentoItem(numero: 2, centroCustoId: 'cc-2', categoriaId: 'cat-2', valor: 30.0),
+        const LancamentoItem(
+          numero: 1,
+          centroCustoId: 'cc-1',
+          categoriaId: 'cat-1',
+          valor: 70.0,
+        ),
+        const LancamentoItem(
+          numero: 2,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          valor: 30.0,
+        ),
       ];
 
-      final res = useCase.removeItem(currentItems: currentItems, totalValor: 100.0, numero: 2);
+      final res = useCase.removeItem(
+        currentItems: currentItems,
+        totalValor: 100.0,
+        numero: 2,
+      );
 
       expect(res.isSuccess(), isTrue);
       final updatedList = res.getOrThrow();
@@ -96,42 +110,76 @@ void main() {
       expect(item1.valor, 100.0);
     });
 
-    test('Should return error when adding item violates minimum value of R\$ 1,00', () {
-      final currentItems = [const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 10.0)];
+    test(
+      'Should return error when adding item violates minimum value of 1,00',
+      () {
+        final currentItems = [
+          const LancamentoItem(
+            numero: 1,
+            centroCustoId: 'cc-1',
+            categoriaId: 'cat-1',
+            valor: 10.0,
+          ),
+        ];
 
-      final res = useCase.addItem(
-        currentItems: currentItems,
-        totalValor: 10.0,
-        centroCustoId: 'cc-2',
-        categoriaId: 'cat-2',
-        itemValor: 0.50, // Inválido: menor que 1.00
-      );
+        final res = useCase.addItem(
+          currentItems: currentItems,
+          totalValor: 10.0,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          itemValor: 0.50, // Inválido: menor que 1.00
+        );
 
-      expect(res.isError(), isTrue);
-      final exception = res.exceptionOrNull() as DomainException;
-      expect(exception.message, contains('Nenhum item pode ter valor inferior a R\$ 1,00'));
-    });
+        expect(res.isError(), isTrue);
+        final exception = res.exceptionOrNull() as DomainException;
+        expect(
+          exception.message,
+          contains('Nenhum item pode ter valor inferior a 1,00'),
+        );
+      },
+    );
 
-    test('Should return error when Item 1 violates minimum percentage of 1%', () {
+    test(
+      'Should return error when Item 1 violates minimum percentage of 1%',
+      () {
+        final currentItems = [
+          const LancamentoItem(
+            numero: 1,
+            centroCustoId: 'cc-1',
+            categoriaId: 'cat-1',
+            valor: 1000.0,
+          ),
+        ];
+
+        final res = useCase.addItem(
+          currentItems: currentItems,
+          totalValor: 1000.0,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          itemValor:
+              995.0, // Deixa Item 1 com 5.0 (0.5%), o que é >= 1.00 mas < 1%
+        );
+
+        expect(res.isError(), isTrue);
+        final exception = res.exceptionOrNull() as DomainException;
+        expect(
+          exception.message,
+          contains(
+            'O Item 1 (principal) deve ter pelo menos 1% do valor total',
+          ),
+        );
+      },
+    );
+
+    test('Should return error when Item 1 violates minimum value of 1,00', () {
       final currentItems = [
-        const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 1000.0),
+        const LancamentoItem(
+          numero: 1,
+          centroCustoId: 'cc-1',
+          categoriaId: 'cat-1',
+          valor: 10.0,
+        ),
       ];
-
-      final res = useCase.addItem(
-        currentItems: currentItems,
-        totalValor: 1000.0,
-        centroCustoId: 'cc-2',
-        categoriaId: 'cat-2',
-        itemValor: 995.0, // Deixa Item 1 com 5.0 (0.5%), o que é >= 1.00 mas < 1%
-      );
-
-      expect(res.isError(), isTrue);
-      final exception = res.exceptionOrNull() as DomainException;
-      expect(exception.message, contains('O Item 1 (principal) deve ter pelo menos 1% do valor total'));
-    });
-
-    test('Should return error when Item 1 violates minimum value of R\$ 1,00', () {
-      final currentItems = [const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 10.0)];
 
       final res = useCase.addItem(
         currentItems: currentItems,
@@ -143,34 +191,62 @@ void main() {
 
       expect(res.isError(), isTrue);
       final exception = res.exceptionOrNull() as DomainException;
-      expect(exception.message, contains('Nenhum item pode ter valor inferior a R\$ 1,00'));
-    });
-
-    test('Should return error when additional item violates maximum percentage of 99%', () {
-      final currentItems = [
-        const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 1000.0),
-      ];
-
-      final res = useCase.addItem(
-        currentItems: currentItems,
-        totalValor: 1000.0,
-        centroCustoId: 'cc-2',
-        categoriaId: 'cat-2',
-        itemValor: 995.0, // Excede 99% (99.5%) e deixa Item 1 com 5.0 (0.5%)
+      expect(
+        exception.message,
+        contains('Nenhum item pode ter valor inferior a 1,00'),
       );
-
-      expect(res.isError(), isTrue);
-      final exception = res.exceptionOrNull() as DomainException;
-      expect(exception.message, contains('O Item 1 (principal) deve ter pelo menos 1%'));
     });
+
+    test(
+      'Should return error when additional item violates maximum percentage of 99%',
+      () {
+        final currentItems = [
+          const LancamentoItem(
+            numero: 1,
+            centroCustoId: 'cc-1',
+            categoriaId: 'cat-1',
+            valor: 1000.0,
+          ),
+        ];
+
+        final res = useCase.addItem(
+          currentItems: currentItems,
+          totalValor: 1000.0,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          itemValor: 995.0, // Excede 99% (99.5%) e deixa Item 1 com 5.0 (0.5%)
+        );
+
+        expect(res.isError(), isTrue);
+        final exception = res.exceptionOrNull() as DomainException;
+        expect(
+          exception.message,
+          contains('O Item 1 (principal) deve ter pelo menos 1%'),
+        );
+      },
+    );
 
     test('Should distribute cent differences correctly in parcelled mode', () {
       final baseItems = [
-        const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 350.02), // 70%
-        const LancamentoItem(numero: 2, centroCustoId: 'cc-2', categoriaId: 'cat-2', valor: 150.01), // 30%
+        const LancamentoItem(
+          numero: 1,
+          centroCustoId: 'cc-1',
+          categoriaId: 'cat-1',
+          valor: 350.02,
+        ), // 70%
+        const LancamentoItem(
+          numero: 2,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          valor: 150.01,
+        ), // 30%
       ];
 
-      final parcelas = useCase.distributeParcelas(totalValor: 500.03, parcelasCount: 5, baseItems: baseItems);
+      final parcelas = useCase.distributeParcelas(
+        totalValor: 500.03,
+        parcelasCount: 5,
+        baseItems: baseItems,
+      );
 
       expect(parcelas, hasLength(5));
 
@@ -193,11 +269,25 @@ void main() {
 
     test('Should distribute replicated percentual correctly', () {
       final baseItems = [
-        const LancamentoItem(numero: 1, centroCustoId: 'cc-1', categoriaId: 'cat-1', valor: 70.0),
-        const LancamentoItem(numero: 2, centroCustoId: 'cc-2', categoriaId: 'cat-2', valor: 30.0),
+        const LancamentoItem(
+          numero: 1,
+          centroCustoId: 'cc-1',
+          categoriaId: 'cat-1',
+          valor: 70.0,
+        ),
+        const LancamentoItem(
+          numero: 2,
+          centroCustoId: 'cc-2',
+          categoriaId: 'cat-2',
+          valor: 30.0,
+        ),
       ];
 
-      final novosItens = useCase.distributeReplicado(valorReplica: 200.0, baseItems: baseItems, baseTotalValor: 100.0);
+      final novosItens = useCase.distributeReplicado(
+        valorReplica: 200.0,
+        baseItems: baseItems,
+        baseTotalValor: 100.0,
+      );
 
       expect(novosItens, hasLength(2));
       expect(novosItens[0].valor, 140.0);

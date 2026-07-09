@@ -136,6 +136,21 @@ class _TransferenciaCreateModalState
     });
   }
 
+  bool get _canSubmit {
+    if (_origemSaida == null || _origemEntrada == null) return false;
+    if (_origemSaida == _origemEntrada) return false;
+
+    final dto = CreateTransferenciaDto(
+      data: _data,
+      descricao: _descricao,
+      valor: _valor,
+      origemSaida: _origemSaida!,
+      origemEntrada: _origemEntrada!,
+      observacao: _observacao,
+    );
+    return validator.validate(dto).isValid;
+  }
+
   void _handleSubmit() {
     if (_origemSaida == null) {
       AppSnackBar.showError(context, 'Selecione a conta ou cartão de origem');
@@ -203,7 +218,8 @@ class _TransferenciaCreateModalState
                 return ButtonSave(
                   focusNode: _saveFocus,
                   loading: viewModel.createCommand.value.isRunning,
-                  onPressed: viewModel.createCommand.value.isRunning
+                  onPressed:
+                      viewModel.createCommand.value.isRunning || !_canSubmit
                       ? null
                       : _handleSubmit,
                 );

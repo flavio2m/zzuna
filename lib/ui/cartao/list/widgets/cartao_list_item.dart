@@ -69,7 +69,7 @@ class CartaoListItem extends StatelessWidget {
                   axis: Axis.horizontal, //
                 ),
 
-                AppTag('Limite: R\$ ${cartaoDetails.limite.toStringAsFixed(2)}'),
+                AppTag('Limite: ${cartaoDetails.limite.toStringAsFixed(2)}'),
 
                 const AppSpacing(
                   size: AppSpacingSize.xs,

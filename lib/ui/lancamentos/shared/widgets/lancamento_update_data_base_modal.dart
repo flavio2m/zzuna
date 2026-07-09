@@ -28,14 +28,18 @@ class LancamentoUpdateDataBaseModal extends StatefulWidget {
 class _LancamentoUpdateDataBaseModalState
     extends State<LancamentoUpdateDataBaseModal> {
   final _formKey = GlobalKey<FormState>();
-  DateTime _selectedData = DateTime.now();
+  DateTime? _selectedData = DateTime.now();
 
+  late final _dataController = TextEditingController(
+    text: _formatDate(_selectedData!),
+  );
   final _dataFocus = FocusNode();
   final _saveFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    _dataController.addListener(() => setState(() {}));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _dataFocus.requestFocus();
@@ -45,6 +49,7 @@ class _LancamentoUpdateDataBaseModalState
 
   @override
   void dispose() {
+    _dataController.dispose();
     _dataFocus.dispose();
     _saveFocus.dispose();
     super.dispose();
@@ -56,9 +61,15 @@ class _LancamentoUpdateDataBaseModalState
     return '$d/$m/${date.year}';
   }
 
+  bool get _canSubmit {
+    final clean = _dataController.text.replaceAll('/', '');
+    return clean.length == 8;
+  }
+
   void _handleSubmit() {
+    if (_selectedData == null) return;
     if (_formKey.currentState?.validate() ?? false) {
-      widget.onSave(_selectedData);
+      widget.onSave(_selectedData!);
     }
   }
 
@@ -74,7 +85,7 @@ class _LancamentoUpdateDataBaseModalState
           ButtonSave(
             focusNode: _saveFocus,
             loading: widget.isExecuting,
-            onPressed: widget.isExecuting ? null : _handleSubmit,
+            onPressed: widget.isExecuting || !_canSubmit ? null : _handleSubmit,
           ),
         ],
         child: Column(
@@ -88,10 +99,10 @@ class _LancamentoUpdateDataBaseModalState
             const AppSpacing(size: AppSpacingSize.md),
             AppDateFormField(
               label: 'Nova Data',
+              controller: _dataController,
               focusNode: _dataFocus,
               textInputAction: TextInputAction.next,
               onFieldSubmitted: (_) => _saveFocus.requestFocus(),
-              initialValue: _formatDate(_selectedData),
               onDateSelected: (date) {
                 setState(() {
                   _selectedData = date;

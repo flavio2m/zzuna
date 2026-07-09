@@ -6,14 +6,23 @@ class ButtonCancel extends StatelessWidget {
   final FocusNode? focusNode;
   final bool small;
   final String label;
+  final bool autofocus;
 
-  const ButtonCancel({super.key, required this.onPressed, this.focusNode, this.small = false, this.label = 'Cancelar'});
+  const ButtonCancel({
+    super.key,
+    required this.onPressed,
+    this.focusNode,
+    this.small = false,
+    this.label = 'Cancelar',
+    this.autofocus = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppButton(
       onPressed: onPressed,
       focusNode: focusNode,
+      autofocus: autofocus,
       small: small,
       label: label,
       icon: Icon(Icons.cancel, color: Theme.of(context).colorScheme.error),
