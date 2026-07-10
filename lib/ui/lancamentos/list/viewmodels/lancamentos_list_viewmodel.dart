@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
@@ -102,6 +103,8 @@ class LancamentosListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _pendingLoad = false;
+
   LancamentosListViewModel(
     this._detailsUseCase,
     this._filterUseCase,
@@ -112,9 +115,46 @@ class LancamentosListViewModel extends ChangeNotifier {
     this._cartaoRepository,
     this._syncRecorrenciasMesUseCase,
   ) {
-    _repositorySubscription = _repository.observer().listen((_) {
-      loadCommand.execute();
+    _repositorySubscription = _repository.observer().listen((event) {
+      bool shouldReload = true;
+
+      if (event is RepositoryCreated<Lancamento>) {
+        shouldReload = _affectsCurrentOrPastMonth(event.model);
+      } else if (event is RepositoryUpdated<Lancamento>) {
+        shouldReload = _affectsCurrentOrPastMonth(event.model);
+        if (!shouldReload &&
+            _allLancamentos.any((l) => l.id == event.model.id)) {
+          shouldReload = true;
+        }
+      }
+
+      if (shouldReload) {
+        _triggerLoad();
+      }
     });
+
+    loadCommand.addListener(() {
+      if (!loadCommand.value.isRunning && _pendingLoad) {
+        _pendingLoad = false;
+        loadCommand.execute();
+      }
+    });
+  }
+
+  void _triggerLoad() {
+    if (loadCommand.value.isRunning) {
+      _pendingLoad = true;
+    } else {
+      _pendingLoad = false;
+      loadCommand.execute();
+    }
+  }
+
+  bool _affectsCurrentOrPastMonth(Lancamento lancamento) {
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
+    return lancamento.data.year <= ano &&
+        (lancamento.data.year < ano || lancamento.data.month <= mes.index);
   }
 
   late final loadCommand = Command0(_load);
@@ -202,7 +242,7 @@ class LancamentosListViewModel extends ChangeNotifier {
     _currentFilter = newFilter;
 
     if (periodChanged) {
-      loadCommand.execute();
+      _triggerLoad();
     } else {
       _applyFilter();
     }
