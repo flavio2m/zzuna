@@ -7,6 +7,7 @@ class ButtonAdd extends StatelessWidget {
   final bool small;
   final IconData? icon;
   final String? label;
+  final Color? color;
 
   const ButtonAdd({
     super.key,
@@ -15,19 +16,22 @@ class ButtonAdd extends StatelessWidget {
     this.small = false,
     this.icon,
     this.label,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
+    final defaultColor = color ?? Theme.of(context).colorScheme.primary;
+
     return AppButton(
       onPressed: onPressed,
       focusNode: focusNode,
       small: small,
       label: label ?? 'Adicionar',
       icon: icon != null
-          ? Icon(icon, color: Theme.of(context).colorScheme.primary)
-          : Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
-      textStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ? Icon(icon, color: defaultColor)
+          : Icon(Icons.add, color: defaultColor),
+      textStyle: TextStyle(color: defaultColor),
     );
   }
 }

@@ -12,6 +12,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});
@@ -127,10 +128,26 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             },
           ),
           // 7. Adicionar
-          ButtonAdd(onPressed: () => LancamentoCreateModal.show(context)),
+          ButtonAdd(
+            label: 'Entrada',
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.receita,
+            ),
+          ),
+          ButtonAdd(
+            label: 'Despesa',
+            icon: Icons.arrow_downward,
+            color: Theme.of(context).colorScheme.error,
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.despesa,
+            ),
+          ),
           ButtonAdd(
             icon: Icons.swap_horiz_rounded,
             label: 'Transferência',
+            color: AppColors.indigo600,
             onPressed: () => TransferenciaCreateModal.show(context),
           ),
         ],

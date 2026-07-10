@@ -557,12 +557,14 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Padronizar loading no botão **Salvar** de todos os CRUDs. |
 | OK | Implementar navegação entre campos do formulário ao pressionar **Enter**
       (FocusNode / nextFocus). |
-| ☐ | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o 
+| OK | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o 
       formulário estiver inválido. |
+| OK | Alterar botão Adicionar para + Entrada e + Despesa |
 | ☐ | Implementar o fechamento do mês |
 | ☐ | Colocar um loading em Lancamentos quando mudar o mês/ano |
-| ☐ | Substituir o seletor de **Despesa/Receita/Investimento/Transferência** por
-      um componente mais intuitivo. |
+| ☐ | Analisar viabilidade e implementar cache local:
+      - CRUD Simples: Centro de Custo, Categoria e Conta/Cartão
+      - CRUD Complexos: Lançamento e ExtratoFatura|
 flavio2m@gmail.com
 ---
 

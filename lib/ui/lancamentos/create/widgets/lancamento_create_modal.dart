@@ -10,6 +10,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
+import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/modo_selector.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/parcelado_panel.dart';
@@ -33,10 +34,15 @@ import 'package:zzuna/utils/extensions/command_state_extension.dart';
 import 'package:uuid/uuid.dart';
 
 class LancamentoCreateModal extends ConsumerStatefulWidget {
-  const LancamentoCreateModal({super.key});
+  final LancamentoTipo? initialTipo;
 
-  static void show(BuildContext context) {
-    AppDialog.show(context: context, child: const LancamentoCreateModal());
+  const LancamentoCreateModal({super.key, this.initialTipo});
+
+  static void show(BuildContext context, {LancamentoTipo? initialTipo}) {
+    AppDialog.show(
+      context: context,
+      child: LancamentoCreateModal(initialTipo: initialTipo),
+    );
   }
 
   @override
@@ -91,6 +97,9 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialTipo != null) {
+      dto.setTipo(widget.initialTipo!);
+    }
     viewModel = ref.read(lancamentoCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
 
