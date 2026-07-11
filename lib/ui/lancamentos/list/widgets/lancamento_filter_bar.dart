@@ -4,6 +4,7 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
+import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
@@ -25,6 +26,8 @@ class LancamentoFilterBar extends ConsumerStatefulWidget {
 class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
   late final TextEditingController _descricaoController;
   late final FocusNode _descricaoFocusNode;
+
+  bool _isLoadingFechamento = false;
 
   @override
   void initState() {
@@ -150,8 +153,71 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             color: AppColors.indigo600,
             onPressed: () => TransferenciaCreateModal.show(context),
           ),
+          _buildFechamentoButton(viewModel),
         ],
       ),
+    );
+  }
+
+  Widget _buildFechamentoButton(LancamentosListViewModel viewModel) {
+    final isFechado = viewModel.isMesFechado;
+
+    return ButtonAdd(
+      label: isFechado ? 'Reabrir Mês' : 'Fechar Mês',
+      icon: isFechado ? Icons.lock : Icons.lock_open,
+      color: isFechado ? Colors.green : Theme.of(context).colorScheme.primary,
+      loading: _isLoadingFechamento,
+      onPressed: () async {
+        setState(() {
+          _isLoadingFechamento = true;
+        });
+
+        if (isFechado) {
+          final result = await viewModel.reabrirMes();
+          if (mounted) {
+            if (result.isError()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result.exceptionOrNull()!.toString()),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mês reaberto com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        } else {
+          final result = await viewModel.fecharMes();
+          if (mounted) {
+            if (result.isError()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result.exceptionOrNull()!.toString()),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mês fechado com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoadingFechamento = false;
+          });
+        }
+      },
     );
   }
 

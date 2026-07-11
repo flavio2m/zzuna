@@ -21,6 +21,24 @@ import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
+
+class FakeFecharMesUseCase implements FecharMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeReabrirMesUseCase implements ReabrirMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class FakeSyncRecorrenciasMesUseCase implements SyncRecorrenciasMesUseCase {
   @override
@@ -201,6 +219,8 @@ void main() {
         FakeContaRepository(),
         FakeCartaoRepository(),
         FakeSyncRecorrenciasMesUseCase(),
+        FakeFecharMesUseCase(),
+        FakeReabrirMesUseCase(),
       );
     });
 
@@ -264,6 +284,8 @@ void main() {
         FakeContaRepository(),
         FakeCartaoRepository(),
         FakeSyncRecorrenciasMesUseCase(),
+        FakeFecharMesUseCase(),
+        FakeReabrirMesUseCase(),
       );
     });
 

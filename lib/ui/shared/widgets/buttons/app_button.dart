@@ -33,7 +33,7 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = onPressed == null;
+    final isDisabled = onPressed == null || loading;
 
     final style = TextButton.styleFrom(
       backgroundColor:
@@ -50,7 +50,7 @@ class AppButton extends StatelessWidget {
 
     final button = switch (buttonType) {
       AppButtonType.elevated => ElevatedButton.icon(
-        onPressed: onPressed,
+        onPressed: loading ? null : onPressed,
         focusNode: focusNode,
         autofocus: autofocus,
         style: style,
@@ -58,7 +58,7 @@ class AppButton extends StatelessWidget {
         label: _buildLabel(isDisabled),
       ),
       AppButtonType.filled => FilledButton.icon(
-        onPressed: onPressed,
+        onPressed: loading ? null : onPressed,
         focusNode: focusNode,
         autofocus: autofocus,
         style: style,
@@ -79,7 +79,9 @@ class AppButton extends StatelessWidget {
 
     return Text(
       label,
-      style: disabled ? const TextStyle(color: AppColors.slate400) : textStyle, //
+      style: disabled
+          ? const TextStyle(color: AppColors.slate400)
+          : textStyle, //
     );
   }
 

@@ -128,16 +128,18 @@ class UpdateLancamentoUseCase {
         startingAno: original.data.year,
         startingMes: Mes.fromDate(original.data),
       );
-      if (oldRecalcRes.isError())
+      if (oldRecalcRes.isError()) {
         return Failure(oldRecalcRes.exceptionOrNull()!);
+      }
 
       final newRecalcRes = await _recalculateUseCase.execute(
         newOrigem,
         startingAno: dto.data.year,
         startingMes: Mes.fromDate(dto.data),
       );
-      if (newRecalcRes.isError())
+      if (newRecalcRes.isError()) {
         return Failure(newRecalcRes.exceptionOrNull()!);
+      }
     }
 
     return updateRes;

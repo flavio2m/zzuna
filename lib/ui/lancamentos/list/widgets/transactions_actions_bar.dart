@@ -76,7 +76,7 @@ class TransactionsActionsBar extends ConsumerWidget {
             constraints: const BoxConstraints(),
             splashRadius: 20,
           ),
-          if (hasSelection) ...[
+          if (hasSelection && !listViewModel.isMesFechado) ...[
             const SizedBox(width: 16),
             LancamentosReconcileButton(
               conciliado: true,
@@ -110,6 +110,15 @@ class TransactionsActionsBar extends ConsumerWidget {
               },
             ),
           ],
+          const Spacer(),
+          Icon(
+            listViewModel.isMesFechado ? Icons.lock : Icons.lock_open,
+            color: listViewModel.isMesFechado
+                ? Colors.green
+                : Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 16),
         ],
       ),
     );

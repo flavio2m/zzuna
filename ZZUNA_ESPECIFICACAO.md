@@ -560,9 +560,19 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Desabilitar o botão **Salvar** no Create/Update de Lançamento enquanto o 
       formulário estiver inválido. |
 | OK | Alterar botão Adicionar para + Entrada e + Despesa |
-| ☐ | Implementar o fechamento do mês |
-| ☐ | Colocar um loading em Lancamentos quando mudar o mês/ano |
-| ☐ | Analisar viabilidade e implementar cache local:
+| OK | Colocar um loading em Lancamentos quando mudar o mês/ano |
+| OK | Implementar o fechamento do mês |
+| ☐ | No lançamento recorrente, colocar o número de lançamento sendo sequência
+      1, 2, 3, etc. No momento de criar o lançamento, deve inserir a sequência
+      tabém no final da descrição (LancamentoGrupoRecorrencia.sequencia)
+      (ex: Recorrência Aluguel - 1, Recorrência Aluguel - 2, etc.)
+      - Criar opção para alterar a sequência: o usuário poderar criar uma recorrência
+      será 1, mas em ações poderá definir que aquela é a 20, por exemplo, o 
+      próximo a ser gerado será o 21.
+| ☐ | Criar uma opção para exportar lançamentos no formato XLS (lançamentos do mês) 
+| ☐ | Ciar opção para importar lançamentos (entradas/saídas) de uma planilha XLS
+---
+| ☐ | Analisar viabilidade e implementar cache local (APÓS IMPLEMENTAR FIREBASE):
       - CRUD Simples: Centro de Custo, Categoria e Conta/Cartão
       - CRUD Complexos: Lançamento e ExtratoFatura|
 flavio2m@gmail.com

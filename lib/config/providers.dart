@@ -52,6 +52,8 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecas
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';

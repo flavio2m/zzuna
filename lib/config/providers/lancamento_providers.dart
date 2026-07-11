@@ -390,6 +390,23 @@ final syncRecorrenciasMesUseCaseProvider =
       );
     });
 
+final fecharMesUseCaseProvider = Provider<FecharMesUseCase>((ref) {
+  return FecharMesUseCase(
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(lancamentoRepositoryProvider),
+  );
+});
+
+final reabrirMesUseCaseProvider = Provider<ReabrirMesUseCase>((ref) {
+  return ReabrirMesUseCase(
+    ref.watch(contaRepositoryProvider),
+    ref.watch(cartaoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+  );
+});
+
 final lancamentosListViewModelProvider =
     ChangeNotifierProvider.autoDispose<LancamentosListViewModel>((ref) {
       final vm = LancamentosListViewModel(
@@ -401,6 +418,8 @@ final lancamentosListViewModelProvider =
         ref.watch(contaRepositoryProvider),
         ref.watch(cartaoRepositoryProvider),
         ref.watch(syncRecorrenciasMesUseCaseProvider),
+        ref.watch(fecharMesUseCaseProvider),
+        ref.watch(reabrirMesUseCaseProvider),
       );
       ref.listen(lancamentoFilterProvider, (previous, next) {
         vm.updateFilter(next);

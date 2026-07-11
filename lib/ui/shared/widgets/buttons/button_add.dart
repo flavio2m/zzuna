@@ -8,6 +8,7 @@ class ButtonAdd extends StatelessWidget {
   final IconData? icon;
   final String? label;
   final Color? color;
+  final bool loading;
 
   const ButtonAdd({
     super.key,
@@ -17,6 +18,7 @@ class ButtonAdd extends StatelessWidget {
     this.icon,
     this.label,
     this.color,
+    this.loading = false,
   });
 
   @override
@@ -27,6 +29,7 @@ class ButtonAdd extends StatelessWidget {
       onPressed: onPressed,
       focusNode: focusNode,
       small: small,
+      loading: loading,
       label: label ?? 'Adicionar',
       icon: icon != null
           ? Icon(icon, color: defaultColor)
