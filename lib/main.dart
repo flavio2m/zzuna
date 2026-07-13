@@ -8,6 +8,8 @@ import 'package:routefly/routefly.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:zzuna/data/services/storage/firebase/firebase_options.dart';
+
 import 'main.route.dart';
 part 'main.g.dart';
 
@@ -15,9 +17,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  
+
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
@@ -70,6 +74,8 @@ Future<void> initSeeds(ProviderContainer container) async {
     centroCustoRepository: container.read(centroCustoRepositoryProvider),
     extratoFaturaRepository: container.read(extratoFaturaRepositoryProvider),
     lancamentoRepository: container.read(lancamentoRepositoryProvider),
-    recalculateBalanceUseCase: container.read(recalculateExtratoFaturaBalanceUseCaseProvider), //
+    recalculateBalanceUseCase: container.read(
+      recalculateExtratoFaturaBalanceUseCaseProvider,
+    ), //
   ).execute();
 }
