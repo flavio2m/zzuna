@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
@@ -27,7 +26,7 @@ class LancamentoRepository
   final _streamController = //
       StreamController<RepositoryEvent<Lancamento>>.broadcast();
 
-  LancamentoRepository(LocalStorage<Lancamento> storage) : _storage = storage;
+  LancamentoRepository(BaseStorage<Lancamento> storage) : _storage = storage;
 
   @override
   AsyncResult<Lancamento> create(LancamentoDto dto) async {

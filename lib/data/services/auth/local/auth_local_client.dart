@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_auth_exception.dart';
 import 'package:zzuna/data/services/auth/auth_client_base.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
@@ -9,7 +9,7 @@ import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
 class AuthLocalClient implements AuthClientBase {
-  final LocalStorage<LoadedUser> _userStorage;
+  final BaseStorage<LoadedUser> _userStorage;
 
   AuthLocalClient(this._userStorage);
 

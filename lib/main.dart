@@ -5,6 +5,8 @@ import 'package:zzuna/ui/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routefly/routefly.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'main.route.dart';
 part 'main.g.dart';
@@ -12,11 +14,19 @@ part 'main.g.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env");
+  
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+  }
+
   final container = ProviderContainer();
 
-  // Executa os seeds para desenvolvimento.
-  // Para desativar a massa de dados fake, comente a linha abaixo.
-  await initSeeds(container);
+  if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
+    await initSeeds(container);
+  }
 
   runApp(
     UncontrolledProviderScope(

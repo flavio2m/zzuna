@@ -3,18 +3,25 @@ import 'dart:async';
 import 'package:zzuna/data/exception/repository_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/user_filter_dto.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
-class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, LoadedUserDto, UserFilterDto> {
+class UserRepository
+    implements
+        BaseRepository<
+          LoadedUser,
+          RegisterUserDto,
+          LoadedUserDto,
+          UserFilterDto
+        > {
   final BaseStorage<LoadedUser> _storage;
-  final _streamController = StreamController<RepositoryEvent<LoadedUser>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<LoadedUser>>.broadcast();
 
-  UserRepository(LocalStorage<LoadedUser> storage) : _storage = storage;
+  UserRepository(BaseStorage<LoadedUser> storage) : _storage = storage;
 
   @override
   AsyncResult<LoadedUser> create(RegisterUserDto dto) async {
@@ -46,13 +53,7 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
   @override
   AsyncResult<Unit> createAll(List<RegisterUserDto> dtos) async {
     final entities = dtos
-        .map(
-          (dto) => LoadedUser(
-            id: dto.id!,
-            email: dto.email,
-            name: dto.name,
-          ),
-        )
+        .map((dto) => LoadedUser(id: dto.id!, email: dto.email, name: dto.name))
         .toList();
 
     final result = await _storage.createAll(entities);
@@ -79,13 +80,7 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
   @override
   AsyncResult<Unit> updateAll(List<LoadedUserDto> dtos) async {
     final entities = dtos
-        .map(
-          (dto) => LoadedUser(
-            id: dto.id,
-            email: dto.email,
-            name: dto.name,
-          ),
-        )
+        .map((dto) => LoadedUser(id: dto.id, email: dto.email, name: dto.name))
         .toList();
 
     final result = await _storage.updateAll(entities);
@@ -122,7 +117,9 @@ class UserRepository implements BaseRepository<LoadedUser, RegisterUserDto, Load
       (users) {
         if (users.isEmpty) {
           return Failure(
-            RepositoryException('Usuário não encontrado com o e-mail: $email'), //
+            RepositoryException(
+              'Usuário não encontrado com o e-mail: $email',
+            ), //
           );
         }
         return Success(users.first);

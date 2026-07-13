@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
@@ -25,7 +24,7 @@ class ExtratoFaturaRepository
   final _streamController =
       StreamController<RepositoryEvent<ExtratoFatura>>.broadcast();
 
-  ExtratoFaturaRepository(LocalStorage<ExtratoFatura> storage)
+  ExtratoFaturaRepository(BaseStorage<ExtratoFatura> storage)
     : _storage = storage;
 
   @override

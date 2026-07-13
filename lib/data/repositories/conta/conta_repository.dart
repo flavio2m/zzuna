@@ -5,18 +5,20 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/conta/conta_filter_dto.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/conta/loaded_conta_dto.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 
-class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedContaDto, ContaFilterDto> {
+class ContaRepository
+    implements
+        BaseRepository<Conta, CreateContaDto, LoadedContaDto, ContaFilterDto> {
   final BaseStorage<Conta> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<Conta>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<Conta>>.broadcast();
 
-  ContaRepository(LocalStorage<Conta> storage) : _storage = storage;
+  ContaRepository(BaseStorage<Conta> storage) : _storage = storage;
 
   @override
   AsyncResult<Conta> create(CreateContaDto dto) async {
@@ -60,7 +62,9 @@ class ContaRepository implements BaseRepository<Conta, CreateContaDto, LoadedCon
             descricao: dto.descricao,
             ativo: dto.ativo,
             bancoSigla: dto.bancoSigla,
-            dataInicial: dto.dataInicial ?? DateTime(DateTime.now().year, DateTime.now().month, 1),
+            dataInicial:
+                dto.dataInicial ??
+                DateTime(DateTime.now().year, DateTime.now().month, 1),
           ),
         )
         .toList();

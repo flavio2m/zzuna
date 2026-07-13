@@ -5,18 +5,24 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/centro_custo/centro_custo_dto.dart';
 import 'package:zzuna/domain/dtos/centro_custo/centro_custo_filter_dto.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 
 class CentroCustoRepository
-    implements BaseRepository<CentroCusto, CentroCustoDto, CentroCustoDto, CentroCustoFilterDto> {
-  final LocalStorage<CentroCusto> _storage;
+    implements
+        BaseRepository<
+          CentroCusto,
+          CentroCustoDto,
+          CentroCustoDto,
+          CentroCustoFilterDto
+        > {
+  final BaseStorage<CentroCusto> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<CentroCusto>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<CentroCusto>>.broadcast();
 
-  CentroCustoRepository(LocalStorage<CentroCusto> storage) : _storage = storage;
+  CentroCustoRepository(BaseStorage<CentroCusto> storage) : _storage = storage;
 
   @override
   AsyncResult<CentroCusto> create(CentroCustoDto dto) async {
@@ -170,5 +176,4 @@ class CentroCustoRepository
 
   @override
   void dispose() => _streamController.close();
-
 }

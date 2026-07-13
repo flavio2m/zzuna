@@ -6,17 +6,24 @@ import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/exception/repository_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_filter_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 
-class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, CategoriaDto, CategoriaFilterDto> {
+class CategoriaRepository
+    implements
+        BaseRepository<
+          Categoria,
+          CategoriaDto,
+          CategoriaDto,
+          CategoriaFilterDto
+        > {
   final BaseStorage<Categoria> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<Categoria>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<Categoria>>.broadcast();
 
-  CategoriaRepository(LocalStorage<Categoria> storage) : _storage = storage;
+  CategoriaRepository(BaseStorage<Categoria> storage) : _storage = storage;
 
   @override
   AsyncResult<Categoria> create(CategoriaDto dto) async {
