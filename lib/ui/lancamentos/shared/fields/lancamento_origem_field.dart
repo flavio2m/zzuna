@@ -10,6 +10,8 @@ class LancamentoOrigemField extends StatelessWidget {
   final ValueChanged<LancamentoOrigem?>? onChanged;
   final String? Function(LancamentoOrigem?)? validator;
   final String label;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const LancamentoOrigemField({
     super.key,
@@ -18,6 +20,8 @@ class LancamentoOrigemField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.label = 'Conta / Cartão',
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   String _labelFor(LancamentoOrigemDetail detalhe) {
@@ -64,6 +68,8 @@ class LancamentoOrigemField extends StatelessWidget {
       label: label,
       value: _matchedValue(),
       validator: validator,
+      focusNode: focusNode,
+      onEnterPressed: onEnterPressed,
       items: origens
           .map(
             (detalhe) => AppDropdownMenuItem<LancamentoOrigem>(

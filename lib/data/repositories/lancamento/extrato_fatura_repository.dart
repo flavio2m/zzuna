@@ -13,12 +13,20 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
 class ExtratoFaturaRepository
-    implements BaseRepository<ExtratoFatura, ExtratoFaturaDto, ExtratoFaturaDto, ExtratoFaturaFilterDto> {
+    implements
+        BaseRepository<
+          ExtratoFatura,
+          ExtratoFaturaDto,
+          ExtratoFaturaDto,
+          ExtratoFaturaFilterDto
+        > {
   final BaseStorage<ExtratoFatura> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<ExtratoFatura>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<ExtratoFatura>>.broadcast();
 
-  ExtratoFaturaRepository(LocalStorage<ExtratoFatura> storage) : _storage = storage;
+  ExtratoFaturaRepository(LocalStorage<ExtratoFatura> storage)
+    : _storage = storage;
 
   @override
   AsyncResult<ExtratoFatura> create(ExtratoFaturaDto dto) async {
@@ -67,7 +75,6 @@ class ExtratoFaturaRepository
       _streamController.add(RepositoryDeleted(id));
     });
   }
-
 
   @override
   AsyncResult<ExtratoFatura> getById(String id) async {
@@ -226,6 +233,34 @@ class ExtratoFaturaRepository
       orderBy: 'periodo',
       order: SearchOrder.ascending,
       limit: limit, //
+    );
+  }
+
+  AsyncResult<List<ExtratoFatura>> searchLatestBeforeOrAt(
+    LancamentoOrigem origem,
+    int ano,
+    Mes mes, //
+  ) async {
+    final fields = [
+      SearchField(
+        fieldName: 'origemKey',
+        value: _getOrigemKey(origem),
+        type: SearchFieldType.string,
+        operator: SearchOperator.equal,
+      ),
+      SearchField(
+        fieldName: 'periodo',
+        value: ano * 100 + mes.numero,
+        type: SearchFieldType.int,
+        operator: SearchOperator.lessThanOrEqual,
+      ),
+    ];
+
+    return _storage.searchByFields(
+      fields,
+      orderBy: 'periodo',
+      order: SearchOrder.descending,
+      limit: 1,
     );
   }
 

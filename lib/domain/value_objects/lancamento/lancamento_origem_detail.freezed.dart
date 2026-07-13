@@ -174,8 +174,8 @@ return cartao(_that.cartao);case _:
 /// @nodoc
 
 
-class LancamentoOrigemContaDetail implements LancamentoOrigemDetail {
-  const LancamentoOrigemContaDetail({required this.conta});
+class LancamentoOrigemContaDetail extends LancamentoOrigemDetail {
+  const LancamentoOrigemContaDetail({required this.conta}): super._();
   
 
  final  ContaDetails conta;
@@ -249,8 +249,8 @@ $ContaDetailsCopyWith<$Res> get conta {
 /// @nodoc
 
 
-class LancamentoOrigemCartaoDetail implements LancamentoOrigemDetail {
-  const LancamentoOrigemCartaoDetail({required this.cartao});
+class LancamentoOrigemCartaoDetail extends LancamentoOrigemDetail {
+  const LancamentoOrigemCartaoDetail({required this.cartao}): super._();
   
 
  final  CartaoDetails cartao;

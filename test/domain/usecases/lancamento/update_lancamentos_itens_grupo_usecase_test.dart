@@ -55,8 +55,8 @@ void main() {
     );
 
     recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(
-      extratoStorage,
-      lancamentoStorage,
+      extratoRepository,
+      lancamentoRepository,
     );
 
     createLancamentoUseCase = CreateLancamentoUseCase(

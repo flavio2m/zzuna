@@ -56,8 +56,8 @@ void main() {
     );
 
     recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(
-      extratoStorage,
-      lancamentoStorage,
+      extratoRepository,
+      lancamentoRepository,
     );
 
     createLancamentoUseCase = CreateLancamentoUseCase(
@@ -109,7 +109,14 @@ void main() {
             parcela: 1,
             totalParcelas: 3,
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 10.0,
+            ),
+          ],
         ),
       )).getOrThrow();
 
@@ -125,7 +132,14 @@ void main() {
             parcela: 2,
             totalParcelas: 3,
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 10.0,
+            ),
+          ],
         ),
       )).getOrThrow();
 
@@ -141,7 +155,14 @@ void main() {
             parcela: 3,
             totalParcelas: 3,
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 10.0,
+            ),
+          ],
         ),
       )).getOrThrow();
 
@@ -166,222 +187,298 @@ void main() {
       expect(check3.data, DateTime(2026, 8, 25));
     });
 
-    test('Should handle moving reference launch to an earlier month than its original month', () async {
-      // A: 05/07/2026
-      final la = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Lancamento A',
-          origem: origemConta,
-          data: DateTime(2026, 7, 5),
-          grupo: const LancamentoGrupo.replicacao(
-            grupoId: 'grupo-replicado',
-            parcela: 1,
-            totalParcelas: 5,
+    test(
+      'Should handle moving reference launch to an earlier month than its original month',
+      () async {
+        // A: 05/07/2026
+        final la = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Lancamento A',
+            origem: origemConta,
+            data: DateTime(2026, 7, 5),
+            grupo: const LancamentoGrupo.replicacao(
+              grupoId: 'grupo-replicado',
+              parcela: 1,
+              totalParcelas: 5,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // B: 05/08/2026 (ref)
-      final lb = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Lancamento B',
-          origem: origemConta,
-          data: DateTime(2026, 8, 5),
-          grupo: const LancamentoGrupo.replicacao(
-            grupoId: 'grupo-replicado',
-            parcela: 2,
-            totalParcelas: 5,
+        // B: 05/08/2026 (ref)
+        final lb = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Lancamento B',
+            origem: origemConta,
+            data: DateTime(2026, 8, 5),
+            grupo: const LancamentoGrupo.replicacao(
+              grupoId: 'grupo-replicado',
+              parcela: 2,
+              totalParcelas: 5,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // C: 05/09/2026
-      final lc = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Lancamento C',
-          origem: origemConta,
-          data: DateTime(2026, 9, 5),
-          grupo: const LancamentoGrupo.replicacao(
-            grupoId: 'grupo-replicado',
-            parcela: 3,
-            totalParcelas: 5,
+        // C: 05/09/2026
+        final lc = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Lancamento C',
+            origem: origemConta,
+            data: DateTime(2026, 9, 5),
+            grupo: const LancamentoGrupo.replicacao(
+              grupoId: 'grupo-replicado',
+              parcela: 3,
+              totalParcelas: 5,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // D: 05/10/2026
-      final ld = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Lancamento D',
-          origem: origemConta,
-          data: DateTime(2026, 10, 5),
-          grupo: const LancamentoGrupo.replicacao(
-            grupoId: 'grupo-replicado',
-            parcela: 4,
-            totalParcelas: 5,
+        // D: 05/10/2026
+        final ld = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Lancamento D',
+            origem: origemConta,
+            data: DateTime(2026, 10, 5),
+            grupo: const LancamentoGrupo.replicacao(
+              grupoId: 'grupo-replicado',
+              parcela: 4,
+              totalParcelas: 5,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // E: 05/11/2026
-      final le = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Lancamento E',
-          origem: origemConta,
-          data: DateTime(2026, 11, 5),
-          grupo: const LancamentoGrupo.replicacao(
-            grupoId: 'grupo-replicado',
-            parcela: 5,
-            totalParcelas: 5,
+        // E: 05/11/2026
+        final le = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Lancamento E',
+            origem: origemConta,
+            data: DateTime(2026, 11, 5),
+            grupo: const LancamentoGrupo.replicacao(
+              grupoId: 'grupo-replicado',
+              parcela: 5,
+              totalParcelas: 5,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // Mudar a data do lb (B) para 29/07/2026
-      final res = await updateDataGrupoUseCase.execute(
-        lancamentoId: lb.id,
-        novaData: DateTime(2026, 7, 29),
-      );
-      expect(res.isSuccess(), isTrue);
+        // Mudar a data do lb (B) para 29/07/2026
+        final res = await updateDataGrupoUseCase.execute(
+          lancamentoId: lb.id,
+          novaData: DateTime(2026, 7, 29),
+        );
+        expect(res.isSuccess(), isTrue);
 
-      final checkA = (await lancamentoRepository.getById(la.id)).getOrThrow();
-      final checkB = (await lancamentoRepository.getById(lb.id)).getOrThrow();
-      final checkC = (await lancamentoRepository.getById(lc.id)).getOrThrow();
-      final checkD = (await lancamentoRepository.getById(ld.id)).getOrThrow();
-      final checkE = (await lancamentoRepository.getById(le.id)).getOrThrow();
+        final checkA = (await lancamentoRepository.getById(la.id)).getOrThrow();
+        final checkB = (await lancamentoRepository.getById(lb.id)).getOrThrow();
+        final checkC = (await lancamentoRepository.getById(lc.id)).getOrThrow();
+        final checkD = (await lancamentoRepository.getById(ld.id)).getOrThrow();
+        final checkE = (await lancamentoRepository.getById(le.id)).getOrThrow();
 
-      // A: deve continuar 05/07 (não alterada pois é anterior à data do ref B)
-      expect(checkA.data, DateTime(2026, 7, 5));
+        // A: deve continuar 05/07 (não alterada pois é anterior à data do ref B)
+        expect(checkA.data, DateTime(2026, 7, 5));
 
-      // B: deve ser 29/07
-      expect(checkB.data, DateTime(2026, 7, 29));
+        // B: deve ser 29/07
+        expect(checkB.data, DateTime(2026, 7, 29));
 
-      // C: deve ser 29/08 (B + 1 mês)
-      expect(checkC.data, DateTime(2026, 8, 29));
+        // C: deve ser 29/08 (B + 1 mês)
+        expect(checkC.data, DateTime(2026, 8, 29));
 
-      // D: deve ser 29/09 (B + 2 meses)
-      expect(checkD.data, DateTime(2026, 9, 29));
+        // D: deve ser 29/09 (B + 2 meses)
+        expect(checkD.data, DateTime(2026, 9, 29));
 
-      // E: deve ser 29/10 (B + 3 meses)
-      expect(checkE.data, DateTime(2026, 10, 29));
-    });
+        // E: deve ser 29/10 (B + 3 meses)
+        expect(checkE.data, DateTime(2026, 10, 29));
+      },
+    );
 
-    test('Should clamp days to last day of month if the target day does not exist', () async {
-      // Parcela 1 (referência): 31/07/2026
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Parcela 1/2',
-          origem: origemConta,
-          data: DateTime(2026, 7, 31),
-          grupo: const LancamentoGrupo.parcelamento(
-            grupoId: 'grupo-clamp',
-            parcela: 1,
-            totalParcelas: 2,
+    test(
+      'Should clamp days to last day of month if the target day does not exist',
+      () async {
+        // Parcela 1 (referência): 31/07/2026
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 1/2',
+            origem: origemConta,
+            data: DateTime(2026, 7, 31),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-clamp',
+              parcela: 1,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // Parcela 2: 31/08/2026
-      final l2 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Parcela 2/2',
-          origem: origemConta,
-          data: DateTime(2026, 8, 31),
-          grupo: const LancamentoGrupo.parcelamento(
-            grupoId: 'grupo-clamp',
-            parcela: 2,
-            totalParcelas: 2,
+        // Parcela 2: 31/08/2026
+        final l2 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 2/2',
+            origem: origemConta,
+            data: DateTime(2026, 8, 31),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-clamp',
+              parcela: 2,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // Mudar a data do l1 para 31/10/2026 (avança 3 meses)
-      // O l2 (Parcela 2) avançará para Novembro (mês 11), que só tem 30 dias.
-      // Deve ficar: Parcela 1 em 31/10/2026 e Parcela 2 em 30/11/2026.
-      final res = await updateDataGrupoUseCase.execute(
-        lancamentoId: l1.id,
-        novaData: DateTime(2026, 10, 31),
-      );
-      expect(res.isSuccess(), isTrue);
+        // Mudar a data do l1 para 31/10/2026 (avança 3 meses)
+        // O l2 (Parcela 2) avançará para Novembro (mês 11), que só tem 30 dias.
+        // Deve ficar: Parcela 1 em 31/10/2026 e Parcela 2 em 30/11/2026.
+        final res = await updateDataGrupoUseCase.execute(
+          lancamentoId: l1.id,
+          novaData: DateTime(2026, 10, 31),
+        );
+        expect(res.isSuccess(), isTrue);
 
-      final check1 = (await lancamentoRepository.getById(l1.id)).getOrThrow();
-      final check2 = (await lancamentoRepository.getById(l2.id)).getOrThrow();
+        final check1 = (await lancamentoRepository.getById(l1.id)).getOrThrow();
+        final check2 = (await lancamentoRepository.getById(l2.id)).getOrThrow();
 
-      expect(check1.data, DateTime(2026, 10, 31));
-      expect(check2.data, DateTime(2026, 11, 30));
-    });
+        expect(check1.data, DateTime(2026, 10, 31));
+        expect(check2.data, DateTime(2026, 11, 30));
+      },
+    );
 
-    test('Should return Failure if any of the target launches resides in a closed period', () async {
-      final l1 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Parcela 1',
-          origem: origemConta,
-          data: DateTime(2026, 5, 5),
-          grupo: const LancamentoGrupo.parcelamento(
-            grupoId: 'grupo-closed',
-            parcela: 1,
-            totalParcelas: 2,
+    test(
+      'Should return Failure if any of the target launches resides in a closed period',
+      () async {
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 1',
+            origem: origemConta,
+            data: DateTime(2026, 5, 5),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-closed',
+              parcela: 1,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      final l2 = (await createLancamentoUseCase.execute(
-        LancamentoDto(
-          tipo: LancamentoTipo.despesa,
-          descricao: 'Parcela 2',
-          origem: origemConta,
-          data: DateTime(2026, 6, 5),
-          grupo: const LancamentoGrupo.parcelamento(
-            grupoId: 'grupo-closed',
-            parcela: 2,
-            totalParcelas: 2,
+        final l2 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 2',
+            origem: origemConta,
+            data: DateTime(2026, 6, 5),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-closed',
+              parcela: 2,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 10.0,
+              ),
+            ],
           ),
-          itens: [LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 10.0)],
-        ),
-      )).getOrThrow();
+        )).getOrThrow();
 
-      // Fechar o extrato do l2
-      final l2Extrato = (await extratoRepository.getById(l2.extratoFaturaId)).getOrThrow();
-      final dto = ExtratoFaturaDto(
-        id: l2Extrato.id,
-        origem: l2Extrato.origem,
-        ano: l2Extrato.ano,
-        mes: l2Extrato.mes,
-        dataInicio: l2Extrato.dataInicio,
-        dataFim: l2Extrato.dataFim,
-        saldoInicial: l2Extrato.saldoInicial,
-        saldoFinal: l2Extrato.saldoFinal,
-        fechado: true,
-      );
-      await extratoRepository.update(dto);
+        // Fechar o extrato do l2
+        final l2Extrato = (await extratoRepository.getById(
+          l2.extratoFaturaId,
+        )).getOrThrow();
+        final dto = ExtratoFaturaDto(
+          id: l2Extrato.id,
+          origem: l2Extrato.origem,
+          ano: l2Extrato.ano,
+          mes: l2Extrato.mes,
+          dataInicio: l2Extrato.dataInicio,
+          dataFim: l2Extrato.dataFim,
+          saldoInicial: l2Extrato.saldoInicial,
+          saldoFinal: l2Extrato.saldoFinal,
+          fechado: true,
+        );
+        await extratoRepository.update(dto);
 
-      // Tentar atualizar a data do grupo a partir de l1 (deverá falhar porque l2 está em período fechado)
-      final res = await updateDataGrupoUseCase.execute(
-        lancamentoId: l1.id,
-        novaData: DateTime(2026, 5, 25),
-      );
+        // Tentar atualizar a data do grupo a partir de l1 (deverá falhar porque l2 está em período fechado)
+        final res = await updateDataGrupoUseCase.execute(
+          lancamentoId: l1.id,
+          novaData: DateTime(2026, 5, 25),
+        );
 
-      expect(res.isError(), isTrue);
-      expect(
-        res.exceptionOrNull()!.toString(),
-        contains('Não é possível editar lançamentos de um período encerrado.'),
-      );
-    });
+        expect(res.isError(), isTrue);
+        expect(
+          res.exceptionOrNull()!.toString(),
+          contains(
+            'Não é possível editar lançamentos de um período encerrado.',
+          ),
+        );
+      },
+    );
   });
 }

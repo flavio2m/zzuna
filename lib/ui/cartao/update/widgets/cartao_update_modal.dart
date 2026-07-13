@@ -42,6 +42,15 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
 
   late final CartaoUpdateViewModel viewModel;
 
+  late final TextEditingController _descController;
+  final _descFocus = FocusNode();
+  final _limiteFocus = FocusNode();
+  final _fechamentoFocus = FocusNode();
+  final _bancoFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _dataFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -57,13 +66,31 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
     );
 
     viewModel = ref.read(cartaoUpdateViewModelProvider);
-
     viewModel.updateCommand.addListener(_commandListener);
+
+    _descController = TextEditingController(text: dto.descricao);
+    _descFocus.addListener(() {
+      if (_descFocus.hasFocus && _descController.text.isNotEmpty) {
+        _descController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _descController.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
+
+    _descController.dispose();
+    _descFocus.dispose();
+    _limiteFocus.dispose();
+    _fechamentoFocus.dispose();
+    _bancoFocus.dispose();
+    _ativoFocus.dispose();
+    _dataFocus.dispose();
+    _saveFocus.dispose();
 
     super.dispose();
   }
@@ -72,7 +99,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
     final commandValue = viewModel.updateCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Cartão atualizado com sucesso');
+      AppSnackBar.showSuccess(context, 'Cartão atualizado com sucesso.');
 
       Navigator.pop(context);
     });
@@ -106,6 +133,8 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
           listenable: viewModel.updateCommand,
           builder: (_, _) {
             return ButtonSave(
+              focusNode: _saveFocus,
+              loading: viewModel.updateCommand.value.isRunning,
               onPressed: viewModel.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
@@ -118,7 +147,11 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
         children: [
           AppTextFormField(
             label: 'Descrição',
-            initialValue: dto.descricao,
+            autofocus: true,
+            focusNode: _descFocus,
+            controller: _descController,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _limiteFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -133,6 +166,9 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
               Expanded(
                 child: AppCurrencyFormField(
                   label: 'Limite',
+                  focusNode: _limiteFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _fechamentoFocus.requestFocus(),
                   initialValue: UtilBrasilFields.obterReal(
                     dto.limite,
                     moeda: true,
@@ -157,6 +193,9 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
               Expanded(
                 child: AppIntegerFormField(
                   label: 'Dia Fechamento',
+                  focusNode: _fechamentoFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _bancoFocus.requestFocus(),
                   initialValue: dto.diaFechamento.toString(),
                   onChanged: (value) {
                     dto.setDiaFechamento(int.tryParse(value) ?? 0);
@@ -171,6 +210,8 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
           const AppSpacing(size: AppSpacingSize.md),
 
           AppBancoDropdown(
+            focusNode: _bancoFocus,
+            onEnterPressed: () => _ativoFocus.requestFocus(),
             value: dto.bancoSigla,
             onChanged: (value) {
               dto.setBancoSigla(value ?? '');
@@ -183,6 +224,8 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
 
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _dataFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);
@@ -195,6 +238,9 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
 
           AppDateFormField(
             label: 'Data Inicial',
+            focusNode: _dataFocus,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _saveFocus.requestFocus(),
             initialValue: dto.dataInicial != null
                 ? UtilData.obterDataDDMMAAAA(dto.dataInicial!)
                 : '',

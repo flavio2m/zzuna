@@ -41,8 +41,9 @@ class TransactionsWorkspace extends ConsumerWidget {
             onClearSelection: () => viewModel.clearSelection(),
           );
 
+          Widget content;
           if (resumoMensal == null || resumoMensal.dias.isEmpty) {
-            return Column(
+            content = Column(
               children: [
                 actionsBar,
                 const Expanded(
@@ -57,27 +58,57 @@ class TransactionsWorkspace extends ConsumerWidget {
                 ),
               ],
             );
+          } else {
+            final dias = resumoMensal.dias;
+            content = Column(
+              children: [
+                actionsBar,
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(24),
+                    itemCount: dias.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final dia = dias[index];
+                      return TransactionDayCard(dia: dia);
+                    },
+                  ),
+                ),
+              ],
+            );
           }
 
-          final dias = resumoMensal.dias;
-
-          return Column(
-            children: [
-              actionsBar,
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(24),
-                  itemCount: dias.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final dia = dias[index];
-                    return TransactionDayCard(dia: dia);
-                  },
+          if (state.isRunning) {
+            return Stack(
+              children: [
+                content,
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
                 ),
-              ),
-            ],
-          );
+              ],
+            );
+          }
+
+          return content;
         },
       ),
     );

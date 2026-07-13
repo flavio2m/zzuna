@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/create_transferencia_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/lancamento_origem_field.dart';
@@ -42,6 +43,14 @@ class _TransferenciaCreateModalState
   LancamentoOrigem? _origemEntrada;
   String? _observacao;
 
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _origemSaidaFocus = FocusNode();
+  final _origemEntradaFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final TransferenciaCreateViewModel viewModel;
 
   @override
@@ -49,12 +58,68 @@ class _TransferenciaCreateModalState
     super.initState();
     viewModel = ref.read(transferenciaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
-    viewModel.load();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
+
+    _loadData();
+  }
+
+  void _loadData() {
+    Future(() {
+      viewModel.load().then((_) {
+        if (!mounted) return;
+        _preencherOrigensDoFiltro();
+      });
+    });
+  }
+
+  void _preencherOrigensDoFiltro() {
+    if (_origemSaida != null || _origemEntrada != null) return;
+
+    final filter = ref.read(lancamentoFilterProvider);
+    final contas = filter.contasSelecionadas;
+    final cartoes = filter.cartoesSelecionados;
+
+    if (contas.isEmpty && cartoes.isEmpty) return;
+
+    final selectedOrigens = viewModel.origens
+        .where(
+          (d) => switch (d) {
+            LancamentoOrigemContaDetail(:final conta) => contas.contains(
+              conta.id,
+            ),
+            LancamentoOrigemCartaoDetail(:final cartao) => cartoes.contains(
+              cartao.id,
+            ),
+          },
+        )
+        .toList();
+
+    if (selectedOrigens.isNotEmpty) {
+      setState(() {
+        _origemSaida = selectedOrigens[0].origem;
+
+        if (selectedOrigens.length > 1) {
+          _origemEntrada = selectedOrigens[1].origem;
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _origemSaidaFocus.dispose();
+    _origemEntradaFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+    _saveFocus.dispose();
     super.dispose();
   }
 
@@ -69,6 +134,21 @@ class _TransferenciaCreateModalState
     commandValue.onFailure((exception) {
       AppSnackBar.showError(context, exception.toString());
     });
+  }
+
+  bool get _canSubmit {
+    if (_origemSaida == null || _origemEntrada == null) return false;
+    if (_origemSaida == _origemEntrada) return false;
+
+    final dto = CreateTransferenciaDto(
+      data: _data,
+      descricao: _descricao,
+      valor: _valor,
+      origemSaida: _origemSaida!,
+      origemEntrada: _origemEntrada!,
+      observacao: _observacao,
+    );
+    return validator.validate(dto).isValid;
   }
 
   void _handleSubmit() {
@@ -109,6 +189,16 @@ class _TransferenciaCreateModalState
     return '$d/$m/$y';
   }
 
+  void _swapOrigens() {
+    if (_origemSaida != null && _origemEntrada != null) {
+      setState(() {
+        final temp = _origemSaida;
+        _origemSaida = _origemEntrada;
+        _origemEntrada = temp;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width > 600;
@@ -126,7 +216,10 @@ class _TransferenciaCreateModalState
               listenable: viewModel.createCommand,
               builder: (_, _) {
                 return ButtonSave(
-                  onPressed: viewModel.createCommand.value.isRunning
+                  focusNode: _saveFocus,
+                  loading: viewModel.createCommand.value.isRunning,
+                  onPressed:
+                      viewModel.createCommand.value.isRunning || !_canSubmit
                       ? null
                       : _handleSubmit,
                 );
@@ -144,12 +237,17 @@ class _TransferenciaCreateModalState
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _formatDate(_data),
                   onDateSelected: (date) => setState(() => _data = date),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  icon: Icons.description_outlined,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _origemSaidaFocus.requestFocus(),
                   initialValue: _descricao,
                   onChanged: (value) => setState(() => _descricao = value),
                 ),
@@ -162,14 +260,28 @@ class _TransferenciaCreateModalState
                 isDesktop: isDesktop,
                 left: LancamentoOrigemField(
                   label: 'Conta/Cartão de Origem',
+                  focusNode: _origemSaidaFocus,
+                  onEnterPressed: () => _origemEntradaFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemSaida,
                   onChanged: (origem) {
                     if (origem != null) setState(() => _origemSaida = origem);
                   },
                 ),
+                middle: Padding(
+                  padding: EdgeInsets.only(top: isDesktop ? 4.0 : 0.0),
+                  child: IconButton(
+                    icon: Icon(isDesktop ? Icons.swap_horiz : Icons.swap_vert),
+                    onPressed: (_origemSaida != null && _origemEntrada != null)
+                        ? _swapOrigens
+                        : null,
+                    tooltip: 'Inverter contas',
+                  ),
+                ),
                 right: LancamentoOrigemField(
                   label: 'Conta/Cartão de Destino',
+                  focusNode: _origemEntradaFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: _origemEntrada,
                   onChanged: (origem) {
@@ -187,6 +299,9 @@ class _TransferenciaCreateModalState
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   onChanged: (raw) {
                     final clean = raw.replaceAll(RegExp(r'[^0-9]'), '');
                     setState(() {
@@ -196,6 +311,9 @@ class _TransferenciaCreateModalState
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _saveFocus.requestFocus(),
                   onChanged: (value) => setState(() {
                     _observacao = value.isEmpty ? null : value;
                   }),
@@ -212,6 +330,7 @@ class _TransferenciaCreateModalState
 class _FormRow extends StatelessWidget {
   final Widget left;
   final Widget right;
+  final Widget? middle;
   final bool isDesktop;
   final int leftFlex;
   final int rightFlex;
@@ -219,6 +338,7 @@ class _FormRow extends StatelessWidget {
   const _FormRow({
     required this.left,
     required this.right,
+    this.middle,
     required this.isDesktop,
     this.leftFlex = 1,
     this.rightFlex = 1,
@@ -229,7 +349,19 @@ class _FormRow extends StatelessWidget {
     if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [left, const SizedBox(height: 16), right],
+        children: [
+          left,
+          if (middle != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: middle,
+              ),
+            )
+          else
+            const SizedBox(height: 16),
+          right,
+        ],
       );
     }
 
@@ -237,7 +369,13 @@ class _FormRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(flex: leftFlex, child: left),
-        const SizedBox(width: 16),
+        if (middle != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: middle,
+          )
+        else
+          const SizedBox(width: 16),
         Expanded(flex: rightFlex, child: right),
       ],
     );

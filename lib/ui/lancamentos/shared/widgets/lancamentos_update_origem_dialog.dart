@@ -35,10 +35,34 @@ class _LancamentosUpdateOrigemDialogState
   final _formKey = GlobalKey<FormState>();
   LancamentoOrigem? _novaOrigem;
 
+  final _origemFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
     _novaOrigem = widget.initialOrigem;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _origemFocus.requestFocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _origemFocus.dispose();
+    _saveFocus.dispose();
+    super.dispose();
+  }
+
+  bool get _canSubmit {
+    final origem = _novaOrigem;
+    if (origem == null) return false;
+    return switch (origem) {
+      LancamentoOrigemConta(:final contaId) => contaId.isNotEmpty,
+      LancamentoOrigemCartao(:final cartaoId) => cartaoId.isNotEmpty,
+    };
   }
 
   void _handleSubmit() {
@@ -59,7 +83,11 @@ class _LancamentosUpdateOrigemDialogState
       type: AppFormType.modal,
       actions: [
         ButtonCancel(onPressed: () => Navigator.of(context).pop()),
-        ButtonSave(onPressed: widget.isLoading ? null : _handleSubmit),
+        ButtonSave(
+          focusNode: _saveFocus,
+          loading: widget.isLoading,
+          onPressed: widget.isLoading || !_canSubmit ? null : _handleSubmit,
+        ),
       ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -74,14 +102,14 @@ class _LancamentosUpdateOrigemDialogState
           LancamentoOrigemField(
             origens: widget.origens,
             value: _novaOrigem,
+            focusNode: _origemFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             validator: (val) =>
                 val == null ? 'Selecione a conta ou cartão' : null,
             onChanged: (origem) {
-              if (origem != null) {
-                setState(() {
-                  _novaOrigem = origem;
-                });
-              }
+              setState(() {
+                _novaOrigem = origem;
+              });
             },
           ),
           const AppSpacing(size: AppSpacingSize.md),

@@ -2,6 +2,7 @@ import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
@@ -59,6 +60,7 @@ class AtualizarDataRecorrenciaUseCase {
       ativo: grupo.ativo,
       diaDoMes: novoDia,
       tipo: grupo.tipo,
+      sequencia: grupo.sequencia,
     );
 
     // 6. Atualizar o lançamento de referência com novo diaDoMes no grupo
@@ -103,7 +105,9 @@ class AtualizarDataRecorrenciaUseCase {
           origem: futuro.origem,
           itens: futuro.itens,
           conciliado: futuro.conciliado,
-          grupo: novoGrupo,
+          grupo: (novoGrupo as LancamentoGrupoRecorrencia).copyWith(
+            sequencia: (futuro.grupo as LancamentoGrupoRecorrencia).sequencia,
+          ),
           observacao: futuro.observacao,
         ),
       );
@@ -122,6 +126,10 @@ class AtualizarDataRecorrenciaUseCase {
     }
 
     // 8. Recalcular saldos
-    return _recalculateUseCase.execute(lanc.origem);
+    return _recalculateUseCase.execute(
+      lanc.origem,
+      startingAno: lanc.data.year,
+      startingMes: Mes.fromDate(lanc.data),
+    );
   }
 }

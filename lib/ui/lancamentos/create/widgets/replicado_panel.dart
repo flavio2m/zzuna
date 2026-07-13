@@ -8,6 +8,10 @@ class ReplicadoPanel extends StatelessWidget {
   final ValueChanged<int> onParcelaInicialChanged;
   final ValueChanged<int> onParcelaFinalChanged;
   final double valorUnitario;
+  final FocusNode? focusInicial;
+  final FocusNode? focusFinal;
+  final ValueChanged<String>? onInicialSubmitted;
+  final ValueChanged<String>? onFinalSubmitted;
 
   const ReplicadoPanel({
     super.key,
@@ -16,6 +20,10 @@ class ReplicadoPanel extends StatelessWidget {
     required this.onParcelaInicialChanged,
     required this.onParcelaFinalChanged,
     required this.valorUnitario,
+    this.focusInicial,
+    this.focusFinal,
+    this.onInicialSubmitted,
+    this.onFinalSubmitted,
   });
 
   @override
@@ -38,12 +46,15 @@ class ReplicadoPanel extends StatelessWidget {
               Expanded(
                 child: AppIntegerFormField(
                   label: 'Parcela Inicial',
+                  focusNode: focusInicial,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: onInicialSubmitted,
                   min: 1,
                   max: 24,
                   initialValue: parcelaInicial.toString(),
                   onChanged: (val) {
                     final parsed = int.tryParse(val);
-                    if (parsed != null && parsed >= 2) {
+                    if (parsed != null && parsed >= 1) {
                       onParcelaInicialChanged(parsed);
                     }
                   },
@@ -53,6 +64,9 @@ class ReplicadoPanel extends StatelessWidget {
               Expanded(
                 child: AppIntegerFormField(
                   label: 'Parcela Final',
+                  focusNode: focusFinal,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: onFinalSubmitted,
                   min: 2,
                   max: 24,
                   initialValue: parcelaFinal.toString(),
@@ -88,7 +102,7 @@ class ReplicadoPanel extends StatelessWidget {
                 fontWeight: FontWeight.normal,
               ),
               AppText(
-                'R\$ ${totalCompromisso.toStringAsFixed(2)}',
+                totalCompromisso.toStringAsFixed(2),
                 variant: AppTextVariant.body,
                 color: theme.colorScheme.primary,
               ),

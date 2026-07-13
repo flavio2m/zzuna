@@ -7,6 +7,8 @@ class ParceladoPanel extends StatelessWidget {
   final ValueChanged<int> onNumParcelasChanged;
   final double totalValor;
   final List<double> previewValores;
+  final FocusNode? focusNode;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const ParceladoPanel({
     super.key,
@@ -14,6 +16,8 @@ class ParceladoPanel extends StatelessWidget {
     required this.onNumParcelasChanged,
     required this.totalValor,
     required this.previewValores,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -35,6 +39,9 @@ class ParceladoPanel extends StatelessWidget {
                   min: 2,
                   max: 24,
                   label: 'Número de Parcelas',
+                  focusNode: focusNode,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: onFieldSubmitted,
                   initialValue: numParcelas.toString(),
                   onChanged: (val) {
                     final parsed = int.tryParse(val);
@@ -70,7 +77,7 @@ class ParceladoPanel extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                         ),
                         AppText(
-                          'R\$ ${previewValores[i].toStringAsFixed(2)}',
+                          previewValores[i].toStringAsFixed(2),
                           variant: AppTextVariant.caption, //
                         ),
                       ],

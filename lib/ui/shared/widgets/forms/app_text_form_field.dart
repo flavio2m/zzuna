@@ -63,14 +63,12 @@ class AppTextFormField extends StatelessWidget {
       ),
       onChanged: onChanged,
       onFieldSubmitted: (value) {
-        onFieldSubmitted?.call(value);
-
-        // Mantém o foco no campo após Enter
-        if (focusNode != null) {
-          Future.microtask(() => focusNode!.requestFocus());
+        if (onFieldSubmitted != null) {
+          onFieldSubmitted!(value);
+        } else if (textInputAction == TextInputAction.next) {
+          FocusScope.of(context).nextFocus();
         }
       },
     );
   }
 }
-

@@ -8,6 +8,7 @@ import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 
 class UpdateLancamentosOrigemUseCase {
   final ResolveExtratoFaturaUseCase _resolveUseCase;
@@ -124,9 +125,35 @@ class UpdateLancamentosOrigemUseCase {
     origensParaRecalcular.add(novaOrigem);
 
     for (final origem in origensParaRecalcular) {
-      final recalcRes = await _recalculateUseCase.execute(origem);
-      if (recalcRes.isError()) {
-        return Failure(recalcRes.exceptionOrNull()!);
+      final lancamentosDaOrigem = targetLaunches.where(
+        (l) => l.origem == origem,
+      );
+      final dtosDaOrigem = dtosToUpdate.where((d) => d.origem == origem);
+
+      DateTime? oldestDate;
+      if (lancamentosDaOrigem.isNotEmpty) {
+        oldestDate = lancamentosDaOrigem
+            .map((l) => l.data)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
+      }
+      if (dtosDaOrigem.isNotEmpty) {
+        final oldestNewDate = dtosDaOrigem
+            .map((d) => d.data)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
+        if (oldestDate == null || oldestNewDate.isBefore(oldestDate)) {
+          oldestDate = oldestNewDate;
+        }
+      }
+
+      if (oldestDate != null) {
+        final recalcRes = await _recalculateUseCase.execute(
+          origem,
+          startingAno: oldestDate.year,
+          startingMes: Mes.fromDate(oldestDate),
+        );
+        if (recalcRes.isError()) {
+          return Failure(recalcRes.exceptionOrNull()!);
+        }
       }
     }
 

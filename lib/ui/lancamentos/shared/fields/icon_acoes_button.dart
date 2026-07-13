@@ -14,6 +14,7 @@ import 'package:zzuna/ui/lancamentos/recorrencia/criar/widgets/lancamentos_criar
 import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/widgets/lancamentos_finalizar_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/reativar/widgets/lancamentos_reativar_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/widgets/lancamentos_atualizar_data_recorrencia_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_sequencia/widgets/lancamentos_atualizar_sequencia_recorrencia_menu_item.dart';
 
 enum TipoAcoes {
   visualizar,
@@ -24,6 +25,7 @@ enum TipoAcoes {
   alterarOrigemGrupo,
   criarRecorrencia,
   atualizarDataRecorrencia,
+  atualizarSequenciaRecorrencia,
   finalizarRecorrencia,
   reativarRecorrencia;
 
@@ -36,6 +38,8 @@ enum TipoAcoes {
     TipoAcoes.alterarOrigemGrupo => 'Alterar Conta/Cartão em Lote',
     TipoAcoes.criarRecorrencia => 'Criar Recorrência',
     TipoAcoes.atualizarDataRecorrencia => 'Atualizar Data da Recorrência',
+    TipoAcoes.atualizarSequenciaRecorrencia =>
+      'Atualizar Sequência da Recorrência',
     TipoAcoes.finalizarRecorrencia => 'Finalizar Recorrência',
     TipoAcoes.reativarRecorrencia => 'Reativar Recorrência',
   };
@@ -71,6 +75,8 @@ class IconAcoesButton extends ConsumerWidget {
         recorrenciaGrupo != null &&
         recorrenciaGrupo.ativo &&
         dataDay != recorrenciaGrupo.diaDoMes;
+    final showAtualizarSequenciaRecorrencia =
+        !conciliado && recorrenciaGrupo != null && recorrenciaGrupo.ativo;
 
     return PopupMenuButton<TipoAcoes>(
       tooltip: 'Ações',
@@ -130,6 +136,11 @@ class IconAcoesButton extends ConsumerWidget {
             lancamentoId: lancamento.id,
             diaDoMesRecorrencia: recorrenciaGrupo.diaDoMes,
             diaDoLancamento: dataDay,
+          ),
+        if (showAtualizarSequenciaRecorrencia)
+          LancamentosAtualizarSequenciaRecorrenciaMenuItem(
+            context: context,
+            lancamento: lancamento,
           ),
         if (showFinalizarRecorrencia)
           LancamentosFinalizarRecorrenciaMenuItem(

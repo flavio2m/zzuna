@@ -36,6 +36,13 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
 
   late final CartaoCreateViewModel viewModel;
 
+  final _descFocus = FocusNode();
+  final _limiteFocus = FocusNode();
+  final _fechamentoFocus = FocusNode();
+  final _bancoFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +56,13 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
 
+    _descFocus.dispose();
+    _limiteFocus.dispose();
+    _fechamentoFocus.dispose();
+    _bancoFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -56,7 +70,7 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
     final commandValue = viewModel.createCommand.value;
 
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Cartão criado com sucesso');
+      AppSnackBar.showSuccess(context, 'Cartão criado com sucesso.');
 
       Navigator.pop(context);
     });
@@ -89,7 +103,13 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
         ListenableBuilder(
           listenable: viewModel.createCommand,
           builder: (_, _) {
-            return ButtonSave(onPressed: viewModel.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit);
+            return ButtonSave(
+              focusNode: _saveFocus,
+              loading: viewModel.createCommand.value.isRunning,
+              onPressed: viewModel.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
+            );
           },
         ),
       ],
@@ -98,6 +118,10 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
         children: [
           AppTextFormField(
             label: 'Descrição',
+            autofocus: true,
+            focusNode: _descFocus,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _limiteFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -112,10 +136,18 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
               Expanded(
                 child: AppCurrencyFormField(
                   label: 'Limite',
-                  initialValue: UtilBrasilFields.obterReal(dto.limite, moeda: true),
+                  focusNode: _limiteFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _fechamentoFocus.requestFocus(),
+                  initialValue: UtilBrasilFields.obterReal(
+                    dto.limite,
+                    moeda: true,
+                  ),
                   onChanged: (value) {
                     if (value.isNotEmpty) {
-                      final valor = UtilBrasilFields.converterMoedaParaDouble(value);
+                      final valor = UtilBrasilFields.converterMoedaParaDouble(
+                        value,
+                      );
                       dto.setLimite(valor);
                     } else {
                       dto.setLimite(0);
@@ -131,6 +163,9 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
               Expanded(
                 child: AppIntegerFormField(
                   label: 'Dia Fechamento',
+                  focusNode: _fechamentoFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _bancoFocus.requestFocus(),
                   onChanged: (value) {
                     dto.setDiaFechamento(int.tryParse(value) ?? 0);
                     setState(() {});
@@ -144,6 +179,8 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
           const AppSpacing(size: AppSpacingSize.md),
 
           AppBancoDropdown(
+            focusNode: _bancoFocus,
+            onEnterPressed: () => _ativoFocus.requestFocus(),
             value: dto.bancoSigla.isEmpty ? null : dto.bancoSigla,
             onChanged: (value) {
               dto.setBancoSigla(value ?? '');
@@ -156,6 +193,8 @@ class _CartaoCreateModalState extends ConsumerState<CartaoCreateModal> {
 
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

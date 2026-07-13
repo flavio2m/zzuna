@@ -51,7 +51,9 @@ class _LancamentosUpdateOrigemGrupoModalState
     super.initState();
     _viewModel = ref.read(lancamentosUpdateOrigemGrupoViewModelProvider);
     _viewModel.updateOrigemGrupoCommand.addListener(_commandListener);
-    _viewModel.load();
+    Future(() {
+      _viewModel.load();
+    });
   }
 
   @override
@@ -104,7 +106,8 @@ class _LancamentosUpdateOrigemGrupoModalState
         return LancamentosUpdateOrigemDialog(
           title: 'Alterar Conta/Cartão do Grupo',
           subtitle:
-              'Escolha a nova conta ou cartão para os lançamentos do grupo a partir deste mês:',
+              'Escolha a nova conta ou cartão para os lançamentos do grupo a '
+              'partir deste mês:',
           origens: _viewModel.origens,
           initialOrigem: widget.currentOrigem,
           isLoading: isLoading,

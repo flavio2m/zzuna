@@ -1,66 +1,80 @@
 import 'package:result_dart/result_dart.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
-import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
+import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 
 class RecalculateExtratoFaturaBalanceUseCase {
-  final LocalStorage<ExtratoFatura> _extratoStorage;
-  final LocalStorage<Lancamento> _lancamentoStorage;
+  final ExtratoFaturaRepository _extratoRepository;
+  final LancamentoRepository _lancamentoRepository;
 
   RecalculateExtratoFaturaBalanceUseCase(
-    this._extratoStorage,
-    this._lancamentoStorage,
+    this._extratoRepository,
+    this._lancamentoRepository,
   );
 
-  Future<Result<Unit>> execute(LancamentoOrigem origem) async {
-    // 1. Carregar os ExtratoFatura da origem
-    final extratosResult = await _extratoStorage.getAll();
-    if (extratosResult.isError()) {
-      return Failure(Exception('Falha ao carregar extratos'));
-    }
-    final allExtratos = extratosResult.getOrThrow();
-    final extratosOrigem = allExtratos
-        .where((e) => e.origem == origem)
-        .toList();
+  /// Recalcula os saldos a partir de um [startingAno] e [startingMes] específicos.
+  /// Se os parâmetros não forem fornecidos, retorna um erro, forçando a
+  /// arquitetura a sempre ser cirúrgica e otimizada (não varrer toda a conta).
+  Future<Result<Unit>> execute(
+    LancamentoOrigem origem, {
+    required int startingAno,
+    required Mes startingMes,
+  }) async {
+    // 1. Buscar o extrato alvo e todos os posteriores
+    final targetRes = await _extratoRepository.searchByPeriodo(
+      origem,
+      startingAno,
+      startingMes,
+    );
+    if (targetRes.isError()) return Failure(targetRes.exceptionOrNull()!);
+    final targetList = targetRes.getOrThrow();
 
+    final futureRes = await _extratoRepository.searchAfter(
+      origem,
+      startingAno,
+      startingMes,
+    );
+    if (futureRes.isError()) return Failure(futureRes.exceptionOrNull()!);
+    final futureList = futureRes.getOrThrow();
+
+    final extratosOrigem = [...targetList, ...futureList];
     if (extratosOrigem.isEmpty) {
       return const Success(unit);
     }
-
-    // 4. Ordenar os extratos por dataInicio
     extratosOrigem.sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
 
-    // 2. Carregar os lançamentos da origem
-    final lancamentosResult = await _lancamentoStorage.getAll();
-    if (lancamentosResult.isError()) {
-      return Failure(Exception('Falha ao carregar lançamentos'));
+    // 2. Definir o saldoAtual baseado no saldoFinal do ExtratoFatura IMEDIATAMENTE ANTERIOR
+    double saldoAtual = 0.0;
+    final firstExtrato = extratosOrigem.first;
+    final prevRes = await _extratoRepository.searchPrevious(
+      origem,
+      firstExtrato.ano,
+      firstExtrato.mes,
+    );
+    if (prevRes.isError()) return Failure(prevRes.exceptionOrNull()!);
+    final prevList = prevRes.getOrThrow();
+
+    if (prevList.isNotEmpty) {
+      saldoAtual = prevList.first.saldoFinal;
+    } else {
+      saldoAtual = firstExtrato.saldoInicial;
     }
-    final allLancamentos = lancamentosResult.getOrThrow();
-    final lancamentosOrigem = allLancamentos
-        .where((l) => l.origem == origem)
-        .toList();
 
-    // 4. Ordenar os lançamentos por data crescente antes do cálculo
-    lancamentosOrigem.sort((a, b) => a.data.compareTo(b.data));
-
-    // 3. Recalcular saldoInicial e saldoFinal com propagação dos saldos
-    // Regra: Não iniciar o primeiro ExtratoFatura com saldo zero. Iniciar com:
-    // saldoAtual = primeiroExtrato.saldoInicial
-    // E depois: saldoFinal = saldoInicial + movimentações
-    // saldoInicial do próximo período = saldoFinal do período anterior
-    double saldoAtual = extratosOrigem.first.saldoInicial;
-
+    // 3. Iterar e propagar o saldo
     for (int i = 0; i < extratosOrigem.length; i++) {
       final extrato = extratosOrigem[i];
+      final saldoInicialPeriodo = saldoAtual;
 
-      final saldoInicialPeriodo = i == 0 ? saldoAtual : saldoAtual;
-
-      // Filtrar lançamentos que pertencem a este extratoFaturaId
-      final lancamentosDoPeriodo = lancamentosOrigem
-          .where((l) => l.extratoFaturaId == extrato.id)
-          .toList();
+      // Buscar APENAS os lançamentos deste extrato (Zero risco de Memory Leak)
+      final lancRes = await _lancamentoRepository.searchByExtratoFaturaId(
+        extrato.id,
+      );
+      if (lancRes.isError()) return Failure(lancRes.exceptionOrNull()!);
+      final lancamentosDoPeriodo = lancRes.getOrThrow();
 
       double totalMovimentado = 0.0;
       for (final l in lancamentosDoPeriodo) {
@@ -95,15 +109,24 @@ class RecalculateExtratoFaturaBalanceUseCase {
 
       final saldoFinalPeriodo = saldoInicialPeriodo + totalMovimentado;
 
-      final updatedExtrato = extrato.copyWith(
-        saldoInicial: saldoInicialPeriodo,
-        saldoFinal: saldoFinalPeriodo,
-      );
-
-      // Atualizar no storage
-      final updateRes = await _extratoStorage.update(updatedExtrato);
-      if (updateRes.isError()) {
-        return Failure(Exception('Falha ao atualizar extrato'));
+      if (extrato.saldoInicial != saldoInicialPeriodo ||
+          extrato.saldoFinal != saldoFinalPeriodo) {
+        final updateRes = await _extratoRepository.update(
+          ExtratoFaturaDto(
+            id: extrato.id,
+            origem: extrato.origem,
+            ano: extrato.ano,
+            mes: extrato.mes,
+            dataInicio: extrato.dataInicio,
+            dataFim: extrato.dataFim,
+            saldoInicial: saldoInicialPeriodo,
+            saldoFinal: saldoFinalPeriodo,
+            fechado: extrato.fechado,
+          ),
+        );
+        if (updateRes.isError()) {
+          return Failure(Exception('Falha ao atualizar extrato'));
+        }
       }
 
       saldoAtual = saldoFinalPeriodo;

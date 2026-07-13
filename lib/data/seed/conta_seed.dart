@@ -19,6 +19,7 @@ class ContaSeed {
       (i) => CreateContaDto(
         descricao: 'Conta ${bancos[i].descricao}',
         bancoSigla: bancos[i].sigla,
+        dataInicial: DateTime(DateTime.now().year, 1, 1),
         ativo: i != 9,
       ),
     );

@@ -9,6 +9,8 @@ class AppBancoDropdown extends StatelessWidget {
   final String label;
   final String? Function(String?)? validator;
   final bool showAllOption;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const AppBancoDropdown({
     super.key,
@@ -17,6 +19,8 @@ class AppBancoDropdown extends StatelessWidget {
     this.label = 'Banco',
     this.validator,
     this.showAllOption = false,
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   @override
@@ -26,10 +30,14 @@ class AppBancoDropdown extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       validator: validator,
+      focusNode: focusNode,
+      onEnterPressed: onEnterPressed,
       items: [
-        if (showAllOption) AppDropdownMenuItem<String>(value: '', label: 'Todos os Bancos'),
+        if (showAllOption)
+          AppDropdownMenuItem<String>(value: '', label: 'Todos os Bancos'),
         ...Bancos.items.map(
-          (b) => AppDropdownMenuItem<String>(value: b.sigla, label: b.descricao),
+          (b) =>
+              AppDropdownMenuItem<String>(value: b.sigla, label: b.descricao),
         ),
       ],
     );

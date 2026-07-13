@@ -4,6 +4,7 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
+import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
@@ -12,6 +13,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
   const LancamentoFilterBar({super.key});
@@ -24,6 +26,8 @@ class LancamentoFilterBar extends ConsumerStatefulWidget {
 class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
   late final TextEditingController _descricaoController;
   late final FocusNode _descricaoFocusNode;
+
+  bool _isLoadingFechamento = false;
 
   @override
   void initState() {
@@ -127,14 +131,93 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             },
           ),
           // 7. Adicionar
-          ButtonAdd(onPressed: () => LancamentoCreateModal.show(context)),
+          ButtonAdd(
+            label: 'Entrada',
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.receita,
+            ),
+          ),
+          ButtonAdd(
+            label: 'Despesa',
+            icon: Icons.arrow_downward,
+            color: Theme.of(context).colorScheme.error,
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.despesa,
+            ),
+          ),
           ButtonAdd(
             icon: Icons.swap_horiz_rounded,
             label: 'Transferência',
+            color: AppColors.indigo600,
             onPressed: () => TransferenciaCreateModal.show(context),
           ),
+          _buildFechamentoButton(viewModel),
         ],
       ),
+    );
+  }
+
+  Widget _buildFechamentoButton(LancamentosListViewModel viewModel) {
+    final isFechado = viewModel.isMesFechado;
+
+    return ButtonAdd(
+      label: isFechado ? 'Reabrir Mês' : 'Fechar Mês',
+      icon: isFechado ? Icons.lock : Icons.lock_open,
+      color: isFechado ? Colors.green : Theme.of(context).colorScheme.primary,
+      loading: _isLoadingFechamento,
+      onPressed: () async {
+        setState(() {
+          _isLoadingFechamento = true;
+        });
+
+        if (isFechado) {
+          final result = await viewModel.reabrirMes();
+          if (mounted) {
+            if (result.isError()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result.exceptionOrNull()!.toString()),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mês reaberto com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        } else {
+          final result = await viewModel.fecharMes();
+          if (mounted) {
+            if (result.isError()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result.exceptionOrNull()!.toString()),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mês fechado com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoadingFechamento = false;
+          });
+        }
+      },
     );
   }
 

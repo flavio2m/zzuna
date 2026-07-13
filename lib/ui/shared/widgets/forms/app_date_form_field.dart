@@ -12,6 +12,8 @@ class AppDateFormField extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final bool autofocus;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppDateFormField({
     super.key,
@@ -23,6 +25,8 @@ class AppDateFormField extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.autofocus = false,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -43,7 +47,8 @@ class _AppDateFormFieldState extends State<AppDateFormField> {
 
     _ownsController = widget.controller == null;
     _controller = //
-        widget.controller ?? TextEditingController(text: widget.initialValue ?? '');
+        widget.controller ??
+        TextEditingController(text: widget.initialValue ?? '');
 
     _ownsFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
@@ -123,23 +128,36 @@ class _AppDateFormFieldState extends State<AppDateFormField> {
       controller: _controller,
       focusNode: _focusNode,
       autofocus: widget.autofocus,
+      textInputAction: widget.textInputAction,
       style: const TextStyle(fontSize: 14),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: widget.validator,
       keyboardType: TextInputType.datetime,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly, DataInputFormatter()],
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        DataInputFormatter(),
+      ],
       decoration: InputDecoration(
         labelText: widget.label,
         border: const OutlineInputBorder(),
         prefixIcon: widget.icon != null ? Icon(widget.icon) : null,
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.calendar_month_outlined),
-          tooltip: 'Selecionar data',
-          color: AppColors.primary,
-          onPressed: _openPicker,
+        suffixIcon: ExcludeFocus(
+          child: IconButton(
+            icon: const Icon(Icons.calendar_month_outlined),
+            tooltip: 'Selecionar data',
+            color: AppColors.primary,
+            onPressed: _openPicker,
+          ),
         ),
       ),
       onChanged: _onChanged,
+      onFieldSubmitted: (value) {
+        if (widget.onFieldSubmitted != null) {
+          widget.onFieldSubmitted!(value);
+        } else if (widget.textInputAction == TextInputAction.next) {
+          FocusScope.of(context).nextFocus();
+        }
+      },
     );
   }
 }

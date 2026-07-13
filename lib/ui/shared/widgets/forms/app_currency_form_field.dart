@@ -13,6 +13,8 @@ class AppCurrencyFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final bool readOnly;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppCurrencyFormField({
     super.key,
@@ -25,6 +27,8 @@ class AppCurrencyFormField extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.readOnly = false,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -44,6 +48,8 @@ class AppCurrencyFormField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       readOnly: readOnly,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }

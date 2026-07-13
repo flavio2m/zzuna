@@ -11,6 +11,8 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 
 import 'package:zzuna/domain/enums/mes.dart';
+import 'package:zzuna/domain/enums/tipo_lancamento_grupo.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 
 class LancamentoRepository
     implements
@@ -138,6 +140,47 @@ class LancamentoRepository
         .where((l) => l.grupo?.grupoId == grupoId)
         .toList();
     return Success(groupLaunches);
+  }
+
+  AsyncResult<List<Lancamento>> searchByExtratoFaturaId(
+    String extratoFaturaId, {
+    TipoLancamentoGrupo? tipoGrupo,
+  }) async {
+    final searchFields = [
+      SearchField(
+        fieldName: 'extratoFaturaId',
+        value: extratoFaturaId,
+        type: SearchFieldType.string,
+      ),
+    ];
+
+    final result = await _storage.searchByFields(searchFields);
+    return result.fold(
+      (list) {
+        if (tipoGrupo == null) return Success(list);
+
+        final filteredList = list.where((l) {
+          final grupo = l.grupo;
+          if (grupo == null) return false;
+
+          return switch (tipoGrupo) {
+            TipoLancamentoGrupo.parcelamento =>
+              grupo is LancamentoGrupoParcelamento,
+            TipoLancamentoGrupo.transferencia =>
+              grupo is LancamentoGrupoTransferencia,
+            TipoLancamentoGrupo.replicacao =>
+              grupo is LancamentoGrupoReplicacao,
+            TipoLancamentoGrupo.recorrencia =>
+              grupo is LancamentoGrupoRecorrencia,
+          };
+        }).toList();
+
+        return Success(filteredList);
+      },
+      (error) => Failure(
+        LocalStorageException('Erro ao buscar lançamentos por extratoFaturaId'),
+      ),
+    );
   }
 
   AsyncResult<List<Lancamento>> searchByPeriodo({

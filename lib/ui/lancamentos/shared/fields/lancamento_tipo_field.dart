@@ -7,12 +7,16 @@ class LancamentoTipoField extends StatelessWidget {
   final LancamentoTipo? value;
   final ValueChanged<LancamentoTipo?>? onChanged;
   final String? Function(LancamentoTipo?)? validator;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const LancamentoTipoField({
     super.key,
     this.value,
     this.onChanged,
     this.validator,
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   @override
@@ -21,6 +25,8 @@ class LancamentoTipoField extends StatelessWidget {
       label: 'Tipo',
       value: value,
       validator: validator != null ? (v) => validator!(v) : null,
+      focusNode: focusNode,
+      onEnterPressed: onEnterPressed,
       items: LancamentoTipo.values
           .where((tipo) => tipo != LancamentoTipo.transferencia)
           .map(

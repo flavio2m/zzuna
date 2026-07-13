@@ -63,6 +63,12 @@ class _LancamentosUpdateValorGrupoModalState
   final _distributionUseCase = LancamentoItemDistributionUseCase();
   final _valorController = TextEditingController();
 
+  final _catFocus = FocusNode();
+  final _ccFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _dividirFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final LancamentosUpdateValorGrupoViewModel _viewModel;
   bool _isExecuting = false;
 
@@ -71,7 +77,9 @@ class _LancamentosUpdateValorGrupoModalState
     super.initState();
     _viewModel = ref.read(lancamentosUpdateValorGrupoViewModelProvider);
     _viewModel.updateValorGrupoCommand.addListener(_commandListener);
-    _viewModel.load();
+    Future(() {
+      _viewModel.load();
+    });
 
     // Carregar itens originais
     _itens = List.from(widget.initialItens);
@@ -81,12 +89,23 @@ class _LancamentosUpdateValorGrupoModalState
     }
     _valor = _itens.fold<double>(0.0, (sum, item) => sum + item.valor);
     _updateTotalValor();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _catFocus.requestFocus();
+      }
+    });
   }
 
   @override
   void dispose() {
     _viewModel.updateValorGrupoCommand.removeListener(_commandListener);
     _valorController.dispose();
+    _catFocus.dispose();
+    _ccFocus.dispose();
+    _valorFocus.dispose();
+    _dividirFocus.dispose();
+    _saveFocus.dispose();
     super.dispose();
   }
 
@@ -135,13 +154,25 @@ class _LancamentosUpdateValorGrupoModalState
       valor: valorItem1,
     );
 
-    setState(() {
-      if (item1Idx == -1) {
-        _itens.insert(0, updatedItem1);
-      } else {
-        _itens[item1Idx] = updatedItem1;
-      }
-    });
+    if (item1Idx == -1) {
+      _itens.insert(0, updatedItem1);
+    } else {
+      _itens[item1Idx] = updatedItem1;
+    }
+  }
+
+  bool get _canSubmit {
+    _syncItem1();
+
+    if (_valor <= 0) return false;
+    if (_itens.any((item) => item.categoriaId.isEmpty)) return false;
+    if (_itens.any((item) => item.centroCustoId.isEmpty)) return false;
+
+    final total = _itens.fold<double>(0.0, (sum, item) => sum + item.valor);
+    final valRes = _distributionUseCase.validateDistribution(_itens, total);
+    if (valRes.isError()) return false;
+
+    return true;
   }
 
   void _handleSubmit() {
@@ -197,7 +228,11 @@ class _LancamentosUpdateValorGrupoModalState
           type: AppFormType.modal,
           actions: [
             ButtonCancel(onPressed: () => Navigator.of(context).pop()),
-            ButtonSave(onPressed: isLoading ? null : _handleSubmit),
+            ButtonSave(
+              focusNode: _saveFocus,
+              loading: isLoading,
+              onPressed: isLoading || !_canSubmit ? null : _handleSubmit,
+            ),
           ],
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -214,6 +249,8 @@ class _LancamentosUpdateValorGrupoModalState
               _FormRow(
                 isDesktop: isDesktop,
                 left: CategoriaField(
+                  focusNode: _catFocus,
+                  onEnterPressed: () => _ccFocus.requestFocus(),
                   categorias: _viewModel.categorias,
                   value: _categoriaId.isNotEmpty ? _categoriaId : null,
                   validator: (val) => val == null || val.isEmpty
@@ -227,6 +264,8 @@ class _LancamentosUpdateValorGrupoModalState
                   },
                 ),
                 right: CentroCustoField(
+                  focusNode: _ccFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   centros: _viewModel.centros,
                   value: _centroCustoId.isNotEmpty ? _centroCustoId : null,
                   validator: (val) => val == null || val.isEmpty
@@ -250,6 +289,9 @@ class _LancamentosUpdateValorGrupoModalState
                     flex: isDesktop ? 2 : 1,
                     child: AppCurrencyFormField(
                       label: 'Valor Total',
+                      focusNode: _valorFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => _dividirFocus.requestFocus(),
                       controller: _valorController,
                       validator: (val) {
                         if (val == null || val.isEmpty) {
@@ -295,6 +337,8 @@ class _LancamentosUpdateValorGrupoModalState
                 categorias: _viewModel.categorias,
                 centros: _viewModel.centros,
                 allowEditItem1: false,
+                focusDividir: _dividirFocus,
+                onDividirEnter: () => _saveFocus.requestFocus(),
                 onSaveNewItem: (ccId, catId, val) {
                   final res = _distributionUseCase.addItem(
                     currentItems: _itens,

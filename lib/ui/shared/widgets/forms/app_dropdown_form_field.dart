@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
+import 'package:flutter/services.dart';
 
 class AppDropdownFormField<T> extends StatefulWidget {
   final String label;
@@ -9,6 +10,8 @@ class AppDropdownFormField<T> extends StatefulWidget {
   final ValueChanged<T?>? onChanged;
   final String? Function(T?)? validator;
   final bool enabled;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const AppDropdownFormField({
     super.key,
@@ -18,21 +21,52 @@ class AppDropdownFormField<T> extends StatefulWidget {
     this.onChanged,
     this.validator,
     this.enabled = true,
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   @override
-  State<AppDropdownFormField<T>> createState() => _AppDropdownFormFieldState<T>();
+  State<AppDropdownFormField<T>> createState() =>
+      _AppDropdownFormFieldState<T>();
 }
 
 class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
   final _controller = TextEditingController();
-  final _focusNode = FocusNode();
+  late final FocusNode _focusNode;
+  bool _isSearching = false;
+  String _lastSyncLabel = '';
 
   @override
   void initState() {
     super.initState();
+    _focusNode = widget.focusNode ?? FocusNode();
     _syncLabel();
+
+    _controller.addListener(() {
+      if (_controller.text != _lastSyncLabel) {
+        _isSearching = true;
+      }
+    });
+
     _focusNode.addListener(() => setState(() {}));
+
+    _focusNode.onKeyEvent = (node, event) {
+      if (event is KeyDownEvent &&
+          event.logicalKey == LogicalKeyboardKey.enter) {
+        if (!_isSearching) {
+          if (widget.onEnterPressed != null) {
+            widget.onEnterPressed!();
+          } else {
+            FocusScope.of(context).nextFocus();
+          }
+          return KeyEventResult.handled;
+        }
+
+        // Return ignored so DropdownMenu can handle the first Enter
+        return KeyEventResult.ignored;
+      }
+      return KeyEventResult.ignored;
+    };
   }
 
   @override
@@ -49,7 +83,9 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
         .cast<AppDropdownMenuItem<T>>()
         .where((e) => e.value == widget.value)
         .firstOrNull;
-    _controller.text = match?.label ?? '';
+    _lastSyncLabel = match?.label ?? '';
+    _controller.text = _lastSyncLabel;
+    _isSearching = false;
   }
 
   List<DropdownMenuEntry<T>> get _entries {
@@ -78,7 +114,7 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
   @override
   void dispose() {
     _controller.dispose();
-    _focusNode.dispose();
+    if (widget.focusNode == null) _focusNode.dispose();
     super.dispose();
   }
 
@@ -107,7 +143,9 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
                 expandedInsets: EdgeInsets.zero,
                 menuHeight: 240,
                 menuStyle: MenuStyle(
-                  backgroundColor: WidgetStatePropertyAll(Theme.of(context).cardColor),
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).cardColor,
+                  ),
                   elevation: const WidgetStatePropertyAll(4),
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(
@@ -135,6 +173,18 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
                     ? (value) {
                         state.didChange(value);
                         widget.onChanged?.call(value);
+                        _isSearching = false;
+                        _syncLabel();
+
+                        final focusScope = FocusScope.of(context);
+                        Future.delayed(Duration.zero, () {
+                          if (!mounted) return;
+                          if (widget.onEnterPressed != null) {
+                            widget.onEnterPressed!();
+                          } else {
+                            focusScope.nextFocus();
+                          }
+                        });
                       }
                     : null,
               ),

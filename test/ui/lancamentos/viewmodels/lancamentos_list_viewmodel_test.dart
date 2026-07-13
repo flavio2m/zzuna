@@ -17,13 +17,46 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecas
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/data/repositories/conta/conta_repository.dart';
+import 'package:zzuna/domain/entities/cartao_entity.dart';
+import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
+
+class FakeFecharMesUseCase implements FecharMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeReabrirMesUseCase implements ReabrirMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeSyncRecorrenciasMesUseCase implements SyncRecorrenciasMesUseCase {
+  @override
+  Future<Result<Unit>> execute(Mes mes, int ano) async => const Success(unit);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
   int executeCallCount = 0;
   List<LancamentoDetails> returnList = [];
 
   @override
-  Future<List<LancamentoDetails>> execute({required Mes mes, required int ano}) async {
+  Future<List<LancamentoDetails>> execute({
+    required Mes mes,
+    required int ano,
+  }) async {
     executeCallCount++;
     return returnList;
   }
@@ -34,7 +67,10 @@ class FakeLancamentoDetailsUseCase implements LancamentoDetailsUseCase {
 
 class FakeLancamentoFilterUseCase implements LancamentoFilterUseCase {
   @override
-  List<LancamentoDetails> execute(List<LancamentoDetails> list, LancamentoFilterDto filter) {
+  List<LancamentoDetails> execute(
+    List<LancamentoDetails> list,
+    LancamentoFilterDto filter,
+  ) {
     return list;
   }
 
@@ -55,6 +91,22 @@ class FakeExtratoFaturaRepository implements ExtratoFaturaRepository {
   AsyncResult<List<ExtratoFatura>> search(ExtratoFaturaFilterDto filter) async {
     return const Success([]);
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeContaRepository implements ContaRepository {
+  @override
+  AsyncResult<List<Conta>> getAll() async => const Success([]);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeCartaoRepository implements CartaoRepository {
+  @override
+  AsyncResult<List<Cartao>> getAll() async => const Success([]);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -119,15 +171,21 @@ void main() {
       expect(notifier.state.ano, 2027);
     });
 
-    test('proximoMes does not wrap after maximum limit (December of current year + 2)', () {
-      final maxYear = DateTime.now().year + 2;
-      notifier.state = notifier.state.copyWith(mes: Mes.dezembro, ano: maxYear);
+    test(
+      'proximoMes does not wrap after maximum limit (December of current year + 2)',
+      () {
+        final maxYear = DateTime.now().year + 2;
+        notifier.state = notifier.state.copyWith(
+          mes: Mes.dezembro,
+          ano: maxYear,
+        );
 
-      notifier.proximoMes();
+        notifier.proximoMes();
 
-      expect(notifier.state.mes, Mes.dezembro);
-      expect(notifier.state.ano, maxYear);
-    });
+        expect(notifier.state.mes, Mes.dezembro);
+        expect(notifier.state.ano, maxYear);
+      },
+    );
 
     test('setTipo updates type and allows resetting to null', () {
       notifier.setTipo(LancamentoTipo.receita);
@@ -158,28 +216,44 @@ void main() {
         LancamentoResumoMensalUseCase(),
         FakeLancamentoRepository(),
         FakeExtratoFaturaRepository(),
+        FakeContaRepository(),
+        FakeCartaoRepository(),
+        FakeSyncRecorrenciasMesUseCase(),
+        FakeFecharMesUseCase(),
+        FakeReabrirMesUseCase(),
       );
     });
 
-    test('updateFilter with same period does not query repository again', () async {
-      final initialFilter = LancamentoFilterState(mes: Mes.janeiro, ano: 2026, descricao: '');
+    test(
+      'updateFilter with same period does not query repository again',
+      () async {
+        final initialFilter = LancamentoFilterState(
+          mes: Mes.janeiro,
+          ano: 2026,
+          descricao: '',
+        );
 
-      // 1. Initial filter update (triggers load because it is the first time or different period)
-      viewModel.updateFilter(initialFilter);
-      await Future<void>.delayed(Duration.zero);
-      expect(detailsUseCase.executeCallCount, 1);
+        // 1. Initial filter update (triggers load because it is the first time or different period)
+        viewModel.updateFilter(initialFilter);
+        await Future<void>.delayed(Duration.zero);
+        expect(detailsUseCase.executeCallCount, 1);
 
-      // 2. Update filters without changing period (e.g. change description)
-      final newFilter = initialFilter.copyWith(descricao: 'Supermercado');
-      viewModel.updateFilter(newFilter);
-      await Future<void>.delayed(Duration.zero);
+        // 2. Update filters without changing period (e.g. change description)
+        final newFilter = initialFilter.copyWith(descricao: 'Supermercado');
+        viewModel.updateFilter(newFilter);
+        await Future<void>.delayed(Duration.zero);
 
-      // Call count should still be 1 (filtered in-memory)
-      expect(detailsUseCase.executeCallCount, 1);
-    });
+        // Call count should still be 1 (filtered in-memory)
+        expect(detailsUseCase.executeCallCount, 1);
+      },
+    );
 
     test('updateFilter with different period queries repository', () async {
-      final initialFilter = LancamentoFilterState(mes: Mes.janeiro, ano: 2026, descricao: '');
+      final initialFilter = LancamentoFilterState(
+        mes: Mes.janeiro,
+        ano: 2026,
+        descricao: '',
+      );
 
       viewModel.updateFilter(initialFilter);
       await Future<void>.delayed(Duration.zero);
@@ -207,6 +281,11 @@ void main() {
         LancamentoResumoMensalUseCase(),
         FakeLancamentoRepository(),
         FakeExtratoFaturaRepository(),
+        FakeContaRepository(),
+        FakeCartaoRepository(),
+        FakeSyncRecorrenciasMesUseCase(),
+        FakeFecharMesUseCase(),
+        FakeReabrirMesUseCase(),
       );
     });
 
@@ -218,7 +297,11 @@ void main() {
           descricao: 'Conta 1',
           ativo: true,
           dataInicial: DateTime(2026, 1, 1),
-          banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+          banco: const Banco(
+            descricao: 'Banco 1',
+            sigla: 'B1',
+            icon: BancoIcon.outros,
+          ),
         ),
       ),
       ano: 2026,
@@ -243,7 +326,11 @@ void main() {
             descricao: 'Conta 1',
             ativo: true,
             dataInicial: DateTime(2026, 1, 1),
-            banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+            banco: const Banco(
+              descricao: 'Banco 1',
+              sigla: 'B1',
+              icon: BancoIcon.outros,
+            ),
           ),
         ),
         itens: const [],
@@ -255,37 +342,42 @@ void main() {
       expect(viewModel.allSelected, isFalse);
     });
 
-    test('selectAll and toggleSelectAll work correctly with visible items', () async {
-      detailsUseCase.returnList = [
-        buildLancamento('1'),
-        buildLancamento('2'),
-      ];
+    test(
+      'selectAll and toggleSelectAll work correctly with visible items',
+      () async {
+        detailsUseCase.returnList = [
+          buildLancamento('1'),
+          buildLancamento('2'),
+        ];
 
-      // Load items
-      viewModel.updateFilter(const LancamentoFilterState(
-        mes: Mes.janeiro,
-        ano: 2026,
-        descricao: '',
-      ));
-      await Future<void>.delayed(Duration.zero);
+        // Load items
+        viewModel.updateFilter(
+          const LancamentoFilterState(
+            mes: Mes.janeiro,
+            ano: 2026,
+            descricao: '',
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
 
-      expect(viewModel.allSelected, isFalse);
-      expect(viewModel.selectedLancamentoIds, isEmpty);
+        expect(viewModel.allSelected, isFalse);
+        expect(viewModel.selectedLancamentoIds, isEmpty);
 
-      // Select all
-      viewModel.selectAll();
-      expect(viewModel.allSelected, isTrue);
-      expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
+        // Select all
+        viewModel.selectAll();
+        expect(viewModel.allSelected, isTrue);
+        expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
 
-      // Toggle select all (should deselect since all are selected)
-      viewModel.toggleSelectAll();
-      expect(viewModel.allSelected, isFalse);
-      expect(viewModel.selectedLancamentoIds, isEmpty);
+        // Toggle select all (should deselect since all are selected)
+        viewModel.toggleSelectAll();
+        expect(viewModel.allSelected, isFalse);
+        expect(viewModel.selectedLancamentoIds, isEmpty);
 
-      // Toggle select all again (should select all)
-      viewModel.toggleSelectAll();
-      expect(viewModel.allSelected, isTrue);
-      expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
-    });
+        // Toggle select all again (should select all)
+        viewModel.toggleSelectAll();
+        expect(viewModel.allSelected, isTrue);
+        expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
+      },
+    );
   });
 }

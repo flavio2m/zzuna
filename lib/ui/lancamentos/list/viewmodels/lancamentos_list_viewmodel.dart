@@ -3,9 +3,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/base_repository.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
+import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
+import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
@@ -15,6 +20,7 @@ import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart'
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_mensal.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_resumo_mensal_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
 
 class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoDetailsUseCase _detailsUseCase;
@@ -22,10 +28,15 @@ class LancamentosListViewModel extends ChangeNotifier {
   final LancamentoResumoMensalUseCase _resumoMensalUseCase;
   final LancamentoRepository _repository;
   final ExtratoFaturaRepository _extratoFaturaRepository;
+  final ContaRepository _contaRepository;
+  final CartaoRepository _cartaoRepository;
+  final SyncRecorrenciasMesUseCase _syncRecorrenciasMesUseCase;
+  final FecharMesUseCase _fecharMesUseCase;
+  final ReabrirMesUseCase _reabrirMesUseCase;
   StreamSubscription? _repositorySubscription;
 
   List<LancamentoDetails> _allLancamentos = [];
-  List<ExtratoFatura> _currentExtratos = [];
+  final List<ExtratoFatura> _currentExtratos = [];
   LancamentoFilterDto _currentFilter = LancamentoFilterDto(
     mes: Mes.fromDate(DateTime.now()),
     ano: DateTime.now().year, //
@@ -35,6 +46,37 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   final Set<String> _selectedLancamentoIds = {};
   Set<String> get selectedLancamentoIds => _selectedLancamentoIds;
+
+  bool get isMesFechado {
+    if (_currentExtratos.isEmpty) return false;
+    return _currentExtratos.every((e) => e.fechado);
+  }
+
+  late final loadCommand = Command0(_load);
+  late final fecharMesCommand = Command0(fecharMes);
+  late final reabrirMesCommand = Command0(reabrirMes);
+
+  AsyncResult<Unit> fecharMes() async {
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
+
+    final result = await _fecharMesUseCase.execute(mes, ano);
+    if (result.isSuccess()) {
+      _triggerLoad();
+    }
+    return result;
+  }
+
+  AsyncResult<Unit> reabrirMes() async {
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
+
+    final result = await _reabrirMesUseCase.execute(mes, ano);
+    if (result.isSuccess()) {
+      _triggerLoad();
+    }
+    return result;
+  }
 
   void toggleSelection(String id) {
     if (_selectedLancamentoIds.contains(id)) {
@@ -96,19 +138,61 @@ class LancamentosListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _pendingLoad = false;
+
   LancamentosListViewModel(
     this._detailsUseCase,
     this._filterUseCase,
     this._resumoMensalUseCase,
     this._repository,
     this._extratoFaturaRepository,
+    this._contaRepository,
+    this._cartaoRepository,
+    this._syncRecorrenciasMesUseCase,
+    this._fecharMesUseCase,
+    this._reabrirMesUseCase,
   ) {
-    _repositorySubscription = _repository.observer().listen((_) {
-      loadCommand.execute();
+    _repositorySubscription = _repository.observer().listen((event) {
+      bool shouldReload = true;
+
+      if (event is RepositoryCreated<Lancamento>) {
+        shouldReload = _affectsCurrentOrPastMonth(event.model);
+      } else if (event is RepositoryUpdated<Lancamento>) {
+        shouldReload = _affectsCurrentOrPastMonth(event.model);
+        if (!shouldReload &&
+            _allLancamentos.any((l) => l.id == event.model.id)) {
+          shouldReload = true;
+        }
+      }
+
+      if (shouldReload) {
+        _triggerLoad();
+      }
+    });
+
+    loadCommand.addListener(() {
+      if (!loadCommand.value.isRunning && _pendingLoad) {
+        _pendingLoad = false;
+        loadCommand.execute();
+      }
     });
   }
 
-  late final loadCommand = Command0(_load);
+  void _triggerLoad() {
+    if (loadCommand.value.isRunning) {
+      _pendingLoad = true;
+    } else {
+      _pendingLoad = false;
+      loadCommand.execute();
+    }
+  }
+
+  bool _affectsCurrentOrPastMonth(Lancamento lancamento) {
+    final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
+    final ano = _currentFilter.ano ?? DateTime.now().year;
+    return lancamento.data.year <= ano &&
+        (lancamento.data.year < ano || lancamento.data.month <= mes.numero);
+  }
 
   AsyncResult<LancamentoResumoMensal> _load() async {
     _selectedLancamentoIds.clear(); // Clear selection when period loads/changes
@@ -116,13 +200,38 @@ class LancamentosListViewModel extends ChangeNotifier {
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
 
-    final extratoResult = await _extratoFaturaRepository.search(
-      ExtratoFaturaFilterDto(mes: mes, ano: ano), //
-    );
-    if (extratoResult.isError()) {
-      return Failure(extratoResult.exceptionOrNull()!);
+    await _syncRecorrenciasMesUseCase.execute(mes, ano);
+
+    final contasResult = await _contaRepository.getAll();
+    final cartoesResult = await _cartaoRepository.getAll();
+    if (contasResult.isError()) {
+      return Failure(contasResult.exceptionOrNull()!);
     }
-    _currentExtratos = extratoResult.getOrThrow();
+    if (cartoesResult.isError()) {
+      return Failure(cartoesResult.exceptionOrNull()!);
+    }
+
+    final origens = [
+      ...contasResult.getOrThrow().map(
+        (c) => LancamentoOrigem.conta(contaId: c.id),
+      ),
+      ...cartoesResult.getOrThrow().map(
+        (c) => LancamentoOrigem.cartao(cartaoId: c.id),
+      ),
+    ];
+
+    _currentExtratos.clear();
+    for (final origem in origens) {
+      final extratoResult = await _extratoFaturaRepository
+          .searchLatestBeforeOrAt(origem, ano, mes);
+      if (extratoResult.isError()) {
+        return Failure(extratoResult.exceptionOrNull()!);
+      }
+      final extratos = extratoResult.getOrThrow();
+      if (extratos.isNotEmpty) {
+        _currentExtratos.add(extratos.first);
+      }
+    }
 
     final allDetails = await _detailsUseCase.execute(mes: mes, ano: ano);
     _allLancamentos = allDetails;
@@ -168,7 +277,7 @@ class LancamentosListViewModel extends ChangeNotifier {
     _currentFilter = newFilter;
 
     if (periodChanged) {
-      loadCommand.execute();
+      _triggerLoad();
     } else {
       _applyFilter();
     }

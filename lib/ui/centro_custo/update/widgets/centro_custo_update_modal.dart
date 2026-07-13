@@ -16,10 +16,6 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 /// Modal para edição de um Centro de Custo.
-///
-/// Essa implementação replica exatamente o comportamento do
-/// `CartaoUpdateModal`, substituindo apenas os tipos de DTO, validator
-/// e provider por aqueles relacionados a Centro de Custo.
 class CentroCustoUpdateModal extends ConsumerStatefulWidget {
   final CentroCustoDto centroCusto;
 
@@ -33,13 +29,20 @@ class CentroCustoUpdateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CentroCustoUpdateModal> createState() => _CentroCustoUpdateModalState();
+  ConsumerState<CentroCustoUpdateModal> createState() =>
+      _CentroCustoUpdateModalState();
 }
 
-class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal> {
+class _CentroCustoUpdateModalState
+    extends ConsumerState<CentroCustoUpdateModal> {
   late final CentroCustoDto dto;
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoUpdateViewModel viewModel;
+
+  late final TextEditingController _descController;
+  final _descFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
 
   @override
   void initState() {
@@ -52,18 +55,37 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
     );
     viewModel = ref.read(centroCustoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
+
+    _descController = TextEditingController(text: dto.descricao);
+    _descFocus.addListener(() {
+      if (_descFocus.hasFocus && _descController.text.isNotEmpty) {
+        _descController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _descController.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
+    
+    _descController.dispose();
+    _descFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
   void _commandListener() {
     final commandValue = viewModel.updateCommand.value;
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Centro de Custo atualizado com sucesso');
+      AppSnackBar.showSuccess(
+        context,
+        'Centro de Custo atualizado com sucesso.',
+      );
       Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
@@ -91,8 +113,9 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
           listenable: vm.updateCommand,
           builder: (_, _) {
             return ButtonSave(
-              onPressed: //
-              vm.updateCommand.value.isRunning || !_canSubmit
+              focusNode: _saveFocus,
+              loading: vm.updateCommand.value.isRunning,
+              onPressed: vm.updateCommand.value.isRunning || !_canSubmit
                   ? null
                   : _handleSubmit,
             );
@@ -104,7 +127,10 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
         children: [
           AppTextFormField(
             label: 'Descrição',
-            initialValue: dto.descricao,
+            autofocus: true,
+            focusNode: _descFocus,
+            controller: _descController,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -114,6 +140,8 @@ class _CentroCustoUpdateModalState extends ConsumerState<CentroCustoUpdateModal>
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

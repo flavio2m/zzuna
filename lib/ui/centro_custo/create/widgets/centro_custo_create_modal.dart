@@ -16,10 +16,6 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 /// Modal para criação de um Centro de Custo.
-///
-/// A estrutura e o fluxo são idênticos ao [CartaoCreateModal] –
-/// apenas os DTOs, validadores e providers são substituídos pelos
-/// correspondentes a Centro de Custo.
 class CentroCustoCreateModal extends ConsumerStatefulWidget {
   const CentroCustoCreateModal({super.key});
 
@@ -28,13 +24,19 @@ class CentroCustoCreateModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<CentroCustoCreateModal> createState() => _CentroCustoCreateModalState();
+  ConsumerState<CentroCustoCreateModal> createState() =>
+      _CentroCustoCreateModalState();
 }
 
-class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal> {
+class _CentroCustoCreateModalState
+    extends ConsumerState<CentroCustoCreateModal> {
   final dto = CentroCustoDto();
   final validator = CentroCustoValidator<CentroCustoDto>();
   late final CentroCustoCreateViewModel viewModel;
+
+  final _descFocus = FocusNode();
+  final _ativoFocus = FocusNode();
+  final _saveFocus = FocusNode();
 
   @override
   void initState() {
@@ -46,13 +48,18 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
+    
+    _descFocus.dispose();
+    _ativoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
   void _commandListener() {
     final commandValue = viewModel.createCommand.value;
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Centro de Custo criado com sucesso');
+      AppSnackBar.showSuccess(context, 'Centro de Custo criado com sucesso.');
       Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
@@ -80,7 +87,11 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
           listenable: vm.createCommand,
           builder: (context, _) {
             return ButtonSave(
-              onPressed: vm.createCommand.value.isRunning || !_canSubmit ? null : _handleSubmit,
+              focusNode: _saveFocus,
+              loading: vm.createCommand.value.isRunning,
+              onPressed: vm.createCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
             );
           },
         ),
@@ -90,6 +101,9 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
         children: [
           AppTextFormField(
             label: 'Descrição',
+            autofocus: true,
+            focusNode: _descFocus,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -99,6 +113,8 @@ class _CentroCustoCreateModalState extends ConsumerState<CentroCustoCreateModal>
           const AppSpacing(size: AppSpacingSize.md),
           AppSwitchField(
             label: 'Ativo',
+            focusNode: _ativoFocus,
+            onEnterPressed: () => _saveFocus.requestFocus(),
             value: dto.ativo,
             onChanged: (value) {
               dto.setAtivo(value);

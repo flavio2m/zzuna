@@ -62,6 +62,17 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
   // Controller para o campo Valor que ficará desabilitado
   final _valorController = TextEditingController();
 
+  final _dataFocus = FocusNode();
+  final _descFocus = FocusNode();
+  final _tipoFocus = FocusNode();
+  final _origemFocus = FocusNode();
+  final _catFocus = FocusNode();
+  final _ccFocus = FocusNode();
+  final _valorFocus = FocusNode();
+  final _obsFocus = FocusNode();
+  final _dividirFocus = FocusNode();
+  final _saveFocus = FocusNode();
+
   late final LancamentoUpdateViewModel viewModel;
   late final LancamentoDto dto;
 
@@ -70,7 +81,16 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
     super.initState();
     viewModel = ref.read(lancamentoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
-    viewModel.load();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _dataFocus.requestFocus();
+      }
+    });
+
+    Future(() {
+      viewModel.load();
+    });
 
     // Inicializar o DTO localmente a partir dos detalhes do lançamento
     dto = LancamentoDto.fromDetails(widget.lancamento);
@@ -89,6 +109,18 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
     _valorController.dispose();
+
+    _dataFocus.dispose();
+    _descFocus.dispose();
+    _tipoFocus.dispose();
+    _origemFocus.dispose();
+    _catFocus.dispose();
+    _ccFocus.dispose();
+    _valorFocus.dispose();
+    _obsFocus.dispose();
+    _dividirFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
@@ -127,29 +159,27 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
       valor: valorItem1,
     );
 
-    setState(() {
-      if (item1Idx == -1) {
-        _itens.insert(0, updatedItem1);
-      } else {
-        _itens[item1Idx] = updatedItem1;
-      }
-    });
+    if (item1Idx == -1) {
+      _itens.insert(0, updatedItem1);
+    } else {
+      _itens[item1Idx] = updatedItem1;
+    }
   }
 
-  void _handleSubmit() {
+  bool get _canSubmit {
     _syncItem1();
     dto.setItens(_itens);
 
+    if (!validator.validate(dto).isValid) return false;
+
     final total = _itens.fold<double>(0.0, (sum, item) => sum + item.valor);
     final valRes = _distributionUseCase.validateDistribution(_itens, total);
-    if (valRes.isError()) {
-      AppSnackBar.showError(
-        context,
-        (valRes.exceptionOrNull() as DomainException).message, //
-      );
-      return;
-    }
+    if (valRes.isError()) return false;
 
+    return true;
+  }
+
+  void _handleSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
       viewModel.updateCommand.execute(dto);
     }
@@ -203,13 +233,12 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               listenable: viewModel.updateCommand,
               builder: (_, _) {
                 return ButtonSave(
+                  focusNode: _saveFocus,
+                  loading: viewModel.updateCommand.value.isRunning,
                   onPressed:
-                      viewModel //
-                          .updateCommand
-                          .value
-                          .isRunning
+                      viewModel.updateCommand.value.isRunning || !_canSubmit
                       ? null
-                      : _handleSubmit, //
+                      : _handleSubmit,
                 );
               },
             ),
@@ -225,13 +254,19 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  focusNode: _dataFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _descFocus.requestFocus(),
                   initialValue: _formatDate(dto.data),
                   validator: validator.byField(dto, 'data'),
                   onDateSelected: (date) => setState(() => dto.setData(date)),
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  icon: Icons.description_outlined,
+                  autofocus: true,
+                  focusNode: _descFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _tipoFocus.requestFocus(),
                   initialValue: dto.descricao,
                   validator: validator.byField(dto, 'descricao'),
                   onChanged: (value) {
@@ -247,12 +282,16 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: LancamentoTipoField(
+                  focusNode: _tipoFocus,
+                  onEnterPressed: () => _origemFocus.requestFocus(),
                   value: dto.tipo,
                   onChanged: (tipo) {
                     if (tipo != null) setState(() => dto.setTipo(tipo));
                   },
                 ),
                 right: LancamentoOrigemField(
+                  focusNode: _origemFocus,
+                  onEnterPressed: () => _catFocus.requestFocus(),
                   origens: viewModel.origens,
                   value: dto.origem,
                   validator: (_) => validator.byField(dto, 'origem')(null),
@@ -268,6 +307,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               _FormRow(
                 isDesktop: isDesktop,
                 left: CategoriaField(
+                  focusNode: _catFocus,
+                  onEnterPressed: () => _ccFocus.requestFocus(),
                   categorias: viewModel.categorias,
                   value: _categoriaId.isNotEmpty ? _categoriaId : null,
                   validator: validator.byField(dto, 'itensCategorias'),
@@ -279,6 +320,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                   },
                 ),
                 right: CentroCustoField(
+                  focusNode: _ccFocus,
+                  onEnterPressed: () => _valorFocus.requestFocus(),
                   centros: viewModel.centros,
                   value: _centroCustoId.isNotEmpty ? _centroCustoId : null,
                   validator: validator.byField(dto, 'itensCentrosCusto'),
@@ -300,6 +343,9 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 rightFlex: 5,
                 left: AppCurrencyFormField(
                   label: 'Valor',
+                  focusNode: _valorFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   controller: _valorController,
                   validator: validator.byField(dto, 'itensValores'),
                   onChanged: (raw) {
@@ -312,6 +358,9 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 ),
                 right: AppTextAreaFormField(
                   label: 'Observação',
+                  focusNode: _obsFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _dividirFocus.requestFocus(),
                   initialValue: dto.observacao,
                   onChanged: (value) => dto.setObservacao(
                     value.isEmpty ? null : value, //
@@ -391,6 +440,8 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
                 categorias: viewModel.categorias,
                 centros: viewModel.centros,
                 allowEditItem1: false,
+                focusDividir: _dividirFocus,
+                onDividirEnter: () => _saveFocus.requestFocus(),
                 onSaveNewItem: (ccId, catId, val) {
                   final res = _distributionUseCase.addItem(
                     currentItems: _itens,

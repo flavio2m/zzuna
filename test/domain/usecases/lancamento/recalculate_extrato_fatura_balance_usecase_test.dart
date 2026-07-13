@@ -28,8 +28,11 @@ void main() {
     final lancamentoStorage = createTestLancamentoStorage();
 
     extratoRepository = ExtratoFaturaRepository(extratoStorage);
-    recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(extratoStorage, lancamentoStorage);
     lancamentoRepository = LancamentoRepository(lancamentoStorage);
+    recalculateUseCase = RecalculateExtratoFaturaBalanceUseCase(
+      extratoRepository,
+      lancamentoRepository,
+    );
 
     origemA = const LancamentoOrigem.conta(contaId: 'conta-A');
     origemB = const LancamentoOrigem.conta(contaId: 'conta-B');
@@ -41,106 +44,153 @@ void main() {
   });
 
   group('RecalculateExtratoFaturaBalanceUseCase Tests', () {
-    test('Should propagate balance forward starting with first period initial balance', () async {
-      // 1. Criar extratos para origem A de forma cronológica
-      final ef1Res = await extratoRepository.create(ExtratoFaturaDto(
-        origem: origemA,
-        ano: 2026,
-        mes: Mes.janeiro,
-        dataInicio: DateTime(2026, 1, 1),
-        dataFim: DateTime(2026, 1, 31),
-        saldoInicial: 100.0, // Saldo inicial não-zero
-        saldoFinal: 100.0,
-        fechado: false,
-      ));
-      final ef1 = ef1Res.getOrThrow();
+    test(
+      'Should propagate balance forward starting with first period initial balance',
+      () async {
+        // 1. Criar extratos para origem A de forma cronológica
+        final ef1Res = await extratoRepository.create(
+          ExtratoFaturaDto(
+            origem: origemA,
+            ano: 2026,
+            mes: Mes.janeiro,
+            dataInicio: DateTime(2026, 1, 1),
+            dataFim: DateTime(2026, 1, 31),
+            saldoInicial: 100.0, // Saldo inicial não-zero
+            saldoFinal: 100.0,
+            fechado: false,
+          ),
+        );
+        final ef1 = ef1Res.getOrThrow();
 
-      final ef2Res = await extratoRepository.create(ExtratoFaturaDto(
-        origem: origemA,
-        ano: 2026,
-        mes: Mes.fevereiro,
-        dataInicio: DateTime(2026, 2, 1),
-        dataFim: DateTime(2026, 2, 28),
-        saldoInicial: 0.0,
-        saldoFinal: 0.0,
-        fechado: false,
-      ));
-      final ef2 = ef2Res.getOrThrow();
+        final ef2Res = await extratoRepository.create(
+          ExtratoFaturaDto(
+            origem: origemA,
+            ano: 2026,
+            mes: Mes.fevereiro,
+            dataInicio: DateTime(2026, 2, 1),
+            dataFim: DateTime(2026, 2, 28),
+            saldoInicial: 0.0,
+            saldoFinal: 0.0,
+            fechado: false,
+          ),
+        );
+        final ef2 = ef2Res.getOrThrow();
 
-      // 2. Fazer lançamento de receita em Janeiro (+50)
-      await lancamentoRepository.create(LancamentoDto(
-        tipo: LancamentoTipo.receita,
-        descricao: 'Freelance',
-        extratoFaturaId: ef1.id,
-        origem: origemA,
-        data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
-      ));
+        // 2. Fazer lançamento de receita em Janeiro (+50)
+        await lancamentoRepository.create(
+          LancamentoDto(
+            tipo: LancamentoTipo.receita,
+            descricao: 'Freelance',
+            extratoFaturaId: ef1.id,
+            origem: origemA,
+            data: DateTime(2026, 1, 15),
+            itens: [
+              const LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 50.0,
+              ),
+            ],
+          ),
+        );
 
-      // 3. Fazer lançamento de despesa em Fevereiro (-30)
-      await lancamentoRepository.create(LancamentoDto(
-        tipo: LancamentoTipo.despesa,
-        descricao: 'Mercado',
-        extratoFaturaId: ef2.id,
-        origem: origemA,
-        data: DateTime(2026, 2, 10),
-        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-2', centroCustoId: 'cc-2', valor: 30.0)],
-      ));
+        // 3. Fazer lançamento de despesa em Fevereiro (-30)
+        await lancamentoRepository.create(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Mercado',
+            extratoFaturaId: ef2.id,
+            origem: origemA,
+            data: DateTime(2026, 2, 10),
+            itens: [
+              const LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-2',
+                centroCustoId: 'cc-2',
+                valor: 30.0,
+              ),
+            ],
+          ),
+        );
 
-      // Executar recálculo manual
-      await recalculateUseCase.execute(origemA);
+        // Executar recálculo manual
+        await recalculateUseCase.execute(
+          origemA,
+          startingAno: 2026,
+          startingMes: Mes.janeiro,
+        );
 
-      // 4. Verificar propagação
-      final extratos = await extratoStorage.getAll();
-      final extratosList = extratos.getOrThrow()..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
+        // 4. Verificar propagação
+        final extratos = await extratoStorage.getAll();
+        final extratosList = extratos.getOrThrow()
+          ..sort((a, b) => a.dataInicio.compareTo(b.dataInicio));
 
-      expect(extratosList[0].saldoInicial, 100.0);
-      expect(extratosList[0].saldoFinal, 150.0); // 100 + 50
+        expect(extratosList[0].saldoInicial, 100.0);
+        expect(extratosList[0].saldoFinal, 150.0); // 100 + 50
 
-      expect(extratosList[1].saldoInicial, 150.0); // saldoFinal anterior
-      expect(extratosList[1].saldoFinal, 120.0); // 150 - 30
-    });
+        expect(extratosList[1].saldoInicial, 150.0); // saldoFinal anterior
+        expect(extratosList[1].saldoFinal, 120.0); // 150 - 30
+      },
+    );
 
     test('Should recalculate both old and new origin on update', () async {
       // 1. Criar extratos para origem A e origem B
-      final efARes = await extratoRepository.create(ExtratoFaturaDto(
-        id: 'ef-A',
-        origem: origemA,
-        ano: 2026,
-        mes: Mes.janeiro,
-        dataInicio: DateTime(2026, 1, 1),
-        dataFim: DateTime(2026, 1, 31),
-        saldoInicial: 100.0,
-        fechado: false,
-      ));
+      final efARes = await extratoRepository.create(
+        ExtratoFaturaDto(
+          id: 'ef-A',
+          origem: origemA,
+          ano: 2026,
+          mes: Mes.janeiro,
+          dataInicio: DateTime(2026, 1, 1),
+          dataFim: DateTime(2026, 1, 31),
+          saldoInicial: 100.0,
+          fechado: false,
+        ),
+      );
       final efA = efARes.getOrThrow();
 
-      final efBRes = await extratoRepository.create(ExtratoFaturaDto(
-        id: 'ef-B',
-        origem: origemB,
-        ano: 2026,
-        mes: Mes.janeiro,
-        dataInicio: DateTime(2026, 1, 1),
-        dataFim: DateTime(2026, 1, 31),
-        saldoInicial: 200.0,
-        saldoFinal: 200.0,
-        fechado: false,
-      ));
+      final efBRes = await extratoRepository.create(
+        ExtratoFaturaDto(
+          id: 'ef-B',
+          origem: origemB,
+          ano: 2026,
+          mes: Mes.janeiro,
+          dataInicio: DateTime(2026, 1, 1),
+          dataFim: DateTime(2026, 1, 31),
+          saldoInicial: 200.0,
+          saldoFinal: 200.0,
+          fechado: false,
+        ),
+      );
       final efB = efBRes.getOrThrow();
 
       // 2. Criar lançamento na origem A
-      final createdLancRes = await lancamentoRepository.create(LancamentoDto(
-        tipo: LancamentoTipo.receita,
-        descricao: 'Freelance',
-        extratoFaturaId: efA.id,
-        origem: origemA,
-        data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
-      ));
+      final createdLancRes = await lancamentoRepository.create(
+        LancamentoDto(
+          tipo: LancamentoTipo.receita,
+          descricao: 'Freelance',
+          extratoFaturaId: efA.id,
+          origem: origemA,
+          data: DateTime(2026, 1, 15),
+          itens: [
+            const LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 50.0,
+            ),
+          ],
+        ),
+      );
       final lancamento = createdLancRes.getOrThrow();
 
       // Recalcular origem A
-      await recalculateUseCase.execute(origemA);
+      await recalculateUseCase.execute(
+        origemA,
+        startingAno: 2026,
+        startingMes: Mes.janeiro,
+      );
 
       // Verificar que saldo de A subiu para 150 e B manteve 200
       var extA = (await extratoRepository.getById(efA.id)).getOrThrow();
@@ -149,19 +199,36 @@ void main() {
       expect(extB.saldoFinal, 200.0);
 
       // 3. Atualizar o lançamento mudando para origem B e seu respectivo extratoFaturaId
-      await lancamentoRepository.update(LancamentoDto(
-        id: lancamento.id,
-        tipo: LancamentoTipo.receita,
-        descricao: 'Freelance',
-        extratoFaturaId: efB.id,
-        origem: origemB,
-        data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
-      ));
+      await lancamentoRepository.update(
+        LancamentoDto(
+          id: lancamento.id,
+          tipo: LancamentoTipo.receita,
+          descricao: 'Freelance',
+          extratoFaturaId: efB.id,
+          origem: origemB,
+          data: DateTime(2026, 1, 15),
+          itens: [
+            const LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 50.0,
+            ),
+          ],
+        ),
+      );
 
       // Recalcular ambas as origens
-      await recalculateUseCase.execute(origemA);
-      await recalculateUseCase.execute(origemB);
+      await recalculateUseCase.execute(
+        origemA,
+        startingAno: 2026,
+        startingMes: Mes.janeiro,
+      );
+      await recalculateUseCase.execute(
+        origemB,
+        startingAno: 2026,
+        startingMes: Mes.janeiro,
+      );
 
       // Verificar que saldo de A voltou para 100 e B subiu para 250
       extA = (await extratoRepository.getById(efA.id)).getOrThrow();
@@ -171,29 +238,44 @@ void main() {
     });
 
     test('Should recalculate when a transaction is deleted', () async {
-      final efRes = await extratoRepository.create(ExtratoFaturaDto(
-        origem: origemA,
-        ano: 2026,
-        mes: Mes.janeiro,
-        dataInicio: DateTime(2026, 1, 1),
-        dataFim: DateTime(2026, 1, 31),
-        saldoInicial: 100.0,
-        fechado: false,
-      ));
+      final efRes = await extratoRepository.create(
+        ExtratoFaturaDto(
+          origem: origemA,
+          ano: 2026,
+          mes: Mes.janeiro,
+          dataInicio: DateTime(2026, 1, 1),
+          dataFim: DateTime(2026, 1, 31),
+          saldoInicial: 100.0,
+          fechado: false,
+        ),
+      );
       final ef = efRes.getOrThrow();
 
-      final createdLancRes = await lancamentoRepository.create(LancamentoDto(
-        tipo: LancamentoTipo.receita,
-        descricao: 'Freelance',
-        extratoFaturaId: ef.id,
-        origem: origemA,
-        data: DateTime(2026, 1, 15),
-        itens: [const LancamentoItem(numero: 1, categoriaId: 'cat-1', centroCustoId: 'cc-1', valor: 50.0)],
-      ));
+      final createdLancRes = await lancamentoRepository.create(
+        LancamentoDto(
+          tipo: LancamentoTipo.receita,
+          descricao: 'Freelance',
+          extratoFaturaId: ef.id,
+          origem: origemA,
+          data: DateTime(2026, 1, 15),
+          itens: [
+            const LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 50.0,
+            ),
+          ],
+        ),
+      );
       final lancamento = createdLancRes.getOrThrow();
 
       // Recalcular
-      await recalculateUseCase.execute(origemA);
+      await recalculateUseCase.execute(
+        origemA,
+        startingAno: 2026,
+        startingMes: Mes.janeiro,
+      );
 
       var ext = (await extratoRepository.getById(ef.id)).getOrThrow();
       expect(ext.saldoFinal, 150.0);
@@ -202,7 +284,11 @@ void main() {
       await lancamentoRepository.delete(lancamento.id);
 
       // Recalcular
-      await recalculateUseCase.execute(origemA);
+      await recalculateUseCase.execute(
+        origemA,
+        startingAno: 2026,
+        startingMes: Mes.janeiro,
+      );
 
       ext = (await extratoRepository.getById(ef.id)).getOrThrow();
       expect(ext.saldoFinal, 100.0);

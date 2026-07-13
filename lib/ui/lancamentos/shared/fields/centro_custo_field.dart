@@ -8,6 +8,8 @@ class CentroCustoField extends StatelessWidget {
   final String? value;
   final ValueChanged<String?>? onChanged;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterPressed;
 
   const CentroCustoField({
     super.key,
@@ -15,6 +17,8 @@ class CentroCustoField extends StatelessWidget {
     this.value,
     this.onChanged,
     this.validator,
+    this.focusNode,
+    this.onEnterPressed,
   });
 
   @override
@@ -23,6 +27,8 @@ class CentroCustoField extends StatelessWidget {
       label: 'Centro de Custo',
       value: value,
       validator: validator,
+      focusNode: focusNode,
+      onEnterPressed: onEnterPressed,
       items: centros
           .map(
             (cc) =>

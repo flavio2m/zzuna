@@ -42,14 +42,20 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
   late final TextEditingController _percentController;
   late final TextEditingController _valueController;
 
+  late final FocusNode _ccFocusNode;
+  late final FocusNode _catFocusNode;
   late final FocusNode _percentFocusNode;
   late final FocusNode _valueFocusNode;
+  late final FocusNode _saveFocusNode;
 
   @override
   void initState() {
     super.initState();
+    _ccFocusNode = FocusNode();
+    _catFocusNode = FocusNode();
     _percentFocusNode = FocusNode();
     _valueFocusNode = FocusNode();
+    _saveFocusNode = FocusNode();
 
     if (widget.initialItem != null) {
       _centroCustoId = widget.initialItem!.centroCustoId;
@@ -69,14 +75,23 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
       _percentController = TextEditingController();
       _valueController = TextEditingController();
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _ccFocusNode.requestFocus();
+      }
+    });
   }
 
   @override
   void dispose() {
     _percentController.dispose();
     _valueController.dispose();
+    _ccFocusNode.dispose();
+    _catFocusNode.dispose();
     _percentFocusNode.dispose();
     _valueFocusNode.dispose();
+    _saveFocusNode.dispose();
     super.dispose();
   }
 
@@ -131,6 +146,8 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
           left: CentroCustoField(
             centros: widget.centros,
             value: _centroCustoId,
+            focusNode: _ccFocusNode,
+            onEnterPressed: () => _catFocusNode.requestFocus(),
             validator: //
             (cc) =>
                 cc == null || cc.isEmpty ? 'Informe o centro de custo' : null,
@@ -139,6 +156,8 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
           right: CategoriaField(
             categorias: widget.categorias,
             value: _categoriaId,
+            focusNode: _catFocusNode,
+            onEnterPressed: () => _percentFocusNode.requestFocus(),
             validator: //
             (cat) =>
                 cat == null || cat.isEmpty ? 'Informe a categoria' : null,
@@ -155,6 +174,8 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
             label: 'Percentual',
             controller: _percentController,
             focusNode: _percentFocusNode,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _valueFocusNode.requestFocus(),
             min: 0.001,
             max: 100.0,
             onChanged: _onPercentChanged,
@@ -166,6 +187,8 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
             label: 'Valor',
             controller: _valueController,
             focusNode: _valueFocusNode,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _saveFocusNode.requestFocus(),
             onChanged: _onValueChanged,
             validator: //
             (val) =>
@@ -187,6 +210,7 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
             Tooltip(
               message: widget.initialItem != null ? 'Salvar' : 'Adicionar', //
               child: ButtonSave(
+                focusNode: _saveFocusNode,
                 onPressed: _submit,
                 small: true,
                 label: widget.initialItem != null ? 'Salvar' : 'Adicionar', //

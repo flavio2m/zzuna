@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 import 'package:zzuna/ui/shared/feedback/app_confirmation_dialog.dart';
-import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class LancamentosAtualizarDataRecorrenciaMenuItem
     extends PopupMenuItem<TipoAcoes> {
@@ -19,16 +18,11 @@ class LancamentosAtualizarDataRecorrenciaMenuItem
          height: 36,
          child: Row(
            children: [
-             const Icon(
-               Icons.event_repeat_outlined,
-               size: 16,
-               color: AppColors.primary,
-             ),
+             const Icon(Icons.event_repeat_outlined, size: 16),
              const SizedBox(width: 8),
              Text(
                TipoAcoes.atualizarDataRecorrencia.label,
                style: const TextStyle(
-                 color: AppColors.primary,
                  fontSize: 13,
                  fontWeight: FontWeight.w600,
                ),

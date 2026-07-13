@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamentos_reconcile_button.dart';
@@ -43,8 +44,24 @@ class TransactionsActionsBar extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add, size: 20),
             color: AppColors.primary,
-            tooltip: 'Adicionar lançamento',
-            onPressed: () => LancamentoCreateModal.show(context),
+            tooltip: 'Adicionar Entrada',
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.receita,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            splashRadius: 20,
+          ),
+          const SizedBox(width: 16),
+          IconButton(
+            icon: const Icon(Icons.arrow_downward, size: 20),
+            color: Theme.of(context).colorScheme.error,
+            tooltip: 'Adicionar Despesa',
+            onPressed: () => LancamentoCreateModal.show(
+              context,
+              initialTipo: LancamentoTipo.despesa,
+            ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             splashRadius: 20,
@@ -52,14 +69,14 @@ class TransactionsActionsBar extends ConsumerWidget {
           const SizedBox(width: 16),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded, size: 20),
-            color: AppColors.primary,
+            color: AppColors.indigo600,
             tooltip: 'Adicionar transferência',
             onPressed: () => TransferenciaCreateModal.show(context),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             splashRadius: 20,
           ),
-          if (hasSelection) ...[
+          if (hasSelection && !listViewModel.isMesFechado) ...[
             const SizedBox(width: 16),
             LancamentosReconcileButton(
               conciliado: true,
@@ -93,6 +110,15 @@ class TransactionsActionsBar extends ConsumerWidget {
               },
             ),
           ],
+          const Spacer(),
+          Icon(
+            listViewModel.isMesFechado ? Icons.lock : Icons.lock_open,
+            color: listViewModel.isMesFechado
+                ? Colors.green
+                : Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 16),
         ],
       ),
     );
