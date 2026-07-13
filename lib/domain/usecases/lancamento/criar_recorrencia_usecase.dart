@@ -12,6 +12,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 ///
 /// - Atualiza o lançamento com [LancamentoGrupo.recorrencia] usando o dia
 ///   da data do lançamento como [diaDoMes].
+/// - Define a `sequencia` como 1 para o mês atual, incrementando nos futuros.
 /// - Gera imediatamente cópias em todos os ExtratoFaturas futuros já existentes
 ///   para a mesma origem.
 class CriarRecorrenciaUseCase {
@@ -50,7 +51,12 @@ class CriarRecorrenciaUseCase {
       ativo: true,
       diaDoMes: diaDoMes,
       tipo: TipoRecorrencia.mensal,
+      sequencia: 1,
     );
+
+    final baseDescricao = lanc.descricao
+        .replaceFirst(RegExp(r' - \d+$'), '')
+        .trim();
 
     // 4. Atualizar o próprio lançamento com o grupo de recorrência
     final updateRes = await _lancamentoRepository.update(
@@ -58,7 +64,7 @@ class CriarRecorrenciaUseCase {
         id: lanc.id,
         tipo: lanc.tipo,
         data: lanc.data,
-        descricao: lanc.descricao,
+        descricao: '$baseDescricao - 1',
         extratoFaturaId: lanc.extratoFaturaId,
         origem: lanc.origem,
         itens: lanc.itens,
@@ -103,6 +109,7 @@ class CriarRecorrenciaUseCase {
       final lancAtualizado = updatedLancRes.getOrThrow();
 
       final List<LancamentoDto> dtos = [];
+      int sequenciaFutura = 2;
       for (final extrato in futureExtratos) {
         final dia = clampDayToMonth(diaDoMes, extrato.mes.numero, extrato.ano);
         final novaData = DateTime(extrato.ano, extrato.mes.numero, dia);
@@ -112,15 +119,18 @@ class CriarRecorrenciaUseCase {
             id: const Uuid().v4(),
             tipo: lancAtualizado.tipo,
             data: novaData,
-            descricao: lancAtualizado.descricao,
+            descricao: '$baseDescricao - $sequenciaFutura',
             extratoFaturaId: extrato.id,
             origem: lancAtualizado.origem,
             itens: lancAtualizado.itens,
             conciliado: false,
-            grupo: novoGrupo,
+            grupo: (novoGrupo as LancamentoGrupoRecorrencia).copyWith(
+              sequencia: sequenciaFutura,
+            ),
             observacao: lancAtualizado.observacao,
           ),
         );
+        sequenciaFutura++;
       }
 
       if (dtos.isNotEmpty) {

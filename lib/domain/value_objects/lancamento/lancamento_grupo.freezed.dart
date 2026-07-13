@@ -190,13 +190,13 @@ return recorrencia(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)?  recorrencia,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult Function( String grupoId)?  transferencia,TResult Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo,  int sequencia)?  recorrencia,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
 return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia() when recorrencia != null:
-return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);case _:
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo,_that.sequencia);case _:
   return orElse();
 
 }
@@ -214,13 +214,13 @@ return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId,  int parcela,  int totalParcelas)  replicacao,required TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)  recorrencia,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String grupoId,  int parcela,  int totalParcelas)  parcelamento,required TResult Function( String grupoId)  transferencia,required TResult Function( String grupoId,  int parcela,  int totalParcelas)  replicacao,required TResult Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo,  int sequencia)  recorrencia,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento():
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia():
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao():
 return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia():
-return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);}
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo,_that.sequencia);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -234,13 +234,13 @@ return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult? Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo)?  recorrencia,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  parcelamento,TResult? Function( String grupoId)?  transferencia,TResult? Function( String grupoId,  int parcela,  int totalParcelas)?  replicacao,TResult? Function( String grupoId,  bool ativo,  int diaDoMes,  TipoRecorrencia tipo,  int sequencia)?  recorrencia,}) {final _that = this;
 switch (_that) {
 case LancamentoGrupoParcelamento() when parcelamento != null:
 return parcelamento(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoTransferencia() when transferencia != null:
 return transferencia(_that.grupoId);case LancamentoGrupoReplicacao() when replicacao != null:
 return replicacao(_that.grupoId,_that.parcela,_that.totalParcelas);case LancamentoGrupoRecorrencia() when recorrencia != null:
-return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo);case _:
+return recorrencia(_that.grupoId,_that.ativo,_that.diaDoMes,_that.tipo,_that.sequencia);case _:
   return null;
 
 }
@@ -479,13 +479,14 @@ as int,
 @JsonSerializable()
 
 class LancamentoGrupoRecorrencia implements LancamentoGrupo {
-  const LancamentoGrupoRecorrencia({required this.grupoId, required this.ativo, required this.diaDoMes, required this.tipo, final  String? $type}): $type = $type ?? 'recorrencia';
+  const LancamentoGrupoRecorrencia({required this.grupoId, required this.ativo, required this.diaDoMes, required this.tipo, required this.sequencia, final  String? $type}): $type = $type ?? 'recorrencia';
   factory LancamentoGrupoRecorrencia.fromJson(Map<String, dynamic> json) => _$LancamentoGrupoRecorrenciaFromJson(json);
 
 @override final  String grupoId;
  final  bool ativo;
  final  int diaDoMes;
  final  TipoRecorrencia tipo;
+ final  int sequencia;
 
 @JsonKey(name: 'runtimeType')
 final String $type;
@@ -504,16 +505,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoGrupoRecorrencia&&(identical(other.grupoId, grupoId) || other.grupoId == grupoId)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaDoMes, diaDoMes) || other.diaDoMes == diaDoMes)&&(identical(other.tipo, tipo) || other.tipo == tipo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LancamentoGrupoRecorrencia&&(identical(other.grupoId, grupoId) || other.grupoId == grupoId)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.diaDoMes, diaDoMes) || other.diaDoMes == diaDoMes)&&(identical(other.tipo, tipo) || other.tipo == tipo)&&(identical(other.sequencia, sequencia) || other.sequencia == sequencia));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,grupoId,ativo,diaDoMes,tipo);
+int get hashCode => Object.hash(runtimeType,grupoId,ativo,diaDoMes,tipo,sequencia);
 
 @override
 String toString() {
-  return 'LancamentoGrupo.recorrencia(grupoId: $grupoId, ativo: $ativo, diaDoMes: $diaDoMes, tipo: $tipo)';
+  return 'LancamentoGrupo.recorrencia(grupoId: $grupoId, ativo: $ativo, diaDoMes: $diaDoMes, tipo: $tipo, sequencia: $sequencia)';
 }
 
 
@@ -524,7 +525,7 @@ abstract mixin class $LancamentoGrupoRecorrenciaCopyWith<$Res> implements $Lanca
   factory $LancamentoGrupoRecorrenciaCopyWith(LancamentoGrupoRecorrencia value, $Res Function(LancamentoGrupoRecorrencia) _then) = _$LancamentoGrupoRecorrenciaCopyWithImpl;
 @override @useResult
 $Res call({
- String grupoId, bool ativo, int diaDoMes, TipoRecorrencia tipo
+ String grupoId, bool ativo, int diaDoMes, TipoRecorrencia tipo, int sequencia
 });
 
 
@@ -541,13 +542,14 @@ class _$LancamentoGrupoRecorrenciaCopyWithImpl<$Res>
 
 /// Create a copy of LancamentoGrupo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? grupoId = null,Object? ativo = null,Object? diaDoMes = null,Object? tipo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? grupoId = null,Object? ativo = null,Object? diaDoMes = null,Object? tipo = null,Object? sequencia = null,}) {
   return _then(LancamentoGrupoRecorrencia(
 grupoId: null == grupoId ? _self.grupoId : grupoId // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,diaDoMes: null == diaDoMes ? _self.diaDoMes : diaDoMes // ignore: cast_nullable_to_non_nullable
 as int,tipo: null == tipo ? _self.tipo : tipo // ignore: cast_nullable_to_non_nullable
-as TipoRecorrencia,
+as TipoRecorrencia,sequencia: null == sequencia ? _self.sequencia : sequencia // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

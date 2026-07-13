@@ -60,6 +60,7 @@ class AtualizarDataRecorrenciaUseCase {
       ativo: grupo.ativo,
       diaDoMes: novoDia,
       tipo: grupo.tipo,
+      sequencia: grupo.sequencia,
     );
 
     // 6. Atualizar o lançamento de referência com novo diaDoMes no grupo
@@ -104,7 +105,9 @@ class AtualizarDataRecorrenciaUseCase {
           origem: futuro.origem,
           itens: futuro.itens,
           conciliado: futuro.conciliado,
-          grupo: novoGrupo,
+          grupo: (novoGrupo as LancamentoGrupoRecorrencia).copyWith(
+            sequencia: (futuro.grupo as LancamentoGrupoRecorrencia).sequencia,
+          ),
           observacao: futuro.observacao,
         ),
       );

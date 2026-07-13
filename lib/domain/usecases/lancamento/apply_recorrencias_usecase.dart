@@ -71,11 +71,16 @@ class ApplyRecorrenciasUseCase {
       );
       final novaData = DateTime(novoExtrato.ano, novoExtrato.mes.numero, dia);
 
+      final novaSequencia = grupo.sequencia + 1;
+      final baseDescricao = l.descricao
+          .replaceFirst(RegExp(r' - \d+$'), '')
+          .trim();
+
       return LancamentoDto(
         id: const Uuid().v4(),
         tipo: l.tipo,
         data: novaData,
-        descricao: l.descricao,
+        descricao: '$baseDescricao - $novaSequencia',
         extratoFaturaId: novoExtrato.id,
         origem: l.origem,
         itens: l.itens,
@@ -85,6 +90,7 @@ class ApplyRecorrenciasUseCase {
           ativo: true,
           diaDoMes: grupo.diaDoMes,
           tipo: grupo.tipo,
+          sequencia: novaSequencia,
         ),
         observacao: l.observacao,
       );

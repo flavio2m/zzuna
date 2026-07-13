@@ -55,6 +55,7 @@ class ReativarRecorrenciaUseCase {
       ativo: true,
       diaDoMes: grupo.diaDoMes,
       tipo: grupo.tipo,
+      sequencia: grupo.sequencia,
     );
     final updateRes = await _lancamentoRepository.update(
       LancamentoDto(
@@ -103,9 +104,15 @@ class ReativarRecorrenciaUseCase {
 
       final lancAtualizado = updatedLancRes.getOrThrow();
 
+      int seqFutura = grupo.sequencia + 1;
+      final baseDescricao = lancAtualizado.descricao
+          .replaceFirst(RegExp(r' - \d+$'), '')
+          .trim();
+
       final List<LancamentoDto> dtos = [];
       for (final extrato in futureExtratos) {
-        // Verificar se já existe lançamento desse grupo neste extrato (evitar duplicatas)
+        // Verificar se já existe lançamento desse grupo neste extrato
+        // (evitar duplicatas)
         final extratoLancRes = await _lancamentoRepository
             .searchByExtratoFaturaId(extrato.id);
         if (extratoLancRes.isError()) continue;
@@ -115,7 +122,12 @@ class ReativarRecorrenciaUseCase {
               l.grupo is LancamentoGrupoRecorrencia &&
               (l.grupo as LancamentoGrupoRecorrencia).grupoId == grupo.grupoId,
         );
-        if (jaExiste) continue;
+        if (jaExiste) {
+          // Avança a sequência caso já exista (teoricamente não deveria
+          // estar inativo e existir na frente, mas por garantia)
+          seqFutura++;
+          continue;
+        }
 
         final dia = clampDayToMonth(
           grupo.diaDoMes,
@@ -129,15 +141,18 @@ class ReativarRecorrenciaUseCase {
             id: const Uuid().v4(),
             tipo: lancAtualizado.tipo,
             data: novaData,
-            descricao: lancAtualizado.descricao,
+            descricao: '$baseDescricao - $seqFutura',
             extratoFaturaId: extrato.id,
             origem: lancAtualizado.origem,
             itens: lancAtualizado.itens,
             conciliado: false,
-            grupo: grupoAtivo,
+            grupo: (grupoAtivo as LancamentoGrupoRecorrencia).copyWith(
+              sequencia: seqFutura,
+            ),
             observacao: lancAtualizado.observacao,
           ),
         );
+        seqFutura++;
       }
 
       if (dtos.isNotEmpty) {

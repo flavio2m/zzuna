@@ -84,12 +84,12 @@ import 'package:zzuna/domain/usecases/lancamento/criar_recorrencia_usecase.dart'
 import 'package:zzuna/domain/usecases/lancamento/finalizar_recorrencia_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reativar_recorrencia_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/atualizar_data_recorrencia_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/atualizar_sequencia_recorrencia_usecase.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/criar/viewmodels/lancamentos_criar_recorrencia_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/viewmodels/lancamentos_finalizar_recorrencia_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/reativar/viewmodels/lancamentos_reativar_recorrencia_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/viewmodels/lancamentos_atualizar_data_recorrencia_viewmodel.dart';
 import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
-
 
 part 'providers/conta_providers.dart';
 part 'providers/cartao_providers.dart';

@@ -69,6 +69,7 @@ class FinalizarRecorrenciaUseCase {
       ativo: false,
       diaDoMes: grupo.diaDoMes,
       tipo: grupo.tipo,
+      sequencia: grupo.sequencia,
     );
     final updateRes = await _lancamentoRepository.update(
       LancamentoDto(

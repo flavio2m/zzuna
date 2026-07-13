@@ -208,10 +208,11 @@ void main() {
           itens: [],
           conciliado: false,
           grupo: const LancamentoGrupo.recorrencia(
-            grupoId: 'grp1',
+            grupoId: 'grupo1',
             ativo: true,
-            diaDoMes: 10,
+            diaDoMes: 5,
             tipo: TipoRecorrencia.mensal,
+            sequencia: 1,
           ),
         );
         lancamentoRepository.lancamentos.add(lancamentoRecorrente);

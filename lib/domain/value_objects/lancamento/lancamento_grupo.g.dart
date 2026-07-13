@@ -63,6 +63,7 @@ LancamentoGrupoRecorrencia _$LancamentoGrupoRecorrenciaFromJson(
   ativo: json['ativo'] as bool,
   diaDoMes: (json['diaDoMes'] as num).toInt(),
   tipo: $enumDecode(_$TipoRecorrenciaEnumMap, json['tipo']),
+  sequencia: (json['sequencia'] as num).toInt(),
   $type: json['runtimeType'] as String?,
 );
 
@@ -73,6 +74,7 @@ Map<String, dynamic> _$LancamentoGrupoRecorrenciaToJson(
   'ativo': instance.ativo,
   'diaDoMes': instance.diaDoMes,
   'tipo': _$TipoRecorrenciaEnumMap[instance.tipo]!,
+  'sequencia': instance.sequencia,
   'runtimeType': instance.$type,
 };
 

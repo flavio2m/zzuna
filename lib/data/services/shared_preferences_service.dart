@@ -8,7 +8,7 @@ class SharedPreferencesService {
     debugPrint('saveData $key');
 
     // Time de 500ms para simular latencia da rede
-    await Future.delayed(const Duration(milliseconds: 100));
+    // await Future.delayed(const Duration(milliseconds: 100));
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -21,7 +21,7 @@ class SharedPreferencesService {
 
   AsyncResult<String> getData(String key) async {
     // Time de 500ms para simular latencia da rede
-    await Future.delayed(const Duration(milliseconds: 100));
+    // await Future.delayed(const Duration(milliseconds: 100));
 
     debugPrint('getData $key');
 
@@ -44,7 +44,7 @@ class SharedPreferencesService {
     debugPrint('deleteData $key');
 
     // Time de 2s para simular latencia da rede
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 100));
 
     try {
       final prefs = await SharedPreferences.getInstance();

@@ -191,7 +191,7 @@ class LancamentosListViewModel extends ChangeNotifier {
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
     return lancamento.data.year <= ano &&
-        (lancamento.data.year < ano || lancamento.data.month <= mes.index);
+        (lancamento.data.year < ano || lancamento.data.month <= mes.numero);
   }
 
   AsyncResult<LancamentoResumoMensal> _load() async {

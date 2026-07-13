@@ -28,6 +28,7 @@ sealed class LancamentoGrupo with _$LancamentoGrupo {
     required bool ativo,
     required int diaDoMes,
     required TipoRecorrencia tipo,
+    required int sequencia,
   }) = LancamentoGrupoRecorrencia;
 
   factory LancamentoGrupo.fromJson(
