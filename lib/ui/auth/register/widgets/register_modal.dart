@@ -26,6 +26,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
   final dto = RegisterUserDto(name: '', email: '', password: '');
 
   final formKey = GlobalKey<FormState>();
+  final cadastrarFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
   @override
   void dispose() {
     viewModel.registerCommand.removeListener(_commandListener);
+    cadastrarFocusNode.dispose();
     super.dispose();
   }
 
@@ -87,7 +89,15 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
 
             return AppButton(
               label: isLoading ? 'Cadastrando...' : 'Cadastrar',
-              icon: const Icon(Icons.person_add),
+              icon: Icon(
+                Icons.person_add,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              focusNode: cadastrarFocusNode,
+              textStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
               onPressed: isLoading || !_canSubmit ? null : _handleRegister,
               loading: isLoading,
             );
@@ -99,6 +109,8 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
           AppTextFormField(
             label: 'Nome',
             icon: Icons.person,
+            autofocus: true,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setName(value);
               setState(() {});
@@ -111,6 +123,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
           AppEmailFormField(
             label: 'E-mail',
             icon: Icons.email,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setEmail(value);
               setState(() {});
@@ -124,6 +137,8 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
             label: 'Senha',
             icon: Icons.lock,
             obscureText: true,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => cadastrarFocusNode.requestFocus(),
             onChanged: (value) {
               dto.setPassword(value);
               setState(() {});

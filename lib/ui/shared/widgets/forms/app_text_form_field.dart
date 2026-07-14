@@ -62,13 +62,7 @@ class AppTextFormField extends StatelessWidget {
         suffixIcon: suffixIcon,
       ),
       onChanged: onChanged,
-      onFieldSubmitted: (value) {
-        if (onFieldSubmitted != null) {
-          onFieldSubmitted!(value);
-        } else if (textInputAction == TextInputAction.next) {
-          FocusScope.of(context).nextFocus();
-        }
-      },
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }

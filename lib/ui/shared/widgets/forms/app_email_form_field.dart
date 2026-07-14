@@ -10,6 +10,8 @@ class AppEmailFormField extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final bool autofocus;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppEmailFormField({
     super.key,
@@ -21,6 +23,8 @@ class AppEmailFormField extends StatelessWidget {
     this.controller,
     this.focusNode,
     this.autofocus = false,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -36,6 +40,8 @@ class AppEmailFormField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       autofocus: autofocus,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }
