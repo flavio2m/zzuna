@@ -18,7 +18,7 @@ class SidebarCategoriaSection extends ConsumerWidget {
     final filterState = ref.watch(lancamentoFilterProvider);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: SidebarOriginSection(
         title: 'CATEGORIAS',
         expanded: state.categoriasExpandidas || state.filtro.isNotEmpty,

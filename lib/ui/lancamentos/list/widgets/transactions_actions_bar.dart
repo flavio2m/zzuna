@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/enums/lancamento_tipo.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
@@ -40,7 +41,57 @@ class TransactionsActionsBar extends ConsumerWidget {
             allSelected: listViewModel.allSelected,
             onPressed: () => listViewModel.toggleSelectAll(),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 24),
+          
+          // Fast Month Navigation
+          Consumer(
+            builder: (context, ref, _) {
+              final filterState = ref.watch(lancamentoFilterProvider);
+              final maxYear = DateTime.now().year + 2;
+
+              return Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    splashRadius: 20,
+                    onPressed: (filterState.mes == Mes.janeiro && filterState.ano == 2025)
+                        ? null
+                        : () {
+                            ref.read(lancamentoFilterProvider.notifier).mesAnterior();
+                            listViewModel.pesquisar();
+                          },
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${filterState.mes.descricao} / ${filterState.ano}',
+                    style: const TextStyle(
+                      color: AppColors.slate700,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    splashRadius: 20,
+                    onPressed: (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
+                        ? null
+                        : () {
+                            ref.read(lancamentoFilterProvider.notifier).proximoMes();
+                            listViewModel.pesquisar();
+                          },
+                  ),
+                ],
+              );
+            },
+          ),
+          
+          const SizedBox(width: 24),
+          
           IconButton(
             icon: const Icon(Icons.add, size: 20),
             color: AppColors.primary,

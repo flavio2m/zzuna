@@ -56,7 +56,7 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                         decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: AppColors.slate100), //
@@ -66,12 +66,12 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
                           children: [
                             SidebarContaSection(items: filteredContas),
                             const Divider(
-                              height: 18,
+                              height: 12,
                               color: AppColors.slate100,
                             ),
                             SidebarCartaoSection(items: filteredCartoes),
                             const Divider(
-                              height: 18,
+                              height: 12,
                               color: AppColors.slate100,
                             ),
                             SidebarCentroCustoSection(items: filteredCentros),
