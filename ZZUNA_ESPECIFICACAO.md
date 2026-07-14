@@ -20,11 +20,11 @@
       - Criar opção para alterar a sequência: o usuário poderar criar uma recorrência
       será 1, mas em ações poderá definir que aquela é a 20, por exemplo, o 
       próximo a ser gerado será o 21.
-| ☐ | Ajustar para que o lançamento em Cartão de Crédito observe a data de
+| OK | Ajustar para que o lançamento em Cartão de Crédito observe a data de
       fechamento da fatura, ou seja, se a fatura fecha dia 10, o lançamento
       deve ser lançado no dia 11 para entrar no próximo mês.
+| OK | Implementar o sobre com data de compilação
 | ☐ | Implementar opção para Excluir dados
-| ☐ | Implementar o sobre com data de compilação
 | ☐ | Criar uma opção para exportar lançamentos no formato XLS (lançamentos do mês) 
 | ☐ | Ciar opção para importar lançamentos (entradas/saídas) de uma planilha XLS
 ---

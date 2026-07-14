@@ -58,6 +58,7 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase
 import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/seed/seed_initial_data_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reconcile_lancamentos_usecase.dart';
@@ -156,21 +157,39 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return repository;
 });
 
-// VIEWMODELS - Camada de Apresentação
+// ============================================================================
+// SEED - Camada de Domínio
 // ============================================================================
 
-// AUTH
-final loginViewModelProvider = Provider<LoginViewModel>(
-  (ref) => LoginViewModel(ref.watch(authRepositoryProvider)), //
-);
+final seedInitialDataUseCaseProvider = Provider<SeedInitialDataUseCase>((ref) {
+  return SeedInitialDataUseCase(
+    ref.read(contaRepositoryProvider),
+    ref.read(cartaoRepositoryProvider),
+    ref.read(centroCustoRepositoryProvider),
+    ref.read(categoriaRepositoryProvider),
+  );
+});
 
-final logoutViewModelProvider = Provider<LogoutViewModel>(
-  (ref) => LogoutViewModel(ref.watch(authRepositoryProvider)), //
-);
+// ============================================================================
+// VIEW MODELS - Camada de Apresentação
+// ============================================================================
 
-final registerViewModelProvider = Provider<RegisterViewModel>(
-  (ref) => RegisterViewModel(ref.watch(authRepositoryProvider)),
-);
+final loginViewModelProvider = Provider.autoDispose<LoginViewModel>((ref) {
+  return LoginViewModel(ref.read(authRepositoryProvider));
+});
+
+final logoutViewModelProvider = Provider.autoDispose<LogoutViewModel>((ref) {
+  return LogoutViewModel(ref.read(authRepositoryProvider));
+});
+
+final registerViewModelProvider = Provider.autoDispose<RegisterViewModel>((
+  ref,
+) {
+  return RegisterViewModel(
+    ref.read(authRepositoryProvider),
+    ref.read(seedInitialDataUseCaseProvider),
+  );
+});
 
 // ============================================================================
 // STATE PROVIDERS - Estado Global da Aplicação

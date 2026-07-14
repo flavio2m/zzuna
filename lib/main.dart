@@ -23,7 +23,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    
+
     FirebaseDatabase.instance.setPersistenceEnabled(true);
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
@@ -31,9 +31,9 @@ void main() async {
 
   final container = ProviderContainer();
 
-  if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
-    await initSeeds(container);
-  }
+  // if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
+  //   await initSeeds(container);
+  // }
 
   runApp(
     UncontrolledProviderScope(
@@ -56,7 +56,7 @@ class MainApp extends ConsumerWidget {
         } else if (user is LoggedUser) {
           final uid = user.id;
           final db = FirebaseDatabase.instance;
-          
+
           db.ref(uid).child('contas').keepSynced(true);
           db.ref(uid).child('cartoes').keepSynced(true);
           db.ref(uid).child('centros_custo').keepSynced(true);

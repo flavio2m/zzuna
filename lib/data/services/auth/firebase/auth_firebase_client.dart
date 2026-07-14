@@ -86,14 +86,6 @@ class AuthFirebaseClient implements AuthClientBase {
 
       final uid = firebaseUser.uid;
 
-      // Salvar as informações do perfil no Storage (Realtime Database)
-      final newUser = LoadedUser(id: uid, name: dto.name, email: dto.email);
-
-      final saveResult = await _userStorage.create(newUser);
-      if (saveResult.isError()) {
-        return Failure(saveResult.exceptionOrNull()!);
-      }
-
       final token = await firebaseUser.getIdToken() ?? '';
 
       return Success(
@@ -124,18 +116,6 @@ class AuthFirebaseClient implements AuthClientBase {
             'Nenhum usuário autenticado no Firebase.',
           ),
         );
-      }
-
-      // Atualizar no storage
-      final userToUpdate = LoadedUser(
-        id: dto.id,
-        name: dto.name,
-        email: dto.email,
-      );
-
-      final updateResult = await _userStorage.update(userToUpdate);
-      if (updateResult.isError()) {
-        return Failure(updateResult.exceptionOrNull()!);
       }
 
       final token = await currentUser.getIdToken() ?? '';
