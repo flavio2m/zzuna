@@ -21,6 +21,7 @@ class ContaListItem extends ConsumerWidget {
       descricao: contaDetails.descricao,
       bancoSigla: contaDetails.banco.sigla,
       ativo: contaDetails.ativo,
+      dataInicial: contaDetails.dataInicial,
     );
 
     ContaUpdateModal.show(context, dto);

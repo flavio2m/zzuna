@@ -21,7 +21,8 @@ class CartaoListItem extends StatelessWidget {
       limite: cartaoDetails.limite,
       bancoSigla: cartaoDetails.banco.sigla,
       ativo: cartaoDetails.ativo,
-      diaFechamento: cartaoDetails.diaFechamento, //
+      diaFechamento: cartaoDetails.diaFechamento,
+      dataInicial: cartaoDetails.dataInicial, //
     );
 
     CartaoUpdateModal.show(context, dto);
