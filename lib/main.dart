@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routefly/routefly.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'package:zzuna/data/services/storage/firebase/firebase_options.dart';
 
@@ -22,6 +23,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    
+    FirebaseDatabase.instance.setPersistenceEnabled(true);
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
@@ -50,7 +53,15 @@ class MainApp extends ConsumerWidget {
       next.whenData((user) {
         if (user is NotLoggedUser) {
           Routefly.navigate(routePaths.auth.login);
-        } else {
+        } else if (user is LoggedUser) {
+          final uid = user.id;
+          final db = FirebaseDatabase.instance;
+          
+          db.ref(uid).child('contas').keepSynced(true);
+          db.ref(uid).child('cartoes').keepSynced(true);
+          db.ref(uid).child('centros_custo').keepSynced(true);
+          db.ref(uid).child('categorias').keepSynced(true);
+
           Routefly.navigate(routePaths.home);
         }
       });
