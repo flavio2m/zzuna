@@ -180,6 +180,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
             onDateSelected: (date) {
               dto.setDataInicial(date);
             },
+            validator: validator.byField(dto, 'dataInicial'),
           ),
         ],
       ),

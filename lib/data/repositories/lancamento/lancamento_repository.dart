@@ -39,6 +39,7 @@ class LancamentoRepository
       origem: dto.origem,
       itens: dto.itens,
       conciliado: dto.conciliado,
+      anoMes: dto.anoMes!,
       grupo: dto.grupo,
       observacao: dto.observacao,
     );
@@ -61,6 +62,7 @@ class LancamentoRepository
             origem: dto.origem,
             itens: dto.itens,
             conciliado: dto.conciliado,
+            anoMes: dto.anoMes!,
             grupo: dto.grupo,
             observacao: dto.observacao,
           ),
@@ -86,6 +88,7 @@ class LancamentoRepository
       origem: dto.origem,
       itens: dto.itens,
       conciliado: dto.conciliado,
+      anoMes: dto.anoMes!,
       grupo: dto.grupo,
       observacao: dto.observacao,
     );
@@ -108,6 +111,7 @@ class LancamentoRepository
             origem: dto.origem,
             itens: dto.itens,
             conciliado: dto.conciliado,
+            anoMes: dto.anoMes!,
             grupo: dto.grupo,
             observacao: dto.observacao,
           ),
@@ -186,14 +190,11 @@ class LancamentoRepository
     required int ano,
     required Mes mes, //
   }) async {
-    final firstDay = DateTime(ano, mes.numero, 1);
-    final lastDay = DateTime(ano, mes.numero + 1, 0, 23, 59, 59, 999);
-
     final searchFields = [
       SearchField(
-        fieldName: 'data',
-        value: [firstDay, lastDay],
-        type: SearchFieldType.date, //
+        fieldName: 'anoMes',
+        value: ano * 100 + mes.numero,
+        type: SearchFieldType.int,
       ),
     ];
 
@@ -224,22 +225,11 @@ class LancamentoRepository
       );
     }
 
-    final firstDay = DateTime(filter.ano!, filter.mes!.numero, 1);
-    final lastDay = DateTime(
-      filter.ano!,
-      filter.mes!.numero + 1,
-      0,
-      23,
-      59,
-      59,
-      999,
-    );
-
     final searchFields = [
       SearchField(
-        fieldName: 'data',
-        value: [firstDay, lastDay],
-        type: SearchFieldType.date, //
+        fieldName: 'anoMes',
+        value: filter.ano! * 100 + filter.mes!.numero,
+        type: SearchFieldType.int,
       ),
     ];
 

@@ -137,6 +137,32 @@ void main() {
       expect(searchResult.getOrThrow().first.descricao, 'A');
     });
 
+    test('search filters by anoMes ignoring date', () async {
+      await repository.create(
+        LancamentoDto(
+          descricao: 'No mes passado mas caiu neste', 
+          anoMes: 202606, 
+          data: DateTime(2026, 5, 20),
+        ), 
+      );
+      await repository.create(
+        LancamentoDto(
+          descricao: 'Neste mes', 
+          anoMes: 202606, 
+          data: DateTime(2026, 6, 15),
+        ), 
+      );
+
+      final searchResult = await repository.search(
+        LancamentoFilterDto(mes: Mes.junho, ano: 2026), 
+      );
+
+      expect(searchResult.getOrThrow(), hasLength(2));
+      final descriptions = searchResult.getOrThrow().map((l) => l.descricao).toList();
+      expect(descriptions, contains('No mes passado mas caiu neste'));
+      expect(descriptions, contains('Neste mes'));
+    });
+
     test('observer emits RepositoryCreated after create', () async {
       final expectation = expectLater(
         repository.observer(),

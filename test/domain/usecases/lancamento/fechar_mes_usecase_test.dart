@@ -161,6 +161,7 @@ void main() {
             tipo: LancamentoTipo.despesa,
             itens: const [],
             conciliado: false, // NÃO CONCILIADO
+            anoMes: 202602,
           ),
         ];
 
@@ -193,6 +194,7 @@ void main() {
             ),
           ],
           conciliado: true,
+          anoMes: 202602,
         ),
       ];
 

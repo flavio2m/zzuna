@@ -247,6 +247,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
             onDateSelected: (date) {
               dto.setDataInicial(date);
             },
+            validator: validator.byField(dto, 'dataInicial'),
           ),
         ],
       ),

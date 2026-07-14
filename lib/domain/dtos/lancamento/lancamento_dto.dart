@@ -14,6 +14,7 @@ class LancamentoDto {
   String extratoFaturaId;
   List<LancamentoItem> itens;
   bool conciliado;
+  int? anoMes;
   LancamentoGrupo? grupo;
   String? observacao;
 
@@ -26,10 +27,13 @@ class LancamentoDto {
     this.extratoFaturaId = '',
     this.itens = const [],
     this.conciliado = false,
+    int? anoMes,
     this.grupo,
     this.observacao,
   }) : data = data ?? DateTime.now(),
-       origem = origem ?? const LancamentoOrigem.conta(contaId: '');
+       origem = origem ?? const LancamentoOrigem.conta(contaId: '') {
+    this.anoMes = anoMes ?? (this.data.year * 100 + this.data.month);
+  }
 
   LancamentoDto copyWith({
     String? id,
@@ -40,6 +44,7 @@ class LancamentoDto {
     String? extratoFaturaId,
     List<LancamentoItem>? itens,
     bool? conciliado,
+    int? anoMes,
     LancamentoGrupo? grupo,
     String? observacao,
   }) {
@@ -52,6 +57,7 @@ class LancamentoDto {
       extratoFaturaId: extratoFaturaId ?? this.extratoFaturaId,
       itens: itens ?? this.itens,
       conciliado: conciliado ?? this.conciliado,
+      anoMes: anoMes ?? this.anoMes,
       grupo: grupo ?? this.grupo,
       observacao: observacao ?? this.observacao,
     );
@@ -97,6 +103,10 @@ class LancamentoDto {
     this.conciliado = conciliado;
   }
 
+  void setAnoMes(int anoMes) {
+    this.anoMes = anoMes;
+  }
+
   void setGrupo(LancamentoGrupo? grupo) {
     this.grupo = grupo;
   }
@@ -114,6 +124,7 @@ class LancamentoDto {
     'extratoFaturaId': extratoFaturaId,
     'itens': itens.map((e) => e.toJson()).toList(),
     'conciliado': conciliado,
+    'anoMes': anoMes,
     'grupo': grupo?.toJson(),
     'observacao': observacao,
   };
@@ -132,6 +143,7 @@ class LancamentoDto {
           .map((e) => LancamentoItem.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       conciliado: json['conciliado'] ?? false,
+      anoMes: json['anoMes'],
       grupo: json['grupo'] != null
           ? LancamentoGrupo.fromJson(Map<String, dynamic>.from(json['grupo']))
           : null,
@@ -192,6 +204,7 @@ class LancamentoDto {
           )
           .toList(),
       conciliado: details.conciliado,
+      anoMes: details.anoMes,
       grupo: details.grupo,
       observacao: details.observacao,
     );
@@ -207,6 +220,7 @@ class LancamentoDto {
       extratoFaturaId: entity.extratoFaturaId,
       itens: entity.itens,
       conciliado: entity.conciliado,
+      anoMes: entity.anoMes,
       grupo: entity.grupo,
       observacao: entity.observacao,
     );

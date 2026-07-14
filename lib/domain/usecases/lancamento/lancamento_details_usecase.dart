@@ -292,6 +292,7 @@ class LancamentoDetailsUseCase {
       origem: origemDetail,
       itens: itemDetails,
       conciliado: l.conciliado,
+      anoMes: l.anoMes,
       grupo: l.grupo,
       observacao: l.observacao,
     );

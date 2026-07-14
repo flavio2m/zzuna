@@ -84,6 +84,7 @@ void main() {
         origem: origem,
         itens: const [],
         conciliado: true,
+        anoMes: 202606,
       );
     }
 

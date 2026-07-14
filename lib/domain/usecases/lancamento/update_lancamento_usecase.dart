@@ -99,8 +99,11 @@ class UpdateLancamentoUseCase {
     }
     final newExtrato = extratoResult.getOrNull()!;
 
-    // 6. Atualizar DTO com o novo ID de extrato/fatura
-    final updatedDto = dto.copyWith(extratoFaturaId: newExtrato.id);
+    // 6. Atualizar DTO com o novo ID de extrato/fatura e anoMes
+    final updatedDto = dto.copyWith(
+      extratoFaturaId: newExtrato.id,
+      anoMes: newExtrato.periodo,
+    );
 
     // 7. Persistir a alteração do lançamento no repositório
     final updateRes = await _repository.update(updatedDto);

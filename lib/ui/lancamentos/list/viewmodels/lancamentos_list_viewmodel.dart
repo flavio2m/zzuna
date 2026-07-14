@@ -190,8 +190,7 @@ class LancamentosListViewModel extends ChangeNotifier {
   bool _affectsCurrentOrPastMonth(Lancamento lancamento) {
     final mes = _currentFilter.mes ?? Mes.fromDate(DateTime.now());
     final ano = _currentFilter.ano ?? DateTime.now().year;
-    return lancamento.data.year <= ano &&
-        (lancamento.data.year < ano || lancamento.data.month <= mes.numero);
+    return lancamento.anoMes <= ano * 100 + mes.numero;
   }
 
   AsyncResult<LancamentoResumoMensal> _load() async {
