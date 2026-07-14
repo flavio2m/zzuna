@@ -64,7 +64,7 @@ class TransactionRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         color: selected
             ? AppColors.emerald50.withValues(alpha: 0.35)
             : AppColors.surface,
@@ -233,9 +233,9 @@ class TransactionRow extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
             reconcileButton,
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
             IconAcoesButton(lancamento: lancamento),
           ],
         ),
@@ -254,7 +254,7 @@ class _MetaChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 150),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      // padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.slate50,
         borderRadius: BorderRadius.circular(4),

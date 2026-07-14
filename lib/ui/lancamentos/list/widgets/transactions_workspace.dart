@@ -65,10 +65,10 @@ class TransactionsWorkspace extends ConsumerWidget {
                 actionsBar,
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(8),
                     itemCount: dias.length,
                     separatorBuilder: (context, index) =>
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final dia = dias[index];
                       return TransactionDayCard(dia: dia);
