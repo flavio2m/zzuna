@@ -12,6 +12,7 @@ import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_bu
 import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/widgets/lancamentos_update_origem_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
 class TransactionsActionsBar extends ConsumerWidget {
   final List<String> selectedIds;
@@ -41,8 +42,10 @@ class TransactionsActionsBar extends ConsumerWidget {
             allSelected: listViewModel.allSelected,
             onPressed: () => listViewModel.toggleSelectAll(),
           ),
-          const SizedBox(width: 24),
-          
+          const SizedBox(width: 12),
+          const AppText('|'),
+          const SizedBox(width: 12),
+
           // Fast Month Navigation
           Consumer(
             builder: (context, ref, _) {
@@ -56,10 +59,14 @@ class TransactionsActionsBar extends ConsumerWidget {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     splashRadius: 20,
-                    onPressed: (filterState.mes == Mes.janeiro && filterState.ano == 2025)
+                    onPressed:
+                        (filterState.mes == Mes.janeiro &&
+                            filterState.ano == 2025)
                         ? null
                         : () {
-                            ref.read(lancamentoFilterProvider.notifier).mesAnterior();
+                            ref
+                                .read(lancamentoFilterProvider.notifier)
+                                .mesAnterior();
                             listViewModel.pesquisar();
                           },
                   ),
@@ -78,10 +85,14 @@ class TransactionsActionsBar extends ConsumerWidget {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     splashRadius: 20,
-                    onPressed: (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
+                    onPressed:
+                        (filterState.mes == Mes.dezembro &&
+                            filterState.ano == maxYear)
                         ? null
                         : () {
-                            ref.read(lancamentoFilterProvider.notifier).proximoMes();
+                            ref
+                                .read(lancamentoFilterProvider.notifier)
+                                .proximoMes();
                             listViewModel.pesquisar();
                           },
                   ),
@@ -89,9 +100,11 @@ class TransactionsActionsBar extends ConsumerWidget {
               );
             },
           ),
-          
-          const SizedBox(width: 24),
-          
+
+          const SizedBox(width: 12),
+          const AppText('|'),
+          const SizedBox(width: 12),
+
           IconButton(
             icon: const Icon(Icons.add, size: 20),
             color: AppColors.primary,
@@ -104,7 +117,7 @@ class TransactionsActionsBar extends ConsumerWidget {
             constraints: const BoxConstraints(),
             splashRadius: 20,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.arrow_downward, size: 20),
             color: Theme.of(context).colorScheme.error,
@@ -117,7 +130,7 @@ class TransactionsActionsBar extends ConsumerWidget {
             constraints: const BoxConstraints(),
             splashRadius: 20,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded, size: 20),
             color: AppColors.indigo600,
@@ -128,19 +141,21 @@ class TransactionsActionsBar extends ConsumerWidget {
             splashRadius: 20,
           ),
           if (hasSelection && !listViewModel.isMesFechado) ...[
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
+            const AppText('|'),
+            const SizedBox(width: 12),
             LancamentosReconcileButton(
               conciliado: true,
               selectedIds: selectedIds,
               onSuccess: onClearSelection,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             LancamentosReconcileButton(
               conciliado: false,
               selectedIds: selectedIds,
               onSuccess: onClearSelection,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             LancamentosUpdateDataButton(
               onPressed: () {
                 LancamentosUpdateDataModal.show(
@@ -150,7 +165,7 @@ class TransactionsActionsBar extends ConsumerWidget {
                 );
               },
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             LancamentosUpdateOrigemButton(
               onPressed: () {
                 LancamentosUpdateOrigemModal.show(

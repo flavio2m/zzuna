@@ -11,7 +11,7 @@ class AppFilterCard extends StatefulWidget {
   const AppFilterCard({
     super.key,
     this.title = 'Opções',
-    this.initiallyExpanded = false,
+    this.initiallyExpanded = true,
     required this.child,
   });
 

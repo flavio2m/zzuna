@@ -1,11 +1,24 @@
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:zzuna/ui/home/pages/sobre_page.dart';
 
-enum HomePageTab { lancamentos, relatorios, contas, cartoes, centroCustos, categorias }
+enum HomePageTab {
+  lancamentos,
+  relatorios,
+  contas,
+  cartoes,
+  centroCustos,
+  categorias,
+}
 // enum _HomeMenuAction { logout }
 
 class HomeTopBar extends StatelessWidget {
-  const HomeTopBar({super.key, required this.selectedTab, required this.onTabSelected, required this.onLogout});
+  const HomeTopBar({
+    super.key,
+    required this.selectedTab,
+    required this.onTabSelected,
+    required this.onLogout,
+  });
 
   final HomePageTab selectedTab;
   final ValueChanged<HomePageTab> onTabSelected;
@@ -17,22 +30,65 @@ class HomeTopBar extends StatelessWidget {
       color: AppColors.slate900,
       child: Container(
         height: 38,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.only(left: 4, right: 24),
         decoration: const BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColors.slate950)),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.22)),
+            InkWell(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  backgroundColor: Colors.transparent,
+                  insetPadding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 600,
+                      maxHeight: 800,
+                    ),
+                    child: const ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                      child: SobrePage(),
+                    ),
+                  ),
+                ),
               ),
-              child: const Text(
-                'ZZuna',
-                style: TextStyle(color: AppColors.emerald400, fontSize: 10, fontWeight: FontWeight.w900),
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: OverflowBox(
+                        minWidth: 78,
+                        maxWidth: 78,
+                        minHeight: 78,
+                        maxHeight: 78,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            'assets/icons/zzuna_logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'ZZuna',
+                      style: TextStyle(
+                        color: AppColors.emerald400,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -51,12 +107,6 @@ class HomeTopBar extends StatelessWidget {
                     label: 'Lançamentos',
                     selected: selectedTab == HomePageTab.lancamentos,
                     onPressed: () => onTabSelected(HomePageTab.lancamentos),
-                  ),
-                  _TopTabButton(
-                    icon: Icons.bar_chart_outlined,
-                    label: 'Relatorios',
-                    selected: selectedTab == HomePageTab.relatorios,
-                    onPressed: () => onTabSelected(HomePageTab.relatorios),
                   ),
                   _TopTabButton(
                     icon: Icons.bar_chart_outlined,
@@ -86,37 +136,60 @@ class HomeTopBar extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Text(
-              'Simulacao: 05/Mar/2026',
-              style: TextStyle(color: AppColors.slate500, fontSize: 12, fontWeight: FontWeight.w600),
+            TextButton.icon(
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  backgroundColor: Colors.transparent,
+                  insetPadding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 600,
+                      maxHeight: 800,
+                    ),
+                    child: const ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                      child: SobrePage(),
+                    ),
+                  ),
+                ),
+              ),
+              icon: const Icon(
+                Icons.info_outline,
+                size: 16,
+                color: AppColors.slate400,
+              ),
+              label: const Text(
+                'Sobre',
+                style: TextStyle(color: AppColors.slate400, fontSize: 12),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+              ),
             ),
             const SizedBox(width: 10),
-            //Refatorar futuramente: utilizar menu para telas pequenas
-            // PopupMenuButton<_HomeMenuAction>(
-            //   tooltip: 'Opcoes',
-            //   icon: const Icon(Icons.more_vert, color: AppColors.slate200),
-            //   color: AppColors.surface,
-            //   onSelected: (action) {
-            //     switch (action) {
-            //       case _HomeMenuAction.logout:
-            //         onLogout();
-            //     }
-            //   },
-            //   itemBuilder: (context) => const [
-            //     PopupMenuItem(
-            //       value: _HomeMenuAction.logout,
-            //       child: Row(children: [Icon(Icons.logout, size: 18), SizedBox(width: 8), Text('Sair')]),
-            //     ),
-            //   ],
-            // ),
-            // Inicialmente será apresentado apenas o botão de logout
             TextButton.icon(
               onPressed: onLogout,
-              icon: const Icon(Icons.logout, size: 16, color: AppColors.slate200),
-              label: const Text('Sair', style: TextStyle(color: AppColors.slate200, fontSize: 12)),
+              icon: const Icon(
+                Icons.logout,
+                size: 16,
+                color: AppColors.slate200,
+              ),
+              label: const Text(
+                'Sair',
+                style: TextStyle(color: AppColors.slate200, fontSize: 12),
+              ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
                 backgroundColor: AppColors.slate800,
               ),
             ),
@@ -128,7 +201,12 @@ class HomeTopBar extends StatelessWidget {
 }
 
 class _TopTabButton extends StatelessWidget {
-  const _TopTabButton({required this.icon, required this.label, required this.selected, required this.onPressed});
+  const _TopTabButton({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onPressed,
+  });
 
   final IconData icon;
   final String label;

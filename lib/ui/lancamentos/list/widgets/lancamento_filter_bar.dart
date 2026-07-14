@@ -51,6 +51,7 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
     final maxYear = DateTime.now().year + 2;
 
     return AppFilterCard(
+      initiallyExpanded: false,
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
