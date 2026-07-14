@@ -27,14 +27,13 @@ class CategoriaRepository
 
   @override
   AsyncResult<Categoria> create(CategoriaDto dto) async {
-    // Verifica se já existe categoria com a mesma descrição
-    final exists = await findByDescricao(dto.descricao).then(
-      (result) => result.isSuccess(), //
-    );
+    // Verifica se já existe categoria com a mesma descrição no mesmo nível
+    final exists = await _existsDuplicate(dto.descricao, dto.categoriaPaiId);
     if (exists) {
       return Failure(
         RepositoryException(
-          'Já existe uma categoria com a descrição: ${dto.descricao}', //
+          'Já existe uma categoria com a descrição "${dto.descricao}" '
+          'neste nível.',
         ),
       );
     }
@@ -91,6 +90,19 @@ class CategoriaRepository
     if (existingResult.isError()) {
       return Failure(
         existingResult.exceptionOrNull()!, //
+      );
+    }
+    // Verifica se já existe categoria com a mesma descrição no mesmo nível
+    final exists = await _existsDuplicate(
+      dto.descricao,
+      dto.categoriaPaiId,
+      excludeId: dto.id,
+    );
+    if (exists) {
+      return Failure(
+        RepositoryException(
+          'Já existe uma categoria com a descrição "${dto.descricao}" neste nível.', //
+        ),
       );
     }
     // Se estiver alterando para subcategoria, validar nível
@@ -155,36 +167,21 @@ class CategoriaRepository
     return _storage.getById(id);
   }
 
-  AsyncResult<Categoria> findByDescricao(String descricao) async {
-    final searchFields = [
-      SearchField(
-        fieldName: 'descricao',
-        value: descricao,
-        type: SearchFieldType.string, //
-      ),
-    ];
-
-    final result = await _storage.searchByFields(searchFields);
-
-    return result.fold(
-      (categorias) {
-        if (categorias.isEmpty) {
-          return Failure(
-            LocalStorageException(
-              'Categoria não encontrada: $descricao', //
-            ),
-          );
-        }
-        return Success(categorias.first);
-      },
-      (error) {
-        return Failure(
-          LocalStorageException(
-            'Erro ao buscar categoria: $descricao', //
-          ),
-        );
-      },
-    );
+  Future<bool> _existsDuplicate(
+    String descricao,
+    String? categoriaPaiId, {
+    String? excludeId,
+  }) async {
+    final result = await getAll();
+    return result.fold((list) {
+      final filtered = list.where((c) {
+        if (c.categoriaPaiId != categoriaPaiId) return false;
+        if (excludeId != null && c.id == excludeId) return false;
+        return c.descricao.trim().toLowerCase() ==
+            descricao.trim().toLowerCase();
+      });
+      return filtered.isNotEmpty;
+    }, (error) => false);
   }
 
   @override
