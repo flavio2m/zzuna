@@ -87,8 +87,9 @@ class ExtratoFaturaRepository
     searchFields.add(
       SearchField(
         fieldName: 'ano',
-        value: filter.ano.toString(),
-        type: SearchFieldType.string, //
+        value: filter.ano,
+        type: SearchFieldType.int,
+        operator: SearchOperator.equal,
       ),
     );
 

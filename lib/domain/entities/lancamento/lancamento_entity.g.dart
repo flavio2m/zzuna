@@ -30,10 +30,10 @@ Map<String, dynamic> _$LancamentoToJson(_Lancamento instance) =>
       'data': instance.data.toIso8601String(),
       'descricao': instance.descricao,
       'extratoFaturaId': instance.extratoFaturaId,
-      'origem': instance.origem,
-      'itens': instance.itens,
+      'origem': instance.origem.toJson(),
+      'itens': instance.itens.map((e) => e.toJson()).toList(),
       'conciliado': instance.conciliado,
-      'grupo': instance.grupo,
+      'grupo': instance.grupo?.toJson(),
       'observacao': instance.observacao,
     };
 

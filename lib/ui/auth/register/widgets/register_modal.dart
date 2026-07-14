@@ -7,6 +7,7 @@ import 'package:zzuna/ui/shared/widgets/buttons/app_button.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_email_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +107,16 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
           ),
 
           _divider(),
+
+          AppEmailFormField(
+            label: 'E-mail',
+            icon: Icons.email,
+            onChanged: (value) {
+              dto.setEmail(value);
+              setState(() {});
+            },
+            validator: validator.byField(dto, 'email'),
+          ),
 
           _divider(),
 

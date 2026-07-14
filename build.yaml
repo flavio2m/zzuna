@@ -1,8 +1,6 @@
-# targets:
-#   $default:
-#     sources:
-#       include:
-#         - "lib/domain/**"
-#       exclude:
-#         - "lib/**.freezed.dart"
-#         - "lib/**.g.dart"
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true

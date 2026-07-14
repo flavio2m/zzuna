@@ -562,13 +562,15 @@ Essa abordagem reduz muito a chance de o LLM gerar código difícil de manter e 
 | OK | Alterar botão Adicionar para + Entrada e + Despesa |
 | OK | Colocar um loading em Lancamentos quando mudar o mês/ano |
 | OK | Implementar o fechamento do mês |
-| ☐ | No lançamento recorrente, colocar o número de lançamento sendo sequência
+| OK | No lançamento recorrente, colocar o número de lançamento sendo sequência
       1, 2, 3, etc. No momento de criar o lançamento, deve inserir a sequência
       tabém no final da descrição (LancamentoGrupoRecorrencia.sequencia)
       (ex: Recorrência Aluguel - 1, Recorrência Aluguel - 2, etc.)
       - Criar opção para alterar a sequência: o usuário poderar criar uma recorrência
       será 1, mas em ações poderá definir que aquela é a 20, por exemplo, o 
       próximo a ser gerado será o 21.
+| ☐ | Implementar opção para Excluir dados
+| ☐ | Implementar o sobre com data de compilação
 | ☐ | Criar uma opção para exportar lançamentos no formato XLS (lançamentos do mês) 
 | ☐ | Ciar opção para importar lançamentos (entradas/saídas) de uma planilha XLS
 ---

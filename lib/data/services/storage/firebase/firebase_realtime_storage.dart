@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
@@ -16,7 +17,13 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
     FirebaseDatabase? database,
   }) : _db = database ?? FirebaseDatabase.instance;
 
-  DatabaseReference get _ref => _db.ref(collectionName);
+  DatabaseReference get _ref {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw LocalStorageException('Usuário não autenticado no Firebase.');
+    }
+    return _db.ref(uid).child(collectionName);
+  }
 
   @override
   AsyncResult<T> create(T model) async {
@@ -55,7 +62,7 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
     try {
       final snapshot = await _ref.child(id).get();
       if (snapshot.exists && snapshot.value != null) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+        final data = _convertMap(snapshot.value as Map);
         return Success(fromJson(data));
       }
       return Failure(LocalStorageException('Item não encontrado com id: $id'));
@@ -71,8 +78,6 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
     try {
       final json = toJson(model);
       final id = json['id'] as String;
-      // using update instead of set to avoid overwriting unrelated nested fields,
-      // but since we save entire objects, set is also fine. We use set.
       await _ref.child(id).set(json);
       return Success(model);
     } catch (e, s) {
@@ -121,16 +126,127 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
       if (snapshot.exists && snapshot.value != null) {
         final map = snapshot.value as Map;
         final list = map.values
-            .map((v) => fromJson(Map<String, dynamic>.from(v as Map)))
+            .map((v) => fromJson(_convertMap(v as Map)))
             .toList();
         return Success(list);
       }
-      return const Success([]);
+      return Success(<T>[]);
     } catch (e, s) {
       return Failure(
         LocalStorageException('Erro ao buscar todos no Firebase: $e', s),
       );
     }
+  }
+
+  Map<String, dynamic> _convertMap(Map rawMap) {
+    final Map<String, dynamic> result = {};
+    if (rawMap.isEmpty) {
+      return result;
+    }
+    rawMap.forEach((key, value) {
+      if (key == null) return;
+      final String stringKey = key.toString();
+      if (value == null) {
+        result[stringKey] = null;
+      } else if (value is Map) {
+        result[stringKey] = _convertMap(value);
+      } else if (value is List) {
+        result[stringKey] = value.map((item) {
+          if (item is Map) return _convertMap(item);
+          return item;
+        }).toList();
+      } else {
+        result[stringKey] = value;
+      }
+    });
+    return result;
+  }
+
+  Map<String, SearchField?> _categorizeSearchFields(List<SearchField> fields) {
+    SearchField? dateField;
+    SearchField? boolField;
+    SearchField? stringField;
+    SearchField? intField;
+
+    for (final f in fields) {
+      if (f.type == SearchFieldType.date && dateField == null) {
+        dateField = f;
+      } else if (f.type == SearchFieldType.boolean && boolField == null) {
+        boolField = f;
+      } else if (f.type == SearchFieldType.string && stringField == null) {
+        stringField = f;
+      } else if (f.type == SearchFieldType.int && intField == null) {
+        intField = f;
+      }
+    }
+
+    return {
+      'date': dateField,
+      'boolean': boolField,
+      'string': stringField,
+      'int': intField,
+    };
+  }
+
+  Query _buildQuery(Map<String, SearchField?> fields) {
+    Query query = _ref;
+
+    if (fields['date'] != null) {
+      final field = fields['date']!;
+      query = query.orderByChild(field.fieldName);
+
+      if (field.operator == SearchOperator.between || field.value is List) {
+        final range = field.value as List;
+        final start = range[0] as DateTime?;
+        final end = range[1] as DateTime?;
+
+        if (start != null) {
+          query = query.startAt(start.toIso8601String());
+        }
+        if (end != null) {
+          query = query.endAt(end.toIso8601String());
+        }
+      } else {
+        if (field.value is DateTime) {
+          final dt = (field.value as DateTime).toIso8601String();
+          if (field.operator == SearchOperator.equal) {
+            query = query.equalTo(dt);
+          } else if (field.operator == SearchOperator.greaterThan ||
+              field.operator == SearchOperator.greaterThanOrEqual) {
+            query = query.startAt(dt);
+          } else if (field.operator == SearchOperator.lessThan ||
+              field.operator == SearchOperator.lessThanOrEqual) {
+            query = query.endAt(dt);
+          }
+        }
+      }
+    } else if (fields['boolean'] != null) {
+      final field = fields['boolean']!;
+      if (field.operator == SearchOperator.equal) {
+        query = query.orderByChild(field.fieldName).equalTo(field.value);
+      }
+    } else if (fields['string'] != null) {
+      final field = fields['string']!;
+      if (field.operator == SearchOperator.equal) {
+        query = query
+            .orderByChild(field.fieldName)
+            .startAt(field.value.toString())
+            .endAt('${field.value.toString()}\uf8ff');
+      }
+    } else if (fields['int'] != null) {
+      final field = fields['int']!;
+      if (field.operator == SearchOperator.equal) {
+        query = query.orderByChild(field.fieldName).equalTo(field.value);
+      } else if (field.operator == SearchOperator.greaterThan ||
+          field.operator == SearchOperator.greaterThanOrEqual) {
+        query = query.orderByChild(field.fieldName).startAt(field.value);
+      } else if (field.operator == SearchOperator.lessThan ||
+          field.operator == SearchOperator.lessThanOrEqual) {
+        query = query.orderByChild(field.fieldName).endAt(field.value);
+      }
+    }
+
+    return query;
   }
 
   @override
@@ -141,41 +257,28 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
     int? limit,
   }) async {
     try {
-      // Firebase Realtime DB limits querying to ONE field via orderByChild.
-      // So if orderBy is provided, we use it for the query.
-      // If no orderBy is provided but there is an equality filter, we can optimize by that field.
-      // However, since we support multiple fields and operators (between, etc),
-      // the safest generic approach is to fetch all OR fetch sorted by orderBy
-      // and then apply the rest of the filters in memory (which matches LocalStorage logic).
-      // For large datasets, proper composite keys (like periodo for extratoFatura) are the best.
-
       Query query = _ref;
+
+      // Firebase permite apenas um orderByChild por Query.
+      // Se tiver orderBy explicito, usamos ele. Senão, delegamos para o melhor filtro.
       if (orderBy != null) {
         query = query.orderByChild(orderBy);
-        // We cannot use startAt/endAt easily generically without knowing the types deeply,
-        // and limitToFirst depends on whether we also do in-memory filtering.
-        // If we filter in-memory, we can't limit at DB level securely unless it's just sorting.
       } else if (fields.isNotEmpty) {
-        // Try to optimize at least the first equality field
-        final eqField = fields
-            .where((f) => f.operator == SearchOperator.equal)
-            .firstOrNull;
-        if (eqField != null) {
-          query = query.orderByChild(eqField.fieldName).equalTo(eqField.value);
-        }
+        final categorizedFields = _categorizeSearchFields(fields);
+        query = _buildQuery(categorizedFields);
       }
 
       final snapshot = await query.get();
       if (!snapshot.exists || snapshot.value == null) {
-        return const Success([]);
+        return Success(<T>[]);
       }
 
       final map = snapshot.value as Map;
       var list = map.values
-          .map((v) => fromJson(Map<String, dynamic>.from(v as Map)))
+          .map((v) => fromJson(_convertMap(v as Map)))
           .toList();
 
-      // Apply in-memory filtering for the rest of the fields exactly like LocalStorage
+      // Aplicar filtros em memória para campos restantes
       list = list.where((item) {
         final itemMap = toJson(item);
 
@@ -258,8 +361,6 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
         });
       }).toList();
 
-      // If we used a custom DB sort but there were other filters, we might need to re-sort
-      // or if order was descending, DB orderByChild only does ascending.
       if (orderBy != null) {
         list.sort((a, b) {
           final aMap = toJson(a);

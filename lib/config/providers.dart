@@ -7,6 +7,8 @@ import 'package:zzuna/data/repositories/user/user_repository.dart';
 import 'package:zzuna/data/services/storage/providers/centro_custo_storage_provider.dart';
 import 'package:zzuna/ui/centro_custo/delete/viewmodel/centro_custo_delete_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/list/viewmodels/centro_custo_list_viewmodel.dart';
+import 'package:zzuna/data/services/auth/auth_client_base.dart';
+import 'package:zzuna/data/services/auth/firebase/auth_firebase_client.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/shared_preferences_service.dart';
 import 'package:zzuna/data/services/storage/providers/cartao_storage_provider.dart';
@@ -36,6 +38,7 @@ import 'package:zzuna/ui/cartao/update/viewmodels/cartao_update_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
@@ -110,6 +113,20 @@ final authLocalClientProvider = Provider<AuthLocalClient>(
   (ref) => AuthLocalClient(ref.watch(userLocalStorageProvider)), //
 );
 
+/// Provider para cliente de autenticação Firebase
+final authFirebaseClientProvider = Provider<AuthFirebaseClient>(
+  (ref) => AuthFirebaseClient(ref.watch(userLocalStorageProvider)), //
+);
+
+/// Provider condicional de autenticação
+final authClientProvider = Provider<AuthClientBase>((ref) {
+  if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
+    return ref.watch(authLocalClientProvider);
+  } else {
+    return ref.watch(authFirebaseClientProvider);
+  }
+});
+
 final sharedPreferencesServiceProvider = Provider<SharedPreferencesService>(
   (ref) => SharedPreferencesService(),
 );
@@ -130,7 +147,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 /// Provider para AuthRepository com lifecycle gerenciado
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final repository = AuthRepository(
-    ref.watch(authLocalClientProvider),
+    ref.watch(authClientProvider),
     ref.watch(userRepositoryProvider), //
   );
 

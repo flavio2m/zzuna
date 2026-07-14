@@ -1,0 +1,30 @@
+{
+  "rules": {
+    "$uid": {
+      ".read": "$uid === auth.uid",
+      ".write": "$uid === auth.uid",
+      
+      "cartoes": {
+        ".indexOn": ["isDeleted", "nome", "ativo"]
+      },
+      "categorias": {
+        ".indexOn": ["isDeleted", "nome", "tipo"]
+      },
+      "centro_custos": {
+        ".indexOn": ["isDeleted", "nome"]
+      },
+      "contas": {
+        ".indexOn": ["isDeleted", "nome", "ativo"]
+      },
+      "extrato_faturas": {
+        ".indexOn": ["isDeleted", "periodo", "origemKey", "ano", "mes", "fechado"]
+      },
+      "lancamentos": {
+        ".indexOn": ["isDeleted", "data", "extratoFaturaId", "tipo", "conciliado"]
+      },
+      "users": {
+        ".indexOn": ["isDeleted", "email", "nome"]
+      }
+    }
+  }
+}
