@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:js_interop';
-
-// For web JS interop in modern Dart
-@JS('appVersion')
-external JSString? get appVersionJS;
 
 class SobrePage extends StatefulWidget {
   final Widget? leading;
@@ -17,13 +11,13 @@ class SobrePage extends StatefulWidget {
 class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
-  late AnimationController _rotateController;
 
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  late Animation<double> _rotateAnimation;
 
-  String _version = 'Carregando...';
+  // Variables to be replaced by deploy.sh
+  String _version = '1.0.0';
+  String _dataAtualizacao = '14/07/2026 12:44';
 
   @override
   void initState() {
@@ -39,11 +33,6 @@ class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _rotateController = AnimationController(
-      duration: const Duration(seconds: 8),
-      vsync: this,
-    );
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
@@ -53,58 +42,21 @@ class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
           CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
         );
 
-    _rotateAnimation = Tween<double>(
-      begin: 0.0,
-      end: 2.0,
-    ).animate(CurvedAnimation(parent: _rotateController, curve: Curves.linear));
-
     // Iniciar animações
     _fadeController.forward();
     _slideController.forward();
-    _rotateController.repeat();
-
-    // Carrega a versão
-    _loadVersion();
-  }
-
-  Future<void> _loadVersion() async {
-    try {
-      if (kIsWeb) {
-        // Lê a versão das variáveis JavaScript globais (usando js_interop)
-        final version = appVersionJS?.toDart ?? '1.0.0';
-        if (mounted) {
-          setState(() {
-            _version = version;
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _version = '1.0.0';
-          });
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _version = '1.0.0';
-        });
-      }
-    }
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
-    _rotateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dataAtualizacao = '14/07/2026';
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -230,7 +182,7 @@ class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              dataAtualizacao,
+                              _dataAtualizacao,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(
                                   alpha: 0.7,
