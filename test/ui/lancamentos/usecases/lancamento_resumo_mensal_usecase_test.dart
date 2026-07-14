@@ -6,6 +6,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
+import 'package:zzuna/domain/statics/banco/banco_regiao.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
@@ -23,7 +24,7 @@ void main() {
       id: 'conta-1',
       descricao: 'Conta 1',
       ativo: true,
-      banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros),
+      banco: const Banco(descricao: 'Banco 1', sigla: 'B1', icon: BancoIcon.outros, regiao: RegiaoBanco.brasil),
       dataInicial: DateTime(2026, 1, 1),
     );
 

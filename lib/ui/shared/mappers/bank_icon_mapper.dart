@@ -16,6 +16,9 @@ class BankIconMapper {
       case BancoIcon.santander:
       case BancoIcon.sicoob:
       case BancoIcon.sicredi:
+      case BancoIcon.wizink:
+      case BancoIcon.novoBanco:
+      case BancoIcon.openbank:
         return Icons.account_balance;
     }
   }
