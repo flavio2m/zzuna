@@ -19,6 +19,7 @@ import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -35,6 +36,7 @@ void main() {
   late LocalStorage<ExtratoFatura> extratoStorage;
 
   late LancamentoOrigem origemConta;
+  late LancamentoOrigem origemCartaoTest;
   late DateTime dataInicialConta;
 
   setUp(() async {
@@ -86,6 +88,20 @@ void main() {
       ),
     );
     origemConta = LancamentoOrigem.conta(contaId: conta.getOrThrow().id);
+
+    final cartaoResult = await cartaoRepository.create(
+      CartaoDto(
+        descricao: 'Cartão 1',
+        limite: 1000,
+        bancoSigla: 'NUB',
+        diaFechamento: 12,
+        ativo: true,
+        dataInicial: DateTime(2026, 1, 1),
+      ),
+    );
+    origemCartaoTest = LancamentoOrigem.cartao(
+      cartaoId: cartaoResult.getOrThrow().id,
+    );
   });
 
   tearDown(() {
@@ -478,6 +494,99 @@ void main() {
             'Não é possível editar lançamentos de um período encerrado.',
           ),
         );
+      },
+    );
+    test(
+      'Should change extratoFaturaIds properly when moving cartao dates across diaFechamento boundaries in a group',
+      () async {
+        final origemCartao = origemCartaoTest;
+
+        // P1: 15/07/2026 (Falls on 07/2026 invoice)
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 1/2 CC',
+            origem: origemCartao,
+            data: DateTime(2026, 7, 15),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-cc',
+              parcela: 1,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 100.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        // P2: 15/08/2026 (Falls on 08/2026 invoice)
+        final l2 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Parcela 2/2 CC',
+            origem: origemCartao,
+            data: DateTime(2026, 8, 15),
+            grupo: const LancamentoGrupo.parcelamento(
+              grupoId: 'grupo-cc',
+              parcela: 2,
+              totalParcelas: 2,
+            ),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 100.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        // Let's verify initial invoices
+        final e1Initial = (await extratoRepository.getById(
+          l1.extratoFaturaId,
+        )).getOrThrow();
+        expect(e1Initial.mes.numero, 7);
+        final e2Initial = (await extratoRepository.getById(
+          l2.extratoFaturaId,
+        )).getOrThrow();
+        expect(e2Initial.mes.numero, 8);
+
+        // Update P1 to 11/07/2026.
+        // 11 < 12 (diaFechamento). Therefore P1 moves to 06/2026.
+        // P2 should cascade to 11/08/2026. 11 < 12. P2 moves to 07/2026.
+        final res = await updateDataGrupoUseCase.execute(
+          lancamentoId: l1.id,
+          novaData: DateTime(2026, 7, 11),
+        );
+        expect(res.isSuccess(), isTrue);
+
+        final updatedL1 = (await lancamentoRepository.getById(
+          l1.id,
+        )).getOrThrow();
+        final updatedL2 = (await lancamentoRepository.getById(
+          l2.id,
+        )).getOrThrow();
+
+        // Retrieve new extratos
+        final e1New = (await extratoRepository.getById(
+          updatedL1.extratoFaturaId,
+        )).getOrThrow();
+        final e2New = (await extratoRepository.getById(
+          updatedL2.extratoFaturaId,
+        )).getOrThrow();
+
+        // Assert they moved to June and July invoices respectively
+        expect(e1New.mes.numero, 6);
+        expect(e1New.ano, 2026);
+
+        expect(e2New.mes.numero, 7);
+        expect(e2New.ano, 2026);
       },
     );
   });

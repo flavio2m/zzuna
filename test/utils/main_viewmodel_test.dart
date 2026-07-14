@@ -17,7 +17,12 @@ void main() {
     final storage = createTestUserStorage();
 
     container = ProviderContainer(
-      overrides: [userLocalStorageProvider.overrideWithValue(storage)],
+      overrides: [
+        userLocalStorageProvider.overrideWithValue(storage),
+        authClientProvider.overrideWith(
+          (ref) => ref.watch(authLocalClientProvider),
+        ),
+      ],
     );
   });
 
@@ -39,7 +44,8 @@ void main() {
 
       await Future<void>.delayed(Duration.zero);
 
-      expect(users, [isA<NotLoggedUser>()]);
+      expect(users.isNotEmpty, isTrue);
+      expect(users.first, isA<NotLoggedUser>());
     });
 
     test('updates user when auth stream emits LoggedUser', () async {

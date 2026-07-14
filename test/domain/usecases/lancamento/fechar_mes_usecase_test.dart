@@ -143,7 +143,7 @@ void main() {
       expect(result.isError(), isTrue);
       expect(
         result.exceptionOrNull()!.toString(),
-        contains('Existe mês anterior não fechado'),
+        contains('mês anterior não está fechado'),
       );
     });
 

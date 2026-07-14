@@ -23,6 +23,7 @@ import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart
 import 'package:zzuna/domain/usecases/lancamento/create_transferencia_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -42,6 +43,7 @@ void main() {
 
   late LancamentoOrigem origemConta;
   late LancamentoOrigem origemConta2;
+  late LancamentoOrigem origemCartaoTest;
   late DateTime dataInicialConta;
 
   setUp(() async {
@@ -116,6 +118,20 @@ void main() {
       ),
     );
     origemConta2 = LancamentoOrigem.conta(contaId: conta2.getOrThrow().id);
+
+    final cartaoResult = await cartaoRepository.create(
+      CartaoDto(
+        descricao: 'Cartão 1',
+        limite: 1000,
+        bancoSigla: 'NUB',
+        diaFechamento: 12,
+        ativo: true,
+        dataInicial: DateTime(2026, 1, 1),
+      ),
+    );
+    origemCartaoTest = LancamentoOrigem.cartao(
+      cartaoId: cartaoResult.getOrThrow().id,
+    );
   });
 
   tearDown(() {
@@ -495,6 +511,86 @@ void main() {
         )).getOrThrow();
         expect(updatedSaida.data, novaData);
         expect(updatedEntrada.data, novaData);
+      },
+    );
+    test(
+      'Should change extratoFaturaIds properly when moving multiple cartao dates across diaFechamento boundaries',
+      () async {
+        final origemCartao = origemCartaoTest;
+
+        // 1. Criar dois lançamentos no cartão em 15/07/2026 (fatura de Julho/2026)
+        final l1 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Ifood',
+            origem: origemCartao,
+            data: DateTime(2026, 7, 15),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 50.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        final l2 = (await createLancamentoUseCase.execute(
+          LancamentoDto(
+            tipo: LancamentoTipo.despesa,
+            descricao: 'Uber',
+            origem: origemCartao,
+            data: DateTime(2026, 7, 15),
+            itens: [
+              LancamentoItem(
+                numero: 1,
+                categoriaId: 'cat-1',
+                centroCustoId: 'cc-1',
+                valor: 20.0,
+              ),
+            ],
+          ),
+        )).getOrThrow();
+
+        // Verificar fatura inicial (Julho)
+        final e1Initial = (await extratoRepository.getById(
+          l1.extratoFaturaId,
+        )).getOrThrow();
+        expect(e1Initial.mes.numero, 7);
+
+        // 2. Mover ambos para 11/07/2026
+        // Como o fechamento é dia 12, compras dia 11 caem na fatura do mês anterior (Junho)
+        final novaData = DateTime(2026, 7, 11);
+        final res = await updateDataUseCase.execute(
+          ids: [l1.id, l2.id],
+          novaData: novaData,
+        );
+        expect(res.isSuccess(), isTrue);
+
+        // 3. Verificar que as datas foram atualizadas
+        final checkL1 = (await lancamentoRepository.getById(
+          l1.id,
+        )).getOrThrow();
+        final checkL2 = (await lancamentoRepository.getById(
+          l2.id,
+        )).getOrThrow();
+        expect(checkL1.data, novaData);
+        expect(checkL2.data, novaData);
+
+        // 4. Verificar que caíram na fatura de Junho
+        final e1New = (await extratoRepository.getById(
+          checkL1.extratoFaturaId,
+        )).getOrThrow();
+        final e2New = (await extratoRepository.getById(
+          checkL2.extratoFaturaId,
+        )).getOrThrow();
+
+        expect(e1New.mes.numero, 6);
+        expect(e1New.ano, 2026);
+
+        expect(e2New.mes.numero, 6);
+        expect(e2New.ano, 2026);
       },
     );
   });

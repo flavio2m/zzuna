@@ -60,17 +60,10 @@ class AuthLocalClient implements AuthClientBase {
 
   @override
   AsyncResult<LoggedUser> registerUser(RegisterUserDto dto) async {
-    final id = dto.id ?? Uuid().v4();
+    final id = dto.id ?? const Uuid().v4();
 
-    // Precisamos de fato salvar o usuário no Storage (Local ou Firebase)
-    final newUser = LoadedUser(id: id, name: dto.name, email: dto.email);
-
-    final saveResult = await _userStorage.create(newUser);
-
-    if (saveResult.isError()) {
-      return Failure(saveResult.exceptionOrNull()!);
-    }
-
+    // A criação do usuário no banco de dados é feita pelo UserRepository.
+    // O AuthLocalClient apenas simula o provedor de auth e retorna o usuário logado.
     return Success(_createLoggedUser(id: id, name: dto.name, email: dto.email));
   }
 
