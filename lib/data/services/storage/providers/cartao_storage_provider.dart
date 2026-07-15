@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/data/services/storage/firebase/firebase_realtime_storage.dart';
+import 'package:zzuna/data/services/storage/cached/cached_storage_decorator.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 
 final cartaoStorageProvider = Provider<BaseStorage<Cartao>>((ref) {
@@ -13,10 +14,14 @@ final cartaoStorageProvider = Provider<BaseStorage<Cartao>>((ref) {
       toJson: (cartao) => cartao.toJson(),
     );
   } else {
-    return FirebaseRealtimeStorage<Cartao>(
+    return CachedStorageDecorator<Cartao>(
       collectionName: 'cartoes',
-      fromJson: (json) => Cartao.fromJson(json),
-      toJson: (cartao) => cartao.toJson(),
+      // ttl: const Duration(minutes: 60),
+      innerStorage: FirebaseRealtimeStorage<Cartao>(
+        collectionName: 'cartoes',
+        fromJson: (json) => Cartao.fromJson(json),
+        toJson: (cartao) => cartao.toJson(),
+      ),
     );
   }
 });

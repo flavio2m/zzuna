@@ -3,6 +3,7 @@ import 'package:zzuna/data/seed/app_seed.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routefly/routefly.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -24,7 +25,9 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    FirebaseDatabase.instance.setPersistenceEnabled(true);
+    if (!kIsWeb) {
+      FirebaseDatabase.instance.setPersistenceEnabled(true);
+    }
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
@@ -55,12 +58,14 @@ class MainApp extends ConsumerWidget {
           Routefly.navigate(routePaths.auth.login);
         } else if (user is LoggedUser) {
           final uid = user.id;
-          final db = FirebaseDatabase.instance;
 
-          db.ref(uid).child('contas').keepSynced(true);
-          db.ref(uid).child('cartoes').keepSynced(true);
-          db.ref(uid).child('centros_custo').keepSynced(true);
-          db.ref(uid).child('categorias').keepSynced(true);
+          if (!kIsWeb) {
+            final db = FirebaseDatabase.instance;
+            db.ref(uid).child('contas').keepSynced(true);
+            db.ref(uid).child('cartoes').keepSynced(true);
+            db.ref(uid).child('centros_custo').keepSynced(true);
+            db.ref(uid).child('categorias').keepSynced(true);
+          }
 
           Routefly.navigate(routePaths.home);
         }

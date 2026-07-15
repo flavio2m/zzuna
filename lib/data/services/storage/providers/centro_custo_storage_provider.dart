@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/data/services/storage/firebase/firebase_realtime_storage.dart';
+import 'package:zzuna/data/services/storage/cached/cached_storage_decorator.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 
 final centroCustoStorageProvider = Provider<BaseStorage<CentroCusto>>((ref) {
@@ -13,10 +14,14 @@ final centroCustoStorageProvider = Provider<BaseStorage<CentroCusto>>((ref) {
       toJson: (centro) => centro.toJson(),
     );
   } else {
-    return FirebaseRealtimeStorage<CentroCusto>(
+    return CachedStorageDecorator<CentroCusto>(
       collectionName: 'centro_custos',
-      fromJson: (json) => CentroCusto.fromJson(json),
-      toJson: (centro) => centro.toJson(),
+      // ttl: const Duration(minutes: 60),
+      innerStorage: FirebaseRealtimeStorage<CentroCusto>(
+        collectionName: 'centro_custos',
+        fromJson: (json) => CentroCusto.fromJson(json),
+        toJson: (centro) => centro.toJson(),
+      ),
     );
   }
 });

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
@@ -29,6 +31,12 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
   AsyncResult<T> create(T model) async {
     try {
       final json = toJson(model);
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] CREATE - JSON gerado: $json',
+          name: 'FirebaseRealtime',
+        );
+      }
       final id = json['id'] as String;
       await _ref.child(id).set(json);
       return Success(model);
@@ -40,6 +48,12 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
   @override
   AsyncResult<Unit> createAll(List<T> models) async {
     try {
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] CREATE ALL - Inserindo ${models.length} itens.',
+          name: 'FirebaseRealtime',
+        );
+      }
       final updates = <String, dynamic>{};
       for (final model in models) {
         final json = toJson(model);
@@ -77,6 +91,12 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
   AsyncResult<T> update(T model) async {
     try {
       final json = toJson(model);
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] UPDATE - JSON gerado: $json',
+          name: 'FirebaseRealtime',
+        );
+      }
       final id = json['id'] as String;
       await _ref.child(id).set(json);
       return Success(model);
@@ -90,6 +110,12 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
   @override
   AsyncResult<Unit> updateAll(List<T> models) async {
     try {
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] UPDATE ALL - Atualizando ${models.length} itens.',
+          name: 'FirebaseRealtime',
+        );
+      }
       final updates = <String, dynamic>{};
       for (final model in models) {
         final json = toJson(model);
@@ -128,7 +154,22 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
         final list = map.values
             .map((v) => fromJson(_convertMap(v as Map)))
             .toList();
+
+        if (kDebugMode) {
+          developer.log(
+            '[$collectionName] GET ALL - Retornados ${list.length} itens da base.',
+            name: 'FirebaseRealtime',
+          );
+        }
+
         return Success(list);
+      }
+
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] GET ALL - Retornados 0 itens da base.',
+          name: 'FirebaseRealtime',
+        );
       }
       return Success(<T>[]);
     } catch (e, s) {
@@ -159,6 +200,12 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
         result[stringKey] = value;
       }
     });
+    // if (kDebugMode) {
+    //   developer.log(
+    //     '[$collectionName] _convertMap result: $result',
+    //     name: 'FirebaseRealtime',
+    //   );
+    // }
     return result;
   }
 
@@ -246,6 +293,13 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
       }
     }
 
+    if (kDebugMode) {
+      developer.log(
+        '[$collectionName] _buildQuery gerado com filtros base: ${fields.keys.where((k) => fields[k] != null).join(', ')}',
+        name: 'FirebaseRealtime',
+      );
+    }
+
     return query;
   }
 
@@ -257,6 +311,18 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
     int? limit,
   }) async {
     try {
+      final stopwatch = Stopwatch()..start();
+      if (kDebugMode) {
+        developer.log(
+          '=== INICIANDO BUSCA EM [$collectionName] ===',
+          name: 'FirebaseRealtime',
+        );
+        developer.log(
+          'Campos: ${fields.map((f) => '${f.fieldName} ${f.operator.name} ${f.value}').join(', ')}',
+          name: 'FirebaseRealtime',
+        );
+      }
+
       Query query = _ref;
 
       // Firebase permite apenas um orderByChild por Query.
@@ -277,6 +343,17 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
       var list = map.values
           .map((v) => fromJson(_convertMap(v as Map)))
           .toList();
+
+      if (kDebugMode) {
+        developer.log(
+          'Documentos retornados do Firebase: ${list.length}',
+          name: 'FirebaseRealtime',
+        );
+        developer.log(
+          'Tempo até leitura remota: ${stopwatch.elapsedMilliseconds}ms',
+          name: 'FirebaseRealtime',
+        );
+      }
 
       // Aplicar filtros em memória para campos restantes
       list = list.where((item) {
@@ -387,6 +464,19 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
 
       if (limit != null && limit > 0 && list.length > limit) {
         list = list.sublist(0, limit);
+      }
+
+      stopwatch.stop();
+      if (kDebugMode) {
+        developer.log(
+          'Documentos finais após filtro em memória: ${list.length}',
+          name: 'FirebaseRealtime',
+        );
+        developer.log(
+          'Tempo total da consulta: ${stopwatch.elapsedMilliseconds}ms',
+          name: 'FirebaseRealtime',
+        );
+        developer.log('=== FIM DA BUSCA ===', name: 'FirebaseRealtime');
       }
 
       return Success(list);

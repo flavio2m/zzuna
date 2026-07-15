@@ -114,6 +114,7 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
               dto.setDescricao(value);
               setState(() {});
             },
+            onFieldSubmitted: (_) => _bancoFocus.requestFocus(),
             validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
