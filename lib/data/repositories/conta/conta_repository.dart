@@ -167,7 +167,8 @@ class ContaRepository
         SearchField(
           fieldName: 'descricao',
           value: filter.descricao,
-          type: SearchFieldType.string, //
+          type: SearchFieldType.string,
+          operator: SearchOperator.contains,
         ),
       );
     }

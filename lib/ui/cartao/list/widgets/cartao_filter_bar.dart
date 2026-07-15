@@ -11,14 +11,34 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 
-class CartaoFilterBar extends ConsumerWidget {
+class CartaoFilterBar extends ConsumerStatefulWidget {
   const CartaoFilterBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CartaoFilterBar> createState() => _CartaoFilterBarState();
+}
+
+class _CartaoFilterBarState extends ConsumerState<CartaoFilterBar> {
+  final _descricaoController = TextEditingController();
+  final _descricaoFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _descricaoController.dispose();
+    _descricaoFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = ref.read(cartaoListViewModelProvider);
+    _descricaoController.text = viewModel.descricaoQuery ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = ref.watch(cartaoListViewModelProvider);
-    TextEditingController? descricaoController = TextEditingController();
-    final descricaoFocusNode = FocusNode();
 
     return AppFilterCard(
       child: Wrap(
@@ -28,8 +48,8 @@ class CartaoFilterBar extends ConsumerWidget {
           SizedBox(
             width: 300,
             child: AppTextFormField(
-              controller: descricaoController,
-              focusNode: descricaoFocusNode,
+              controller: _descricaoController,
+              focusNode: _descricaoFocusNode,
               textInputAction: TextInputAction.search,
               label: 'Descrição',
               onChanged: (value) {
@@ -37,37 +57,44 @@ class CartaoFilterBar extends ConsumerWidget {
               },
               onFieldSubmitted: (_) {
                 viewModel.pesquisar();
+                _descricaoFocusNode.requestFocus();
               },
             ),
           ),
 
           SizedBox(
             width: 220,
-            child: AppDropdownFormField<String>(
-              label: 'Banco',
-              value: viewModel.bancoSelecionado,
-              items: [
-                AppDropdownMenuItem(value: '', label: 'Todos'),
-                ...Bancos.items.map(
-                  (banco) => AppDropdownMenuItem(
-                    value: banco.sigla,
-                    label: banco.descricao, //
+            child: ListenableBuilder(
+              listenable: viewModel.loadCommand,
+              builder: (context, _) => AppDropdownFormField<String>(
+                label: 'Banco',
+                value: viewModel.bancoSelecionado,
+                items: [
+                  AppDropdownMenuItem(value: '', label: 'Todos'),
+                  ...Bancos.items.map(
+                    (banco) => AppDropdownMenuItem(
+                      value: banco.sigla,
+                      label: banco.descricao, //
+                    ),
                   ),
-                ),
-              ],
-              onChanged: (value) {
-                viewModel.setBanco(value);
-              },
+                ],
+                onChanged: (value) {
+                  viewModel.setBanco(value);
+                },
+              ),
             ),
           ),
 
           SizedBox(
             width: 160,
-            child: AppStatusDropdown(
-              value: viewModel.statusSelecionado,
-              onChanged: (value) {
-                viewModel.setStatus(value);
-              },
+            child: ListenableBuilder(
+              listenable: viewModel.loadCommand,
+              builder: (context, _) => AppStatusDropdown(
+                value: viewModel.statusSelecionado,
+                onChanged: (value) {
+                  viewModel.setStatus(value);
+                },
+              ),
             ),
           ),
 

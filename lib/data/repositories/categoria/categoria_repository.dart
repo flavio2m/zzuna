@@ -191,7 +191,8 @@ class CategoriaRepository
         SearchField(
           fieldName: 'descricao',
           value: filter.descricao,
-          type: SearchFieldType.string, //
+          type: SearchFieldType.string,
+          operator: SearchOperator.contains,
         ),
       );
     }
@@ -208,9 +209,7 @@ class CategoriaRepository
     return result.fold(
       Success.new,
       (error) => Failure(
-        RepositoryException(
-          'Erro ao buscar categorias: ${error.toString()}',
-        ),
+        RepositoryException('Erro ao buscar categorias: ${error.toString()}'),
       ),
     );
   }

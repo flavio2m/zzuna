@@ -21,7 +21,15 @@ enum SearchFieldType { string, boolean, date, int }
 ///
 /// Intervalo:
 ///   data between [01/01, 31/01]
-enum SearchOperator { equal, lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, between }
+enum SearchOperator {
+  equal,
+  lessThan,
+  lessThanOrEqual,
+  greaterThan,
+  greaterThanOrEqual,
+  between,
+  contains,
+}
 
 /// Ordenação dos resultados.
 enum SearchOrder { ascending, descending }
