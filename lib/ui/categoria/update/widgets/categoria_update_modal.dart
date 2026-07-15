@@ -158,6 +158,9 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
             focusNode: _descFocus,
             controller: _descController,
             textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => widget.temSubcategorias
+                ? _ativoFocus.requestFocus()
+                : _paiFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});

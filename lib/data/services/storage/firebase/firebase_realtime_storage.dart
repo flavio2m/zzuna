@@ -336,6 +336,26 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
 
       final snapshot = await query.get();
       if (!snapshot.exists || snapshot.value == null) {
+        if (kDebugMode) {
+          stopwatch.stop();
+          developer.log(
+            'Documentos retornados do Firebase: 0',
+            name: 'FirebaseRealtime',
+          );
+          developer.log(
+            'Tempo até leitura remota: ${stopwatch.elapsedMilliseconds}ms',
+            name: 'FirebaseRealtime',
+          );
+          developer.log(
+            'Documentos finais após filtro em memória: 0',
+            name: 'FirebaseRealtime',
+          );
+          developer.log(
+            'Tempo total da consulta: ${stopwatch.elapsedMilliseconds}ms',
+            name: 'FirebaseRealtime',
+          );
+          developer.log('=== FIM DA BUSCA ===', name: 'FirebaseRealtime');
+        }
         return Success(<T>[]);
       }
 

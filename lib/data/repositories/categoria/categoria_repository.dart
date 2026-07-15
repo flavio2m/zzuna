@@ -209,7 +209,7 @@ class CategoriaRepository
       Success.new,
       (error) => Failure(
         RepositoryException(
-          'Erro ao buscar categorias', //
+          'Erro ao buscar categorias: ${error.toString()}',
         ),
       ),
     );

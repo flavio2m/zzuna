@@ -70,7 +70,7 @@ class _CentroCustoUpdateModalState
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
-    
+
     _descController.dispose();
     _descFocus.dispose();
     _ativoFocus.dispose();
@@ -131,6 +131,7 @@ class _CentroCustoUpdateModalState
             focusNode: _descFocus,
             controller: _descController,
             textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _ativoFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
