@@ -174,7 +174,10 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     }
 
     if (_centroCustoId.isEmpty && viewModel.centros.isNotEmpty) {
-      _centroCustoId = viewModel.centros.first.id;
+      final defaultCentro =
+          viewModel.centros.where((c) => c.padrao).firstOrNull ??
+          viewModel.centros.first;
+      _centroCustoId = defaultCentro.id;
       _syncItem1();
       needsUpdate = true;
     }

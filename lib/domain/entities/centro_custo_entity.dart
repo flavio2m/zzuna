@@ -8,7 +8,8 @@ sealed class CentroCusto with _$CentroCusto {
   const factory CentroCusto({
     required String id,
     required String descricao,
-    required bool ativo, //
+    required bool ativo,
+    @Default(false) bool padrao,
   }) = _CentroCusto;
 
   factory CentroCusto //
@@ -20,7 +21,8 @@ sealed class CentroCustoDetails with _$CentroCustoDetails {
   const factory CentroCustoDetails({
     required String id,
     required String descricao,
-    required bool ativo, //
+    required bool ativo,
+    @Default(false) bool padrao,
   }) = _CentroCustoDetails;
 
   factory CentroCustoDetails //

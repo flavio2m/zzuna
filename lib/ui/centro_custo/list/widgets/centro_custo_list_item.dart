@@ -23,7 +23,8 @@ class CentroCustoListItem extends StatelessWidget {
     final dto = CentroCustoDto(
       id: centroCusto.id,
       descricao: centroCusto.descricao,
-      ativo: centroCusto.ativo, //
+      ativo: centroCusto.ativo,
+      padrao: centroCusto.padrao,
     );
     CentroCustoUpdateModal.show(context, dto);
   }
@@ -36,7 +37,9 @@ class CentroCustoListItem extends StatelessWidget {
         children: [
           const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
           Icon(
-            centroCusto.ativo ? Icons.account_balance : Icons.account_balance_outlined,
+            centroCusto.ativo
+                ? Icons.account_balance
+                : Icons.account_balance_outlined,
             size: 18,
             color: centroCusto.ativo ? AppColors.primary : AppColors.slate400,
           ),
@@ -50,8 +53,18 @@ class CentroCustoListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis, //
                   ),
                 ),
-                const AppSpacing(size: AppSpacingSize.xs, axis: Axis.horizontal),
+                const AppSpacing(
+                  size: AppSpacingSize.xs,
+                  axis: Axis.horizontal,
+                ),
                 AppTag('Ativo: ${centroCusto.ativo ? "Sim" : "Não"}'),
+                if (centroCusto.padrao) ...[
+                  const AppSpacing(
+                    size: AppSpacingSize.xs,
+                    axis: Axis.horizontal,
+                  ),
+                  const AppTag('Padrão'),
+                ],
               ],
             ),
           ),

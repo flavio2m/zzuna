@@ -36,10 +36,16 @@ class CentroCustoRepository
         ),
       );
     }
+    final centrosResult = await getAll();
+    final isEmpty =
+        centrosResult.isSuccess() && centrosResult.getOrThrow().isEmpty;
+    dto.padrao = isEmpty;
+
     final centro = CentroCusto(
       id: const Uuid().v4(),
       descricao: dto.descricao,
-      ativo: dto.ativo, //
+      ativo: dto.ativo,
+      padrao: dto.padrao,
     );
     return _storage.create(centro).onSuccess((c) {
       _streamController.add(RepositoryCreated(c));
@@ -54,6 +60,7 @@ class CentroCustoRepository
             id: dto.id ?? const Uuid().v4(),
             descricao: dto.descricao,
             ativo: dto.ativo,
+            padrao: dto.padrao,
           ),
         )
         .toList();
@@ -68,10 +75,41 @@ class CentroCustoRepository
 
   @override
   AsyncResult<CentroCusto> update(CentroCustoDto dto) async {
+    final existingResult = await getById(dto.id!);
+    if (existingResult.isError()) {
+      return Failure(existingResult.exceptionOrNull()!);
+    }
+    final existing = existingResult.getOrThrow();
+
+    if (dto.padrao) {
+      final allResult = await getAll();
+      if (allResult.isSuccess()) {
+        final currentDefault = allResult
+            .getOrThrow()
+            .where((c) => c.padrao && c.id != dto.id)
+            .firstOrNull;
+        if (currentDefault != null) {
+          final oldEntity = CentroCusto(
+            id: currentDefault.id,
+            descricao: currentDefault.descricao,
+            ativo: currentDefault.ativo,
+            padrao: false,
+          );
+          await _storage.update(oldEntity);
+          _streamController.add(RepositoryUpdated(oldEntity));
+        }
+      }
+    } else {
+      if (existing.padrao) {
+        dto.padrao = true;
+      }
+    }
+
     final centro = CentroCusto(
       id: dto.id!,
       descricao: dto.descricao,
-      ativo: dto.ativo, //
+      ativo: dto.ativo,
+      padrao: dto.padrao,
     );
     return _storage.update(centro).onSuccess((c) {
       _streamController.add(RepositoryUpdated(c));
@@ -86,6 +124,7 @@ class CentroCustoRepository
             id: dto.id!,
             descricao: dto.descricao,
             ativo: dto.ativo,
+            padrao: dto.padrao,
           ),
         )
         .toList();

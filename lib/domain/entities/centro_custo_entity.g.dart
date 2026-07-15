@@ -10,6 +10,7 @@ _CentroCusto _$CentroCustoFromJson(Map<String, dynamic> json) => _CentroCusto(
   id: json['id'] as String,
   descricao: json['descricao'] as String,
   ativo: json['ativo'] as bool,
+  padrao: json['padrao'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$CentroCustoToJson(_CentroCusto instance) =>
@@ -17,6 +18,7 @@ Map<String, dynamic> _$CentroCustoToJson(_CentroCusto instance) =>
       'id': instance.id,
       'descricao': instance.descricao,
       'ativo': instance.ativo,
+      'padrao': instance.padrao,
     };
 
 _CentroCustoDetails _$CentroCustoDetailsFromJson(Map<String, dynamic> json) =>
@@ -24,6 +26,7 @@ _CentroCustoDetails _$CentroCustoDetailsFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       descricao: json['descricao'] as String,
       ativo: json['ativo'] as bool,
+      padrao: json['padrao'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CentroCustoDetailsToJson(_CentroCustoDetails instance) =>
@@ -31,4 +34,5 @@ Map<String, dynamic> _$CentroCustoDetailsToJson(_CentroCustoDetails instance) =>
       'id': instance.id,
       'descricao': instance.descricao,
       'ativo': instance.ativo,
+      'padrao': instance.padrao,
     };

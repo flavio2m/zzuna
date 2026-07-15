@@ -42,7 +42,11 @@ class SeedInitialDataUseCase {
     await _cartaoRepository.create(cartao);
 
     // 3. Criar Centro de Custo Padrão
-    final centro = CentroCustoDto(descricao: 'Moradia', ativo: true);
+    final centro = CentroCustoDto(
+      descricao: 'Moradia',
+      ativo: true,
+      padrao: true,
+    );
     await _centroCustoRepository.create(centro);
 
     // 4. Criar Categorias Padrão
@@ -55,6 +59,8 @@ class SeedInitialDataUseCase {
     final saudeId = uuid.v4();
     final terceirosId = uuid.v4();
     final viagemId = uuid.v4();
+    final higieneId = uuid.v4();
+    final pessoalId = uuid.v4();
 
     final dtos = <CategoriaDto>[
       CategoriaDto(id: alimentacaoId, descricao: 'Alimentação', ativo: true),
@@ -69,6 +75,8 @@ class SeedInitialDataUseCase {
       CategoriaDto(id: saudeId, descricao: 'Saúde', ativo: true),
       CategoriaDto(id: terceirosId, descricao: 'Terceiros', ativo: true),
       CategoriaDto(id: viagemId, descricao: 'Viagem', ativo: true),
+      CategoriaDto(id: higieneId, descricao: 'Higiene e Beleza', ativo: true),
+      CategoriaDto(id: pessoalId, descricao: 'Pessoal', ativo: true),
 
       // 1) Alimentação
       CategoriaDto(
@@ -136,6 +144,51 @@ class SeedInitialDataUseCase {
       CategoriaDto(
         descricao: 'Pedágio e Estacionamento',
         categoriaPaiId: transporteId,
+        ativo: true,
+      ),
+
+      // Higiene e Beleza
+      CategoriaDto(
+        descricao: 'Cabelereiro',
+        categoriaPaiId: higieneId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Higiene Pessoal',
+        categoriaPaiId: higieneId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Perfumes e Colônias',
+        categoriaPaiId: higieneId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Produtos de Limpeza',
+        categoriaPaiId: higieneId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Diversos Higiene Pessoal',
+        categoriaPaiId: higieneId,
+        ativo: true,
+      ),
+
+      // Pessoal
+      CategoriaDto(descricao: 'Roupas', categoriaPaiId: pessoalId, ativo: true),
+      CategoriaDto(
+        descricao: 'Calçados',
+        categoriaPaiId: pessoalId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Eletrônicos',
+        categoriaPaiId: pessoalId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Diversos Pessoal',
+        categoriaPaiId: pessoalId,
         ativo: true,
       ),
 

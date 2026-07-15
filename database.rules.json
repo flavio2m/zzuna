@@ -23,7 +23,8 @@
         ".indexOn": [
           "isDeleted",
           "descricao",
-          "ativo"
+          "ativo",
+          "padrao"
         ]
       },
       "contas": {

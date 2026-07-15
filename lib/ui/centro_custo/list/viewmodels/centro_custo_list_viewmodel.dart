@@ -30,7 +30,10 @@ class CentroCustoListViewModel {
     // Ensure seed data exists
     await _repository.getAll();
 
-    final filter = CentroCustoFilterDto(descricao: descricaoQuery ?? '', ativo: ativoSelecionado);
+    final filter = CentroCustoFilterDto(
+      descricao: descricaoQuery ?? '',
+      ativo: ativoSelecionado,
+    );
     final result = await _repository.search(filter);
     return result.map((list) {
       centros = _toDetailsList(list);
@@ -39,17 +42,18 @@ class CentroCustoListViewModel {
   }
 
   List<CentroCustoDetails> _toDetailsList(List<CentroCusto> list) {
-    return list.map(_toDetails).toList()
-      ..sort(
-        (a, b) => StringComparer.compareIgnoreAccents(
-          a.descricao,
-          b.descricao,
-        ),
-      );
+    return list.map(_toDetails).toList()..sort(
+      (a, b) => StringComparer.compareIgnoreAccents(a.descricao, b.descricao),
+    );
   }
 
   CentroCustoDetails _toDetails(CentroCusto centro) {
-    return CentroCustoDetails(id: centro.id, descricao: centro.descricao, ativo: centro.ativo);
+    return CentroCustoDetails(
+      id: centro.id,
+      descricao: centro.descricao,
+      ativo: centro.ativo,
+      padrao: centro.padrao,
+    );
   }
 
   void setDescricao(String value) {
