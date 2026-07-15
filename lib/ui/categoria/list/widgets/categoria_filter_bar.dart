@@ -10,14 +10,34 @@ import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
-class CategoriaFilterBar extends ConsumerWidget {
+class CategoriaFilterBar extends ConsumerStatefulWidget {
   const CategoriaFilterBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CategoriaFilterBar> createState() => _CategoriaFilterBarState();
+}
+
+class _CategoriaFilterBarState extends ConsumerState<CategoriaFilterBar> {
+  final _descricaoController = TextEditingController();
+  final _descricaoFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _descricaoController.dispose();
+    _descricaoFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = ref.read(categoriaListViewModelProvider);
+    _descricaoController.text = viewModel.descricaoQuery ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = ref.watch(categoriaListViewModelProvider);
-    TextEditingController? descricaoController = TextEditingController();
-    final descricaoFocusNode = FocusNode();
 
     return AppFilterCard(
       child: Wrap(
@@ -28,8 +48,8 @@ class CategoriaFilterBar extends ConsumerWidget {
           SizedBox(
             width: 300,
             child: AppTextFormField(
-              controller: descricaoController,
-              focusNode: descricaoFocusNode,
+              controller: _descricaoController,
+              focusNode: _descricaoFocusNode,
               textInputAction: TextInputAction.search,
               label: 'Descrição',
               onChanged: (value) {
@@ -37,17 +57,21 @@ class CategoriaFilterBar extends ConsumerWidget {
               },
               onFieldSubmitted: (_) {
                 viewModel.pesquisar();
+                _descricaoFocusNode.requestFocus();
               },
             ),
           ),
 
           SizedBox(
             width: 160,
-            child: AppStatusDropdown(
-              value: viewModel.statusSelecionado,
-              onChanged: (value) {
-                viewModel.setStatus(value);
-              },
+            child: ListenableBuilder(
+              listenable: viewModel.loadCommand,
+              builder: (context, _) => AppStatusDropdown(
+                value: viewModel.statusSelecionado,
+                onChanged: (value) {
+                  viewModel.setStatus(value);
+                },
+              ),
             ),
           ),
 
@@ -60,7 +84,9 @@ class CategoriaFilterBar extends ConsumerWidget {
           ButtonAdd(onPressed: () => CategoriaCreateModal.show(context)),
 
           IconButton(
-            tooltip: viewModel.isAllCollapsed ? 'Expandir todas' : 'Colapsar todas',
+            tooltip: viewModel.isAllCollapsed
+                ? 'Expandir todas'
+                : 'Colapsar todas',
             icon: Icon(
               viewModel.isAllCollapsed ? Icons.unfold_more : Icons.unfold_less,
               color: AppColors.primary, //

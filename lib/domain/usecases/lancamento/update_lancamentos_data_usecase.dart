@@ -213,21 +213,26 @@ class UpdateLancamentosDataUseCase {
       final lancamentosDaOrigem = lancamentos.where((l) => l.origem == origem);
       final dtosDaOrigem = dtosToUpdate.where((d) => d.origem == origem);
 
-      final oldestOldDate = lancamentosDaOrigem
-          .map((l) => l.data)
-          .reduce((a, b) => a.isBefore(b) ? a : b);
-      final oldestNewDate = dtosDaOrigem
-          .map((d) => d.data)
-          .reduce((a, b) => a.isBefore(b) ? a : b);
+      final oldestOldAnoMes = lancamentosDaOrigem
+          .map((l) => l.anoMes)
+          .reduce((a, b) => a < b ? a : b);
+      final oldestNewAnoMes = dtosDaOrigem
+          .map((d) => d.anoMes!)
+          .reduce((a, b) => a < b ? a : b);
 
-      final oldestDate = oldestOldDate.isBefore(oldestNewDate)
-          ? oldestOldDate
-          : oldestNewDate;
+      final oldestAnoMes = oldestOldAnoMes < oldestNewAnoMes
+          ? oldestOldAnoMes
+          : oldestNewAnoMes;
+
+      final int startingAno = oldestAnoMes ~/ 100;
+      final Mes startingMes = Mes.values.firstWhere(
+        (m) => m.numero == (oldestAnoMes % 100),
+      );
 
       final recalcRes = await _recalculateUseCase.execute(
         origem,
-        startingAno: oldestDate.year,
-        startingMes: Mes.fromDate(oldestDate),
+        startingAno: startingAno,
+        startingMes: startingMes,
       );
       if (recalcRes.isError()) {
         return Failure(recalcRes.exceptionOrNull()!);

@@ -17,7 +17,7 @@ class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
 
   // Variables to be replaced by deploy.sh
   final _version = '1.0.1';
-  final _dataAtualizacao = '14/07/2026 21:54';
+  final _dataAtualizacao = '15/07/2026 12:20';
 
   @override
   void initState() {

@@ -9,4 +9,5 @@ abstract interface class AuthClientBase {
   AsyncResult<Unit> logout();
   AsyncResult<LoggedUser> registerUser(RegisterUserDto dto);
   AsyncResult<LoggedUser> updateUser(LoadedUserDto dto);
+  Stream<LoggedUser?> authStateChanges();
 }

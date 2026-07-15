@@ -406,6 +406,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 rightFlex: 5,
                 left: AppDateFormField(
                   label: 'Data',
+                  autofocus: true,
                   focusNode: _dataFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _descFocus.requestFocus(),
@@ -415,7 +416,6 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 ),
                 right: AppTextFormField(
                   label: 'Descrição',
-                  autofocus: true,
                   focusNode: _descFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _tipoFocus.requestFocus(),

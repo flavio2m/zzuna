@@ -105,7 +105,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const FlutterLogo(size: 100),
+                  Image.asset('assets/icons/zzuna_logo.png', height: 100),
 
                   AppSpacing(size: AppSpacingSize.md),
 

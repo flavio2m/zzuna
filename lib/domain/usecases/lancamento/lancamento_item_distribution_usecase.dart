@@ -77,15 +77,15 @@ class LancamentoItemDistributionUseCase {
     return const Success(unit);
   }
 
-  // Validar se todos os itens possuem valor de no mínimo R$ 1,00
+  // Validar se todos os itens possuem valor maior que zero
   Result<Unit> _validarValoresMinimos(List<LancamentoItem> itens) {
     for (final item in itens) {
       // Arredonda para evitar dízimas de ponto flutuante
       final valorArredondado = double.parse(item.valor.toStringAsFixed(2));
-      if (valorArredondado < 1.00) {
+      if (valorArredondado < 0.01) {
         return Failure(
           DomainException(
-            'Nenhum item pode ter valor inferior a 1,00.', //
+            'Nenhum item pode ter valor inferior a 0,01.', //
           ),
         );
       }

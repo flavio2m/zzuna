@@ -74,6 +74,11 @@ class AuthLocalClient implements AuthClientBase {
     );
   }
 
+  @override
+  Stream<LoggedUser?> authStateChanges() async* {
+    yield null; // Local auth won't restore session by default
+  }
+
   LoggedUser _toLoggedUser(LoadedUser user) {
     return _createLoggedUser(id: user.id, name: user.name, email: user.email);
   }

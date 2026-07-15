@@ -111,35 +111,6 @@ void main() {
     });
 
     test(
-      'Should return error when adding item violates minimum value of 1,00',
-      () {
-        final currentItems = [
-          const LancamentoItem(
-            numero: 1,
-            centroCustoId: 'cc-1',
-            categoriaId: 'cat-1',
-            valor: 10.0,
-          ),
-        ];
-
-        final res = useCase.addItem(
-          currentItems: currentItems,
-          totalValor: 10.0,
-          centroCustoId: 'cc-2',
-          categoriaId: 'cat-2',
-          itemValor: 0.50, // Inválido: menor que 1.00
-        );
-
-        expect(res.isError(), isTrue);
-        final exception = res.exceptionOrNull() as DomainException;
-        expect(
-          exception.message,
-          contains('Nenhum item pode ter valor inferior a 1,00'),
-        );
-      },
-    );
-
-    test(
       'Should return error when Item 1 violates minimum percentage of 1%',
       () {
         final currentItems = [
@@ -170,32 +141,6 @@ void main() {
         );
       },
     );
-
-    test('Should return error when Item 1 violates minimum value of 1,00', () {
-      final currentItems = [
-        const LancamentoItem(
-          numero: 1,
-          centroCustoId: 'cc-1',
-          categoriaId: 'cat-1',
-          valor: 10.0,
-        ),
-      ];
-
-      final res = useCase.addItem(
-        currentItems: currentItems,
-        totalValor: 10.0,
-        centroCustoId: 'cc-2',
-        categoriaId: 'cat-2',
-        itemValor: 9.5, // Deixa Item 1 com 0.50, menor que 1.00
-      );
-
-      expect(res.isError(), isTrue);
-      final exception = res.exceptionOrNull() as DomainException;
-      expect(
-        exception.message,
-        contains('Nenhum item pode ter valor inferior a 1,00'),
-      );
-    });
 
     test(
       'Should return error when additional item violates maximum percentage of 99%',

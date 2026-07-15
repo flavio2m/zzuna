@@ -134,6 +134,27 @@ class AuthFirebaseClient implements AuthClientBase {
     }
   }
 
+  @override
+  Stream<LoggedUser?> authStateChanges() {
+    return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
+      if (firebaseUser == null) return null;
+
+      final userResult = await _userStorage.getById(firebaseUser.uid);
+      if (userResult.isSuccess()) {
+        final loadedUser = userResult.getOrThrow();
+        final token = await firebaseUser.getIdToken() ?? '';
+        return LoggedUser(
+          id: loadedUser.id,
+          name: loadedUser.name,
+          email: loadedUser.email,
+          token: token,
+          refreshToken: firebaseUser.refreshToken ?? '',
+        );
+      }
+      return null;
+    });
+  }
+
   String _mapFirebaseAuthExceptionMessage(String code) {
     switch (code) {
       case 'user-not-found':
