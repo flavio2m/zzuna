@@ -53,32 +53,28 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
               const SidebarSearch(),
               Expanded(
                 child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: AppColors.slate100), //
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            SidebarContaSection(items: filteredContas),
-                            const Divider(
-                              height: 12,
-                              color: AppColors.slate100,
-                            ),
-                            SidebarCartaoSection(items: filteredCartoes),
-                            const Divider(
-                              height: 12,
-                              color: AppColors.slate100,
-                            ),
-                            SidebarCentroCustoSection(items: filteredCentros),
-                          ],
-                        ),
+                      SidebarContaSection(items: filteredContas),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Divider(height: 12, color: AppColors.slate100),
+                      ),
+                      SidebarCartaoSection(items: filteredCartoes),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Divider(height: 12, color: AppColors.slate100),
                       ),
                       SidebarCategoriaSection(items: filteredCategorias),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Divider(height: 12, color: AppColors.slate100),
+                      ),
+                      SidebarCentroCustoSection(items: filteredCentros),
                     ],
                   ),
                 ),
