@@ -146,6 +146,28 @@ class FirebaseRealtimeStorage<T extends Object> implements BaseStorage<T> {
   }
 
   @override
+  AsyncResult<Unit> deleteAll(List<String> ids) async {
+    try {
+      if (ids.isEmpty) return const Success(unit);
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] DELETE ALL - Removendo ${ids.length} itens.',
+          name: 'FirebaseRealtime',
+        );
+      }
+      // Passa null como valor para cada ID — o Firebase interpreta como remove().
+      // Uma única chamada de rede, atômica.
+      final updates = <String, dynamic>{for (final id in ids) id: null};
+      await _ref.update(updates);
+      return const Success(unit);
+    } catch (e, s) {
+      return Failure(
+        LocalStorageException('Erro ao deletar lista no Firebase: $e', s),
+      );
+    }
+  }
+
+  @override
   AsyncResult<List<T>> getAll() async {
     try {
       final snapshot = await _ref.get();

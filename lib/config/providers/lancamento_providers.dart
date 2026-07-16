@@ -159,6 +159,16 @@ final updateLancamentoUseCaseProvider = Provider<UpdateLancamentoUseCase>((
   );
 });
 
+final deleteLancamentoUseCaseProvider = Provider<DeleteLancamentoUseCase>((
+  ref,
+) {
+  return DeleteLancamentoUseCase(
+    ref.watch(lancamentoRepositoryProvider),
+    ref.watch(extratoFaturaRepositoryProvider),
+    ref.watch(recalculateExtratoFaturaBalanceUseCaseProvider),
+  );
+});
+
 final lancamentoUpdateViewModelProvider = Provider<LancamentoUpdateViewModel>(
   (ref) => LancamentoUpdateViewModel(
     ref.watch(updateLancamentoUseCaseProvider),

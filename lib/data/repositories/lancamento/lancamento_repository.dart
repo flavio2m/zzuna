@@ -133,6 +133,15 @@ class LancamentoRepository
     });
   }
 
+  AsyncResult<Unit> deleteAll(List<String> ids) async {
+    final result = await _storage.deleteAll(ids);
+    return result.onSuccess((_) {
+      for (final id in ids) {
+        _streamController.add(RepositoryDeleted(id));
+      }
+    });
+  }
+
   AsyncResult<List<Lancamento>> getByGrupoId(String grupoId) async {
     final listResult = await _storage.getAll();
     if (listResult.isError()) {

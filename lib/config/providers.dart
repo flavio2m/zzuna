@@ -61,6 +61,7 @@ import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart'
 import 'package:zzuna/domain/usecases/seed/seed_initial_data_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/delete_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reconcile_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_data_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';

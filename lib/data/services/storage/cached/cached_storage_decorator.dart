@@ -1,12 +1,14 @@
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
 
 class CachedStorageDecorator<T extends Object> implements BaseStorage<T> {
   final BaseStorage<T> innerStorage;
   final Duration ttl;
   final String collectionName;
+  final Map<String, dynamic> Function(T model)? toJson;
 
   // ignore: constant_identifier_names
   static const int TTL_MINUTES = 60;
@@ -19,6 +21,7 @@ class CachedStorageDecorator<T extends Object> implements BaseStorage<T> {
     required this.innerStorage,
     this.ttl = const Duration(minutes: TTL_MINUTES),
     required this.collectionName,
+    this.toJson,
   });
 
   bool get _isCacheValid {
@@ -60,6 +63,15 @@ class CachedStorageDecorator<T extends Object> implements BaseStorage<T> {
   @override
   AsyncResult<Unit> delete(String id) async {
     final result = await innerStorage.delete(id);
+    if (result.isSuccess()) {
+      clearCache();
+    }
+    return result;
+  }
+
+  @override
+  AsyncResult<Unit> deleteAll(List<String> ids) async {
+    final result = await innerStorage.deleteAll(ids);
     if (result.isSuccess()) {
       clearCache();
     }
@@ -128,7 +140,134 @@ class CachedStorageDecorator<T extends Object> implements BaseStorage<T> {
     SearchOrder order = SearchOrder.ascending,
     int? limit,
   }) async {
-    // We delegate search to the inner storage as requested for now.
+    // Se o cache é válido e temos toJson, resolvemos na memória
+    if (_isCacheValid && toJson != null) {
+      if (kDebugMode) {
+        developer.log(
+          '[$collectionName] SEARCH RETORNANDO DO CACHE',
+          name: 'CachedStorage',
+        );
+      }
+      try {
+        var filtered = _cache!.where((item) {
+          final itemMap = toJson!(item);
+
+          return fields.every((field) {
+            final fieldValue = itemMap[field.fieldName];
+
+            switch (field.type) {
+              case SearchFieldType.string:
+                if (fieldValue == null) return false;
+                return fieldValue.toString().toLowerCase().contains(
+                  field.value.toString().toLowerCase(),
+                );
+
+              case SearchFieldType.boolean:
+                return fieldValue == field.value;
+
+              case SearchFieldType.date:
+                if (fieldValue == null) return false;
+                final date = DateTime.tryParse(fieldValue.toString());
+                if (date == null) return false;
+
+                if (field.operator == SearchOperator.between ||
+                    field.value is List) {
+                  final range = field.value as List;
+                  final start = range[0] as DateTime?;
+                  final end = range[1] as DateTime?;
+                  if (start != null && date.isBefore(start)) return false;
+                  if (end != null && date.isAfter(end)) return false;
+                  return true;
+                }
+
+                final searchDate = field.value as DateTime;
+                switch (field.operator) {
+                  case SearchOperator.equal:
+                    return date.isAtSameMomentAs(searchDate);
+                  case SearchOperator.lessThan:
+                    return date.isBefore(searchDate);
+                  case SearchOperator.lessThanOrEqual:
+                    return !date.isAfter(searchDate);
+                  case SearchOperator.greaterThan:
+                    return date.isAfter(searchDate);
+                  case SearchOperator.greaterThanOrEqual:
+                    return !date.isBefore(searchDate);
+                  default:
+                    return false;
+                }
+
+              case SearchFieldType.int:
+                if (fieldValue == null) return false;
+                final val = num.tryParse(fieldValue.toString())?.toInt();
+                if (val == null) return false;
+
+                if (field.operator == SearchOperator.between ||
+                    field.value is List) {
+                  final range = field.value as List;
+                  final start = range[0] as int?;
+                  final end = range[1] as int?;
+                  if (start != null && val < start) return false;
+                  if (end != null && val > end) return false;
+                  return true;
+                }
+
+                final searchVal = num.tryParse(field.value.toString())?.toInt();
+                if (searchVal == null) return false;
+                switch (field.operator) {
+                  case SearchOperator.equal:
+                    return val == searchVal;
+                  case SearchOperator.lessThan:
+                    return val < searchVal;
+                  case SearchOperator.lessThanOrEqual:
+                    return val <= searchVal;
+                  case SearchOperator.greaterThan:
+                    return val > searchVal;
+                  case SearchOperator.greaterThanOrEqual:
+                    return val >= searchVal;
+                  default:
+                    return false;
+                }
+            }
+          });
+        }).toList();
+
+        if (orderBy != null) {
+          filtered.sort((a, b) {
+            final aMap = toJson!(a);
+            final bMap = toJson!(b);
+            final aVal = aMap[orderBy];
+            final bVal = bMap[orderBy];
+
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return 1;
+            if (bVal == null) return -1;
+
+            int compareResult;
+            if (aVal is Comparable && bVal is Comparable) {
+              compareResult = aVal.compareTo(bVal);
+            } else {
+              compareResult = aVal.toString().compareTo(bVal.toString());
+            }
+
+            return order == SearchOrder.ascending
+                ? compareResult
+                : -compareResult;
+          });
+        }
+
+        if (limit != null && limit > 0 && filtered.length > limit) {
+          filtered = filtered.sublist(0, limit);
+        }
+
+        return Success(filtered);
+      } catch (e, s) {
+        return Failure(
+          LocalStorageException('Erro ao pesquisar no cache: $e', s),
+        );
+      }
+    }
+
+    // Se não tem cache ou não tem toJson, delega pro innerStorage
     return innerStorage.searchByFields(
       fields,
       orderBy: orderBy,
