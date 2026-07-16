@@ -31,12 +31,7 @@ class TransactionDayCard extends StatelessWidget {
   }
 
   String _formatValue(double valor, LancamentoTipo tipo) {
-    // final rowPrefix = tipo == LancamentoTipo.receita ? '+' : '-';
-    return UtilBrasilFields.obterReal(valor.abs(), moeda: true);
-    // .replaceFirst(
-    //   'R\$',
-    //   '$rowPrefix R\$', //
-    // );
+    return UtilBrasilFields.obterReal(valor.abs(), moeda: false);
   }
 
   Widget _buildTransactionRow(BuildContext context, LancamentoDetails l) {
@@ -119,19 +114,14 @@ class TransactionDayCard extends StatelessWidget {
     final dateKey = DateFormatter.fullDate(dia.data);
 
     final isPositive = dia.saldo >= 0;
-    // final prefix = isPositive ? '+' : '-';
+    final prefix = isPositive ? '' : '- ';
     final balanceStr =
-        UtilBrasilFields //
-        .obterReal(dia.saldo.abs(), moeda: true);
-    // .replaceFirst('R\$', '$prefix R\$');
+        '$prefix${UtilBrasilFields.obterReal(dia.saldo.abs(), moeda: false)}';
 
     final isExtractPositive = dia.saldoExtrato >= 0;
-    // final extractPrefix = isExtractPositive ? '+' : '-';
-    final extractBalanceStr = UtilBrasilFields.obterReal(
-      dia.saldoExtrato.abs(),
-      moeda: true,
-    );
-    // .replaceFirst('R\$', '$extractPrefix R\$');
+    final extractPrefix = isExtractPositive ? '' : '- ';
+    final extractBalanceStr =
+        '$extractPrefix${UtilBrasilFields.obterReal(dia.saldoExtrato.abs(), moeda: false)}';
 
     final rows = dia.lancamentos
         .map(

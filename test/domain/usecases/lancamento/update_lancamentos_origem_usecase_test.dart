@@ -185,6 +185,14 @@ void main() {
         )).getOrThrow();
         expect(updatedL1.origem, origemContaC);
 
+        final extrato5C = (await extratoRepository.getById(
+          updatedL1.extratoFaturaId,
+        )).getOrThrow();
+        expect(
+          updatedL1.anoMes,
+          equals(extrato5C.periodo),
+        ); // Garante o mapeamento do anoMes para a nova fatura
+
         // l2 deve continuar na Conta A
         final updatedL2 = (await lancamentoRepository.getById(
           l2.id,
@@ -196,6 +204,14 @@ void main() {
           l3.id,
         )).getOrThrow();
         expect(updatedL3.origem, origemContaC);
+
+        final extrato5CL3 = (await extratoRepository.getById(
+          updatedL3.extratoFaturaId,
+        )).getOrThrow();
+        expect(
+          updatedL3.anoMes,
+          equals(extrato5CL3.periodo),
+        ); // Garante o mapeamento do anoMes para a nova fatura
 
         // Recalculos:
         // Conta A: L1 removido (mes 5), L2 preservado (mes 6)
@@ -220,9 +236,6 @@ void main() {
 
         // Conta C: L1 e L3 recebidos no mes 5 (soma = 25.0)
         // Mês 5: saldoFinal = -25.0
-        final extrato5C = (await extratoRepository.getById(
-          updatedL1.extratoFaturaId,
-        )).getOrThrow();
         expect(extrato5C.saldoFinal, -25.0);
       },
     );
