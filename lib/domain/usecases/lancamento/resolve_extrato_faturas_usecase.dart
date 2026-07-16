@@ -147,12 +147,21 @@ class ResolveExtratoFaturasUseCase {
 
         final targetMonth = DateTime(year, monthVal, 1);
         if (targetMonth.isBefore(dataInicial)) {
-          return Failure(
-            DomainException(
-              'Data do lançamento não pode ser anterior à data inicial do '
-              'cartão/conta', //
-            ),
-          );
+          final targetMesStr = '${monthVal.toString().padLeft(2, '0')}/$year';
+          if (origem is LancamentoOrigemCartao) {
+            return Failure(
+              DomainException(
+                'Alguns lançamentos cairiam na fatura $targetMesStr, '
+                'que é anterior à data inicial do cartão.',
+              ),
+            );
+          } else {
+            return Failure(
+              DomainException(
+                'Existem lançamentos com data anterior à data inicial da conta.',
+              ),
+            );
+          }
         }
 
         if (inMemoryExtratos.containsKey(currentPeriod)) {

@@ -286,7 +286,7 @@ void main() {
         expect(res.isError(), isTrue);
         expect(
           res.exceptionOrNull().toString(),
-          contains('não pode ser anterior à data inicial'),
+          contains('anterior à data inicial'),
         );
       },
     );

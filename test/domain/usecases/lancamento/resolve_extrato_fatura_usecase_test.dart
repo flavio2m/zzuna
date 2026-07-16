@@ -92,7 +92,7 @@ void main() {
 
       final res = await resolveUseCase.execute(dto);
       expect(res.isError(), isTrue);
-      expect(res.exceptionOrNull()!.toString(), contains('não pode ser anterior à data inicial'));
+      expect(res.exceptionOrNull()!.toString(), contains('anterior à data inicial'));
     });
 
     test('Should resolve and create missing months since dataInicial when none exists', () async {

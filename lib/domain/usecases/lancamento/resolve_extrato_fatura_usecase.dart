@@ -58,12 +58,24 @@ class ResolveExtratoFaturaUseCase {
     if (targetMonth.isBefore(dataInicial)) {
       final dateStr = UtilData.obterDataDDMMAAAA(dto.data);
       final dataInicialStr = UtilData.obterDataDDMMAAAA(dataInicial);
-      return Failure(
-        DomainException(
-          'A data do lançamento ($dateStr) não pode ser anterior à data '
-          'inicial ($dataInicialStr) do(a) "${info.nomeOrigem}".',
-        ),
-      );
+
+      if (origem is LancamentoOrigemCartao) {
+        final targetMesStr =
+            '${targetMonthNumber.toString().padLeft(2, '0')}/$targetYear';
+        return Failure(
+          DomainException(
+            'A compra do dia $dateStr entraria na fatura $targetMesStr, '
+            'que é anterior à data inicial ($dataInicialStr) do cartão "${info.nomeOrigem}".',
+          ),
+        );
+      } else {
+        return Failure(
+          DomainException(
+            'A data do lançamento ($dateStr) não pode ser anterior à data '
+            'inicial ($dataInicialStr) do(a) "${info.nomeOrigem}".',
+          ),
+        );
+      }
     }
 
     final mes = Mes.values.firstWhere((m) => m.numero == targetMonthNumber);
