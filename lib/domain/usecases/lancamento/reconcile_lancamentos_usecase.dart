@@ -54,6 +54,7 @@ class ReconcileLancamentosUseCase {
           extratoFaturaId: l.extratoFaturaId,
           itens: l.itens,
           conciliado: conciliado,
+          anoMes: l.anoMes,
           grupo: l.grupo,
           observacao: l.observacao,
         ),

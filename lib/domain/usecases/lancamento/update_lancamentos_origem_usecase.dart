@@ -106,6 +106,7 @@ class UpdateLancamentosOrigemUseCase {
           origem: novaOrigem,
           itens: l.itens,
           conciliado: l.conciliado,
+          anoMes: newExtrato.periodo,
           grupo: l.grupo,
           observacao: l.observacao,
         ),
