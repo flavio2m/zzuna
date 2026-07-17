@@ -81,6 +81,7 @@ class FinalizarRecorrenciaUseCase {
         origem: lanc.origem,
         itens: lanc.itens,
         conciliado: lanc.conciliado,
+        anoMes: lanc.anoMes,
         grupo: grupoInativo,
         observacao: lanc.observacao,
       ),

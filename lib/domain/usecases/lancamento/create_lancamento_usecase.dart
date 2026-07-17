@@ -39,8 +39,11 @@ class CreateLancamentoUseCase {
     }
     final extrato = extratoResult.getOrThrow();
 
-    // 4. Preencher extratoFaturaId no DTO de forma imutável
-    final updatedDto = dto.copyWith(extratoFaturaId: extrato.id);
+    // 4. Preencher extratoFaturaId e anoMes no DTO de forma imutável
+    final updatedDto = dto.copyWith(
+      extratoFaturaId: extrato.id,
+      anoMes: extrato.periodo,
+    );
 
     // 5. Persistir
     return _repository.create(updatedDto);

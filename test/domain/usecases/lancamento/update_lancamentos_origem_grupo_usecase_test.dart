@@ -195,12 +195,20 @@ void main() {
           l2.id,
         )).getOrThrow();
         expect(updatedL2.origem, origemContaB);
+        final extrato6Bl2 = (await extratoRepository.getById(
+          updatedL2.extratoFaturaId,
+        )).getOrThrow();
+        expect(updatedL2.anoMes, equals(extrato6Bl2.periodo));
 
         // Parcela 3 deve ter sido movida para Conta B
         final updatedL3 = (await lancamentoRepository.getById(
           l3.id,
         )).getOrThrow();
         expect(updatedL3.origem, origemContaB);
+        final extrato7Bl3 = (await extratoRepository.getById(
+          updatedL3.extratoFaturaId,
+        )).getOrThrow();
+        expect(updatedL3.anoMes, equals(extrato7Bl3.periodo));
 
         // Saldos de Conta A devem refletir apenas Parcela 1
         // Mês 5: saldoFinal = -10.0
@@ -278,7 +286,7 @@ void main() {
         expect(res.isError(), isTrue);
         expect(
           res.exceptionOrNull().toString(),
-          contains('não pode ser anterior à data inicial'),
+          contains('anterior à data inicial'),
         );
       },
     );

@@ -10,9 +10,8 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
   const LancamentoResumoFinanceiroCard({super.key, required this.resumo});
 
   String _formatCurrency(double value) {
-    // final prefix = value < 0 ? '- ' : '';
-    return UtilBrasilFields.obterReal(value.abs(), moeda: true);
-    // .replaceFirst(r'R$', '$prefix R\$');
+    final prefix = value < 0 ? '- ' : '';
+    return '$prefix${UtilBrasilFields.obterReal(value.abs(), moeda: false)}';
   }
 
   Color _valueColor(double value) {

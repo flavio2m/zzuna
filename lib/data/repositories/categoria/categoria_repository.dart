@@ -2,32 +2,37 @@ import 'dart:async';
 
 import 'package:result_dart/result_dart.dart';
 import 'package:uuid/uuid.dart';
-import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/exception/repository_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_filter_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 
-class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, CategoriaDto, CategoriaFilterDto> {
+class CategoriaRepository
+    implements
+        BaseRepository<
+          Categoria,
+          CategoriaDto,
+          CategoriaDto,
+          CategoriaFilterDto
+        > {
   final BaseStorage<Categoria> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<Categoria>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<Categoria>>.broadcast();
 
-  CategoriaRepository(LocalStorage<Categoria> storage) : _storage = storage;
+  CategoriaRepository(BaseStorage<Categoria> storage) : _storage = storage;
 
   @override
   AsyncResult<Categoria> create(CategoriaDto dto) async {
-    // Verifica se já existe categoria com a mesma descrição
-    final exists = await findByDescricao(dto.descricao).then(
-      (result) => result.isSuccess(), //
-    );
+    // Verifica se já existe categoria com a mesma descrição no mesmo nível
+    final exists = await _existsDuplicate(dto.descricao, dto.categoriaPaiId);
     if (exists) {
       return Failure(
         RepositoryException(
-          'Já existe uma categoria com a descrição: ${dto.descricao}', //
+          'Já existe uma categoria com a descrição "${dto.descricao}" '
+          'neste nível.',
         ),
       );
     }
@@ -84,6 +89,19 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
     if (existingResult.isError()) {
       return Failure(
         existingResult.exceptionOrNull()!, //
+      );
+    }
+    // Verifica se já existe categoria com a mesma descrição no mesmo nível
+    final exists = await _existsDuplicate(
+      dto.descricao,
+      dto.categoriaPaiId,
+      excludeId: dto.id,
+    );
+    if (exists) {
+      return Failure(
+        RepositoryException(
+          'Já existe uma categoria com a descrição "${dto.descricao}" neste nível.', //
+        ),
       );
     }
     // Se estiver alterando para subcategoria, validar nível
@@ -148,36 +166,21 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
     return _storage.getById(id);
   }
 
-  AsyncResult<Categoria> findByDescricao(String descricao) async {
-    final searchFields = [
-      SearchField(
-        fieldName: 'descricao',
-        value: descricao,
-        type: SearchFieldType.string, //
-      ),
-    ];
-
-    final result = await _storage.searchByFields(searchFields);
-
-    return result.fold(
-      (categorias) {
-        if (categorias.isEmpty) {
-          return Failure(
-            LocalStorageException(
-              'Categoria não encontrada: $descricao', //
-            ),
-          );
-        }
-        return Success(categorias.first);
-      },
-      (error) {
-        return Failure(
-          LocalStorageException(
-            'Erro ao buscar categoria: $descricao', //
-          ),
-        );
-      },
-    );
+  Future<bool> _existsDuplicate(
+    String descricao,
+    String? categoriaPaiId, {
+    String? excludeId,
+  }) async {
+    final result = await getAll();
+    return result.fold((list) {
+      final filtered = list.where((c) {
+        if (c.categoriaPaiId != categoriaPaiId) return false;
+        if (excludeId != null && c.id == excludeId) return false;
+        return c.descricao.trim().toLowerCase() ==
+            descricao.trim().toLowerCase();
+      });
+      return filtered.isNotEmpty;
+    }, (error) => false);
   }
 
   @override
@@ -188,7 +191,8 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
         SearchField(
           fieldName: 'descricao',
           value: filter.descricao,
-          type: SearchFieldType.string, //
+          type: SearchFieldType.string,
+          operator: SearchOperator.contains,
         ),
       );
     }
@@ -205,9 +209,7 @@ class CategoriaRepository implements BaseRepository<Categoria, CategoriaDto, Cat
     return result.fold(
       Success.new,
       (error) => Failure(
-        RepositoryException(
-          'Erro ao buscar categorias', //
-        ),
+        RepositoryException('Erro ao buscar categorias: ${error.toString()}'),
       ),
     );
   }

@@ -17,50 +17,42 @@ class SidebarCategoriaSection extends ConsumerWidget {
     final state = ref.watch(lancamentosSidebarStateProvider);
     final filterState = ref.watch(lancamentoFilterProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: SidebarOriginSection(
-        title: 'CATEGORIAS',
-        expanded: state.categoriasExpandidas || state.filtro.isNotEmpty,
-        active: filterState.categoriasSelecionadas.isNotEmpty,
-        onTap: () {
-          ref //
-              .read(lancamentosSidebarStateProvider.notifier)
-              .toggleCategoriasSection();
-        },
-        onFilterTap: () {
-          final notifier = ref.read(lancamentoFilterProvider.notifier);
-          if (filterState.categoriasSelecionadas.isNotEmpty) {
-            notifier.clearCategorias();
-          } else {
-            final allIds = <String>[];
-            void collect(CategoriaDetails cat) {
-              allIds.add(cat.id);
-              for (final sub in cat.subcategorias) {
-                collect(sub);
-              }
+    return SidebarOriginSection(
+      title: 'CATEGORIAS',
+      expanded: state.categoriasExpandidas || state.filtro.isNotEmpty,
+      active: filterState.categoriasSelecionadas.isNotEmpty,
+      onTap: () {
+        ref //
+            .read(lancamentosSidebarStateProvider.notifier)
+            .toggleCategoriasSection();
+      },
+      onFilterTap: () {
+        final notifier = ref.read(lancamentoFilterProvider.notifier);
+        if (filterState.categoriasSelecionadas.isNotEmpty) {
+          notifier.clearCategorias();
+        } else {
+          final allIds = <String>[];
+          void collect(CategoriaDetails cat) {
+            allIds.add(cat.id);
+            for (final sub in cat.subcategorias) {
+              collect(sub);
             }
-
-            for (final item in items) {
-              collect(item);
-            }
-            notifier.selectAllCategorias(allIds);
           }
-        },
-        child: Column(
-          children:
-              items //
-                  .map(
-                    (categoria) => _buildNode(
-                      ref,
-                      categoria,
-                      state,
-                      filterState,
-                      level: 0,
-                    ),
-                  )
-                  .toList(), //
-        ),
+
+          for (final item in items) {
+            collect(item);
+          }
+          notifier.selectAllCategorias(allIds);
+        }
+      },
+      child: Column(
+        children:
+            items //
+                .map(
+                  (categoria) =>
+                      _buildNode(ref, categoria, state, filterState, level: 0),
+                )
+                .toList(), //
       ),
     );
   }

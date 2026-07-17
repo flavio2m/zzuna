@@ -8,6 +8,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
+import 'package:zzuna/domain/statics/banco/banco_regiao.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
@@ -301,6 +302,7 @@ void main() {
             descricao: 'Banco 1',
             sigla: 'B1',
             icon: BancoIcon.outros,
+            regiao: RegiaoBanco.brasil,
           ),
         ),
       ),
@@ -330,11 +332,13 @@ void main() {
               descricao: 'Banco 1',
               sigla: 'B1',
               icon: BancoIcon.outros,
+              regiao: RegiaoBanco.brasil,
             ),
           ),
         ),
         itens: const [],
         conciliado: true,
+        anoMes: 202601,
       );
     }
 

@@ -14,8 +14,8 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_fatura_usecase.
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
-
 import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import '../../../helpers/test_storage.dart';
 
@@ -31,6 +31,7 @@ void main() {
 
   late LancamentoOrigem origemConta;
   late LancamentoOrigem origemConta2;
+  late LancamentoOrigem origemCartaoTest;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
@@ -83,6 +84,20 @@ void main() {
       ),
     );
     origemConta2 = LancamentoOrigem.conta(contaId: c2.getOrThrow().id);
+
+    final cartaoResult = await cartaoRepository.create(
+      CartaoDto(
+        descricao: 'Cartão 1',
+        limite: 1000,
+        bancoSigla: 'NUB',
+        diaFechamento: 12,
+        ativo: true,
+        dataInicial: DateTime(2026, 1, 1),
+      ),
+    );
+    origemCartaoTest = LancamentoOrigem.cartao(
+      cartaoId: cartaoResult.getOrThrow().id,
+    );
   });
 
   tearDown(() {
@@ -306,6 +321,79 @@ void main() {
           (e) => e.origem == origemConta2,
         );
         expect(newExtratoInDb.saldoFinal, equals(-150.0));
+      },
+    );
+    test(
+      'Should change extratoFaturaId correctly when date crosses the diaFechamento boundary for a Cartão',
+      () async {
+        final origemCartao = origemCartaoTest;
+
+        // 1. Create original launch in Cartao on 15/07 (falls on 07/2026 invoice)
+        final createDto = LancamentoDto(
+          descricao: 'Original',
+          origem: origemCartao,
+          data: DateTime(2026, 7, 15),
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 100,
+            ),
+          ],
+        );
+        final extrato = await resolveUseCase.execute(
+          ResolveExtratoFaturaDto(
+            origem: origemCartao,
+            data: createDto.data,
+            valor: 100,
+            tipo: createDto.tipo,
+          ),
+        );
+        final extratoJulhoEntity = extrato.getOrThrow();
+        createDto.setExtratoFaturaId(extratoJulhoEntity.id);
+        final original = await lancamentoRepository.create(createDto);
+        final originalId = original.getOrThrow().id;
+
+        // Assert it was created in July
+        expect(extratoJulhoEntity.mes.numero, equals(7));
+
+        // 2. Update launch date to 11/07 (should fall on 06/2026 invoice since diaFechamento is 12)
+        final updateDto = LancamentoDto(
+          id: originalId,
+          descricao: 'Alterado',
+          origem: origemCartao,
+          data: DateTime(2026, 7, 11),
+          itens: [
+            LancamentoItem(
+              numero: 1,
+              categoriaId: 'cat-1',
+              centroCustoId: 'cc-1',
+              valor: 100,
+            ),
+          ],
+        );
+
+        final result = await useCase.execute(updateDto);
+        expect(result.isSuccess(), isTrue);
+
+        final updatedEntity = result.getOrThrow();
+
+        // It must have changed to a different extrato
+        expect(
+          updatedEntity.extratoFaturaId,
+          isNot(equals(extratoJulhoEntity.id)),
+        );
+
+        // Retrieve the new extrato
+        final newExtratoRes = await extratoRepository.getById(
+          updatedEntity.extratoFaturaId,
+        );
+        final newExtrato = newExtratoRes.getOrThrow();
+
+        // Assert it moved to June
+        expect(newExtrato.mes.numero, equals(6));
+        expect(newExtrato.ano, equals(2026));
       },
     );
   });

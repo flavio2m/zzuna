@@ -87,6 +87,7 @@ class CreateLancamentosUseCase {
 
       final matchingExtrato = extratos[matchingExtratoIdx];
       dto.setExtratoFaturaId(matchingExtrato.id);
+      dto.setAnoMes(matchingExtrato.periodo);
       if (dto.id == null) {
         dto.setId(const Uuid().v4());
       }
@@ -110,6 +111,7 @@ class CreateLancamentosUseCase {
             origem: dto.origem,
             itens: dto.itens,
             conciliado: dto.conciliado,
+            anoMes: dto.anoMes!,
             grupo: dto.grupo,
             observacao: dto.observacao,
           ),

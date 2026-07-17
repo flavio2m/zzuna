@@ -15,7 +15,15 @@ class AuthRepository {
   final UserRepository _userRepository;
   final _streamController = StreamController<User>.broadcast();
 
-  AuthRepository(this._authClient, this._userRepository);
+  AuthRepository(this._authClient, this._userRepository) {
+    _authClient.authStateChanges().listen((loggedUser) {
+      if (loggedUser != null) {
+        _streamController.add(loggedUser);
+      } else {
+        _streamController.add(const User.notLogged());
+      }
+    });
+  }
 
   AsyncResult<LoggedUser> login(Credentials credentials) async {
     final validator = CredentialsValidator();

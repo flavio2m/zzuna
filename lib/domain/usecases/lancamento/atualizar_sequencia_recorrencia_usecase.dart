@@ -68,6 +68,7 @@ class AtualizarSequenciaRecorrenciaUseCase {
           origem: item.origem,
           itens: item.itens,
           conciliado: item.conciliado,
+          anoMes: item.anoMes,
           grupo: itemGrupo.copyWith(sequencia: currentSeq),
           observacao: item.observacao,
         ),

@@ -36,24 +36,67 @@ class ResolveExtratoFaturaUseCase {
     final info = infoRes.getOrThrow();
     final dataInicial = info.dataInicial;
 
-    final targetMonth = DateTime(dto.data.year, dto.data.month, 1);
+    // Se for cartão, a fatura muda no dia do fechamento.
+    // Lançamento < diaFechamento -> cai no mês ANTERIOR
+    //   (ex: fatura 06 fecha 10/07. Compra 05/07 cai em 06).
+    // Lançamento >= diaFechamento -> cai no mês ATUAL
+    //   (ex: fatura 07 fecha 10/08. Compra 15/07 cai em 07).
+    int targetYear = dto.data.year;
+    int targetMonthNumber = dto.data.month;
+
+    if (info.diaFechamento != null) {
+      if (info.diaFechamento! < 15) {
+        // Fechamento na primeira quinzena. A fatura leva o nome do mês anterior (maior parte do ciclo)
+        if (dto.data.day < info.diaFechamento!) {
+          targetMonthNumber -= 1;
+        }
+      } else {
+        // Fechamento na segunda quinzena. A fatura leva o nome do mês atual
+        if (dto.data.day > info.diaFechamento!) {
+          targetMonthNumber += 1;
+        }
+      }
+
+      // Tratar viradas de ano
+      if (targetMonthNumber == 0) {
+        targetMonthNumber = 12;
+        targetYear -= 1;
+      } else if (targetMonthNumber == 13) {
+        targetMonthNumber = 1;
+        targetYear += 1;
+      }
+    }
+
+    final targetMonth = DateTime(targetYear, targetMonthNumber, 1);
     if (targetMonth.isBefore(dataInicial)) {
       final dateStr = UtilData.obterDataDDMMAAAA(dto.data);
       final dataInicialStr = UtilData.obterDataDDMMAAAA(dataInicial);
-      return Failure(
-        DomainException(
-          'A data do lançamento ($dateStr) não pode ser anterior à data '
-          'inicial ($dataInicialStr) do(a) "${info.nomeOrigem}".',
-        ),
-      );
+
+      if (origem is LancamentoOrigemCartao) {
+        final targetMesStr =
+            '${targetMonthNumber.toString().padLeft(2, '0')}/$targetYear';
+        return Failure(
+          DomainException(
+            'A compra do dia $dateStr entraria na fatura $targetMesStr, '
+            'que é anterior à data inicial ($dataInicialStr) do cartão "${info.nomeOrigem}".',
+          ),
+        );
+      } else {
+        return Failure(
+          DomainException(
+            'A data do lançamento ($dateStr) não pode ser anterior à data '
+            'inicial ($dataInicialStr) do(a) "${info.nomeOrigem}".',
+          ),
+        );
+      }
     }
 
-    final mes = Mes.values.firstWhere((m) => m.numero == dto.data.month);
+    final mes = Mes.values.firstWhere((m) => m.numero == targetMonthNumber);
 
     // 2. Buscar extrato do período
     final targetRes = await _extratoRepository.searchByPeriodo(
       origem,
-      dto.data.year,
+      targetYear,
       mes, //
     );
     if (targetRes.isError()) {
@@ -71,7 +114,7 @@ class ResolveExtratoFaturaUseCase {
       // 3. Buscar extrato anterior para herdar o saldoInicial
       final prevRes = await _extratoRepository.searchPrevious(
         origem,
-        dto.data.year,
+        targetYear,
         mes, //
       );
       if (prevRes.isError()) {
@@ -88,12 +131,12 @@ class ResolveExtratoFaturaUseCase {
 
       final newExtratoDto = ExtratoFaturaDto(
         origem: origem,
-        ano: dto.data.year,
+        ano: targetYear,
         mes: mes,
-        dataInicio: DateTime(dto.data.year, dto.data.month, 1),
+        dataInicio: DateTime(targetYear, targetMonthNumber, 1),
         dataFim: DateTime(
-          dto.data.year,
-          dto.data.month + 1,
+          targetYear,
+          targetMonthNumber + 1,
           0,
           23,
           59,
@@ -165,11 +208,14 @@ class ResolveExtratoFaturaUseCase {
     return Success(updatedAlvo);
   }
 
-  Future<Result<({DateTime dataInicial, String nomeOrigem})>> _getDataInicial(
-    LancamentoOrigem origem,
-  ) async {
+  Future<
+    Result<({DateTime dataInicial, String nomeOrigem, int? diaFechamento})>
+  >
+  _getDataInicial(LancamentoOrigem origem) async {
     DateTime dataInicial;
     String nomeOrigem;
+    int? diaFechamento;
+
     if (origem is LancamentoOrigemConta) {
       final contaRes = await _contaRepository.getById(origem.contaId);
       if (contaRes.isError()) {
@@ -190,12 +236,14 @@ class ResolveExtratoFaturaUseCase {
       final cartao = cartaoRes.getOrThrow();
       dataInicial = cartao.dataInicial;
       nomeOrigem = cartao.descricao;
+      diaFechamento = cartao.diaFechamento;
     } else {
       return Failure(DomainException('Origem de lançamento desconhecida'));
     }
     return Success((
       dataInicial: DateTime(dataInicial.year, dataInicial.month, 1),
       nomeOrigem: nomeOrigem,
+      diaFechamento: diaFechamento,
     ));
   }
 

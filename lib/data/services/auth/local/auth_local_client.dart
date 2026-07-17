@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_auth_exception.dart';
 import 'package:zzuna/data/services/auth/auth_client_base.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
+import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/domain/dtos/user/credentials.dart';
 import 'package:zzuna/domain/dtos/user/register_user_dto.dart';
 import 'package:zzuna/domain/dtos/user/loaded_user_dto.dart';
@@ -9,7 +9,7 @@ import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:result_dart/result_dart.dart';
 
 class AuthLocalClient implements AuthClientBase {
-  final LocalStorage<LoadedUser> _userStorage;
+  final BaseStorage<LoadedUser> _userStorage;
 
   AuthLocalClient(this._userStorage);
 
@@ -60,9 +60,10 @@ class AuthLocalClient implements AuthClientBase {
 
   @override
   AsyncResult<LoggedUser> registerUser(RegisterUserDto dto) async {
-    // await Future.delayed(const Duration(seconds: 5));
-    final id = dto.id ?? Uuid().v4();
+    final id = dto.id ?? const Uuid().v4();
 
+    // A criação do usuário no banco de dados é feita pelo UserRepository.
+    // O AuthLocalClient apenas simula o provedor de auth e retorna o usuário logado.
     return Success(_createLoggedUser(id: id, name: dto.name, email: dto.email));
   }
 
@@ -71,6 +72,11 @@ class AuthLocalClient implements AuthClientBase {
     return Success(
       _createLoggedUser(id: dto.id, name: dto.name, email: dto.email), //
     );
+  }
+
+  @override
+  Stream<LoggedUser?> authStateChanges() async* {
+    yield null; // Local auth won't restore session by default
   }
 
   LoggedUser _toLoggedUser(LoadedUser user) {

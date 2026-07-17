@@ -128,6 +128,23 @@ class LocalStorage<T extends Object> implements BaseStorage<T> {
   }
 
   @override
+  AsyncResult<Unit> deleteAll(List<String> ids) async {
+    if (ids.isEmpty) return const Success(unit);
+    try {
+      final listResult = await _getList();
+      if (listResult.isError()) {
+        return listResult.exceptionOrNull()!.toFailure();
+      }
+      final list = listResult.getOrThrow();
+      final idSet = ids.toSet();
+      list.removeWhere((item) => idSet.contains(toJson(item)['id']));
+      return _saveList(list);
+    } catch (e, s) {
+      return Failure(LocalStorageException('Erro ao deletar lista: $e', s));
+    }
+  }
+
+  @override
   AsyncResult<List<T>> getAll() async {
     return _getList();
   }

@@ -21,7 +21,15 @@ enum SearchFieldType { string, boolean, date, int }
 ///
 /// Intervalo:
 ///   data between [01/01, 31/01]
-enum SearchOperator { equal, lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, between }
+enum SearchOperator {
+  equal,
+  lessThan,
+  lessThanOrEqual,
+  greaterThan,
+  greaterThanOrEqual,
+  between,
+  contains,
+}
 
 /// Ordenação dos resultados.
 enum SearchOrder { ascending, descending }
@@ -89,6 +97,13 @@ abstract class BaseStorage<T extends Object> {
   AsyncResult<Unit> updateAll(List<T> models);
 
   AsyncResult<Unit> delete(String id);
+
+  /// Exclusão em lote.
+  ///
+  /// LocalStorage implementa removendo todos da lista e salvando uma vez.
+  /// FirebaseRealtimeStorage implementa via multi-path update com valor null,
+  /// resultando em uma única chamada de rede (atômica).
+  AsyncResult<Unit> deleteAll(List<String> ids);
 
   AsyncResult<List<T>> getAll();
 

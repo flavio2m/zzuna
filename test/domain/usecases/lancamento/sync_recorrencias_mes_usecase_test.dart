@@ -214,6 +214,7 @@ void main() {
             tipo: TipoRecorrencia.mensal,
             sequencia: 1,
           ),
+          anoMes: 202607,
         );
         lancamentoRepository.lancamentos.add(lancamentoRecorrente);
 
@@ -267,6 +268,7 @@ void main() {
           itens: [],
           conciliado: false,
           grupo: null,
+          anoMes: 202607,
         );
         lancamentoRepository.lancamentos.add(lancamentoNaoRecorrente);
 

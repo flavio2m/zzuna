@@ -143,6 +143,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
               dto.setDescricao(value);
               setState(() {});
             },
+            onFieldSubmitted: (_) => _bancoFocus.requestFocus(),
             validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
@@ -180,6 +181,7 @@ class _ContaUpdateModalState extends ConsumerState<ContaUpdateModal> {
             onDateSelected: (date) {
               dto.setDataInicial(date);
             },
+            validator: validator.byField(dto, 'dataInicial'),
           ),
         ],
       ),

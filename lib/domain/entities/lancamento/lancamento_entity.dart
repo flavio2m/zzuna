@@ -21,6 +21,7 @@ sealed class Lancamento with _$Lancamento {
     required LancamentoOrigem origem,
     required List<LancamentoItem> itens,
     required bool conciliado,
+    required int anoMes,
     LancamentoGrupo? grupo,
     String? observacao,
   }) = _Lancamento;
@@ -43,6 +44,7 @@ sealed class LancamentoDetails with _$LancamentoDetails {
     required LancamentoOrigemDetail origem,
     required List<LancamentoItemDetails> itens,
     required bool conciliado,
+    required int anoMes,
     LancamentoGrupo? grupo,
     String? observacao,
   }) = _LancamentoDetails;

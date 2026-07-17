@@ -181,6 +181,7 @@ class UpdateTransferenciaUseCase {
       extratoFaturaId: newExtratoSaida.id,
       itens: [transferItem],
       conciliado: originalSaida.conciliado,
+      anoMes: newExtratoSaida.periodo,
       grupo: originalSaida.grupo,
       observacao: dto.observacao,
     );
@@ -194,6 +195,7 @@ class UpdateTransferenciaUseCase {
       extratoFaturaId: newExtratoEntrada.id,
       itens: [transferItem],
       conciliado: originalEntrada.conciliado,
+      anoMes: newExtratoEntrada.periodo,
       grupo: originalEntrada.grupo,
       observacao: dto.observacao,
     );

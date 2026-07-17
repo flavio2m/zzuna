@@ -4,15 +4,17 @@ import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/user/user_repository.dart';
-import 'package:zzuna/data/services/storage/local/centro_custo_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/centro_custo_storage_provider.dart';
 import 'package:zzuna/ui/centro_custo/delete/viewmodel/centro_custo_delete_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/list/viewmodels/centro_custo_list_viewmodel.dart';
+import 'package:zzuna/data/services/auth/auth_client_base.dart';
+import 'package:zzuna/data/services/auth/firebase/auth_firebase_client.dart';
 import 'package:zzuna/data/services/auth/local/auth_local_client.dart';
 import 'package:zzuna/data/services/shared_preferences_service.dart';
-import 'package:zzuna/data/services/storage/local/cartao_storage_provider.dart';
-import 'package:zzuna/data/services/storage/local/categoria_storage_provider.dart';
-import 'package:zzuna/data/services/storage/local/conta_storage_provider.dart';
-import 'package:zzuna/data/services/storage/local/user_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/cartao_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/categoria_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/conta_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/user_storage_provider.dart';
 import 'package:zzuna/domain/entities/user_entity.dart';
 import 'package:zzuna/ui/auth/login/viewmodels/login_viewmodel.dart';
 import 'package:zzuna/ui/auth/logout/viewmodels/logout_viewmodel.dart';
@@ -36,6 +38,7 @@ import 'package:zzuna/ui/cartao/update/viewmodels/cartao_update_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/update/viewmodels/centro_custo_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/list/viewmodels/conta_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
@@ -43,8 +46,8 @@ import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
-import 'package:zzuna/data/services/storage/local/extrato_fatura_storage_provider.dart';
-import 'package:zzuna/data/services/storage/local/lancamento_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/extrato_fatura_storage_provider.dart';
+import 'package:zzuna/data/services/storage/providers/lancamento_storage_provider.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
@@ -55,8 +58,10 @@ import 'package:zzuna/domain/usecases/lancamento/resolve_extrato_faturas_usecase
 import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reabrir_mes_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/seed/seed_initial_data_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/create_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
+import 'package:zzuna/domain/usecases/lancamento/delete_lancamento_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/reconcile_lancamentos_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamentos_data_usecase.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
@@ -110,6 +115,20 @@ final authLocalClientProvider = Provider<AuthLocalClient>(
   (ref) => AuthLocalClient(ref.watch(userLocalStorageProvider)), //
 );
 
+/// Provider para cliente de autenticação Firebase
+final authFirebaseClientProvider = Provider<AuthFirebaseClient>(
+  (ref) => AuthFirebaseClient(ref.watch(userLocalStorageProvider)), //
+);
+
+/// Provider condicional de autenticação
+final authClientProvider = Provider<AuthClientBase>((ref) {
+  if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
+    return ref.watch(authLocalClientProvider);
+  } else {
+    return ref.watch(authFirebaseClientProvider);
+  }
+});
+
 final sharedPreferencesServiceProvider = Provider<SharedPreferencesService>(
   (ref) => SharedPreferencesService(),
 );
@@ -130,7 +149,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 /// Provider para AuthRepository com lifecycle gerenciado
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final repository = AuthRepository(
-    ref.watch(authLocalClientProvider),
+    ref.watch(authClientProvider),
     ref.watch(userRepositoryProvider), //
   );
 
@@ -139,21 +158,39 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return repository;
 });
 
-// VIEWMODELS - Camada de Apresentação
+// ============================================================================
+// SEED - Camada de Domínio
 // ============================================================================
 
-// AUTH
-final loginViewModelProvider = Provider<LoginViewModel>(
-  (ref) => LoginViewModel(ref.watch(authRepositoryProvider)), //
-);
+final seedInitialDataUseCaseProvider = Provider<SeedInitialDataUseCase>((ref) {
+  return SeedInitialDataUseCase(
+    ref.read(contaRepositoryProvider),
+    ref.read(cartaoRepositoryProvider),
+    ref.read(centroCustoRepositoryProvider),
+    ref.read(categoriaRepositoryProvider),
+  );
+});
 
-final logoutViewModelProvider = Provider<LogoutViewModel>(
-  (ref) => LogoutViewModel(ref.watch(authRepositoryProvider)), //
-);
+// ============================================================================
+// VIEW MODELS - Camada de Apresentação
+// ============================================================================
 
-final registerViewModelProvider = Provider<RegisterViewModel>(
-  (ref) => RegisterViewModel(ref.watch(authRepositoryProvider)),
-);
+final loginViewModelProvider = Provider.autoDispose<LoginViewModel>((ref) {
+  return LoginViewModel(ref.read(authRepositoryProvider));
+});
+
+final logoutViewModelProvider = Provider.autoDispose<LogoutViewModel>((ref) {
+  return LogoutViewModel(ref.read(authRepositoryProvider));
+});
+
+final registerViewModelProvider = Provider.autoDispose<RegisterViewModel>((
+  ref,
+) {
+  return RegisterViewModel(
+    ref.read(authRepositoryProvider),
+    ref.read(seedInitialDataUseCaseProvider),
+  );
+});
 
 // ============================================================================
 // STATE PROVIDERS - Estado Global da Aplicação

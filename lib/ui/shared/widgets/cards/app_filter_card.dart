@@ -6,14 +6,27 @@ class AppFilterCard extends StatefulWidget {
   final String title;
   final Widget child;
 
-  const AppFilterCard({super.key, this.title = 'Opções', required this.child});
+  final bool initiallyExpanded;
+
+  const AppFilterCard({
+    super.key,
+    this.title = 'Opções',
+    this.initiallyExpanded = true,
+    required this.child,
+  });
 
   @override
   State<AppFilterCard> createState() => _AppFilterCardState();
 }
 
 class _AppFilterCardState extends State<AppFilterCard> {
-  bool _expanded = true;
+  late bool _expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.initiallyExpanded;
+  }
 
   void _toggleExpanded() {
     setState(() {
@@ -43,7 +56,9 @@ class _AppFilterCardState extends State<AppFilterCard> {
 
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 200),
-            crossFadeState: _expanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            crossFadeState: _expanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
             firstChild: Column(
               children: [
                 const AppSpacing(size: AppSpacingSize.md),

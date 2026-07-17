@@ -99,8 +99,11 @@ class UpdateLancamentoUseCase {
     }
     final newExtrato = extratoResult.getOrNull()!;
 
-    // 6. Atualizar DTO com o novo ID de extrato/fatura
-    final updatedDto = dto.copyWith(extratoFaturaId: newExtrato.id);
+    // 6. Atualizar DTO com o novo ID de extrato/fatura e anoMes
+    final updatedDto = dto.copyWith(
+      extratoFaturaId: newExtrato.id,
+      anoMes: newExtrato.periodo,
+    );
 
     // 7. Persistir a alteração do lançamento no repositório
     final updateRes = await _repository.update(updatedDto);
@@ -113,29 +116,42 @@ class UpdateLancamentoUseCase {
     final newOrigem = dto.origem;
 
     if (oldOrigem == newOrigem) {
-      final oldestDate = original.data.isBefore(dto.data)
-          ? original.data
-          : dto.data;
+      final int oldestAnoMes = original.anoMes < updatedDto.anoMes!
+          ? original.anoMes
+          : updatedDto.anoMes!;
+      final int startingAno = oldestAnoMes ~/ 100;
+      final Mes startingMes = Mes.values.firstWhere(
+        (m) => m.numero == (oldestAnoMes % 100),
+      );
+
       final recalcRes = await _recalculateUseCase.execute(
         oldOrigem,
-        startingAno: oldestDate.year,
-        startingMes: Mes.fromDate(oldestDate),
+        startingAno: startingAno,
+        startingMes: startingMes,
       );
       if (recalcRes.isError()) return Failure(recalcRes.exceptionOrNull()!);
     } else {
+      final int oldAno = original.anoMes ~/ 100;
+      final Mes oldMes = Mes.values.firstWhere(
+        (m) => m.numero == (original.anoMes % 100),
+      );
       final oldRecalcRes = await _recalculateUseCase.execute(
         oldOrigem,
-        startingAno: original.data.year,
-        startingMes: Mes.fromDate(original.data),
+        startingAno: oldAno,
+        startingMes: oldMes,
       );
       if (oldRecalcRes.isError()) {
         return Failure(oldRecalcRes.exceptionOrNull()!);
       }
 
+      final int newAno = updatedDto.anoMes! ~/ 100;
+      final Mes newMes = Mes.values.firstWhere(
+        (m) => m.numero == (updatedDto.anoMes! % 100),
+      );
       final newRecalcRes = await _recalculateUseCase.execute(
         newOrigem,
-        startingAno: dto.data.year,
-        startingMes: Mes.fromDate(dto.data),
+        startingAno: newAno,
+        startingMes: newMes,
       );
       if (newRecalcRes.isError()) {
         return Failure(newRecalcRes.exceptionOrNull()!);

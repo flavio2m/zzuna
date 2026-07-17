@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
@@ -10,6 +11,7 @@ import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 
 class FecharMesUseCase {
   final ContaRepository _contaRepository;
@@ -169,6 +171,14 @@ class FecharMesUseCase {
 
     final naoConciliados = naoConciliadosResult.getOrThrow();
     if (naoConciliados.isNotEmpty) {
+      for (final l in naoConciliados) {
+        developer.log(
+          'Lançamento não conciliado: id=${l.id}, extratoFaturaId='
+          '${l.extratoFaturaId}, anoMes=${l.anoMes}, data=${l.data}, '
+          'descricao=${l.descricao}',
+          name: 'FecharMesUseCase',
+        );
+      }
       return Failure(
         DomainException(
           'Existem ${naoConciliados.length} lançamentos não conciliados.',
@@ -183,13 +193,35 @@ class FecharMesUseCase {
     ExtratoFatura extrato,
     List<Lancamento> lancamentosDaOrigem,
   ) {
-    double totalLancamentos = 0;
+    double totalMovimentado = 0;
     for (final l in lancamentosDaOrigem) {
-      for (final item in l.itens) {
-        totalLancamentos += item.valor;
+      if (l.tipo == LancamentoTipo.receita) {
+        for (final item in l.itens) {
+          totalMovimentado += item.valor;
+        }
+      } else if (l.tipo == LancamentoTipo.despesa) {
+        for (final item in l.itens) {
+          totalMovimentado -= item.valor;
+        }
+      } else if (l.tipo == LancamentoTipo.transferencia) {
+        for (final item in l.itens) {
+          switch (item) {
+            case LancamentoItemTransferencia(
+              :final origemEntrada,
+              :final origemSaida,
+            ):
+              if (origemEntrada == extrato.origem) {
+                totalMovimentado += item.valor;
+              } else if (origemSaida == extrato.origem) {
+                totalMovimentado -= item.valor;
+              }
+            default:
+              break;
+          }
+        }
       }
     }
-    return extrato.saldoInicial + totalLancamentos;
+    return extrato.saldoInicial + totalMovimentado;
   }
 
   AsyncResult<List<ExtratoFaturaDto>> _propagarDelta(

@@ -1,0 +1,69 @@
+{
+  "rules": {
+    "$uid": {
+      ".read": "$uid === auth.uid",
+      ".write": "$uid === auth.uid",
+      "cartoes": {
+        ".indexOn": [
+          "isDeleted",
+          "descricao",
+          "ativo",
+          "bancoSigla"
+        ]
+      },
+      "categorias": {
+        ".indexOn": [
+          "isDeleted",
+          "descricao",
+          "tipo",
+          "ativo",
+          "categoriaPaiId"
+        ]
+      },
+      "centro_custos": {
+        ".indexOn": [
+          "isDeleted",
+          "descricao",
+          "ativo",
+          "padrao"
+        ]
+      },
+      "contas": {
+        ".indexOn": [
+          "isDeleted",
+          "descricao",
+          "ativo",
+          "bancoSigla"
+        ]
+      },
+      "extrato_faturas": {
+        ".indexOn": [
+          "isDeleted",
+          "periodo",
+          "origemKey",
+          "ano",
+          "mes",
+          "fechado"
+        ]
+      },
+      "lancamentos": {
+        ".indexOn": [
+          "isDeleted",
+          "data",
+          "extratoFaturaId",
+          "tipo",
+          "conciliado",
+          "anoMes",
+          "grupo/grupoId"
+        ]
+      },
+      "users": {
+        ".indexOn": [
+          "isDeleted",
+          "email",
+          "nome"
+        ]
+      }
+    }
+  }
+}

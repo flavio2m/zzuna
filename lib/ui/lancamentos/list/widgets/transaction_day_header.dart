@@ -26,7 +26,7 @@ class TransactionDayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: const BoxDecoration(
         color: AppColors.slate50,
         border: Border(bottom: BorderSide(color: AppColors.border)),
@@ -61,7 +61,7 @@ class TransactionDayHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const AppText(
-                    'SALDO DO DIA: ',
+                    'Saldo do dia: ',
                     variant: AppTextVariant.caption,
                     color: AppColors.slate400,
                     fontWeight: FontWeight.w900,
@@ -79,7 +79,7 @@ class TransactionDayHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const AppText(
-                    'SALDO EXTRATO: ',
+                    'Saldo Extrato: ',
                     variant: AppTextVariant.caption,
                     color: AppColors.slate400,
                     fontWeight: FontWeight.w900,

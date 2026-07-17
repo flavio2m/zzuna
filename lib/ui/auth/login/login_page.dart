@@ -27,6 +27,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   late final LoginViewModel viewModel;
   final validator = CredentialsValidator();
   final Credentials credentials = Credentials();
+  final entrarFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void dispose() {
     viewModel.loginCommand.removeListener(_listenableListener);
+    entrarFocusNode.dispose();
     super.dispose();
   }
 
@@ -79,8 +81,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                     return AppButton(
                       label: isLoading ? 'Entrando...' : 'Entrar',
-                      icon: const Icon(Icons.login),
-                      onPressed: isLoading || !_canSubmit ? null : _handleRegister,
+                      icon: Icon(
+                        Icons.login,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      focusNode: entrarFocusNode,
+                      onPressed: isLoading || !_canSubmit
+                          ? null
+                          : _handleRegister,
                       loading: isLoading,
                       textStyle: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
@@ -97,13 +105,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const FlutterLogo(size: 100),
+                  Image.asset('assets/icons/zzuna_logo.png', height: 100),
 
                   AppSpacing(size: AppSpacingSize.md),
 
                   AppEmailFormField(
                     label: 'E-mail',
                     icon: Icons.email,
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
                     onChanged: (value) {
                       credentials.setEmail(value);
                       setState(() {});
@@ -117,6 +127,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     label: 'Senha',
                     icon: Icons.lock,
                     obscureText: true,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => entrarFocusNode.requestFocus(),
                     onChanged: (value) {
                       credentials.setPassword(value);
                       setState(() {});

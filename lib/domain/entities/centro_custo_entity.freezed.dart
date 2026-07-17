@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CentroCusto {
 
- String get id; String get descricao; bool get ativo;
+ String get id; String get descricao; bool get ativo; bool get padrao;
 /// Create a copy of CentroCusto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CentroCustoCopyWith<CentroCusto> get copyWith => _$CentroCustoCopyWithImpl<Cent
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CentroCusto&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CentroCusto&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.padrao, padrao) || other.padrao == padrao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,padrao);
 
 @override
 String toString() {
-  return 'CentroCusto(id: $id, descricao: $descricao, ativo: $ativo)';
+  return 'CentroCusto(id: $id, descricao: $descricao, ativo: $ativo, padrao: $padrao)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CentroCustoCopyWith<$Res>  {
   factory $CentroCustoCopyWith(CentroCusto value, $Res Function(CentroCusto) _then) = _$CentroCustoCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, bool ativo
+ String id, String descricao, bool ativo, bool padrao
 });
 
 
@@ -65,11 +65,12 @@ class _$CentroCustoCopyWithImpl<$Res>
 
 /// Create a copy of CentroCusto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? padrao = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
+as bool,padrao: null == padrao ? _self.padrao : padrao // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  bool padrao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CentroCusto() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.id,_that.descricao,_that.ativo);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  bool padrao)  $default,) {final _that = this;
 switch (_that) {
 case _CentroCusto():
-return $default(_that.id,_that.descricao,_that.ativo);}
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -190,10 +191,10 @@ return $default(_that.id,_that.descricao,_that.ativo);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  bool padrao)?  $default,) {final _that = this;
 switch (_that) {
 case _CentroCusto() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);case _:
   return null;
 
 }
@@ -205,12 +206,13 @@ return $default(_that.id,_that.descricao,_that.ativo);case _:
 @JsonSerializable()
 
 class _CentroCusto implements CentroCusto {
-  const _CentroCusto({required this.id, required this.descricao, required this.ativo});
+  const _CentroCusto({required this.id, required this.descricao, required this.ativo, this.padrao = false});
   factory _CentroCusto.fromJson(Map<String, dynamic> json) => _$CentroCustoFromJson(json);
 
 @override final  String id;
 @override final  String descricao;
 @override final  bool ativo;
+@override@JsonKey() final  bool padrao;
 
 /// Create a copy of CentroCusto
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +227,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CentroCusto&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CentroCusto&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.padrao, padrao) || other.padrao == padrao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,padrao);
 
 @override
 String toString() {
-  return 'CentroCusto(id: $id, descricao: $descricao, ativo: $ativo)';
+  return 'CentroCusto(id: $id, descricao: $descricao, ativo: $ativo, padrao: $padrao)';
 }
 
 
@@ -245,7 +247,7 @@ abstract mixin class _$CentroCustoCopyWith<$Res> implements $CentroCustoCopyWith
   factory _$CentroCustoCopyWith(_CentroCusto value, $Res Function(_CentroCusto) _then) = __$CentroCustoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, bool ativo
+ String id, String descricao, bool ativo, bool padrao
 });
 
 
@@ -262,11 +264,12 @@ class __$CentroCustoCopyWithImpl<$Res>
 
 /// Create a copy of CentroCusto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? padrao = null,}) {
   return _then(_CentroCusto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
+as bool,padrao: null == padrao ? _self.padrao : padrao // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -278,7 +281,7 @@ as bool,
 /// @nodoc
 mixin _$CentroCustoDetails {
 
- String get id; String get descricao; bool get ativo;
+ String get id; String get descricao; bool get ativo; bool get padrao;
 /// Create a copy of CentroCustoDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,16 +294,16 @@ $CentroCustoDetailsCopyWith<CentroCustoDetails> get copyWith => _$CentroCustoDet
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CentroCustoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CentroCustoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.padrao, padrao) || other.padrao == padrao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,padrao);
 
 @override
 String toString() {
-  return 'CentroCustoDetails(id: $id, descricao: $descricao, ativo: $ativo)';
+  return 'CentroCustoDetails(id: $id, descricao: $descricao, ativo: $ativo, padrao: $padrao)';
 }
 
 
@@ -311,7 +314,7 @@ abstract mixin class $CentroCustoDetailsCopyWith<$Res>  {
   factory $CentroCustoDetailsCopyWith(CentroCustoDetails value, $Res Function(CentroCustoDetails) _then) = _$CentroCustoDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, bool ativo
+ String id, String descricao, bool ativo, bool padrao
 });
 
 
@@ -328,11 +331,12 @@ class _$CentroCustoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CentroCustoDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? padrao = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
+as bool,padrao: null == padrao ? _self.padrao : padrao // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -415,10 +419,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  bool padrao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CentroCustoDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);case _:
   return orElse();
 
 }
@@ -436,10 +440,10 @@ return $default(_that.id,_that.descricao,_that.ativo);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  bool padrao)  $default,) {final _that = this;
 switch (_that) {
 case _CentroCustoDetails():
-return $default(_that.id,_that.descricao,_that.ativo);}
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -453,10 +457,10 @@ return $default(_that.id,_that.descricao,_that.ativo);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  bool padrao)?  $default,) {final _that = this;
 switch (_that) {
 case _CentroCustoDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.padrao);case _:
   return null;
 
 }
@@ -468,12 +472,13 @@ return $default(_that.id,_that.descricao,_that.ativo);case _:
 @JsonSerializable()
 
 class _CentroCustoDetails implements CentroCustoDetails {
-  const _CentroCustoDetails({required this.id, required this.descricao, required this.ativo});
+  const _CentroCustoDetails({required this.id, required this.descricao, required this.ativo, this.padrao = false});
   factory _CentroCustoDetails.fromJson(Map<String, dynamic> json) => _$CentroCustoDetailsFromJson(json);
 
 @override final  String id;
 @override final  String descricao;
 @override final  bool ativo;
+@override@JsonKey() final  bool padrao;
 
 /// Create a copy of CentroCustoDetails
 /// with the given fields replaced by the non-null parameter values.
@@ -488,16 +493,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CentroCustoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CentroCustoDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.padrao, padrao) || other.padrao == padrao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,padrao);
 
 @override
 String toString() {
-  return 'CentroCustoDetails(id: $id, descricao: $descricao, ativo: $ativo)';
+  return 'CentroCustoDetails(id: $id, descricao: $descricao, ativo: $ativo, padrao: $padrao)';
 }
 
 
@@ -508,7 +513,7 @@ abstract mixin class _$CentroCustoDetailsCopyWith<$Res> implements $CentroCustoD
   factory _$CentroCustoDetailsCopyWith(_CentroCustoDetails value, $Res Function(_CentroCustoDetails) _then) = __$CentroCustoDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, bool ativo
+ String id, String descricao, bool ativo, bool padrao
 });
 
 
@@ -525,11 +530,12 @@ class __$CentroCustoDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CentroCustoDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? padrao = null,}) {
   return _then(_CentroCustoDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
+as bool,padrao: null == padrao ? _self.padrao : padrao // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

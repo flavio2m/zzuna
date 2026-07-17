@@ -15,6 +15,7 @@ import 'package:zzuna/ui/lancamentos/recorrencia/finalizar/widgets/lancamentos_f
 import 'package:zzuna/ui/lancamentos/recorrencia/reativar/widgets/lancamentos_reativar_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/widgets/lancamentos_atualizar_data_recorrencia_menu_item.dart';
 import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_sequencia/widgets/lancamentos_atualizar_sequencia_recorrencia_menu_item.dart';
+import 'package:zzuna/ui/lancamentos/delete/widgets/lancamentos_excluir_menu_item.dart';
 
 enum TipoAcoes {
   visualizar,
@@ -27,7 +28,8 @@ enum TipoAcoes {
   atualizarDataRecorrencia,
   atualizarSequenciaRecorrencia,
   finalizarRecorrencia,
-  reativarRecorrencia;
+  reativarRecorrencia,
+  excluir;
 
   String get label => switch (this) {
     TipoAcoes.visualizar => 'Visualizar',
@@ -42,6 +44,7 @@ enum TipoAcoes {
       'Atualizar Sequência da Recorrência',
     TipoAcoes.finalizarRecorrencia => 'Finalizar Recorrência',
     TipoAcoes.reativarRecorrencia => 'Reativar Recorrência',
+    TipoAcoes.excluir => 'Excluir',
   };
 }
 
@@ -77,6 +80,7 @@ class IconAcoesButton extends ConsumerWidget {
         dataDay != recorrenciaGrupo.diaDoMes;
     final showAtualizarSequenciaRecorrencia =
         !conciliado && recorrenciaGrupo != null && recorrenciaGrupo.ativo;
+    final showExcluir = !conciliado;
 
     return PopupMenuButton<TipoAcoes>(
       tooltip: 'Ações',
@@ -153,6 +157,12 @@ class IconAcoesButton extends ConsumerWidget {
             context: context,
             ref: ref,
             lancamentoId: lancamento.id,
+          ),
+        if (showExcluir)
+          LancamentosExcluirMenuItem(
+            context: context,
+            ref: ref,
+            lancamento: lancamento,
           ),
       ],
     );

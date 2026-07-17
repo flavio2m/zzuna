@@ -31,17 +31,46 @@ void main() {
       expect(list.any((c) => c.descricao == 'Alimentação'), isTrue);
     });
 
-    test('create returns failure when descricao already exists', () async {
-      final dto = CategoriaDto(descricao: 'Alimentação');
+    test(
+      'create returns failure when descricao already exists at the same level',
+      () async {
+        final dto = CategoriaDto(descricao: 'Alimentação');
 
-      await repository.create(dto);
+        await repository.create(dto);
 
-      final result = await repository.create(
-        CategoriaDto(descricao: 'Alimentação'), //
-      );
+        final result = await repository.create(
+          CategoriaDto(descricao: 'Alimentação'), //
+        );
 
-      expect(result.isError(), isTrue);
-    });
+        expect(result.isError(), isTrue);
+      },
+    );
+
+    test(
+      'create succeeds when descricao already exists at a different level',
+      () async {
+        final p1 = await repository.create(
+          CategoriaDto(descricao: 'Transporte'),
+        );
+        final p2 = await repository.create(CategoriaDto(descricao: 'Viagem'));
+
+        await repository.create(
+          CategoriaDto(
+            descricao: 'Combustível',
+            categoriaPaiId: p1.getOrThrow().id,
+          ),
+        );
+
+        final result = await repository.create(
+          CategoriaDto(
+            descricao: 'Combustível',
+            categoriaPaiId: p2.getOrThrow().id,
+          ), //
+        );
+
+        expect(result.isSuccess(), isTrue);
+      },
+    );
 
     test('create permits maximum 2 levels of hierarchy', () async {
       // Level 1
@@ -65,22 +94,25 @@ void main() {
       expect(subSubResult.isError(), isTrue);
     });
 
-    test('findByDescricao returns an existing categoria', () async {
-      final dto = CategoriaDto(descricao: 'Viagem');
+    test(
+      'update returns failure when new descricao already exists at the same level',
+      () async {
+        await repository.create(CategoriaDto(descricao: 'Transporte'));
+        final created = await repository.create(
+          CategoriaDto(descricao: 'Viagem'),
+        );
 
-      await repository.create(dto);
+        final result = await repository.update(
+          CategoriaDto(
+            id: created.getOrThrow().id,
+            descricao: 'Transporte',
+            ativo: true,
+          ),
+        );
 
-      final result = await repository.findByDescricao('Viagem');
-
-      expect(result.isSuccess(), isTrue);
-      expect(result.getOrThrow().descricao, 'Viagem');
-    });
-
-    test('findByDescricao returns failure when categoria does not exist', () async {
-      final result = await repository.findByDescricao('Categoria Inexistente');
-
-      expect(result.isError(), isTrue);
-    });
+        expect(result.isError(), isTrue);
+      },
+    );
 
     test('update changes an existing categoria', () async {
       final created = await repository.create(
@@ -90,11 +122,7 @@ void main() {
       final categoria = created.getOrThrow();
 
       final result = await repository.update(
-        CategoriaDto(
-          id: categoria.id,
-          descricao: 'Atualizado',
-          ativo: false,
-        ),
+        CategoriaDto(id: categoria.id, descricao: 'Atualizado', ativo: false),
       );
 
       final saved = await repository.getById(categoria.id);

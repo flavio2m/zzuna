@@ -7,6 +7,7 @@ import 'package:zzuna/ui/shared/widgets/buttons/app_button.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_email_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
   final dto = RegisterUserDto(name: '', email: '', password: '');
 
   final formKey = GlobalKey<FormState>();
+  final cadastrarFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -54,6 +56,7 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
   @override
   void dispose() {
     viewModel.registerCommand.removeListener(_commandListener);
+    cadastrarFocusNode.dispose();
     super.dispose();
   }
 
@@ -86,7 +89,15 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
 
             return AppButton(
               label: isLoading ? 'Cadastrando...' : 'Cadastrar',
-              icon: const Icon(Icons.person_add),
+              icon: Icon(
+                Icons.person_add,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              focusNode: cadastrarFocusNode,
+              textStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
               onPressed: isLoading || !_canSubmit ? null : _handleRegister,
               loading: isLoading,
             );
@@ -98,6 +109,8 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
           AppTextFormField(
             label: 'Nome',
             icon: Icons.person,
+            autofocus: true,
+            textInputAction: TextInputAction.next,
             onChanged: (value) {
               dto.setName(value);
               setState(() {});
@@ -107,12 +120,25 @@ class _RegisterModalState extends ConsumerState<RegisterModal> {
 
           _divider(),
 
+          AppEmailFormField(
+            label: 'E-mail',
+            icon: Icons.email,
+            textInputAction: TextInputAction.next,
+            onChanged: (value) {
+              dto.setEmail(value);
+              setState(() {});
+            },
+            validator: validator.byField(dto, 'email'),
+          ),
+
           _divider(),
 
           AppTextFormField(
             label: 'Senha',
             icon: Icons.lock,
             obscureText: true,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => cadastrarFocusNode.requestFocus(),
             onChanged: (value) {
               dto.setPassword(value);
               setState(() {});

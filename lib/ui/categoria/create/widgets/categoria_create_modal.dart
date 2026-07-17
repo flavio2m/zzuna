@@ -35,7 +35,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   final validator = CategoriaValidator<CategoriaDto>();
 
   late final CategoriaCreateViewModel viewModel;
-  
+
   final _descFocus = FocusNode();
   final _paiFocus = FocusNode();
   final _ativoFocus = FocusNode();
@@ -53,7 +53,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
-    
+
     _descFocus.dispose();
     _paiFocus.dispose();
     _ativoFocus.dispose();
@@ -119,6 +119,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
             autofocus: true,
             focusNode: _descFocus,
             textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _paiFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});

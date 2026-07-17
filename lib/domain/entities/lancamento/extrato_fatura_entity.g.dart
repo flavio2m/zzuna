@@ -24,7 +24,7 @@ _ExtratoFatura _$ExtratoFaturaFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ExtratoFaturaToJson(_ExtratoFatura instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'origem': instance.origem,
+      'origem': instance.origem.toJson(),
       'ano': instance.ano,
       'mes': _$MesEnumMap[instance.mes]!,
       'dataInicio': instance.dataInicio.toIso8601String(),

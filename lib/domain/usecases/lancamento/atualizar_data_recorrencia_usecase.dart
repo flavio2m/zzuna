@@ -74,6 +74,7 @@ class AtualizarDataRecorrenciaUseCase {
         origem: lanc.origem,
         itens: lanc.itens,
         conciliado: lanc.conciliado,
+        anoMes: lanc.anoMes,
         grupo: novoGrupo,
         observacao: lanc.observacao,
       ),
@@ -105,6 +106,7 @@ class AtualizarDataRecorrenciaUseCase {
           origem: futuro.origem,
           itens: futuro.itens,
           conciliado: futuro.conciliado,
+          anoMes: futuro.anoMes,
           grupo: (novoGrupo as LancamentoGrupoRecorrencia).copyWith(
             sequencia: (futuro.grupo as LancamentoGrupoRecorrencia).sequencia,
           ),

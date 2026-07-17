@@ -67,6 +67,7 @@ class ReativarRecorrenciaUseCase {
         origem: lanc.origem,
         itens: lanc.itens,
         conciliado: lanc.conciliado,
+        anoMes: lanc.anoMes,
         grupo: grupoAtivo,
         observacao: lanc.observacao,
       ),
@@ -146,6 +147,7 @@ class ReativarRecorrenciaUseCase {
             origem: lancAtualizado.origem,
             itens: lancAtualizado.itens,
             conciliado: false,
+            anoMes: extrato.periodo,
             grupo: (grupoAtivo as LancamentoGrupoRecorrencia).copyWith(
               sequencia: seqFutura,
             ),

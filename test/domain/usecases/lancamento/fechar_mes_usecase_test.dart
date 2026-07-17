@@ -143,7 +143,7 @@ void main() {
       expect(result.isError(), isTrue);
       expect(
         result.exceptionOrNull()!.toString(),
-        contains('Existe mês anterior não fechado'),
+        contains('mês anterior não está fechado'),
       );
     });
 
@@ -161,6 +161,7 @@ void main() {
             tipo: LancamentoTipo.despesa,
             itens: const [],
             conciliado: false, // NÃO CONCILIADO
+            anoMes: 202602,
           ),
         ];
 
@@ -174,78 +175,100 @@ void main() {
       },
     );
 
-    test('Deve fechar com sucesso e propagar delta', () async {
-      extratoRepo.extratosAnteriores = [];
-      lancamentoRepo.lancamentos = [
-        Lancamento(
-          id: 'l-1',
-          extratoFaturaId: 'ef-1',
-          data: DateTime(2026, 2, 10),
-          descricao: 'Receita',
-          origem: origem,
-          tipo: LancamentoTipo.receita,
-          itens: const [
-            LancamentoItem(
-              numero: 1,
-              centroCustoId: '',
-              categoriaId: '',
-              valor: 100.0,
-            ),
-          ],
-          conciliado: true,
-        ),
-      ];
+    test(
+      'Deve fechar com sucesso e calcular saldo corretamente (receitas e despesas)',
+      () async {
+        extratoRepo.extratosAnteriores = [];
+        lancamentoRepo.lancamentos = [
+          Lancamento(
+            id: 'l-1',
+            extratoFaturaId: 'ef-atual',
+            data: DateTime(2026, 2, 10),
+            descricao: 'Receita',
+            origem: origem,
+            tipo: LancamentoTipo.receita,
+            itens: const [
+              LancamentoItem(
+                numero: 1,
+                centroCustoId: '',
+                categoriaId: '',
+                valor: 100.0,
+              ),
+            ],
+            conciliado: true,
+            anoMes: 202602,
+          ),
+          Lancamento(
+            id: 'l-2',
+            extratoFaturaId: 'ef-atual',
+            data: DateTime(2026, 2, 11),
+            descricao: 'Despesa',
+            origem: origem,
+            tipo: LancamentoTipo.despesa,
+            itens: const [
+              LancamentoItem(
+                numero: 1,
+                centroCustoId: '',
+                categoriaId: '',
+                valor: 30.0,
+              ),
+            ],
+            conciliado: true,
+            anoMes: 202602,
+          ),
+        ];
 
-      extratoRepo.extratosAtuais = [
-        ExtratoFatura(
-          id: 'ef-atual',
-          origem: origem,
-          ano: 2026,
-          mes: Mes.fevereiro,
-          dataInicio: DateTime(2026, 2, 1),
-          dataFim: DateTime(2026, 2, 28),
-          saldoInicial: 50.0,
-          saldoFinal: 50.0,
-          fechado: false,
-          periodo: 202602,
-          origemKey: 'conta_c-1',
-        ),
-      ];
+        extratoRepo.extratosAtuais = [
+          ExtratoFatura(
+            id: 'ef-atual',
+            origem: origem,
+            ano: 2026,
+            mes: Mes.fevereiro,
+            dataInicio: DateTime(2026, 2, 1),
+            dataFim: DateTime(2026, 2, 28),
+            saldoInicial: 50.0,
+            saldoFinal: 50.0, // Errado, será corrigido (50 + 100 - 30 = 120)
+            fechado: false,
+            periodo: 202602,
+            origemKey: 'conta_c-1',
+          ),
+        ];
 
-      extratoRepo.extratosFuturos = [
-        ExtratoFatura(
-          id: 'ef-futuro',
-          origem: origem,
-          ano: 2026,
-          mes: Mes.marco,
-          dataInicio: DateTime(2026, 3, 1),
-          dataFim: DateTime(2026, 3, 31),
-          saldoInicial: 50.0,
-          saldoFinal: 100.0,
-          fechado: false,
-          periodo: 202603,
-          origemKey: 'conta_c-1',
-        ),
-      ];
+        extratoRepo.extratosFuturos = [
+          ExtratoFatura(
+            id: 'ef-futuro',
+            origem: origem,
+            ano: 2026,
+            mes: Mes.marco,
+            dataInicio: DateTime(2026, 3, 1),
+            dataFim: DateTime(2026, 3, 31),
+            saldoInicial: 50.0,
+            saldoFinal: 100.0, // Delta será 120 - 50 = +70
+            fechado: false,
+            periodo: 202603,
+            origemKey: 'conta_c-1',
+          ),
+        ];
 
-      final result = await useCase.execute(Mes.fevereiro, 2026);
+        final result = await useCase.execute(Mes.fevereiro, 2026);
 
-      expect(result.isSuccess(), isTrue);
-      expect(extratoRepo.updatedDtos.length, 2);
+        expect(result.isSuccess(), isTrue);
+        expect(extratoRepo.updatedDtos.length, 2);
 
-      // Atual (fechado = true, saldoFinal = 150)
-      final atualDto = extratoRepo.updatedDtos.firstWhere(
-        (e) => e.id == 'ef-atual',
-      );
-      expect(atualDto.fechado, isTrue);
-      expect(atualDto.saldoFinal, 150.0);
+        // Atual (fechado = true, saldoFinal = 120.0)
+        final atualDto = extratoRepo.updatedDtos.firstWhere(
+          (e) => e.id == 'ef-atual',
+        );
+        expect(atualDto.fechado, isTrue);
+        expect(atualDto.saldoFinal, 120.0);
 
-      // Futuro propagou o delta (100) -> 50.0 + 100 = 150, saldoFinal 100 + 100 = 200
-      final futuroDto = extratoRepo.updatedDtos.firstWhere(
-        (e) => e.id == 'ef-futuro',
-      );
-      expect(futuroDto.saldoInicial, 150.0);
-      expect(futuroDto.saldoFinal, 200.0);
-    });
+        // Futuro propagou o delta (+70)
+        final futuroDto = extratoRepo.updatedDtos.firstWhere(
+          (e) => e.id == 'ef-futuro',
+        );
+        expect(futuroDto.saldoInicial, 120.0);
+        expect(futuroDto.saldoFinal, 170.0);
+      },
+    );
   });
 }

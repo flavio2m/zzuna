@@ -48,7 +48,7 @@ class _CentroCustoCreateModalState
   @override
   void dispose() {
     viewModel.createCommand.removeListener(_commandListener);
-    
+
     _descFocus.dispose();
     _ativoFocus.dispose();
     _saveFocus.dispose();
@@ -104,6 +104,7 @@ class _CentroCustoCreateModalState
             autofocus: true,
             focusNode: _descFocus,
             textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _ativoFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});

@@ -8,13 +8,26 @@ import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_status_dropdown.dart';
 
-class CentroCustoFilterBar extends ConsumerWidget {
+class CentroCustoFilterBar extends ConsumerStatefulWidget {
   const CentroCustoFilterBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CentroCustoFilterBar> createState() =>
+      _CentroCustoFilterBarState();
+}
+
+class _CentroCustoFilterBarState extends ConsumerState<CentroCustoFilterBar> {
+  final _descFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _descFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = ref.watch(centroCustoListViewModelProvider);
-    final ativo = viewModel.ativoSelecionado;
 
     return AppFilterCard(
       child: Wrap(
@@ -26,12 +39,23 @@ class CentroCustoFilterBar extends ConsumerWidget {
             child: AppTextFormField(
               initialValue: viewModel.descricaoQuery ?? '',
               label: 'Descrição',
+              focusNode: _descFocus,
               onChanged: viewModel.setDescricao,
+              onFieldSubmitted: (_) {
+                viewModel.pesquisar();
+                _descFocus.requestFocus();
+              },
             ),
           ),
           SizedBox(
             width: 160,
-            child: AppStatusDropdown(value: ativo, onChanged: viewModel.setAtivo),
+            child: ListenableBuilder(
+              listenable: viewModel.loadCommand,
+              builder: (context, _) => AppStatusDropdown(
+                value: viewModel.ativoSelecionado,
+                onChanged: viewModel.setAtivo,
+              ),
+            ),
           ),
           ButtonFind(onPressed: viewModel.pesquisar),
           ButtonAdd(onPressed: () => CentroCustoCreateModal.show(context)),

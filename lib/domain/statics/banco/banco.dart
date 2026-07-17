@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'banco_regiao.dart';
 
 enum BancoIcon {
   bancoDoBrasil,
@@ -13,40 +14,41 @@ enum BancoIcon {
   santander,
   sicoob,
   sicredi,
+  wizink,
+  novoBanco,
+  openbank,
 }
 
 class Banco {
   final String descricao;
   final String sigla;
   final BancoIcon icon;
+  final RegiaoBanco regiao;
 
-  const Banco({required this.descricao, required this.sigla, required this.icon});
+  const Banco({
+    required this.descricao,
+    required this.sigla,
+    required this.icon,
+    required this.regiao,
+  });
 
   IconData getIcon() {
     switch (icon) {
       case BancoIcon.bancoDoBrasil:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.bancoDoNordeste:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.bradesco:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.c6:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.caixa:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.inter:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.itau:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.nubank:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.outros:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.santander:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.sicoob:
-        return Icons.account_balance_wallet_outlined;
       case BancoIcon.sicredi:
+      case BancoIcon.wizink:
+      case BancoIcon.novoBanco:
+      case BancoIcon.openbank:
         return Icons.account_balance_wallet_outlined;
     }
   }

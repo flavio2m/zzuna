@@ -5,17 +5,18 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_filter_dto.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 
-class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, CartaoFilterDto> {
+class CartaoRepository
+    implements BaseRepository<Cartao, CartaoDto, CartaoDto, CartaoFilterDto> {
   final BaseStorage<Cartao> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<Cartao>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<Cartao>>.broadcast();
 
-  CartaoRepository(LocalStorage<Cartao> storage) : _storage = storage;
+  CartaoRepository(BaseStorage<Cartao> storage) : _storage = storage;
 
   @override
   AsyncResult<Cartao> create(CartaoDto dto) async {
@@ -63,7 +64,9 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
             bancoSigla: dto.bancoSigla,
             ativo: dto.ativo,
             diaFechamento: dto.diaFechamento,
-            dataInicial: dto.dataInicial ?? DateTime(DateTime.now().year, DateTime.now().month, 1),
+            dataInicial:
+                dto.dataInicial ??
+                DateTime(DateTime.now().year, DateTime.now().month, 1),
           ),
         )
         .toList();
@@ -174,7 +177,8 @@ class CartaoRepository implements BaseRepository<Cartao, CartaoDto, CartaoDto, C
         SearchField(
           fieldName: 'descricao',
           value: filter.descricao,
-          type: SearchFieldType.string, //
+          type: SearchFieldType.string,
+          operator: SearchOperator.contains,
         ),
       );
     }

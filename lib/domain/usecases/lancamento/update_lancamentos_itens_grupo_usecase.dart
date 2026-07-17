@@ -108,6 +108,7 @@ class UpdateLancamentosItensGrupoUseCase {
           origem: l.origem,
           itens: novosItens,
           conciliado: l.conciliado,
+          anoMes: l.anoMes,
           grupo: l.grupo,
           observacao: l.observacao,
         ),

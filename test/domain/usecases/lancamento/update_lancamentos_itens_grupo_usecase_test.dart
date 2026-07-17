@@ -204,6 +204,7 @@ void main() {
         expect(updatedL2.itens.first.categoriaId, 'cat-new');
         expect(updatedL2.itens.first.valor, 15.0);
         expect(updatedL2.itens.last.valor, 10.0);
+        expect(updatedL2.anoMes, equals(l2.anoMes));
 
         // Parcela 3 deve ter sido alterada
         final updatedL3 = (await lancamentoRepository.getById(
@@ -213,6 +214,7 @@ void main() {
         expect(updatedL3.itens.first.categoriaId, 'cat-new');
         expect(updatedL3.itens.first.valor, 15.0);
         expect(updatedL3.itens.last.valor, 10.0);
+        expect(updatedL3.anoMes, equals(l3.anoMes));
 
         // Saldos dos extratos devem ter sido recalculados
         // Mês 05: saldoInicial = 0, despesa = 10.0 => saldoFinal = -10.0

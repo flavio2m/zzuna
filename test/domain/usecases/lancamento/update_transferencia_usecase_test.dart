@@ -352,6 +352,12 @@ void main() {
         )).getOrThrow().first;
         expect(extratoC.saldoFinal, -150.0);
         expect(extratoD.saldoFinal, 150.0);
+
+        final updatedLaunches = (await lancamentoStorage.getAll()).getOrThrow();
+        final saida = updatedLaunches.firstWhere((l) => l.origem == cartaoC);
+        final entrada = updatedLaunches.firstWhere((l) => l.origem == cartaoD);
+        expect(saida.anoMes, equals(extratoC.periodo));
+        expect(entrada.anoMes, equals(extratoD.periodo));
       },
     );
 

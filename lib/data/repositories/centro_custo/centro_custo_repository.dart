@@ -5,18 +5,24 @@ import 'package:uuid/uuid.dart';
 import 'package:zzuna/data/exception/local_storage_exception.dart';
 import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/services/storage/base_storage.dart';
-import 'package:zzuna/data/services/storage/local/local_storage.dart';
 import 'package:zzuna/domain/dtos/centro_custo/centro_custo_dto.dart';
 import 'package:zzuna/domain/dtos/centro_custo/centro_custo_filter_dto.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
 
 class CentroCustoRepository
-    implements BaseRepository<CentroCusto, CentroCustoDto, CentroCustoDto, CentroCustoFilterDto> {
-  final LocalStorage<CentroCusto> _storage;
+    implements
+        BaseRepository<
+          CentroCusto,
+          CentroCustoDto,
+          CentroCustoDto,
+          CentroCustoFilterDto
+        > {
+  final BaseStorage<CentroCusto> _storage;
 
-  final _streamController = StreamController<RepositoryEvent<CentroCusto>>.broadcast();
+  final _streamController =
+      StreamController<RepositoryEvent<CentroCusto>>.broadcast();
 
-  CentroCustoRepository(LocalStorage<CentroCusto> storage) : _storage = storage;
+  CentroCustoRepository(BaseStorage<CentroCusto> storage) : _storage = storage;
 
   @override
   AsyncResult<CentroCusto> create(CentroCustoDto dto) async {
@@ -30,10 +36,16 @@ class CentroCustoRepository
         ),
       );
     }
+    final centrosResult = await getAll();
+    final isEmpty =
+        centrosResult.isSuccess() && centrosResult.getOrThrow().isEmpty;
+    dto.padrao = isEmpty;
+
     final centro = CentroCusto(
       id: const Uuid().v4(),
       descricao: dto.descricao,
-      ativo: dto.ativo, //
+      ativo: dto.ativo,
+      padrao: dto.padrao,
     );
     return _storage.create(centro).onSuccess((c) {
       _streamController.add(RepositoryCreated(c));
@@ -48,6 +60,7 @@ class CentroCustoRepository
             id: dto.id ?? const Uuid().v4(),
             descricao: dto.descricao,
             ativo: dto.ativo,
+            padrao: dto.padrao,
           ),
         )
         .toList();
@@ -62,10 +75,41 @@ class CentroCustoRepository
 
   @override
   AsyncResult<CentroCusto> update(CentroCustoDto dto) async {
+    final existingResult = await getById(dto.id!);
+    if (existingResult.isError()) {
+      return Failure(existingResult.exceptionOrNull()!);
+    }
+    final existing = existingResult.getOrThrow();
+
+    if (dto.padrao) {
+      final allResult = await getAll();
+      if (allResult.isSuccess()) {
+        final currentDefault = allResult
+            .getOrThrow()
+            .where((c) => c.padrao && c.id != dto.id)
+            .firstOrNull;
+        if (currentDefault != null) {
+          final oldEntity = CentroCusto(
+            id: currentDefault.id,
+            descricao: currentDefault.descricao,
+            ativo: currentDefault.ativo,
+            padrao: false,
+          );
+          await _storage.update(oldEntity);
+          _streamController.add(RepositoryUpdated(oldEntity));
+        }
+      }
+    } else {
+      if (existing.padrao) {
+        dto.padrao = true;
+      }
+    }
+
     final centro = CentroCusto(
       id: dto.id!,
       descricao: dto.descricao,
-      ativo: dto.ativo, //
+      ativo: dto.ativo,
+      padrao: dto.padrao,
     );
     return _storage.update(centro).onSuccess((c) {
       _streamController.add(RepositoryUpdated(c));
@@ -80,6 +124,7 @@ class CentroCustoRepository
             id: dto.id!,
             descricao: dto.descricao,
             ativo: dto.ativo,
+            padrao: dto.padrao,
           ),
         )
         .toList();
@@ -141,7 +186,8 @@ class CentroCustoRepository
         SearchField(
           fieldName: 'descricao',
           value: filter.descricao,
-          type: SearchFieldType.string, //
+          type: SearchFieldType.string,
+          operator: SearchOperator.contains,
         ),
       );
     }
@@ -170,5 +216,4 @@ class CentroCustoRepository
 
   @override
   void dispose() => _streamController.close();
-
 }

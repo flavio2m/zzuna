@@ -41,17 +41,18 @@ class _CentroCustoUpdateModalState
 
   late final TextEditingController _descController;
   final _descFocus = FocusNode();
+  final _padraoFocus = FocusNode();
   final _ativoFocus = FocusNode();
   final _saveFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    // Copia os valores do DTO recebido para um novo DTO editável.
     dto = CentroCustoDto(
       id: widget.centroCusto.id,
       descricao: widget.centroCusto.descricao,
       ativo: widget.centroCusto.ativo,
+      padrao: widget.centroCusto.padrao,
     );
     viewModel = ref.read(centroCustoUpdateViewModelProvider);
     viewModel.updateCommand.addListener(_commandListener);
@@ -70,9 +71,10 @@ class _CentroCustoUpdateModalState
   @override
   void dispose() {
     viewModel.updateCommand.removeListener(_commandListener);
-    
+
     _descController.dispose();
     _descFocus.dispose();
+    _padraoFocus.dispose();
     _ativoFocus.dispose();
     _saveFocus.dispose();
 
@@ -131,6 +133,7 @@ class _CentroCustoUpdateModalState
             focusNode: _descFocus,
             controller: _descController,
             textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _padraoFocus.requestFocus(),
             onChanged: (value) {
               dto.setDescricao(value);
               setState(() {});
@@ -138,15 +141,41 @@ class _CentroCustoUpdateModalState
             validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          AppSwitchField(
-            label: 'Ativo',
-            focusNode: _ativoFocus,
-            onEnterPressed: () => _saveFocus.requestFocus(),
-            value: dto.ativo,
-            onChanged: (value) {
-              dto.setAtivo(value);
-              setState(() {});
-            },
+          Row(
+            children: [
+              Expanded(
+                child: AppSwitchField(
+                  label: 'Padrão',
+                  focusNode: _padraoFocus,
+                  onEnterPressed: () => _ativoFocus.requestFocus(),
+                  value: dto.padrao,
+                  onChanged: (value) {
+                    if (!value && widget.centroCusto.padrao) {
+                      AppSnackBar.showError(
+                        context,
+                        'Deve existir pelo menos um centro de custo padrão.',
+                      );
+                      return;
+                    }
+                    dto.setPadrao(value);
+                    setState(() {});
+                  },
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                child: AppSwitchField(
+                  label: 'Ativo',
+                  focusNode: _ativoFocus,
+                  onEnterPressed: () => _saveFocus.requestFocus(),
+                  value: dto.ativo,
+                  onChanged: (value) {
+                    dto.setAtivo(value);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -220,6 +220,7 @@ class UpdateLancamentosDataGrupoUseCase {
           origem: l.origem,
           itens: l.itens,
           conciliado: l.conciliado,
+          anoMes: targetExtrato.periodo,
           grupo: l.grupo,
           observacao: l.observacao,
         ),
