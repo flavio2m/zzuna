@@ -45,12 +45,25 @@ class ResolveExtratoFaturaUseCase {
     int targetMonthNumber = dto.data.month;
 
     if (info.diaFechamento != null) {
-      if (dto.data.day < info.diaFechamento!) {
-        targetMonthNumber -= 1;
-        if (targetMonthNumber == 0) {
-          targetMonthNumber = 12;
-          targetYear -= 1;
+      if (info.diaFechamento! < 15) {
+        // Fechamento na primeira quinzena. A fatura leva o nome do mês anterior (maior parte do ciclo)
+        if (dto.data.day < info.diaFechamento!) {
+          targetMonthNumber -= 1;
         }
+      } else {
+        // Fechamento na segunda quinzena. A fatura leva o nome do mês atual
+        if (dto.data.day > info.diaFechamento!) {
+          targetMonthNumber += 1;
+        }
+      }
+
+      // Tratar viradas de ano
+      if (targetMonthNumber == 0) {
+        targetMonthNumber = 12;
+        targetYear -= 1;
+      } else if (targetMonthNumber == 13) {
+        targetMonthNumber = 1;
+        targetYear += 1;
       }
     }
 

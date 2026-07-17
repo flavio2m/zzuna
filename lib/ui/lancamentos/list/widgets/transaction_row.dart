@@ -4,6 +4,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.d
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
+import 'package:zzuna/ui/lancamentos/create/widgets/clone_lancamento_button.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -235,6 +236,10 @@ class TransactionRow extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             reconcileButton,
+            if (grupo is! LancamentoGrupoTransferencia) ...[
+              const SizedBox(width: 4),
+              CloneLancamentoButton(lancamento: lancamento),
+            ],
             const SizedBox(width: 4),
             IconAcoesButton(lancamento: lancamento),
           ],

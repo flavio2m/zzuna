@@ -195,20 +195,20 @@ void main() {
           l2.id,
         )).getOrThrow();
         expect(updatedL2.origem, origemContaB);
-        final extrato6B_l2 = (await extratoRepository.getById(
+        final extrato6Bl2 = (await extratoRepository.getById(
           updatedL2.extratoFaturaId,
         )).getOrThrow();
-        expect(updatedL2.anoMes, equals(extrato6B_l2.periodo));
+        expect(updatedL2.anoMes, equals(extrato6Bl2.periodo));
 
         // Parcela 3 deve ter sido movida para Conta B
         final updatedL3 = (await lancamentoRepository.getById(
           l3.id,
         )).getOrThrow();
         expect(updatedL3.origem, origemContaB);
-        final extrato7B_l3 = (await extratoRepository.getById(
+        final extrato7Bl3 = (await extratoRepository.getById(
           updatedL3.extratoFaturaId,
         )).getOrThrow();
-        expect(updatedL3.anoMes, equals(extrato7B_l3.periodo));
+        expect(updatedL3.anoMes, equals(extrato7Bl3.periodo));
 
         // Saldos de Conta A devem refletir apenas Parcela 1
         // Mês 5: saldoFinal = -10.0

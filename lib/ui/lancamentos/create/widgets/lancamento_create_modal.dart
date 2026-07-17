@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
@@ -10,7 +11,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
-import 'package:zzuna/domain/enums/lancamento_tipo.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/create/viewmodels/lancamento_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/modo_selector.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/parcelado_panel.dart';
@@ -35,13 +36,25 @@ import 'package:uuid/uuid.dart';
 
 class LancamentoCreateModal extends ConsumerStatefulWidget {
   final LancamentoTipo? initialTipo;
+  final LancamentoDetails? cloneLancamento;
 
-  const LancamentoCreateModal({super.key, this.initialTipo});
+  const LancamentoCreateModal({
+    super.key,
+    this.initialTipo,
+    this.cloneLancamento,
+  });
 
-  static void show(BuildContext context, {LancamentoTipo? initialTipo}) {
+  static void show(
+    BuildContext context, {
+    LancamentoTipo? initialTipo,
+    LancamentoDetails? cloneLancamento,
+  }) {
     AppDialog.show(
       context: context,
-      child: LancamentoCreateModal(initialTipo: initialTipo),
+      child: LancamentoCreateModal(
+        initialTipo: initialTipo,
+        cloneLancamento: cloneLancamento,
+      ),
     );
   }
 
@@ -100,6 +113,35 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
     if (widget.initialTipo != null) {
       dto.setTipo(widget.initialTipo!);
     }
+    if (widget.cloneLancamento != null) {
+      final clone = widget.cloneLancamento!;
+      dto.setTipo(clone.tipo);
+      dto.setData(clone.data);
+      dto.setDescricao(clone.descricao);
+      if (clone.observacao != null) {
+        dto.setObservacao(clone.observacao);
+      }
+
+      _valor = clone.valor;
+      _itens = clone.itens
+          .map(
+            (i) => LancamentoItem(
+              numero: i.numero,
+              categoriaId: i.categoria?.id ?? '',
+              centroCustoId: i.centroCusto?.id ?? '',
+              valor: i.valor,
+            ),
+          )
+          .toList();
+
+      if (_itens.isNotEmpty) {
+        _categoriaId = _itens.first.categoriaId;
+        _centroCustoId = _itens.first.centroCustoId;
+        if (_itens.length > 1) {
+          _showItens = true;
+        }
+      }
+    }
     viewModel = ref.read(lancamentoCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
 
@@ -143,7 +185,17 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
       LancamentoOrigemConta(:final contaId) => contaId.isEmpty,
       LancamentoOrigemCartao() => false,
     };
-    if (isOrigemDefault) {
+
+    if (widget.cloneLancamento != null) {
+      // Preenche origem do clone, convertendo detail para origem
+      final cloneOrigem = widget.cloneLancamento!.origem;
+      final origemToSet = cloneOrigem.map(
+        conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+        cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+      );
+      dto.setOrigem(origemToSet);
+      needsUpdate = true;
+    } else if (isOrigemDefault) {
       final filter = ref.read(lancamentoFilterProvider);
       final contas = filter.contasSelecionadas;
       final cartoes = filter.cartoesSelecionados;
@@ -417,6 +469,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 right: AppTextFormField(
                   label: 'Descrição',
                   focusNode: _descFocus,
+                  initialValue: dto.descricao,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _tipoFocus.requestFocus(),
                   validator: validator.byField(dto, 'descricao'),
@@ -495,6 +548,9 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 left: AppCurrencyFormField(
                   label: 'Valor',
                   focusNode: _valorFocus,
+                  initialValue: _valor > 0
+                      ? UtilBrasilFields.obterReal(_valor)
+                      : null,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   validator: validator.byField(dto, 'itensValores'),
@@ -509,6 +565,7 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 right: AppTextAreaFormField(
                   label: 'Observação',
                   focusNode: _obsFocus,
+                  initialValue: dto.observacao,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _simplesFocus.requestFocus(),
                   onChanged: (value) => dto.setObservacao(
