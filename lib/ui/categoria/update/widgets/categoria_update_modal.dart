@@ -170,40 +170,56 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
 
           const AppSpacing(size: AppSpacingSize.md),
 
-          if (!widget.temSubcategorias) //
-            AppDropdownFormField<String>(
-              label: 'Categoria Pai',
-              focusNode: _paiFocus,
-              onEnterPressed: () => _ativoFocus.requestFocus(),
-              value: dto.categoriaPaiId,
-              items: [
-                AppDropdownMenuItem<String>(value: '', label: 'Selecione...'),
-                ...categoriasPai.map(
-                  (cat) => AppDropdownMenuItem<String>(
-                    value: cat.id,
-                    label: cat.descricao, //
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (!widget.temSubcategorias) ...[
+                Expanded(
+                  flex: 2,
+                  child: AppDropdownFormField<String>(
+                    label: 'Categoria Pai',
+                    focusNode: _paiFocus,
+                    onEnterPressed: () => _ativoFocus.requestFocus(),
+                    value: dto.categoriaPaiId,
+                    items: [
+                      AppDropdownMenuItem<String>(
+                        value: '',
+                        label: 'Selecione...',
+                      ),
+                      ...categoriasPai.map(
+                        (cat) => AppDropdownMenuItem<String>(
+                          value: cat.id,
+                          label: cat.descricao, //
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      dto.setCategoriaPaiId(
+                        value == null || value.isEmpty ? null : value,
+                      );
+                      setState(() {});
+                    },
                   ),
                 ),
+                const AppSpacing(
+                  size: AppSpacingSize.md,
+                  axis: Axis.horizontal,
+                ),
               ],
-              onChanged: (value) {
-                dto.setCategoriaPaiId(
-                  value == null || value.isEmpty ? null : value,
-                );
-                setState(() {});
-              },
-            ),
-
-          const AppSpacing(size: AppSpacingSize.md),
-
-          AppSwitchField(
-            label: 'Ativo',
-            focusNode: _ativoFocus,
-            onEnterPressed: () => _saveFocus.requestFocus(),
-            value: dto.ativo,
-            onChanged: (value) {
-              dto.setAtivo(value);
-              setState(() {});
-            },
+              Expanded(
+                flex: 1,
+                child: AppSwitchField(
+                  label: 'Ativo',
+                  focusNode: _ativoFocus,
+                  onEnterPressed: () => _saveFocus.requestFocus(),
+                  value: dto.ativo,
+                  onChanged: (value) {
+                    dto.setAtivo(value);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

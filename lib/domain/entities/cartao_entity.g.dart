@@ -14,6 +14,12 @@ _Cartao _$CartaoFromJson(Map<String, dynamic> json) => _Cartao(
   ativo: json['ativo'] as bool,
   diaFechamento: (json['diaFechamento'] as num).toInt(),
   dataInicial: DateTime.parse(json['dataInicial'] as String),
+  comportamentoFechamento:
+      $enumDecodeNullable(
+        _$CartaoComportamentoFechamentoEnumMap,
+        json['comportamentoFechamento'],
+      ) ??
+      CartaoComportamentoFechamento.migrarAnteriores,
 );
 
 Map<String, dynamic> _$CartaoToJson(_Cartao instance) => <String, dynamic>{
@@ -24,4 +30,12 @@ Map<String, dynamic> _$CartaoToJson(_Cartao instance) => <String, dynamic>{
   'ativo': instance.ativo,
   'diaFechamento': instance.diaFechamento,
   'dataInicial': instance.dataInicial.toIso8601String(),
+  'comportamentoFechamento':
+      _$CartaoComportamentoFechamentoEnumMap[instance.comportamentoFechamento]!,
+};
+
+const _$CartaoComportamentoFechamentoEnumMap = {
+  CartaoComportamentoFechamento.migrarAnteriores: 'migrarAnteriores',
+  CartaoComportamentoFechamento.migrarPosteriores: 'migrarPosteriores',
+  CartaoComportamentoFechamento.manterNoMes: 'manterNoMes',
 };

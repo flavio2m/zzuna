@@ -10,6 +10,7 @@ import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_banco_dropdown.dart';
+import 'package:zzuna/ui/lancamentos/shared/widgets/app_cartao_comportamento_dropdown.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_currency_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
@@ -62,6 +63,7 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
       bancoSigla: widget.cartao.bancoSigla,
       ativo: widget.cartao.ativo,
       diaFechamento: widget.cartao.diaFechamento,
+      comportamentoFechamento: widget.cartao.comportamentoFechamento,
       dataInicial: widget.cartao.dataInicial,
     );
 
@@ -145,25 +147,28 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppTextFormField(
-            label: 'Descrição',
-            autofocus: true,
-            focusNode: _descFocus,
-            controller: _descController,
-            textInputAction: TextInputAction.next,
-            onFieldSubmitted: (_) => _limiteFocus.requestFocus(),
-            onChanged: (value) {
-              dto.setDescricao(value);
-              setState(() {});
-            },
-            validator: validator.byField(dto, 'descricao'),
-          ),
-
-          const AppSpacing(size: AppSpacingSize.md),
-
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 2,
+                child: AppTextFormField(
+                  label: 'Descrição',
+                  autofocus: true,
+                  focusNode: _descFocus,
+                  controller: _descController,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _limiteFocus.requestFocus(),
+                  onChanged: (value) {
+                    dto.setDescricao(value);
+                    setState(() {});
+                  },
+                  validator: validator.byField(dto, 'descricao'),
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                flex: 1,
                 child: AppCurrencyFormField(
                   label: 'Limite',
                   focusNode: _limiteFocus,
@@ -187,10 +192,16 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
                   validator: validator.byField(dto, 'limite'),
                 ),
               ),
+            ],
+          ),
 
-              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+          const AppSpacing(size: AppSpacingSize.md),
 
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Expanded(
+                flex: 1,
                 child: AppIntegerFormField(
                   label: 'Dia Fechamento',
                   focusNode: _fechamentoFocus,
@@ -204,34 +215,54 @@ class _CartaoUpdateModalState extends ConsumerState<CartaoUpdateModal> {
                   validator: validator.byField(dto, 'diaFechamento'),
                 ),
               ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                flex: 3,
+                child: AppCartaoComportamentoDropdown(
+                  initialValue: dto.comportamentoFechamento,
+                  onChanged: (value) {
+                    if (value != null) {
+                      dto.setComportamentoFechamento(value);
+                      setState(() {});
+                    }
+                  },
+                ),
+              ),
             ],
           ),
 
           const AppSpacing(size: AppSpacingSize.md),
 
-          AppBancoDropdown(
-            focusNode: _bancoFocus,
-            onEnterPressed: () => _ativoFocus.requestFocus(),
-            value: dto.bancoSigla,
-            onChanged: (value) {
-              dto.setBancoSigla(value ?? '');
-
-              setState(() {});
-            },
-          ),
-
-          const AppSpacing(size: AppSpacingSize.md),
-
-          AppSwitchField(
-            label: 'Ativo',
-            focusNode: _ativoFocus,
-            onEnterPressed: () => _dataFocus.requestFocus(),
-            value: dto.ativo,
-            onChanged: (value) {
-              dto.setAtivo(value);
-
-              setState(() {});
-            },
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 2,
+                child: AppBancoDropdown(
+                  focusNode: _bancoFocus,
+                  onEnterPressed: () => _ativoFocus.requestFocus(),
+                  value: dto.bancoSigla,
+                  onChanged: (value) {
+                    dto.setBancoSigla(value ?? '');
+                    setState(() {});
+                  },
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                flex: 1,
+                child: AppSwitchField(
+                  label: 'Ativo',
+                  focusNode: _ativoFocus,
+                  onEnterPressed: () => _dataFocus.requestFocus(),
+                  value: dto.ativo,
+                  onChanged: (value) {
+                    dto.setAtivo(value);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
           ),
 
           const AppSpacing(size: AppSpacingSize.md),

@@ -39,6 +39,7 @@ class CartaoRepository
       bancoSigla: dto.bancoSigla,
       ativo: dto.ativo,
       diaFechamento: dto.diaFechamento,
+      comportamentoFechamento: dto.comportamentoFechamento,
       dataInicial:
           dto.dataInicial ??
           DateTime(
@@ -64,6 +65,7 @@ class CartaoRepository
             bancoSigla: dto.bancoSigla,
             ativo: dto.ativo,
             diaFechamento: dto.diaFechamento,
+            comportamentoFechamento: dto.comportamentoFechamento,
             dataInicial:
                 dto.dataInicial ??
                 DateTime(DateTime.now().year, DateTime.now().month, 1),
@@ -88,6 +90,7 @@ class CartaoRepository
       bancoSigla: dto.bancoSigla,
       ativo: dto.ativo,
       diaFechamento: dto.diaFechamento,
+      comportamentoFechamento: dto.comportamentoFechamento,
       dataInicial: dto.dataInicial!,
     );
     return _storage.update(cartao).onSuccess((cartao) {
@@ -106,6 +109,7 @@ class CartaoRepository
             bancoSigla: dto.bancoSigla,
             ativo: dto.ativo,
             diaFechamento: dto.diaFechamento,
+            comportamentoFechamento: dto.comportamentoFechamento,
             dataInicial: dto.dataInicial!,
           ),
         )

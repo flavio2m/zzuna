@@ -11,6 +11,7 @@ import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
+import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
 
 class ResolveExtratoFaturaUseCase {
   final ExtratoFaturaRepository _extratoRepository;
@@ -45,24 +46,32 @@ class ResolveExtratoFaturaUseCase {
     int targetMonthNumber = dto.data.month;
 
     if (info.diaFechamento != null) {
-      if (info.diaFechamento! < 15) {
-        // Fechamento na primeira quinzena. A fatura leva o nome do mês anterior (maior parte do ciclo)
-        if (dto.data.day < info.diaFechamento!) {
-          targetMonthNumber -= 1;
-        }
-      } else {
-        // Fechamento na segunda quinzena. A fatura leva o nome do mês atual
-        if (dto.data.day > info.diaFechamento!) {
-          targetMonthNumber += 1;
-        }
+      final comp =
+          info.comportamentoFechamento ??
+          CartaoComportamentoFechamento.migrarAnteriores;
+
+      switch (comp) {
+        case CartaoComportamentoFechamento.migrarAnteriores:
+          if (dto.data.day < info.diaFechamento!) {
+            targetMonthNumber -= 1;
+          }
+          break;
+        case CartaoComportamentoFechamento.migrarPosteriores:
+          if (dto.data.day >= info.diaFechamento!) {
+            targetMonthNumber += 1;
+          }
+          break;
+        case CartaoComportamentoFechamento.manterNoMes:
+          // Não altera a fatura alvo
+          break;
       }
 
       // Tratar viradas de ano
-      if (targetMonthNumber == 0) {
-        targetMonthNumber = 12;
+      if (targetMonthNumber <= 0) {
+        targetMonthNumber += 12;
         targetYear -= 1;
-      } else if (targetMonthNumber == 13) {
-        targetMonthNumber = 1;
+      } else if (targetMonthNumber > 12) {
+        targetMonthNumber -= 12;
         targetYear += 1;
       }
     }
@@ -209,12 +218,20 @@ class ResolveExtratoFaturaUseCase {
   }
 
   Future<
-    Result<({DateTime dataInicial, String nomeOrigem, int? diaFechamento})>
+    Result<
+      ({
+        DateTime dataInicial,
+        String nomeOrigem,
+        int? diaFechamento,
+        CartaoComportamentoFechamento? comportamentoFechamento,
+      })
+    >
   >
   _getDataInicial(LancamentoOrigem origem) async {
     DateTime dataInicial;
     String nomeOrigem;
     int? diaFechamento;
+    CartaoComportamentoFechamento? comportamentoFechamento;
 
     if (origem is LancamentoOrigemConta) {
       final contaRes = await _contaRepository.getById(origem.contaId);
@@ -237,6 +254,7 @@ class ResolveExtratoFaturaUseCase {
       dataInicial = cartao.dataInicial;
       nomeOrigem = cartao.descricao;
       diaFechamento = cartao.diaFechamento;
+      comportamentoFechamento = cartao.comportamentoFechamento;
     } else {
       return Failure(DomainException('Origem de lançamento desconhecida'));
     }
@@ -244,6 +262,7 @@ class ResolveExtratoFaturaUseCase {
       dataInicial: DateTime(dataInicial.year, dataInicial.month, 1),
       nomeOrigem: nomeOrigem,
       diaFechamento: diaFechamento,
+      comportamentoFechamento: comportamentoFechamento,
     ));
   }
 

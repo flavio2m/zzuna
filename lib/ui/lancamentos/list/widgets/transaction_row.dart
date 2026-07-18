@@ -5,6 +5,7 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/clone_lancamento_button.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
@@ -44,17 +45,38 @@ class TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = switch (tipo) {
-      LancamentoTipo.receita => AppColors.primary,
-      LancamentoTipo.transferencia => AppColors.indigo600,
-      LancamentoTipo.despesa => AppColors.danger,
-    };
+    final firstItem = lancamento.itens.isNotEmpty
+        ? lancamento.itens.first
+        : null;
 
-    final iconBackground = switch (tipo) {
-      LancamentoTipo.receita => AppColors.emerald50,
-      LancamentoTipo.transferencia => AppColors.indigo50,
-      LancamentoTipo.despesa => AppColors.rose50,
-    };
+    final isTransferenciaSaida =
+        tipo == LancamentoTipo.transferencia &&
+        switch (firstItem) {
+          LancamentoItemDetailsTransferencia t => t.origemSaida == origem,
+          _ => false,
+        };
+
+    final isTransferenciaEntrada =
+        tipo == LancamentoTipo.transferencia &&
+        switch (firstItem) {
+          LancamentoItemDetailsTransferencia t => t.origemEntrada == origem,
+          _ => false,
+        };
+
+    final isSaida = tipo == LancamentoTipo.despesa || isTransferenciaSaida;
+    final isEntrada = tipo == LancamentoTipo.receita || isTransferenciaEntrada;
+
+    final iconColor = isSaida
+        ? AppColors.danger
+        : isEntrada
+        ? AppColors.primary
+        : AppColors.indigo600;
+
+    final iconBackground = isSaida
+        ? AppColors.rose50
+        : isEntrada
+        ? AppColors.emerald50
+        : AppColors.indigo50;
 
     final icon = switch (tipo) {
       LancamentoTipo.receita => Icons.arrow_upward_rounded,
@@ -224,11 +246,11 @@ class TransactionRow extends StatelessWidget {
                 value,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  color: switch (tipo) {
-                    LancamentoTipo.receita => AppColors.primary,
-                    LancamentoTipo.transferencia => AppColors.slate600,
-                    LancamentoTipo.despesa => AppColors.danger,
-                  },
+                  color: isSaida
+                      ? AppColors.danger
+                      : isEntrada
+                      ? AppColors.primary
+                      : AppColors.slate600,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                 ),

@@ -118,29 +118,43 @@ class _ContaCreateModalState extends ConsumerState<ContaCreateModal> {
             validator: validator.byField(dto, 'descricao'),
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          AppDropdownFormField<String>(
-            label: 'Banco',
-            focusNode: _bancoFocus,
-            onEnterPressed: () => _ativoFocus.requestFocus(),
-            items: Bancos.items.map((b) {
-              return AppDropdownMenuItem(value: b.sigla, label: b.descricao);
-            }).toList(),
-            onChanged: (value) {
-              dto.setBancoSigla(value ?? '');
-              setState(() {});
-            },
-            validator: validator.byField(dto, 'bancoSigla'),
-          ),
-          const AppSpacing(size: AppSpacingSize.md),
-          AppSwitchField(
-            label: 'Ativo',
-            focusNode: _ativoFocus,
-            onEnterPressed: () => _saveFocus.requestFocus(),
-            value: dto.ativo,
-            onChanged: (value) {
-              dto.setAtivo(value);
-              setState(() {});
-            },
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 2,
+                child: AppDropdownFormField<String>(
+                  label: 'Banco',
+                  focusNode: _bancoFocus,
+                  onEnterPressed: () => _ativoFocus.requestFocus(),
+                  items: Bancos.items.map((b) {
+                    return AppDropdownMenuItem(
+                      value: b.sigla,
+                      label: b.descricao,
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    dto.setBancoSigla(value ?? '');
+                    setState(() {});
+                  },
+                  validator: validator.byField(dto, 'bancoSigla'),
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                flex: 1,
+                child: AppSwitchField(
+                  label: 'Ativo',
+                  focusNode: _ativoFocus,
+                  onEnterPressed: () => _saveFocus.requestFocus(),
+                  value: dto.ativo,
+                  onChanged: (value) {
+                    dto.setAtivo(value);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

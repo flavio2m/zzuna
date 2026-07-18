@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
+import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
 
 part 'cartao_entity.freezed.dart';
 part 'cartao_entity.g.dart';
@@ -14,6 +15,8 @@ sealed class Cartao with _$Cartao {
     required bool ativo,
     required int diaFechamento,
     required DateTime dataInicial,
+    @Default(CartaoComportamentoFechamento.migrarAnteriores)
+    CartaoComportamentoFechamento comportamentoFechamento,
   }) = _Cartao;
 
   factory Cartao.fromJson(Map<String, dynamic> json) => _$CartaoFromJson(json);
@@ -29,5 +32,7 @@ sealed class CartaoDetails with _$CartaoDetails {
     required bool ativo,
     required int diaFechamento,
     required DateTime dataInicial,
+    @Default(CartaoComportamentoFechamento.migrarAnteriores)
+    CartaoComportamentoFechamento comportamentoFechamento,
   }) = _CartaoDetails;
 }
