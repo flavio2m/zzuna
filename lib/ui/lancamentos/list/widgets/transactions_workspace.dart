@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_day_card.dart';
-import 'package:zzuna/ui/lancamentos/list/widgets/transactions_actions_bar.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/lancamento_resumo_financeiro_card.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -34,18 +34,15 @@ class TransactionsWorkspace extends ConsumerWidget {
             );
           }
 
-          final selectedIds = viewModel.selectedLancamentoIds.toList();
-
-          final actionsBar = TransactionsActionsBar(
-            selectedIds: selectedIds,
-            onClearSelection: () => viewModel.clearSelection(),
-          );
-
           Widget content;
           if (resumoMensal == null || resumoMensal.dias.isEmpty) {
             content = Column(
               children: [
-                actionsBar,
+                if (resumoMensal != null && resumoMensal.exibirResumoFinanceiro)
+                  LancamentoResumoFinanceiroCard(
+                    resumo: resumoMensal,
+                    isMesFechado: viewModel.isMesFechado,
+                  ),
                 const Expanded(
                   child: Center(
                     child: Text(
@@ -62,10 +59,18 @@ class TransactionsWorkspace extends ConsumerWidget {
             final dias = resumoMensal.dias;
             content = Column(
               children: [
-                actionsBar,
+                if (resumoMensal.exibirResumoFinanceiro)
+                  LancamentoResumoFinanceiroCard(
+                    resumo: resumoMensal,
+                    isMesFechado: viewModel.isMesFechado,
+                  ),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.only(
+                      left: 8,
+                      right: 8,
+                      bottom: 8,
+                    ),
                     itemCount: dias.length,
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 8),
@@ -84,8 +89,8 @@ class TransactionsWorkspace extends ConsumerWidget {
               children: [
                 content,
                 Positioned(
-                  top: 16,
-                  right: 16,
+                  top: 0,
+                  right: 0,
                   child: Container(
                     width: 36,
                     height: 36,

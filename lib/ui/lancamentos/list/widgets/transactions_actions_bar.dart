@@ -29,13 +29,8 @@ class TransactionsActionsBar extends ConsumerWidget {
     final listViewModel = ref.watch(lancamentosListViewModelProvider);
     final hasSelection = selectedIds.isNotEmpty;
 
-    return Container(
-      height: 40,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.slate50,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
-      ),
+    return SizedBox(
+      height: 36,
       child: Row(
         children: [
           IconSelecionarTodosButton(
@@ -146,15 +141,6 @@ class TransactionsActionsBar extends ConsumerWidget {
               },
             ),
           ],
-          const Spacer(),
-          Icon(
-            listViewModel.isMesFechado ? Icons.lock : Icons.lock_open,
-            color: listViewModel.isMesFechado
-                ? Colors.green
-                : Theme.of(context).colorScheme.primary,
-            size: 20,
-          ),
-          const SizedBox(width: 16),
         ],
       ),
     );

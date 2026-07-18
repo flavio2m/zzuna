@@ -13,6 +13,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/transactions_actions_bar.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class LancamentoFilterBar extends ConsumerStatefulWidget {
@@ -52,9 +53,13 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
 
     return AppFilterCard(
       initiallyExpanded: false,
+      collapsedHeaderAction: TransactionsActionsBar(
+        selectedIds: viewModel.selectedLancamentoIds.toList(),
+        onClearSelection: () => viewModel.clearSelection(),
+      ),
       child: Wrap(
         spacing: 12,
-        runSpacing: 12,
+        runSpacing: 8,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           _buildPeriodNavigator(filterState, maxYear),

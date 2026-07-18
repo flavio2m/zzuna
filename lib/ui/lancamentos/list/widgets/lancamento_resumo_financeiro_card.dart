@@ -6,8 +6,13 @@ import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
 class LancamentoResumoFinanceiroCard extends StatelessWidget {
   final LancamentoResumoMensal resumo;
+  final bool isMesFechado;
 
-  const LancamentoResumoFinanceiroCard({super.key, required this.resumo});
+  const LancamentoResumoFinanceiroCard({
+    super.key,
+    required this.resumo,
+    required this.isMesFechado,
+  });
 
   String _formatCurrency(double value) {
     final prefix = value < 0 ? '- ' : '';
@@ -23,62 +28,71 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .03),
-            blurRadius: 8,
-            offset: const Offset(0, 3), //
-          ),
-        ],
+      height: 36,
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Expanded(
-            child: _InfoItem(
-              width: 120,
-              title: 'Saldo Inicial: ',
-              value: _formatCurrency(resumo.saldoInicial),
-              color: _valueColor(resumo.saldoInicial),
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _InfoItem(
+                  width: 120,
+                  title: 'Saldo Inicial: ',
+                  value: _formatCurrency(resumo.saldoInicial),
+                  color: _valueColor(resumo.saldoInicial),
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  width: 110,
+                  title: 'Entradas: ',
+                  value: _formatCurrency(resumo.receitas),
+                  color: AppColors.emerald800,
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  width: 110,
+                  title: 'Saídas: ',
+                  value: _formatCurrency(resumo.despesas),
+                  color: AppColors.danger, //
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  width: 120,
+                  title: 'Transferências: ',
+                  value: _formatCurrency(resumo.transferencias),
+                  color: AppColors.indigo600,
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  width: 120,
+                  title: 'Saldo Final: ',
+                  value: _formatCurrency(resumo.saldoFinal),
+                  color: _valueColor(resumo.saldoFinal),
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: _InfoItem(
-              width: 110,
-              title: 'Entradas: ',
-              value: _formatCurrency(resumo.receitas),
-              color: AppColors.emerald800,
-            ),
-          ),
-          Expanded(
-            child: _InfoItem(
-              width: 110,
-              title: 'Saídas: ',
-              value: _formatCurrency(resumo.despesas),
-              color: AppColors.danger, //
-            ),
-          ),
-          Expanded(
-            child: _InfoItem(
-              width: 120,
-              title: 'Transferências: ',
-              value: _formatCurrency(resumo.transferencias),
-              color: AppColors.indigo600,
-            ),
-          ),
-          Expanded(
-            child: _InfoItem(
-              width: 120,
-              title: 'Saldo Final: ',
-              value: _formatCurrency(resumo.saldoFinal),
-              color: _valueColor(resumo.saldoFinal),
+          Positioned(
+            right: 2,
+            top: 0,
+            bottom: 0,
+            child: Icon(
+              isMesFechado ? Icons.lock : Icons.lock_open,
+              color: isMesFechado
+                  ? AppColors.emerald800
+                  : Theme.of(context).colorScheme.primary,
+              size: 20,
             ),
           ),
         ],
@@ -114,7 +128,7 @@ class _InfoItem extends StatelessWidget {
             variant: AppTextVariant.body,
             color: AppColors.slate500, //
           ),
-          // const SizedBox(height: 2),
+          const SizedBox(width: 4),
           AppText(value, variant: AppTextVariant.subtitle, color: color),
         ],
       ),
