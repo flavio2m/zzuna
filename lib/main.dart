@@ -34,9 +34,9 @@ void main() async {
 
   final container = ProviderContainer();
 
-  // if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
-  //   await initSeeds(container);
-  // }
+  if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
+    await initSeeds(container);
+  }
 
   runApp(
     UncontrolledProviderScope(
@@ -90,6 +90,7 @@ Future<void> initSeeds(ProviderContainer container) async {
     centroCustoRepository: container.read(centroCustoRepositoryProvider),
     extratoFaturaRepository: container.read(extratoFaturaRepositoryProvider),
     lancamentoRepository: container.read(lancamentoRepositoryProvider),
+    authRepository: container.read(authRepositoryProvider),
     recalculateBalanceUseCase: container.read(
       recalculateExtratoFaturaBalanceUseCaseProvider,
     ), //

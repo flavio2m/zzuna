@@ -1,5 +1,6 @@
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
+import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
 import 'package:zzuna/domain/statics/banco/bancos.dart';
 
 class CartaoSeed {
@@ -23,6 +24,9 @@ class CartaoSeed {
         dataInicial: DateTime(DateTime.now().year, 1, 1),
         ativo: i != 9,
         diaFechamento: 5 + i,
+        comportamentoFechamento: i % 2 == 0
+            ? CartaoComportamentoFechamento.migrarAnteriores
+            : CartaoComportamentoFechamento.migrarPosteriores,
       ),
     );
 

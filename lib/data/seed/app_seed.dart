@@ -10,6 +10,8 @@ import 'package:zzuna/data/seed/centro_custo_seed.dart';
 import 'package:zzuna/data/seed/conta_seed.dart';
 import 'package:zzuna/data/seed/extrato_fatura_seed.dart';
 import 'package:zzuna/data/seed/lancamento_seed.dart';
+import 'package:zzuna/data/seed/user_seed.dart';
+import 'package:zzuna/data/repositories/auth/auth_repository.dart';
 import 'package:zzuna/domain/usecases/lancamento/recalculate_extrato_fatura_balance_usecase.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/enums/mes.dart';
@@ -21,6 +23,7 @@ class AppSeed {
   final CentroCustoRepository centroCustoRepository;
   final ExtratoFaturaRepository extratoFaturaRepository;
   final LancamentoRepository lancamentoRepository;
+  final AuthRepository authRepository;
 
   final RecalculateExtratoFaturaBalanceUseCase recalculateBalanceUseCase;
 
@@ -31,10 +34,12 @@ class AppSeed {
     required this.centroCustoRepository,
     required this.extratoFaturaRepository,
     required this.lancamentoRepository,
+    required this.authRepository,
     required this.recalculateBalanceUseCase, //
   });
 
   Future<void> execute() async {
+    await UserSeed(authRepository).execute();
     await ContaSeed(contaRepository).execute();
     await CartaoSeed(cartaoRepository).execute();
     await CategoriaSeed(categoriaRepository).execute();

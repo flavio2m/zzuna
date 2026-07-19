@@ -11,7 +11,7 @@ class CloneLancamentoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.copy, size: 18, color: AppColors.indigo600),
+      icon: const Icon(Icons.copy, size: 18, color: AppColors.slate600),
       tooltip: 'Clonar Lançamento',
       constraints: const BoxConstraints(),
       padding: const EdgeInsets.all(4),

@@ -32,16 +32,29 @@ class LancamentoSeed {
   });
 
   Future<void> execute() async {
-    final result = await repository.searchByPeriodo(mes: Mes.junho, ano: 2026);
+    final hoje = DateTime.now();
+    final mesAtual = Mes.values.firstWhere((e) => e.numero == hoje.month);
+    final anoAtual = hoje.year;
+
+    final result = await repository.searchByPeriodo(
+      mes: mesAtual,
+      ano: anoAtual,
+    );
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
     final dependencies = await _carregarDependencias();
     if (dependencies == null) return;
 
+    final mesAtualNum = hoje.month;
+    final mesAnteriorNum = mesAtualNum == 1 ? 12 : mesAtualNum - 1;
+    final anoAnterior = mesAtualNum == 1 ? anoAtual - 1 : anoAtual;
+
     final seeds = <LancamentoDto>[];
-    seeds.addAll(_criarLancamentosJunho(dependencies));
-    seeds.addAll(_criarLancamentosMaio(dependencies));
+    seeds.addAll(_criarLancamentosAtual(dependencies, anoAtual, mesAtualNum));
+    seeds.addAll(
+      _criarLancamentosAnterior(dependencies, anoAnterior, mesAnteriorNum),
+    );
 
     if (seeds.isNotEmpty) {
       await repository.createAll(seeds);
@@ -52,18 +65,34 @@ class LancamentoSeed {
     final contas = (await contaRepository.getAll()).getOrElse((_) => []);
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
     final centros = (await centroCustoRepository.getAll()).getOrElse((_) => []);
-    final categorias = (await categoriaRepository.getAll()).getOrElse((_) => []);
+    final categorias = (await categoriaRepository.getAll()).getOrElse(
+      (_) => [],
+    );
+
+    final hoje = DateTime.now();
+    final mesAtualNum = hoje.month;
+    final anoAtual = hoje.year;
+    final mesAnteriorNum = mesAtualNum == 1 ? 12 : mesAtualNum - 1;
+    final anoAnterior = mesAtualNum == 1 ? anoAtual - 1 : anoAtual;
+    final mesAtual = Mes.values.firstWhere((e) => e.numero == mesAtualNum);
+    final mesAnterior = Mes.values.firstWhere(
+      (e) => e.numero == mesAnteriorNum,
+    );
 
     final extratoFaturasMay = (await extratoFaturaRepository.search(
-      ExtratoFaturaFilterDto(mes: Mes.maio, ano: 2026),
+      ExtratoFaturaFilterDto(mes: mesAnterior, ano: anoAnterior),
     )).getOrElse((_) => []);
     final extratoFaturasJune = (await extratoFaturaRepository.search(
-      ExtratoFaturaFilterDto(mes: Mes.junho, ano: 2026),
+      ExtratoFaturaFilterDto(mes: mesAtual, ano: anoAtual),
     )).getOrElse((_) => []);
 
     final extratoFaturas = [...extratoFaturasMay, ...extratoFaturasJune];
 
-    if (contas.isEmpty || cartoes.isEmpty || centros.isEmpty || categorias.isEmpty || extratoFaturas.isEmpty) {
+    if (contas.isEmpty ||
+        cartoes.isEmpty ||
+        centros.isEmpty ||
+        categorias.isEmpty ||
+        extratoFaturas.isEmpty) {
       return null;
     }
 
@@ -78,13 +107,31 @@ class LancamentoSeed {
       );
     }
 
-    final efJun1 = getExtratoFatura(LancamentoOrigem.conta(contaId: firstConta.id), Mes.junho);
-    final efJun2 = getExtratoFatura(LancamentoOrigem.conta(contaId: secondConta.id), Mes.junho);
-    final efJunCard = getExtratoFatura(LancamentoOrigem.cartao(cartaoId: firstCartao.id), Mes.junho);
+    final efJun1 = getExtratoFatura(
+      LancamentoOrigem.conta(contaId: firstConta.id),
+      mesAtual,
+    );
+    final efJun2 = getExtratoFatura(
+      LancamentoOrigem.conta(contaId: secondConta.id),
+      mesAtual,
+    );
+    final efJunCard = getExtratoFatura(
+      LancamentoOrigem.cartao(cartaoId: firstCartao.id),
+      mesAtual,
+    );
 
-    final efMay1 = getExtratoFatura(LancamentoOrigem.conta(contaId: firstConta.id), Mes.maio);
-    final efMay2 = getExtratoFatura(LancamentoOrigem.conta(contaId: secondConta.id), Mes.maio);
-    final efMayCard = getExtratoFatura(LancamentoOrigem.cartao(cartaoId: firstCartao.id), Mes.maio);
+    final efMay1 = getExtratoFatura(
+      LancamentoOrigem.conta(contaId: firstConta.id),
+      mesAnterior,
+    );
+    final efMay2 = getExtratoFatura(
+      LancamentoOrigem.conta(contaId: secondConta.id),
+      mesAnterior,
+    );
+    final efMayCard = getExtratoFatura(
+      LancamentoOrigem.cartao(cartaoId: firstCartao.id),
+      mesAnterior,
+    );
 
     String findCat(String query) {
       final match = categorias.firstWhere(
@@ -128,11 +175,15 @@ class LancamentoSeed {
     );
   }
 
-  List<LancamentoDto> _criarLancamentosJunho(_SeedDependencies dep) {
+  List<LancamentoDto> _criarLancamentosAtual(
+    _SeedDependencies dep,
+    int ano,
+    int mes,
+  ) {
     return [
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 6, 1),
+        data: DateTime(ano, mes, 1),
         descricao: 'Salário Mensal Zzuna',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -148,7 +199,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 3),
+        data: DateTime(ano, mes, 3),
         descricao: 'Supermercado Carrefour',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -164,7 +215,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 5),
+        data: DateTime(ano, mes, 5),
         descricao: 'Restaurante Pizzaria Bella',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -180,7 +231,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 7),
+        data: DateTime(ano, mes, 7),
         descricao: 'Posto Petrobras Combustível',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -196,18 +247,23 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 9),
+        data: DateTime(ano, mes, 9),
         descricao: 'Drogasil Medicamentos',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(numero: 1, centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 35.90),
+          LancamentoItem(
+            numero: 1,
+            centroCustoId: dep.ccSaude,
+            categoriaId: dep.catSaude,
+            valor: 35.90,
+          ),
         ],
         conciliado: true,
       ),
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 6, 11),
+        data: DateTime(ano, mes, 11),
         descricao: 'Venda Computador Usado',
         extratoFaturaId: dep.efJun2Id,
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
@@ -223,7 +279,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 13),
+        data: DateTime(ano, mes, 13),
         descricao: 'Conta de Energia Enel',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -245,7 +301,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 15),
+        data: DateTime(ano, mes, 15),
         descricao: 'Condomínio Edifício Jardim',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -261,7 +317,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 6, 17),
+        data: DateTime(ano, mes, 17),
         descricao: 'Internet Fibra Claro',
         extratoFaturaId: dep.efJunCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -277,7 +333,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 6, 19),
+        data: DateTime(ano, mes, 19),
         descricao: 'Reembolso Despesas Viagem',
         extratoFaturaId: dep.efJun1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -294,11 +350,15 @@ class LancamentoSeed {
     ];
   }
 
-  List<LancamentoDto> _criarLancamentosMaio(_SeedDependencies dep) {
+  List<LancamentoDto> _criarLancamentosAnterior(
+    _SeedDependencies dep,
+    int ano,
+    int mes,
+  ) {
     return [
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 5, 1),
+        data: DateTime(ano, mes, 1),
         descricao: 'Salário Mensal Zzuna',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -314,7 +374,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 3),
+        data: DateTime(ano, mes, 3),
         descricao: 'Supermercado Pão de Açúcar',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -330,7 +390,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 5),
+        data: DateTime(ano, mes, 5),
         descricao: 'Restaurante Sushi Zen',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -346,7 +406,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 8),
+        data: DateTime(ano, mes, 8),
         descricao: 'Posto Ipiranga Combustível',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -362,18 +422,23 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 10),
+        data: DateTime(ano, mes, 10),
         descricao: 'Pague Menos Medicamentos',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
         itens: [
-          LancamentoItem(numero: 1, centroCustoId: dep.ccSaude, categoriaId: dep.catSaude, valor: 45.20),
+          LancamentoItem(
+            numero: 1,
+            centroCustoId: dep.ccSaude,
+            categoriaId: dep.catSaude,
+            valor: 45.20,
+          ),
         ],
         conciliado: true,
       ),
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 5, 12),
+        data: DateTime(ano, mes, 12),
         descricao: 'Venda Bicicleta Usada',
         extratoFaturaId: dep.efMay2Id,
         origem: LancamentoOrigem.conta(contaId: dep.secondConta.id),
@@ -389,7 +454,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 15),
+        data: DateTime(ano, mes, 15),
         descricao: 'Conta de Energia Enel',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -411,7 +476,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 18),
+        data: DateTime(ano, mes, 18),
         descricao: 'Condomínio Edifício Jardim',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
@@ -427,7 +492,7 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.despesa,
-        data: DateTime(2026, 5, 18),
+        data: DateTime(ano, mes, 18),
         descricao: 'Internet Fibra Claro',
         extratoFaturaId: dep.efMayCardId,
         origem: LancamentoOrigem.cartao(cartaoId: dep.firstCartao.id),
@@ -443,12 +508,17 @@ class LancamentoSeed {
       ),
       LancamentoDto(
         tipo: LancamentoTipo.receita,
-        data: DateTime(2026, 5, 25),
+        data: DateTime(ano, mes, 25),
         descricao: 'Reembolso Almoço Comercial',
         extratoFaturaId: dep.efMay1Id,
         origem: LancamentoOrigem.conta(contaId: dep.firstConta.id),
         itens: [
-          LancamentoItem(numero: 1, centroCustoId: dep.ccViagens, categoriaId: dep.catViagem, valor: 75.00),
+          LancamentoItem(
+            numero: 1,
+            centroCustoId: dep.ccViagens,
+            categoriaId: dep.catViagem,
+            valor: 75.00,
+          ),
         ],
         conciliado: true,
       ),

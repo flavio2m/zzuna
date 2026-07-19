@@ -19,8 +19,12 @@ class ExtratoFaturaSeed {
   });
 
   Future<void> execute() async {
+    final hoje = DateTime.now();
+    final mesAtual = Mes.values.firstWhere((e) => e.numero == hoje.month);
+    final anoAtual = hoje.year;
+
     final result = await repository.search(
-      ExtratoFaturaFilterDto(mes: Mes.maio, ano: 2026),
+      ExtratoFaturaFilterDto(mes: mesAtual, ano: anoAtual),
     );
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
@@ -28,17 +32,22 @@ class ExtratoFaturaSeed {
     final contas = (await contaRepository.getAll()).getOrElse((_) => []);
     final cartoes = (await cartaoRepository.getAll()).getOrElse((_) => []);
 
+    final mesAnterior = DateTime(hoje.year, hoje.month - 1, 1);
+    final periodos = [mesAnterior, hoje];
+
     final dtos = <ExtratoFaturaDto>[];
 
     for (final c in cartoes) {
-      for (final m in [Mes.maio, Mes.junho]) {
+      for (final p in periodos) {
+        final m = Mes.values.firstWhere((e) => e.numero == p.month);
+        final ano = p.year;
         dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.cartao(cartaoId: c.id),
-            ano: 2026,
+            ano: ano,
             mes: m,
-            dataInicio: DateTime(2026, m.numero, 1),
-            dataFim: DateTime(2026, m.numero + 1, 0),
+            dataInicio: DateTime(ano, m.numero, 1),
+            dataFim: DateTime(ano, m.numero + 1, 0),
             saldoInicial: 0.0,
             saldoFinal: 0.0,
             fechado: false,
@@ -48,14 +57,16 @@ class ExtratoFaturaSeed {
     }
 
     for (final c in contas) {
-      for (final m in [Mes.maio, Mes.junho]) {
+      for (final p in periodos) {
+        final m = Mes.values.firstWhere((e) => e.numero == p.month);
+        final ano = p.year;
         dtos.add(
           ExtratoFaturaDto(
             origem: LancamentoOrigem.conta(contaId: c.id),
-            ano: 2026,
+            ano: ano,
             mes: m,
-            dataInicio: DateTime(2026, m.numero, 1),
-            dataFim: DateTime(2026, m.numero + 1, 0),
+            dataInicio: DateTime(ano, m.numero, 1),
+            dataFim: DateTime(ano, m.numero + 1, 0),
             saldoInicial: 0.0,
             saldoFinal: 0.0,
             fechado: false,
