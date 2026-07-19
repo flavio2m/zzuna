@@ -46,5 +46,11 @@ class TransferenciaValidator extends LucidValidator<CreateTransferenciaDto> {
       'O valor deve ser maior que zero',
       'valorInvalido',
     );
+
+    ruleFor((dto) => dto.ocorrencias, key: 'ocorrencias').must(
+      (ocorrencias) => ocorrencias >= 1 && ocorrencias <= 24,
+      'A quantidade de meses deve ser entre 1 e 24',
+      'ocorrenciasInvalidas',
+    );
   }
 }

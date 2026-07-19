@@ -19,6 +19,7 @@ import 'package:zzuna/ui/shared/widgets/forms/app_date_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_area_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -53,6 +54,7 @@ class _TransferenciaCreateModalState
   LancamentoOrigem? _origemSaida;
   LancamentoOrigem? _origemEntrada;
   String? _observacao;
+  int _ocorrencias = 1;
 
   final _dataFocus = FocusNode();
   final _descFocus = FocusNode();
@@ -60,6 +62,7 @@ class _TransferenciaCreateModalState
   final _origemEntradaFocus = FocusNode();
   final _valorFocus = FocusNode();
   final _obsFocus = FocusNode();
+  final _ocorrenciasFocus = FocusNode();
   final _saveFocus = FocusNode();
 
   late final TransferenciaCreateViewModel viewModel;
@@ -153,6 +156,7 @@ class _TransferenciaCreateModalState
     _origemEntradaFocus.dispose();
     _valorFocus.dispose();
     _obsFocus.dispose();
+    _ocorrenciasFocus.dispose();
     _saveFocus.dispose();
     super.dispose();
   }
@@ -181,6 +185,7 @@ class _TransferenciaCreateModalState
       origemSaida: _origemSaida!,
       origemEntrada: _origemEntrada!,
       observacao: _observacao,
+      ocorrencias: _ocorrencias,
     );
     return validator.validate(dto).isValid;
   }
@@ -209,6 +214,7 @@ class _TransferenciaCreateModalState
       origemSaida: _origemSaida!,
       origemEntrada: _origemEntrada!,
       observacao: _observacao,
+      ocorrencias: _ocorrencias,
     );
 
     if (_formKey.currentState?.validate() ?? false) {
@@ -329,8 +335,8 @@ class _TransferenciaCreateModalState
               // 3. Valor (25%) + Observação (75%)
               _FormRow(
                 isDesktop: isDesktop,
-                leftFlex: 2,
-                rightFlex: 5,
+                leftFlex: 1,
+                rightFlex: 1,
                 left: AppCurrencyFormField(
                   label: 'Valor',
                   focusNode: _valorFocus,
@@ -346,16 +352,30 @@ class _TransferenciaCreateModalState
                     });
                   },
                 ),
-                right: AppTextAreaFormField(
-                  label: 'Observação',
-                  focusNode: _obsFocus,
-                  initialValue: _observacao,
-                  textInputAction: TextInputAction.next,
+                right: AppIntegerFormField(
+                  label: 'Replicar no mês seguinte:',
+                  focusNode: _ocorrenciasFocus,
+                  initialValue: _ocorrencias.toString(),
+                  min: 1,
+                  max: 24,
                   onFieldSubmitted: (_) => _saveFocus.requestFocus(),
-                  onChanged: (value) => setState(() {
-                    _observacao = value.isEmpty ? null : value;
-                  }),
+                  onChanged: (val) {
+                    final parsed = int.tryParse(val) ?? 1;
+                    setState(() => _ocorrencias = parsed);
+                  },
                 ),
+              ),
+
+              const AppSpacing(size: AppSpacingSize.md),
+              AppTextAreaFormField(
+                label: 'Observação',
+                focusNode: _obsFocus,
+                initialValue: _observacao,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => _ocorrenciasFocus.requestFocus(),
+                onChanged: (value) => setState(() {
+                  _observacao = value.isEmpty ? null : value;
+                }),
               ),
             ],
           ),

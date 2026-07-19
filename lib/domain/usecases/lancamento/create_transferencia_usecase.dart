@@ -27,50 +27,86 @@ class CreateTransferenciaUseCase {
       );
     }
 
-    // 2. Gerar grupoId único (Uuid.v4())
-    final grupoId = const Uuid().v4();
-    final grupo = LancamentoGrupo.transferencia(grupoId: grupoId);
+    final List<LancamentoDto> allDtos = [];
 
-    // 3. Montar os itens de transferência (numero deve ser 1)
-    final transferItem = LancamentoItem.transferencia(
-      numero: 1,
-      origemEntrada: dto.origemEntrada,
-      origemSaida: dto.origemSaida,
-      valor: dto.valor,
-    );
+    for (int i = 0; i < dto.ocorrencias; i++) {
+      final grupoId = const Uuid().v4();
+      final grupo = LancamentoGrupo.transferencia(grupoId: grupoId);
 
-    // 4. Montar os dois LancamentoDtos
-    final dtoSaida = LancamentoDto(
-      tipo: LancamentoTipo.transferencia,
-      data: dto.data,
-      descricao: dto.descricao,
-      origem: dto.origemSaida,
-      itens: [transferItem],
-      conciliado: false,
-      grupo: grupo,
-      observacao: dto.observacao,
-    );
+      final transferItem = LancamentoItem.transferencia(
+        numero: 1,
+        origemEntrada: dto.origemEntrada,
+        origemSaida: dto.origemSaida,
+        valor: dto.valor,
+      );
 
-    final dtoEntrada = LancamentoDto(
-      tipo: LancamentoTipo.transferencia,
-      data: dto.data,
-      descricao: dto.descricao,
-      origem: dto.origemEntrada,
-      itens: [transferItem],
-      conciliado: false,
-      grupo: grupo,
-      observacao: dto.observacao,
-    );
+      final date = _addMonths(dto.data, i);
+      final itemDescricao = dto.ocorrencias > 1
+          ? '${dto.descricao} ${i + 1}'
+          : dto.descricao;
+
+      final dtoSaida = LancamentoDto(
+        tipo: LancamentoTipo.transferencia,
+        data: date,
+        descricao: itemDescricao,
+        origem: dto.origemSaida,
+        itens: [transferItem],
+        conciliado: false,
+        grupo: grupo,
+        observacao: dto.observacao,
+      );
+
+      final dtoEntrada = LancamentoDto(
+        tipo: LancamentoTipo.transferencia,
+        data: date,
+        descricao: itemDescricao,
+        origem: dto.origemEntrada,
+        itens: [transferItem],
+        conciliado: false,
+        grupo: grupo,
+        observacao: dto.observacao,
+      );
+
+      allDtos.add(dtoSaida);
+      allDtos.add(dtoEntrada);
+    }
 
     // 5. Delegar criação em lote para CreateLancamentosUseCase
-    final result = await _createLancamentosUseCase.execute([
-      dtoSaida,
-      dtoEntrada,
-    ]);
+    final result = await _createLancamentosUseCase.execute(allDtos);
     if (result.isError()) {
       return Failure(result.exceptionOrNull()!);
     }
 
     return const Success(unit);
+  }
+
+  DateTime _addMonths(DateTime date, int months) {
+    if (months == 0) return date;
+
+    int nextYear = date.year;
+    int nextMonth = date.month + months;
+
+    while (nextMonth > 12) {
+      nextMonth -= 12;
+      nextYear++;
+    }
+
+    int nextDay = date.day;
+    int lastDayOfNextMonth = DateTime(nextYear, nextMonth + 1, 0).day;
+
+    if (nextDay > lastDayOfNextMonth) {
+      nextDay = lastDayOfNextMonth;
+    }
+
+    return DateTime(
+      nextYear,
+      nextMonth,
+      nextDay,
+      date.hour,
+      date.minute,
+      date.second,
+      date.millisecond,
+      date.microsecond,
+    );
   }
 }

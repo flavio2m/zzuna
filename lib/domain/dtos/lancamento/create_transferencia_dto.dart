@@ -7,6 +7,7 @@ class CreateTransferenciaDto {
   final LancamentoOrigem origemSaida;
   final LancamentoOrigem origemEntrada;
   final String? observacao;
+  final int ocorrencias;
 
   CreateTransferenciaDto({
     required this.data,
@@ -15,5 +16,6 @@ class CreateTransferenciaDto {
     required this.origemSaida,
     required this.origemEntrada,
     this.observacao,
+    this.ocorrencias = 1,
   });
 }
