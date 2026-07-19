@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
+import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class CloneLancamentoButton extends StatelessWidget {
@@ -16,7 +17,14 @@ class CloneLancamentoButton extends StatelessWidget {
       constraints: const BoxConstraints(),
       padding: const EdgeInsets.all(4),
       onPressed: () {
-        LancamentoCreateModal.show(context, cloneLancamento: lancamento);
+        if (lancamento.tipo == LancamentoTipo.transferencia) {
+          TransferenciaCreateModal.show(
+            context,
+            cloneTransferencia: lancamento,
+          );
+        } else {
+          LancamentoCreateModal.show(context, cloneLancamento: lancamento);
+        }
       },
     );
   }

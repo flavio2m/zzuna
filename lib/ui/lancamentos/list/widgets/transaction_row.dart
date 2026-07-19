@@ -258,10 +258,8 @@ class TransactionRow extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             reconcileButton,
-            if (grupo is! LancamentoGrupoTransferencia) ...[
-              const SizedBox(width: 4),
-              CloneLancamentoButton(lancamento: lancamento),
-            ],
+            const SizedBox(width: 4),
+            CloneLancamentoButton(lancamento: lancamento),
             const SizedBox(width: 4),
             IconAcoesButton(lancamento: lancamento),
           ],

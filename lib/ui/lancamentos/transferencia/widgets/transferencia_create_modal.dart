@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lancamento/create_transferencia_dto.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/validators/transferencia_validator.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/viewmodels/transferencia_create_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/lancamento_origem_field.dart';
@@ -20,10 +23,18 @@ import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class TransferenciaCreateModal extends ConsumerStatefulWidget {
-  const TransferenciaCreateModal({super.key});
+  final LancamentoDetails? cloneTransferencia;
 
-  static void show(BuildContext context) {
-    AppDialog.show(context: context, child: const TransferenciaCreateModal());
+  const TransferenciaCreateModal({super.key, this.cloneTransferencia});
+
+  static void show(
+    BuildContext context, {
+    LancamentoDetails? cloneTransferencia,
+  }) {
+    AppDialog.show(
+      context: context,
+      child: TransferenciaCreateModal(cloneTransferencia: cloneTransferencia),
+    );
   }
 
   @override
@@ -56,6 +67,29 @@ class _TransferenciaCreateModalState
   @override
   void initState() {
     super.initState();
+
+    if (widget.cloneTransferencia != null) {
+      final clone = widget.cloneTransferencia!;
+      _data = clone.data;
+      _descricao = clone.descricao;
+      _valor = clone.valor;
+      _observacao = clone.observacao;
+
+      if (clone.itens.isNotEmpty) {
+        clone.itens.first.map(
+          (standard) {
+            _origemSaida = clone.origem.origem;
+          },
+          transferencia: (t) {
+            _origemSaida = t.origemSaida.origem;
+            _origemEntrada = t.origemEntrada.origem;
+          },
+        );
+      } else {
+        _origemSaida = clone.origem.origem;
+      }
+    }
+
     viewModel = ref.read(transferenciaCreateViewModelProvider);
     viewModel.createCommand.addListener(_commandListener);
 
@@ -101,9 +135,9 @@ class _TransferenciaCreateModalState
 
     if (selectedOrigens.isNotEmpty) {
       setState(() {
-        _origemSaida = selectedOrigens[0].origem;
+        _origemSaida ??= selectedOrigens[0].origem;
 
-        if (selectedOrigens.length > 1) {
+        if (selectedOrigens.length > 1 && _origemEntrada == null) {
           _origemEntrada = selectedOrigens[1].origem;
         }
       });
@@ -300,6 +334,9 @@ class _TransferenciaCreateModalState
                 left: AppCurrencyFormField(
                   label: 'Valor',
                   focusNode: _valorFocus,
+                  initialValue: _valor > 0
+                      ? UtilBrasilFields.obterReal(_valor)
+                      : null,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _obsFocus.requestFocus(),
                   onChanged: (raw) {
@@ -312,6 +349,7 @@ class _TransferenciaCreateModalState
                 right: AppTextAreaFormField(
                   label: 'Observação',
                   focusNode: _obsFocus,
+                  initialValue: _observacao,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _saveFocus.requestFocus(),
                   onChanged: (value) => setState(() {
