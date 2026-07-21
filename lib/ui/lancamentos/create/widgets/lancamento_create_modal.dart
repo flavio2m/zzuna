@@ -612,40 +612,37 @@ class _LancamentoCreateModalState extends ConsumerState<LancamentoCreateModal> {
                 onDetalhamentoSubmitted: () {
                   _saveFocus.requestFocus();
                 },
+                middlePanel: (_modo != ModoLancamento.simples && !_showItens)
+                    ? (_modo == ModoLancamento.parcelado
+                          ? ParceladoPanel(
+                              numParcelas: _numParcelas,
+                              focusNode: _parcelasFocus,
+                              onFieldSubmitted: (_) =>
+                                  _detalhamentoFocus.requestFocus(),
+                              onNumParcelasChanged: (val) =>
+                                  setState(() => _numParcelas = val),
+                              totalValor: _valor,
+                              previewValores: _previewValores,
+                            )
+                          : ReplicadoPanel(
+                              parcelaInicial: _parcelaInicial,
+                              parcelaFinal: _parcelaFinal,
+                              focusInicial: _parcelaIniFocus,
+                              focusFinal: _parcelaFimFocus,
+                              onInicialSubmitted: (_) =>
+                                  _parcelaFimFocus.requestFocus(),
+                              onFinalSubmitted: (_) =>
+                                  _detalhamentoFocus.requestFocus(),
+                              onParcelaInicialChanged: (val) =>
+                                  setState(() => _parcelaInicial = val),
+                              onParcelaFinalChanged: (val) =>
+                                  setState(() => _parcelaFinal = val),
+                              valorUnitario: _valor,
+                            ))
+                    : null,
               ),
 
-              if (_showItens) ...[
-                _buildItensPanel(),
-              ] else if (_modo != ModoLancamento.simples) ...[
-                const AppSpacing(size: AppSpacingSize.md),
-                if (_modo == ModoLancamento.parcelado)
-                  ParceladoPanel(
-                    numParcelas: _numParcelas,
-                    focusNode: _parcelasFocus,
-                    onFieldSubmitted: (_) => _detalhamentoFocus.requestFocus(),
-                    onNumParcelasChanged: (val) => setState(
-                      () => _numParcelas = val, //
-                    ),
-                    totalValor: _valor,
-                    previewValores: _previewValores,
-                  )
-                else if (_modo == ModoLancamento.replicado)
-                  ReplicadoPanel(
-                    parcelaInicial: _parcelaInicial,
-                    parcelaFinal: _parcelaFinal,
-                    focusInicial: _parcelaIniFocus,
-                    focusFinal: _parcelaFimFocus,
-                    onInicialSubmitted: (_) => _parcelaFimFocus.requestFocus(),
-                    onFinalSubmitted: (_) => _detalhamentoFocus.requestFocus(),
-                    onParcelaInicialChanged: (val) => setState(
-                      () => _parcelaInicial = val, //
-                    ),
-                    onParcelaFinalChanged: (val) => setState(
-                      () => _parcelaFinal = val, //
-                    ),
-                    valorUnitario: _valor,
-                  ),
-              ],
+              if (_showItens) ...[_buildItensPanel()],
             ],
           ),
         );

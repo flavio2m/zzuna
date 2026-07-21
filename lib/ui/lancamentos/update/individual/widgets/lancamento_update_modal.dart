@@ -371,66 +371,58 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
               const AppSpacing(size: AppSpacingSize.lg),
 
               // Seção informativa do Modo de Lançamento (Tag somente leitura) + Detalhamento
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: theme.dividerColor),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8, //
-                      ),
-                      child: Row(
-                        children: [
-                          const AppText(
-                            'Modo de Lançamento',
-                            variant: AppTextVariant.body, //
-                          ),
-                          const Spacer(),
-                          AppTag(modeText, variant: AppTagVariant.neutral),
-                        ],
-                      ),
-                    ),
+              _FormRow(
+                isDesktop: isDesktop,
+                left: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: theme.dividerColor),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: theme.colorScheme.primary,
-                          width: 2, //
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                        color: theme.colorScheme.primary.withValues(
-                          alpha: 0.05,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8, //
-                      ),
-                      child: Row(
-                        children: [
-                          AppText(
-                            'Detalhamento do Valor',
-                            variant: AppTextVariant.body,
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          const Spacer(),
-                          Icon(
-                            Icons.list_alt_outlined,
-                            size: 20,
-                            color: theme.colorScheme.primary, //
-                          ),
-                        ],
-                      ),
-                    ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                ],
+                  child: Row(
+                    children: [
+                      const AppText(
+                        'Modo de Lançamento',
+                        variant: AppTextVariant.body,
+                      ),
+                      const Spacer(),
+                      AppTag(modeText, variant: AppTagVariant.neutral),
+                    ],
+                  ),
+                ),
+                right: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: theme.colorScheme.primary,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      AppText(
+                        'Detalhamento do Valor',
+                        variant: AppTextVariant.body,
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.list_alt_outlined,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
               // Painel de itens de distribuição (sempre visível no Update)

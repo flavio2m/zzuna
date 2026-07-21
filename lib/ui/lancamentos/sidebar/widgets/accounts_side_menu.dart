@@ -42,8 +42,10 @@ class _AccountsSideMenuState extends ConsumerState<AccountsSideMenu> {
           sidebarState.filtro,
         );
 
+        final isDesktop = MediaQuery.of(context).size.width >= 800;
+
         return Container(
-          width: 280,
+          width: isDesktop ? 280 : null,
           decoration: const BoxDecoration(
             color: AppColors.surface,
             border: Border(right: BorderSide(color: AppColors.border)),

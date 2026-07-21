@@ -88,6 +88,7 @@ class LancamentoItensPanel extends StatelessWidget {
                         categorias: categorias,
                         centros: centros,
                         totalValor: totalValor,
+                        initialCentroCustoId: item.centroCustoId,
                         onSave: (ccId, catId, val) {
                           onSaveNewItem(ccId, catId, val);
                           Navigator.pop(context);

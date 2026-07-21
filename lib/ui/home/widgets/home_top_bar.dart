@@ -24,8 +24,44 @@ class HomeTopBar extends StatelessWidget {
   final ValueChanged<HomePageTab> onTabSelected;
   final VoidCallback onLogout;
 
+  String _getLabelForTab(HomePageTab tab) {
+    switch (tab) {
+      case HomePageTab.lancamentos:
+        return 'Lançamentos';
+      case HomePageTab.relatorios:
+        return 'Relatórios';
+      case HomePageTab.contas:
+        return 'Contas';
+      case HomePageTab.cartoes:
+        return 'Cartões';
+      case HomePageTab.centroCustos:
+        return 'Centro de Custos';
+      case HomePageTab.categorias:
+        return 'Categorias';
+    }
+  }
+
+  void _showSobre(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600, maxHeight: 800),
+          child: const ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            child: SobrePage(),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
     return Material(
       color: AppColors.slate900,
       child: Container(
@@ -36,24 +72,14 @@ class HomeTopBar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            InkWell(
-              onTap: () => showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  backgroundColor: Colors.transparent,
-                  insetPadding: const EdgeInsets.all(16),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 600,
-                      maxHeight: 800,
-                    ),
-                    child: const ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      child: SobrePage(),
-                    ),
-                  ),
-                ),
+            if (!isDesktop && selectedTab == HomePageTab.lancamentos)
+              IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.slate200),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                tooltip: 'Filtros e Contas',
               ),
+            InkWell(
+              onTap: () => _showSobre(context),
               borderRadius: BorderRadius.circular(10),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -91,108 +117,166 @@ class HomeTopBar extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Container(
-              height: 48,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: AppColors.slate950,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.slate800),
-              ),
-              child: Row(
-                children: [
-                  _TopTabButton(
-                    icon: Icons.dashboard_outlined,
-                    label: 'Lançamentos',
-                    selected: selectedTab == HomePageTab.lancamentos,
-                    onPressed: () => onTabSelected(HomePageTab.lancamentos),
+            SizedBox(width: isDesktop ? 12 : 8),
+            if (!isDesktop) ...[
+              PopupMenuButton<int>(
+                icon: const Icon(
+                  Icons.apps,
+                  color: AppColors.slate200,
+                  size: 24,
+                ),
+                offset: const Offset(0, 40),
+                color: AppColors.surface,
+                onSelected: (value) {
+                  if (value == 99) {
+                    _showSobre(context);
+                  } else {
+                    onTabSelected(HomePageTab.values[value]);
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: HomePageTab.lancamentos.index,
+                    child: const Text('Lançamentos'),
                   ),
-                  _TopTabButton(
-                    icon: Icons.bar_chart_outlined,
-                    label: 'Contas',
-                    selected: selectedTab == HomePageTab.contas,
-                    onPressed: () => onTabSelected(HomePageTab.contas),
+                  PopupMenuItem(
+                    value: HomePageTab.contas.index,
+                    child: const Text('Contas'),
                   ),
-                  _TopTabButton(
-                    icon: Icons.credit_card_outlined,
-                    label: 'Cartões',
-                    selected: selectedTab == HomePageTab.cartoes,
-                    onPressed: () => onTabSelected(HomePageTab.cartoes),
+                  PopupMenuItem(
+                    value: HomePageTab.cartoes.index,
+                    child: const Text('Cartões'),
                   ),
-                  _TopTabButton(
-                    icon: Icons.account_balance_outlined,
-                    label: 'Centro de Custos',
-                    selected: selectedTab == HomePageTab.centroCustos,
-                    onPressed: () => onTabSelected(HomePageTab.centroCustos),
+                  PopupMenuItem(
+                    value: HomePageTab.centroCustos.index,
+                    child: const Text('Centro de Custos'),
                   ),
-                  _TopTabButton(
-                    icon: Icons.account_tree,
-                    label: 'Categorias',
-                    selected: selectedTab == HomePageTab.categorias,
-                    onPressed: () => onTabSelected(HomePageTab.categorias),
+                  PopupMenuItem(
+                    value: HomePageTab.categorias.index,
+                    child: const Text('Categorias'),
                   ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(value: 99, child: Text('Sobre')),
                 ],
               ),
-            ),
-            const Spacer(),
-            TextButton.icon(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  backgroundColor: Colors.transparent,
-                  insetPadding: const EdgeInsets.all(16),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 600,
-                      maxHeight: 800,
-                    ),
-                    child: const ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      child: SobrePage(),
-                    ),
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _getLabelForTab(selectedTab),
+                  style: const TextStyle(
+                    color: AppColors.surface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
-              icon: const Icon(
-                Icons.info_outline,
-                size: 16,
-                color: AppColors.slate400,
-              ),
-              label: const Text(
-                'Sobre',
-                style: TextStyle(color: AppColors.slate400, fontSize: 12),
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+            ],
+            if (isDesktop)
+              Container(
+                height: 48,
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: AppColors.slate950,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.slate800),
+                ),
+                child: Row(
+                  children: [
+                    _TopTabButton(
+                      icon: Icons.dashboard_outlined,
+                      label: 'Lançamentos',
+                      selected: selectedTab == HomePageTab.lancamentos,
+                      onPressed: () => onTabSelected(HomePageTab.lancamentos),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.bar_chart_outlined,
+                      label: 'Contas',
+                      selected: selectedTab == HomePageTab.contas,
+                      onPressed: () => onTabSelected(HomePageTab.contas),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.credit_card_outlined,
+                      label: 'Cartões',
+                      selected: selectedTab == HomePageTab.cartoes,
+                      onPressed: () => onTabSelected(HomePageTab.cartoes),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.account_balance_outlined,
+                      label: 'Centro de Custos',
+                      selected: selectedTab == HomePageTab.centroCustos,
+                      onPressed: () => onTabSelected(HomePageTab.centroCustos),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.account_tree,
+                      label: 'Categorias',
+                      selected: selectedTab == HomePageTab.categorias,
+                      onPressed: () => onTabSelected(HomePageTab.categorias),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            TextButton.icon(
-              onPressed: onLogout,
-              icon: const Icon(
-                Icons.logout,
-                size: 16,
-                color: AppColors.slate200,
-              ),
-              label: const Text(
-                'Sair',
-                style: TextStyle(color: AppColors.slate200, fontSize: 12),
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+            const Spacer(),
+            if (isDesktop)
+              TextButton.icon(
+                onPressed: () => _showSobre(context),
+                icon: const Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.slate400,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                label: const Text(
+                  'Sobre',
+                  style: TextStyle(color: AppColors.slate400, fontSize: 12),
                 ),
-                backgroundColor: AppColors.slate800,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                ),
               ),
-            ),
+            if (isDesktop) const SizedBox(width: 8),
+            if (isDesktop)
+              TextButton.icon(
+                onPressed: onLogout,
+                icon: const Icon(
+                  Icons.logout,
+                  size: 16,
+                  color: AppColors.slate200,
+                ),
+                label: const Text(
+                  'Sair',
+                  style: TextStyle(color: AppColors.slate200, fontSize: 12),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  backgroundColor: AppColors.slate800,
+                ),
+              )
+            else
+              IconButton(
+                onPressed: onLogout,
+                icon: const Icon(
+                  Icons.logout,
+                  size: 18,
+                  color: AppColors.slate200,
+                ),
+                tooltip: 'Sair',
+              ),
           ],
         ),
       ),

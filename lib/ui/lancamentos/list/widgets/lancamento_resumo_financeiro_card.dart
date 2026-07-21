@@ -27,6 +27,8 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
     return Container(
       height: 36,
       margin: EdgeInsets.zero,
@@ -44,7 +46,7 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
               Expanded(
                 child: _InfoItem(
                   width: 120,
-                  title: 'Saldo Inicial: ',
+                  title: isDesktop ? 'Saldo Inicial: ' : 'S. Inicial: ',
                   value: _formatCurrency(resumo.saldoInicial),
                   color: _valueColor(resumo.saldoInicial),
                 ),
@@ -52,7 +54,7 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
               Expanded(
                 child: _InfoItem(
                   width: 110,
-                  title: 'Entradas: ',
+                  title: isDesktop ? 'Entradas: ' : 'Entradas: ',
                   value: _formatCurrency(resumo.receitas),
                   color: AppColors.emerald800,
                 ),
@@ -60,7 +62,7 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
               Expanded(
                 child: _InfoItem(
                   width: 110,
-                  title: 'Saídas: ',
+                  title: isDesktop ? 'Saídas: ' : 'Saídas: ',
                   value: _formatCurrency(resumo.despesas),
                   color: AppColors.danger, //
                 ),
@@ -68,7 +70,7 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
               Expanded(
                 child: _InfoItem(
                   width: 120,
-                  title: 'Transferências: ',
+                  title: isDesktop ? 'Transferências: ' : 'Transf.: ',
                   value: _formatCurrency(resumo.transferencias),
                   color: AppColors.indigo600,
                 ),
@@ -76,25 +78,26 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
               Expanded(
                 child: _InfoItem(
                   width: 120,
-                  title: 'Saldo Final: ',
+                  title: isDesktop ? 'Saldo Final: ' : 'S. Final: ',
                   value: _formatCurrency(resumo.saldoFinal),
                   color: _valueColor(resumo.saldoFinal),
                 ),
               ),
             ],
           ),
-          Positioned(
-            right: 2,
-            top: 0,
-            bottom: 0,
-            child: Icon(
-              isMesFechado ? Icons.lock : Icons.lock_open,
-              color: isMesFechado
-                  ? AppColors.emerald800
-                  : Theme.of(context).colorScheme.primary,
-              size: 20,
+          if (isDesktop)
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: Icon(
+                isMesFechado ? Icons.lock : Icons.lock_open,
+                color: isMesFechado
+                    ? AppColors.emerald800
+                    : Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
             ),
-          ),
         ],
       ),
     );

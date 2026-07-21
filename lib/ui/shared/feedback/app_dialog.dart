@@ -8,7 +8,13 @@ class AppDialog {
     double maxWidth = 600,
     double maxHeightFactor = 0.85,
   }) {
-    final maxHeight = MediaQuery.of(context).size.height * maxHeightFactor;
+    final size = MediaQuery.of(context).size;
+    final isDesktop = size.width >= 800;
+
+    final actualMaxHeight = isDesktop
+        ? size.height * maxHeightFactor
+        : size.height;
+    final actualMaxWidth = isDesktop ? maxWidth : size.width;
 
     return showDialog<T>(
       context: context,
@@ -17,11 +23,14 @@ class AppDialog {
         return Dialog(
           elevation: 8,
           backgroundColor: Theme.of(context).cardColor,
+          insetPadding: isDesktop
+              ? const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0)
+              : const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: maxWidth,
-              maxHeight: maxHeight, //
+              maxWidth: actualMaxWidth,
+              maxHeight: actualMaxHeight,
             ),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),

@@ -16,6 +16,7 @@ class LancamentoItemForm extends StatefulWidget {
   final List<CentroCusto> centros;
   final double totalValor;
   final LancamentoItem? initialItem;
+  final String? initialCentroCustoId;
   final Function(String centroCustoId, String categoriaId, double valor) onSave;
   final VoidCallback onCancel;
 
@@ -25,6 +26,7 @@ class LancamentoItemForm extends StatefulWidget {
     required this.centros,
     required this.totalValor,
     this.initialItem,
+    this.initialCentroCustoId,
     required this.onSave,
     required this.onCancel,
   });
@@ -74,11 +76,18 @@ class _LancamentoItemFormState extends State<LancamentoItemForm> {
     } else {
       _percentController = TextEditingController();
       _valueController = TextEditingController();
+      if (widget.initialCentroCustoId != null) {
+        _centroCustoId = widget.initialCentroCustoId;
+      }
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _ccFocusNode.requestFocus();
+        if (_centroCustoId != null && _centroCustoId!.isNotEmpty) {
+          _catFocusNode.requestFocus();
+        } else {
+          _ccFocusNode.requestFocus();
+        }
       }
     });
   }

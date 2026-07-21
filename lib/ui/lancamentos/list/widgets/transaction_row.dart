@@ -45,6 +45,8 @@ class TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
     final firstItem = lancamento.itens.isNotEmpty
         ? lancamento.itens.first
         : null;
@@ -236,32 +238,66 @@ class TransactionRow extends StatelessWidget {
                       ],
                     ],
                   ),
+                  if (!isDesktop) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          value,
+                          style: TextStyle(
+                            color: isSaida
+                                ? AppColors.danger
+                                : isEntrada
+                                ? AppColors.primary
+                                : AppColors.slate600,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            reconcileButton,
+                            const SizedBox(width: 4),
+                            CloneLancamentoButton(lancamento: lancamento),
+                            const SizedBox(width: 4),
+                            IconAcoesButton(lancamento: lancamento),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
-            const SizedBox(width: 16),
-            SizedBox(
-              width: 104,
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: isSaida
-                      ? AppColors.danger
-                      : isEntrada
-                      ? AppColors.primary
-                      : AppColors.slate600,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
+            if (isDesktop) ...[
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 104,
+                child: Text(
+                  value,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: isSaida
+                        ? AppColors.danger
+                        : isEntrada
+                        ? AppColors.primary
+                        : AppColors.slate600,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 4),
-            reconcileButton,
-            const SizedBox(width: 4),
-            CloneLancamentoButton(lancamento: lancamento),
-            const SizedBox(width: 4),
-            IconAcoesButton(lancamento: lancamento),
+              const SizedBox(width: 4),
+              reconcileButton,
+              const SizedBox(width: 4),
+              CloneLancamentoButton(lancamento: lancamento),
+              const SizedBox(width: 4),
+              IconAcoesButton(lancamento: lancamento),
+            ],
           ],
         ),
       ),

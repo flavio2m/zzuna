@@ -6,6 +6,7 @@ class TransactionDayHeader extends StatelessWidget {
   const TransactionDayHeader({
     super.key,
     required this.date,
+    required this.shortDate,
     required this.balance,
     required this.extractBalance,
     this.positive = false,
@@ -15,6 +16,7 @@ class TransactionDayHeader extends StatelessWidget {
   });
 
   final String date;
+  final String shortDate;
   final String balance;
   final String extractBalance;
   final bool positive;
@@ -24,6 +26,8 @@ class TransactionDayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -48,7 +52,7 @@ class TransactionDayHeader extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: AppText(
-              date,
+              isDesktop ? date : shortDate,
               variant: AppTextVariant.body,
               color: AppColors.slate800,
               fontWeight: FontWeight.w800, //
@@ -60,8 +64,8 @@ class TransactionDayHeader extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AppText(
-                    'Saldo do dia: ',
+                  AppText(
+                    isDesktop ? 'Saldo do dia: ' : 'S. Dia: ',
                     variant: AppTextVariant.caption,
                     color: AppColors.slate400,
                     fontWeight: FontWeight.w900,
@@ -78,8 +82,8 @@ class TransactionDayHeader extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AppText(
-                    'Saldo Extrato: ',
+                  AppText(
+                    isDesktop ? 'Saldo Extrato: ' : 'S. Extrato: ',
                     variant: AppTextVariant.caption,
                     color: AppColors.slate400,
                     fontWeight: FontWeight.w900,

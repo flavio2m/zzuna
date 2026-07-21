@@ -15,6 +15,7 @@ class ModoSelector extends StatelessWidget {
   final FocusNode? focusParcelado;
   final FocusNode? focusReplicado;
   final FocusNode? focusDetalhamento;
+  final Widget? middlePanel;
 
   const ModoSelector({
     super.key,
@@ -28,6 +29,7 @@ class ModoSelector extends StatelessWidget {
     this.focusParcelado,
     this.focusReplicado,
     this.focusDetalhamento,
+    this.middlePanel,
   });
 
   Widget _buildModoButton(
@@ -84,111 +86,122 @@ class ModoSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Modo de Lançamento agrupado com borda e texto
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: theme.dividerColor),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Row(
-              children: [
-                const AppText(
-                  'Modo de Lançamento',
-                  variant: AppTextVariant.body,
-                ),
-                const Spacer(),
-                _buildModoButton(
-                  context,
-                  ModoLancamento.simples,
-                  Icons.payment_outlined,
-                  'Simples',
-                  focusSimples,
-                ),
-                _buildModoButton(
-                  context,
-                  ModoLancamento.parcelado,
-                  Icons.date_range_outlined,
-                  'Parcelado',
-                  focusParcelado,
-                ),
-                _buildModoButton(
-                  context,
-                  ModoLancamento.replicado,
-                  Icons.repeat_outlined,
-                  'Replicado',
-                  focusReplicado,
-                ),
-              ],
-            ),
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
+    final modoLancamentoWidget = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.dividerColor),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        children: [
+          const AppText('Modo de Lançamento', variant: AppTextVariant.body),
+          const Spacer(),
+          _buildModoButton(
+            context,
+            ModoLancamento.simples,
+            Icons.payment_outlined,
+            'Simples',
+            focusSimples,
           ),
-        ),
+          _buildModoButton(
+            context,
+            ModoLancamento.parcelado,
+            Icons.date_range_outlined,
+            'Parcelado',
+            focusParcelado,
+          ),
+          _buildModoButton(
+            context,
+            ModoLancamento.replicado,
+            Icons.repeat_outlined,
+            'Replicado',
+            focusReplicado,
+          ),
+        ],
+      ),
+    );
 
-        const SizedBox(width: 16),
-
-        // Detalhamento do Valor agrupado à direita
-        Expanded(
-          child: Tooltip(
-            message: showItens
-                ? 'Ocultar Detalhamento'
-                : 'Mostrar Detalhamento',
-            child: Builder(
-              builder: (ctx) {
-                if (focusDetalhamento != null) {
-                  focusDetalhamento!.onKeyEvent = (node, event) {
-                    if (event is KeyDownEvent &&
-                        event.logicalKey == LogicalKeyboardKey.enter) {
-                      if (onDetalhamentoSubmitted != null) {
-                        onDetalhamentoSubmitted!();
-                      } else {
-                        onShowItensChanged(!showItens);
-                      }
-                      return KeyEventResult.handled;
-                    }
-                    return KeyEventResult.ignored;
-                  };
+    final detalhamentoWidget = Tooltip(
+      message: showItens ? 'Ocultar Detalhamento' : 'Mostrar Detalhamento',
+      child: Builder(
+        builder: (ctx) {
+          if (focusDetalhamento != null) {
+            focusDetalhamento!.onKeyEvent = (node, event) {
+              if (event is KeyDownEvent &&
+                  event.logicalKey == LogicalKeyboardKey.enter) {
+                if (onDetalhamentoSubmitted != null) {
+                  onDetalhamentoSubmitted!();
+                } else {
+                  onShowItensChanged(!showItens);
                 }
-                return InkWell(
-                  focusNode: focusDetalhamento,
-                  onTap: () => onShowItensChanged(!showItens),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: theme.dividerColor),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        AppText(
-                          'Detalhamento do Valor',
-                          variant: AppTextVariant.body,
-                          color: showItens ? theme.colorScheme.primary : null,
-                          fontWeight: showItens ? FontWeight.bold : null,
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.list_alt_outlined,
-                          size: 20,
-                          color: showItens
-                              ? theme.colorScheme.primary
-                              : theme.hintColor,
-                        ),
-                      ],
-                    ),
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            };
+          }
+          return InkWell(
+            focusNode: focusDetalhamento,
+            onTap: () => onShowItensChanged(!showItens),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.dividerColor),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  AppText(
+                    'Detalhamento do Valor',
+                    variant: AppTextVariant.body,
+                    color: showItens ? theme.colorScheme.primary : null,
+                    fontWeight: showItens ? FontWeight.bold : null,
                   ),
-                );
-              },
+                  const Spacer(),
+                  Icon(
+                    Icons.list_alt_outlined,
+                    size: 20,
+                    color: showItens
+                        ? theme.colorScheme.primary
+                        : theme.hintColor,
+                  ),
+                ],
+              ),
             ),
-          ),
+          );
+        },
+      ),
+    );
+
+    if (!isDesktop) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          modoLancamentoWidget,
+          if (middlePanel != null) ...[
+            const SizedBox(height: 16),
+            middlePanel!,
+          ],
+          const SizedBox(height: 16),
+          detalhamentoWidget,
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(child: modoLancamentoWidget),
+            const SizedBox(width: 16),
+            Expanded(child: detalhamentoWidget),
+          ],
         ),
+        if (middlePanel != null) ...[const SizedBox(height: 16), middlePanel!],
       ],
     );
   }

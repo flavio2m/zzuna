@@ -112,6 +112,7 @@ class TransactionDayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateKey = DateFormatter.fullDate(dia.data);
+    final shortDateKey = DateFormatter.shortDate(dia.data);
 
     final isPositive = dia.saldo >= 0;
     final prefix = isPositive ? '' : '- ';
@@ -155,6 +156,7 @@ class TransactionDayCard extends StatelessWidget {
 
                 return TransactionDayHeader(
                   date: dateKey,
+                  shortDate: shortDateKey,
                   balance: balanceStr,
                   extractBalance: extractBalanceStr,
                   positive: isPositive,

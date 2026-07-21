@@ -13,6 +13,8 @@ import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/widgets/la
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
+import 'package:zzuna/utils/extensions/command_state_extension.dart';
+import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 
 class TransactionsActionsBar extends ConsumerWidget {
   final List<String> selectedIds;
@@ -28,121 +30,258 @@ class TransactionsActionsBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listViewModel = ref.watch(lancamentosListViewModelProvider);
     final hasSelection = selectedIds.isNotEmpty;
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
+
+    // Listener para feedback visual caso a conciliação por menu falhe
+    ref.listen(
+      lancamentoReconcileViewModelProvider.select(
+        (vm) => vm.reconcileCommand.value,
+      ),
+      (previous, next) {
+        if (!isDesktop && next.isFailure) {
+          final errorMessage =
+              next.getExceptionOrNull()?.toString() ??
+              'Erro ao conciliar lançamentos';
+          AppSnackBar.showError(context, errorMessage);
+        } else if (!isDesktop && next.isSuccess) {
+          onClearSelection();
+        }
+      },
+    );
 
     return SizedBox(
       height: 36,
-      child: Row(
-        children: [
-          IconSelecionarTodosButton(
-            allSelected: listViewModel.allSelected,
-            onPressed: () => listViewModel.toggleSelectAll(),
-          ),
-          const SizedBox(width: 12),
-          const AppText('|'),
-          const SizedBox(width: 12),
-
-          // Fast Month Navigation
-          Consumer(
-            builder: (context, ref, _) {
-              final filterState = ref.watch(lancamentoFilterProvider);
-              final maxYear = DateTime.now().year + 2;
-
-              return Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 20),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    splashRadius: 20,
-                    onPressed:
-                        (filterState.mes == Mes.janeiro &&
-                            filterState.ano == 2025)
-                        ? null
-                        : () {
-                            ref
-                                .read(lancamentoFilterProvider.notifier)
-                                .mesAnterior();
-                            listViewModel.pesquisar();
-                          },
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${filterState.mes.descricao} / ${filterState.ano}',
-                    style: const TextStyle(
-                      color: AppColors.slate700,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 20),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    splashRadius: 20,
-                    onPressed:
-                        (filterState.mes == Mes.dezembro &&
-                            filterState.ano == maxYear)
-                        ? null
-                        : () {
-                            ref
-                                .read(lancamentoFilterProvider.notifier)
-                                .proximoMes();
-                            listViewModel.pesquisar();
-                          },
-                  ),
-                ],
-              );
-            },
-          ),
-
-          const SizedBox(width: 12),
-          const AppText('|'),
-          const SizedBox(width: 12),
-
-          const CreateReceitaButton(),
-          const SizedBox(width: 8),
-          const CreateDespesaButton(),
-          const SizedBox(width: 8),
-          const CreateTransferenciaButton(),
-          if (hasSelection && !listViewModel.isMesFechado) ...[
-            const SizedBox(width: 12),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            IconSelecionarTodosButton(
+              allSelected: listViewModel.allSelected,
+              onPressed: () => listViewModel.toggleSelectAll(),
+            ),
+            _buildDivider(isDesktop),
             const AppText('|'),
-            const SizedBox(width: 12),
-            LancamentosReconcileButton(
-              conciliado: true,
-              selectedIds: selectedIds,
-              onSuccess: onClearSelection,
+            _buildDivider(isDesktop),
+
+            _buildMonthNavigation(ref, isDesktop, listViewModel),
+
+            _buildDivider(isDesktop),
+            const AppText('|'),
+            _buildDivider(isDesktop),
+
+            const CreateReceitaButton(),
+            _buildDivider(isDesktop, smallSpace: true),
+            const CreateDespesaButton(),
+            _buildDivider(isDesktop, smallSpace: true),
+            const CreateTransferenciaButton(),
+            if (hasSelection && !listViewModel.isMesFechado) ...[
+              _buildDivider(isDesktop),
+              const AppText('|'),
+              _buildDivider(isDesktop),
+              if (isDesktop)
+                ..._buildDesktopActions(context)
+              else
+                _buildMobileActionsMenu(context, ref),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider(bool isDesktop, {bool smallSpace = false}) {
+    if (smallSpace) {
+      return SizedBox(width: isDesktop ? 8 : 2);
+    }
+
+    return SizedBox(width: isDesktop ? 12 : 2);
+  }
+
+  Widget _buildMonthNavigation(
+    WidgetRef ref,
+    bool isDesktop,
+    dynamic listViewModel,
+  ) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final filterState = ref.watch(lancamentoFilterProvider);
+        final maxYear = DateTime.now().year + 2;
+
+        return Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              splashRadius: 20,
+              onPressed:
+                  (filterState.mes == Mes.janeiro && filterState.ano == 2025)
+                  ? null
+                  : () {
+                      ref.read(lancamentoFilterProvider.notifier).mesAnterior();
+                      listViewModel.pesquisar();
+                    },
             ),
-            const SizedBox(width: 8),
-            LancamentosReconcileButton(
-              conciliado: false,
-              selectedIds: selectedIds,
-              onSuccess: onClearSelection,
+            SizedBox(width: isDesktop ? 8 : 4),
+            Text(
+              '${filterState.mes.descricao} / ${filterState.ano}',
+              style: TextStyle(
+                color: AppColors.slate700,
+                fontWeight: FontWeight.w700,
+                fontSize: isDesktop ? 13 : 11,
+              ),
             ),
-            const SizedBox(width: 8),
-            LancamentosUpdateDataButton(
-              onPressed: () {
-                LancamentosUpdateDataModal.show(
-                  context: context,
-                  selectedIds: selectedIds,
-                  onSuccess: onClearSelection,
-                );
-              },
-            ),
-            const SizedBox(width: 8),
-            LancamentosUpdateOrigemButton(
-              onPressed: () {
-                LancamentosUpdateOrigemModal.show(
-                  context: context,
-                  selectedIds: selectedIds,
-                  onSuccess: onClearSelection,
-                );
-              },
+            SizedBox(width: isDesktop ? 8 : 4),
+            IconButton(
+              icon: const Icon(Icons.chevron_right, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              splashRadius: 20,
+              onPressed:
+                  (filterState.mes == Mes.dezembro &&
+                      filterState.ano == maxYear)
+                  ? null
+                  : () {
+                      ref.read(lancamentoFilterProvider.notifier).proximoMes();
+                      listViewModel.pesquisar();
+                    },
             ),
           ],
-        ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildDesktopActions(BuildContext context) {
+    return [
+      LancamentosReconcileButton(
+        conciliado: true,
+        selectedIds: selectedIds,
+        onSuccess: onClearSelection,
       ),
+      const SizedBox(width: 8),
+      LancamentosReconcileButton(
+        conciliado: false,
+        selectedIds: selectedIds,
+        onSuccess: onClearSelection,
+      ),
+      const SizedBox(width: 8),
+      LancamentosUpdateDataButton(
+        onPressed: () {
+          LancamentosUpdateDataModal.show(
+            context: context,
+            selectedIds: selectedIds,
+            onSuccess: onClearSelection,
+          );
+        },
+      ),
+      const SizedBox(width: 8),
+      LancamentosUpdateOrigemButton(
+        onPressed: () {
+          LancamentosUpdateOrigemModal.show(
+            context: context,
+            selectedIds: selectedIds,
+            onSuccess: onClearSelection,
+          );
+        },
+      ),
+    ];
+  }
+
+  Widget _buildMobileActionsMenu(BuildContext context, WidgetRef ref) {
+    return PopupMenuButton<int>(
+      icon: const Icon(Icons.more_vert, color: AppColors.primary, size: 20),
+      offset: const Offset(0, 40),
+      color: AppColors.surface,
+      tooltip: 'Ações de seleção',
+      onSelected: (value) {
+        switch (value) {
+          case 0:
+            ref
+                .read(lancamentoReconcileViewModelProvider)
+                .reconcileCommand
+                .execute((ids: selectedIds, conciliado: true));
+            break;
+          case 1:
+            ref
+                .read(lancamentoReconcileViewModelProvider)
+                .reconcileCommand
+                .execute((ids: selectedIds, conciliado: false));
+            break;
+          case 2:
+            LancamentosUpdateDataModal.show(
+              context: context,
+              selectedIds: selectedIds,
+              onSuccess: onClearSelection,
+            );
+            break;
+          case 3:
+            LancamentosUpdateOrigemModal.show(
+              context: context,
+              selectedIds: selectedIds,
+              onSuccess: onClearSelection,
+            );
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 0,
+          child: Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                color: AppColors.primary,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text('Conciliar', style: TextStyle(color: AppColors.slate700)),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 1,
+          child: Row(
+            children: [
+              Icon(
+                Icons.remove_circle_outline,
+                color: AppColors.danger,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text('Desconciliar', style: TextStyle(color: AppColors.slate700)),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        const PopupMenuItem(
+          value: 2,
+          child: Row(
+            children: [
+              Icon(Icons.calendar_month, color: AppColors.slate600, size: 20),
+              SizedBox(width: 8),
+              Text('Alterar Data', style: TextStyle(color: AppColors.slate700)),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 3,
+          child: Row(
+            children: [
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                color: AppColors.slate600,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Alterar Origem',
+                style: TextStyle(color: AppColors.slate700),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
