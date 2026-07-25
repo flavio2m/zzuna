@@ -78,7 +78,10 @@ void main() {
       TransferenciaValidator(),
     );
 
-    reconcileUseCase = ReconcileLancamentosUseCase(lancamentoRepository);
+    reconcileUseCase = ReconcileLancamentosUseCase(
+      lancamentoRepository,
+      extratoRepository,
+    );
 
     dataInicialConta = DateTime(2026, 1, 1);
 

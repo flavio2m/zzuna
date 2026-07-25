@@ -184,6 +184,7 @@ final reconcileLancamentosUseCaseProvider =
     Provider<ReconcileLancamentosUseCase>((ref) {
       return ReconcileLancamentosUseCase(
         ref.watch(lancamentoRepositoryProvider),
+        ref.watch(extratoFaturaRepositoryProvider),
       );
     });
 

@@ -11,6 +11,7 @@ import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/domain/usecases/lancamento/apply_recorrencias_usecase.dart';
+import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
 
 class ResolveExtratoFaturaUseCase {
@@ -101,6 +102,21 @@ class ResolveExtratoFaturaUseCase {
     }
 
     final mes = Mes.values.firstWhere((m) => m.numero == targetMonthNumber);
+
+    // 1.5. Validar se o período possui qualquer extrato fechado (mês encerrado)
+    final periodExtratosRes = await _extratoRepository.search(
+      ExtratoFaturaFilterDto(mes: mes, ano: targetYear),
+    );
+    if (periodExtratosRes.isSuccess()) {
+      final extratosNoPeriodo = periodExtratosRes.getOrThrow();
+      if (extratosNoPeriodo.any((e) => e.fechado)) {
+        return Failure(
+          DomainException(
+            'Não é possível registrar lançamentos em um período encerrado.',
+          ),
+        );
+      }
+    }
 
     // 2. Buscar extrato do período
     final targetRes = await _extratoRepository.searchByPeriodo(
