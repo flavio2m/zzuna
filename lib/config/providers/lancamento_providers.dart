@@ -444,3 +444,18 @@ final lancamentosListViewModelProvider =
       vm.updateFilter(ref.read(lancamentoFilterProvider));
       return vm;
     });
+
+final lancamentoPendenteViewModelProvider =
+    ChangeNotifierProvider<LancamentoPendenteViewModel>((ref) {
+      final vm = LancamentoPendenteViewModel(
+        ref.watch(lancamentoDetailsUseCaseProvider),
+        ref.watch(lancamentoFilterUseCaseProvider),
+        ref.watch(lancamentoRepositoryProvider),
+        ref.watch(contaRepositoryProvider),
+        ref.watch(cartaoRepositoryProvider),
+        ref.watch(categoriaRepositoryProvider),
+        ref.watch(centroCustoRepositoryProvider),
+        ref.watch(categoriaTreeUseCaseProvider),
+      );
+      return vm;
+    });

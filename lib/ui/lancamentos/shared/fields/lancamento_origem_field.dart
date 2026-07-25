@@ -13,6 +13,9 @@ class LancamentoOrigemField extends StatelessWidget {
   final FocusNode? focusNode;
   final VoidCallback? onEnterPressed;
 
+  final bool showAllOption;
+  final String allOptionLabel;
+
   const LancamentoOrigemField({
     super.key,
     required this.origens,
@@ -22,6 +25,8 @@ class LancamentoOrigemField extends StatelessWidget {
     this.label = 'Conta / Cartão',
     this.focusNode,
     this.onEnterPressed,
+    this.showAllOption = false,
+    this.allOptionLabel = 'Todas',
   });
 
   String _labelFor(LancamentoOrigemDetail detalhe) {
@@ -64,20 +69,25 @@ class LancamentoOrigemField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppDropdownFormField<LancamentoOrigem>(
+    return AppDropdownFormField<LancamentoOrigem?>(
       label: label,
       value: _matchedValue(),
       validator: validator,
       focusNode: focusNode,
       onEnterPressed: onEnterPressed,
-      items: origens
-          .map(
-            (detalhe) => AppDropdownMenuItem<LancamentoOrigem>(
-              value: _origemFor(detalhe),
-              label: _labelFor(detalhe),
-            ),
-          )
-          .toList(),
+      items: [
+        if (showAllOption)
+          AppDropdownMenuItem<LancamentoOrigem?>(
+            value: null,
+            label: allOptionLabel,
+          ),
+        ...origens.map(
+          (detalhe) => AppDropdownMenuItem<LancamentoOrigem?>(
+            value: _origemFor(detalhe),
+            label: _labelFor(detalhe),
+          ),
+        ),
+      ],
       onChanged: onChanged,
     );
   }

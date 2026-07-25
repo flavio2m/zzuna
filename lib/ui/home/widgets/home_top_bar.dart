@@ -4,6 +4,7 @@ import 'package:zzuna/ui/home/pages/sobre_page.dart';
 
 enum HomePageTab {
   lancamentos,
+  lancamentosPendentes,
   relatorios,
   contas,
   cartoes,
@@ -28,6 +29,8 @@ class HomeTopBar extends StatelessWidget {
     switch (tab) {
       case HomePageTab.lancamentos:
         return 'Lançamentos';
+      case HomePageTab.lancamentosPendentes:
+        return 'Lançamentos Pendentes';
       case HomePageTab.relatorios:
         return 'Relatórios';
       case HomePageTab.contas:
@@ -140,6 +143,10 @@ class HomeTopBar extends StatelessWidget {
                     child: const Text('Lançamentos'),
                   ),
                   PopupMenuItem(
+                    value: HomePageTab.lancamentosPendentes.index,
+                    child: const Text('Lançamentos Pendentes'),
+                  ),
+                  PopupMenuItem(
                     value: HomePageTab.contas.index,
                     child: const Text('Contas'),
                   ),
@@ -195,6 +202,13 @@ class HomeTopBar extends StatelessWidget {
                       label: 'Lançamentos',
                       selected: selectedTab == HomePageTab.lancamentos,
                       onPressed: () => onTabSelected(HomePageTab.lancamentos),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.warning_amber_outlined,
+                      label: 'Pendentes',
+                      selected: selectedTab == HomePageTab.lancamentosPendentes,
+                      onPressed: () =>
+                          onTabSelected(HomePageTab.lancamentosPendentes),
                     ),
                     _TopTabButton(
                       icon: Icons.bar_chart_outlined,

@@ -78,10 +78,7 @@ class TransactionsActionsBar extends ConsumerWidget {
               _buildDivider(isDesktop),
               const AppText('|'),
               _buildDivider(isDesktop),
-              if (isDesktop)
-                ..._buildDesktopActions(context)
-              else
-                _buildMobileActionsMenu(context, ref),
+              ..._buildDesktopActions(context),
             ],
           ],
         ),
@@ -186,102 +183,5 @@ class TransactionsActionsBar extends ConsumerWidget {
         },
       ),
     ];
-  }
-
-  Widget _buildMobileActionsMenu(BuildContext context, WidgetRef ref) {
-    return PopupMenuButton<int>(
-      icon: const Icon(Icons.more_vert, color: AppColors.primary, size: 20),
-      offset: const Offset(0, 40),
-      color: AppColors.surface,
-      tooltip: 'Ações de seleção',
-      onSelected: (value) {
-        switch (value) {
-          case 0:
-            ref
-                .read(lancamentoReconcileViewModelProvider)
-                .reconcileCommand
-                .execute((ids: selectedIds, conciliado: true));
-            break;
-          case 1:
-            ref
-                .read(lancamentoReconcileViewModelProvider)
-                .reconcileCommand
-                .execute((ids: selectedIds, conciliado: false));
-            break;
-          case 2:
-            LancamentosUpdateDataModal.show(
-              context: context,
-              selectedIds: selectedIds,
-              onSuccess: onClearSelection,
-            );
-            break;
-          case 3:
-            LancamentosUpdateOrigemModal.show(
-              context: context,
-              selectedIds: selectedIds,
-              onSuccess: onClearSelection,
-            );
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 0,
-          child: Row(
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                color: AppColors.primary,
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Text('Conciliar', style: TextStyle(color: AppColors.slate700)),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 1,
-          child: Row(
-            children: [
-              Icon(
-                Icons.remove_circle_outline,
-                color: AppColors.danger,
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Text('Desconciliar', style: TextStyle(color: AppColors.slate700)),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
-        const PopupMenuItem(
-          value: 2,
-          child: Row(
-            children: [
-              Icon(Icons.calendar_month, color: AppColors.slate600, size: 20),
-              SizedBox(width: 8),
-              Text('Alterar Data', style: TextStyle(color: AppColors.slate700)),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 3,
-          child: Row(
-            children: [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                color: AppColors.slate600,
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Alterar Origem',
-                style: TextStyle(color: AppColors.slate700),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

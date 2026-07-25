@@ -91,6 +91,94 @@ class LancamentoDetailsUseCase {
     return detailsList;
   }
 
+  /// Busca todos os lançamentos não conciliados (independente de período)
+  /// e os converte em LancamentoDetails, ordenados por data.
+  ///
+  /// Para montar o mapa de Extratos/Faturas, determina o intervalo de períodos
+  /// (menor e maior anoMes dos lançamentos encontrados) e busca apenas os
+  /// extratos compreendidos nesse intervalo — evitando trazer a base toda.
+  Future<List<LancamentoDetails>> executeUnconsolidated() async {
+    final lancamentosResult = await _lancamentoRepository
+        .searchUnconsolidated();
+    final lancamentos = lancamentosResult.getOrElse((_) => <Lancamento>[]);
+
+    if (lancamentos.isEmpty) return [];
+
+    // ── 1. Determinar intervalo de anoMes ──────────────────────────────────
+    final anoMesMin = lancamentos
+        .map((l) => l.anoMes)
+        .reduce((a, b) => a < b ? a : b);
+    final anoMesMax = lancamentos
+        .map((l) => l.anoMes)
+        .reduce((a, b) => a > b ? a : b);
+
+    final anoMin = anoMesMin ~/ 100;
+    final mesMin = Mes.fromNumero(anoMesMin % 100);
+    final anoMax = anoMesMax ~/ 100;
+    final mesMax = Mes.fromNumero(anoMesMax % 100);
+
+    // ── 2. Buscar extratos mês a mês no intervalo ─────────────────────────
+    final List<ExtratoFatura> extratoFaturas = [];
+    int curAno = anoMin;
+    Mes curMes = mesMin;
+    while (true) {
+      final result = await _extratoFaturaRepository.search(
+        ExtratoFaturaFilterDto(mes: curMes, ano: curAno),
+      );
+      extratoFaturas.addAll(result.getOrElse((_) => []));
+
+      // Avançar um mês
+      if (curAno == anoMax && curMes == mesMax) break;
+      if (curMes.numero == 12) {
+        curAno++;
+        curMes = Mes.janeiro;
+      } else {
+        curMes = Mes.fromNumero(curMes.numero + 1);
+      }
+    }
+
+    // ── 3. Buscar dados de suporte ─────────────────────────────────────────
+    final contasResult = await _contaRepository.getAll();
+    final cartoesResult = await _cartaoRepository.getAll();
+    final categoriasResult = await _categoriaRepository.getAll();
+    final centrosResult = await _centroCustoRepository.getAll();
+
+    final contas = contasResult.getOrElse((_) => <Conta>[]);
+    final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
+    final categorias = categoriasResult.getOrElse((_) => <Categoria>[]);
+    final centros = centrosResult.getOrElse((_) => <CentroCusto>[]);
+
+    final contaDetailsMap = _buildContaDetailsMap(contas);
+    final cartaoDetailsMap = _buildCartaoDetailsMap(cartoes);
+    final categoryDetailsMap = _buildCategoriaDetailsMap(categorias);
+    final centroCustoMap = _buildCentroCustoMap(centros);
+    final extratoFaturaDetailsMap = _buildExtratoFaturaDetailsMap(
+      extratoFaturas,
+      contaDetailsMap,
+      cartaoDetailsMap,
+    );
+
+    // ── 4. Montar detalhes ────────────────────────────────────────────────
+    final List<LancamentoDetails> detailsList = [];
+    for (final l in lancamentos) {
+      final details = _toDetails(
+        l,
+        contaDetailsMap,
+        cartaoDetailsMap,
+        centroCustoMap,
+        categoryDetailsMap,
+        extratoFaturaDetailsMap,
+      );
+      if (details != null) {
+        detailsList.add(details);
+      }
+    }
+
+    // Ordenar cronologicamente (mais antigo primeiro)
+    detailsList.sort((a, b) => a.data.compareTo(b.data));
+    return detailsList;
+  }
+
   Map<String, ContaDetails> _buildContaDetailsMap(List<Conta> contas) {
     final Map<String, ContaDetails> map = {};
     for (final c in contas) {

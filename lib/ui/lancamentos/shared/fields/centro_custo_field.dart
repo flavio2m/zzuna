@@ -11,6 +11,9 @@ class CentroCustoField extends StatelessWidget {
   final FocusNode? focusNode;
   final VoidCallback? onEnterPressed;
 
+  final bool showAllOption;
+  final String allOptionLabel;
+
   const CentroCustoField({
     super.key,
     required this.centros,
@@ -19,22 +22,26 @@ class CentroCustoField extends StatelessWidget {
     this.validator,
     this.focusNode,
     this.onEnterPressed,
+    this.showAllOption = false,
+    this.allOptionLabel = 'Todos',
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppDropdownFormField<String>(
+    return AppDropdownFormField<String?>(
       label: 'Centro de Custo',
       value: value,
       validator: validator,
       focusNode: focusNode,
       onEnterPressed: onEnterPressed,
-      items: centros
-          .map(
-            (cc) =>
-                AppDropdownMenuItem<String>(value: cc.id, label: cc.descricao),
-          )
-          .toList(),
+      items: [
+        if (showAllOption)
+          AppDropdownMenuItem<String?>(value: null, label: allOptionLabel),
+        ...centros.map(
+          (cc) =>
+              AppDropdownMenuItem<String?>(value: cc.id, label: cc.descricao),
+        ),
+      ],
       onChanged: onChanged,
     );
   }

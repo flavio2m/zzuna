@@ -283,6 +283,24 @@ class LancamentoRepository
     );
   }
 
+  AsyncResult<List<Lancamento>> searchUnconsolidated() async {
+    final searchFields = [
+      SearchField(
+        fieldName: 'conciliado',
+        value: false,
+        type: SearchFieldType.boolean,
+      ),
+    ];
+
+    final result = await _storage.searchByFields(searchFields);
+    return result.fold(
+      Success.new,
+      (error) => Failure(
+        LocalStorageException('Erro ao buscar lançamentos não conciliados'),
+      ),
+    );
+  }
+
   @override
   Stream<RepositoryEvent<Lancamento>> observer() {
     return _streamController.stream;

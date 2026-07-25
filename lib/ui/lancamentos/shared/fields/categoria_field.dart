@@ -11,6 +11,9 @@ class CategoriaField extends StatelessWidget {
   final FocusNode? focusNode;
   final VoidCallback? onEnterPressed;
 
+  final bool showAllOption;
+  final String allOptionLabel;
+
   const CategoriaField({
     super.key,
     required this.categorias,
@@ -19,6 +22,8 @@ class CategoriaField extends StatelessWidget {
     this.validator,
     this.focusNode,
     this.onEnterPressed,
+    this.showAllOption = false,
+    this.allOptionLabel = 'Todas',
   });
 
   /// Flattens the category tree into a sorted list with full path labels.
@@ -40,18 +45,20 @@ class CategoriaField extends StatelessWidget {
   Widget build(BuildContext context) {
     final flat = _flatten(categorias, '');
 
-    return AppDropdownFormField<String>(
+    return AppDropdownFormField<String?>(
       label: 'Categoria',
       value: value,
       validator: validator,
       focusNode: focusNode,
       onEnterPressed: onEnterPressed,
-      items: flat
-          .map(
-            (cat) =>
-                AppDropdownMenuItem<String>(value: cat.id, label: cat.label),
-          )
-          .toList(),
+      items: [
+        if (showAllOption)
+          AppDropdownMenuItem<String?>(value: null, label: allOptionLabel),
+        ...flat.map(
+          (cat) =>
+              AppDropdownMenuItem<String?>(value: cat.id, label: cat.label),
+        ),
+      ],
       onChanged: onChanged,
     );
   }

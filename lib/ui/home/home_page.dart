@@ -5,6 +5,7 @@ import 'package:zzuna/ui/centro_custo/list/centro_custo_list_page.dart';
 import 'package:zzuna/ui/conta/list/conta_list_page.dart';
 import 'package:zzuna/ui/home/widgets/home_top_bar.dart';
 import 'package:zzuna/ui/lancamentos/list/lancamentos_page.dart';
+import 'package:zzuna/ui/lancamentos/pendentes/lancamento_pendente_page.dart';
 import 'package:zzuna/ui/lancamentos/sidebar/widgets/accounts_side_menu.dart';
 import 'package:zzuna/ui/relatorios/relatorios_page.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
@@ -49,6 +50,8 @@ class _MyWidgetState extends ConsumerState<MyWidget> {
             Expanded(
               child: switch (_selectedTab) {
                 HomePageTab.lancamentos => const LancamentosPage(),
+                HomePageTab.lancamentosPendentes =>
+                  const LancamentoPendentePage(),
                 HomePageTab.relatorios => const RelatoriosPage(),
                 HomePageTab.contas => const ContaListPage(),
                 HomePageTab.cartoes => const CartaoListPage(),
