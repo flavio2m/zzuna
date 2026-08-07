@@ -41,6 +41,14 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
     state = state.copyWith(conciliado: value, clearConciliado: value == null);
   }
 
+  void setIncluirSaldoInicial(bool value) {
+    state = state.copyWith(incluirSaldoInicial: value);
+  }
+
+  void toggleIncluirSaldoInicial() {
+    state = state.copyWith(incluirSaldoInicial: !state.incluirSaldoInicial);
+  }
+
   void toggleConta(String id) {
     final current = {...state.contasSelecionadas};
     if (current.contains(id)) {

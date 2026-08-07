@@ -9,6 +9,7 @@ class LancamentoFilterState {
   final LancamentoTipo? tipo;
   final LancamentoModo? modo;
   final bool? conciliado;
+  final bool incluirSaldoInicial;
   final Set<String> contasSelecionadas;
   final Set<String> cartoesSelecionados;
   final Set<String> centrosSelecionados;
@@ -21,6 +22,7 @@ class LancamentoFilterState {
     this.tipo,
     this.modo,
     this.conciliado,
+    this.incluirSaldoInicial = true,
     this.contasSelecionadas = const {},
     this.cartoesSelecionados = const {},
     this.centrosSelecionados = const {},
@@ -34,6 +36,7 @@ class LancamentoFilterState {
     LancamentoTipo? tipo,
     LancamentoModo? modo,
     bool? conciliado,
+    bool? incluirSaldoInicial,
     bool clearTipo = false,
     bool clearModo = false,
     bool clearConciliado = false,
@@ -49,6 +52,7 @@ class LancamentoFilterState {
       tipo: clearTipo ? null : (tipo ?? this.tipo),
       modo: clearModo ? null : (modo ?? this.modo),
       conciliado: clearConciliado ? null : (conciliado ?? this.conciliado),
+      incluirSaldoInicial: incluirSaldoInicial ?? this.incluirSaldoInicial,
       contasSelecionadas: contasSelecionadas ?? this.contasSelecionadas,
       cartoesSelecionados: cartoesSelecionados ?? this.cartoesSelecionados,
       centrosSelecionados: centrosSelecionados ?? this.centrosSelecionados,

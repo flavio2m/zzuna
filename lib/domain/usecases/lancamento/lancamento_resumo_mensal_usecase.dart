@@ -16,6 +16,7 @@ class LancamentoResumoMensalUseCase {
     required bool temFiltroRestritivo,
     required Mes mes,
     required int ano,
+    bool incluirSaldoInicial = true,
   }) {
     double saldoInicial = 0;
     double saldoFinal = 0;
@@ -50,13 +51,25 @@ class LancamentoResumoMensalUseCase {
     }
 
     final totals = _calcularTotais(lancamentos);
-    final dias = _agruparPorDia(lancamentos, saldoInicial);
+
+    final saldoInicialReal = saldoInicial;
+    final saldoFinalReal = saldoFinal;
+
+    final saldoInicialExibicao = incluirSaldoInicial ? saldoInicialReal : 0.0;
+    final saldoFinalExibicao = incluirSaldoInicial
+        ? saldoFinalReal
+        : (saldoFinalReal - saldoInicialReal);
+
+    final dias = _agruparPorDia(lancamentos, saldoInicialExibicao);
 
     return LancamentoResumoMensal(
       mes: mes,
       ano: ano,
-      saldoInicial: saldoInicial,
-      saldoFinal: saldoFinal,
+      saldoInicial: saldoInicialExibicao,
+      saldoFinal: saldoFinalExibicao,
+      saldoInicialReal: saldoInicialReal,
+      saldoFinalReal: saldoFinalReal,
+      incluirSaldoInicial: incluirSaldoInicial,
       receitas: totals.receitas,
       despesas: totals.despesas,
       transferencias: totals.transferencias,

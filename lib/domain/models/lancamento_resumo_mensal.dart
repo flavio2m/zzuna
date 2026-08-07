@@ -6,6 +6,9 @@ class LancamentoResumoMensal {
   final int ano;
   final double saldoInicial;
   final double saldoFinal;
+  final double saldoInicialReal;
+  final double saldoFinalReal;
+  final bool incluirSaldoInicial;
   final double receitas;
   final double despesas;
   final double transferencias;
@@ -17,6 +20,9 @@ class LancamentoResumoMensal {
     required this.ano,
     required this.saldoInicial,
     required this.saldoFinal,
+    required this.saldoInicialReal,
+    required this.saldoFinalReal,
+    this.incluirSaldoInicial = true,
     required this.receitas,
     required this.despesas,
     required this.transferencias,

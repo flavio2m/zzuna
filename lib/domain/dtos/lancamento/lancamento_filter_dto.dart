@@ -7,6 +7,7 @@ class LancamentoFilterDto {
   final LancamentoTipo? tipo;
   final LancamentoModo? modo;
   final bool? conciliado;
+  final bool incluirSaldoInicial;
   final Mes? mes;
   final int? ano;
   final Set<String> contasSelecionadas;
@@ -19,6 +20,7 @@ class LancamentoFilterDto {
     this.tipo,
     this.modo,
     this.conciliado,
+    this.incluirSaldoInicial = true,
     this.mes,
     this.ano,
     this.contasSelecionadas = const {},

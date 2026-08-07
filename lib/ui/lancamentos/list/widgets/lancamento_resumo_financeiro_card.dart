@@ -1,10 +1,12 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_mensal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
-class LancamentoResumoFinanceiroCard extends StatelessWidget {
+class LancamentoResumoFinanceiroCard extends ConsumerWidget {
   final LancamentoResumoMensal resumo;
   final bool isMesFechado;
 
@@ -26,8 +28,9 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDesktop = MediaQuery.of(context).size.width >= 800;
+    final filterState = ref.watch(lancamentoFilterProvider);
 
     return Container(
       height: 36,
@@ -45,7 +48,29 @@ class LancamentoResumoFinanceiroCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _InfoItem(
-                  width: 120,
+                  width: 140,
+                  prefixWidget: isDesktop
+                      ? InkWell(
+                          onTap: () {
+                            ref
+                                .read(lancamentoFilterProvider.notifier)
+                                .toggleIncluirSaldoInicial();
+                          },
+                          borderRadius: BorderRadius.circular(4),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Icon(
+                              filterState.incluirSaldoInicial
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              size: 16,
+                              color: filterState.incluirSaldoInicial
+                                  ? AppColors.primary
+                                  : AppColors.slate400,
+                            ),
+                          ),
+                        )
+                      : null,
                   title: isDesktop ? 'Saldo Inicial: ' : 'S. Inicial: ',
                   value: _formatCurrency(resumo.saldoInicial),
                   color: _valueColor(resumo.saldoInicial),
@@ -109,12 +134,14 @@ class _InfoItem extends StatelessWidget {
   final String value;
   final Color color;
   final double width;
+  final Widget? prefixWidget;
 
   const _InfoItem({
     required this.title,
     required this.value,
     required this.color,
-    required this.width, //
+    required this.width,
+    this.prefixWidget,
   });
 
   @override
@@ -122,10 +149,13 @@ class _InfoItem extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Wrap(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
+          if (prefixWidget != null) ...[
+            prefixWidget!,
+            const SizedBox(width: 4),
+          ],
           AppText(
             title,
             variant: AppTextVariant.body,
