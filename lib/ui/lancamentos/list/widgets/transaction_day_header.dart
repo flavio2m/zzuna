@@ -13,6 +13,8 @@ class TransactionDayHeader extends StatelessWidget {
     this.positiveExtract = false,
     this.selected = false,
     this.onSelectAll,
+    this.isCollapsed = false,
+    this.onToggleCollapse,
   });
 
   final String date;
@@ -23,6 +25,8 @@ class TransactionDayHeader extends StatelessWidget {
   final bool positiveExtract;
   final bool selected;
   final VoidCallback? onSelectAll;
+  final bool isCollapsed;
+  final VoidCallback? onToggleCollapse;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +35,11 @@ class TransactionDayHeader extends StatelessWidget {
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.slate50,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+        border: isCollapsed
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
@@ -49,56 +55,80 @@ class TransactionDayHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
-            child: AppText(
-              isDesktop ? date : shortDate,
-              variant: AppTextVariant.body,
-              color: AppColors.slate800,
-              fontWeight: FontWeight.w800, //
+            child: InkWell(
+              onTap: onToggleCollapse,
+              borderRadius: BorderRadius.circular(4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: AppText(
+                        isDesktop ? date : shortDate,
+                        variant: AppTextVariant.body,
+                        color: AppColors.slate800,
+                        fontWeight: FontWeight.w800, //
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText(
+                              isDesktop ? 'Saldo do dia: ' : 'S. Dia: ',
+                              variant: AppTextVariant.caption,
+                              color: AppColors.slate400,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            AppText(
+                              balance,
+                              variant: AppTextVariant.caption,
+                              color: positive
+                                  ? AppColors.primary
+                                  : AppColors.danger,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText(
+                              isDesktop ? 'Saldo Extrato: ' : 'S. Extrato: ',
+                              variant: AppTextVariant.caption,
+                              color: AppColors.slate400,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            AppText(
+                              extractBalance,
+                              variant: AppTextVariant.caption,
+                              color: positiveExtract
+                                  ? AppColors.primary
+                                  : AppColors.danger,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          isCollapsed
+                              ? Icons.keyboard_arrow_right
+                              : Icons.keyboard_arrow_down,
+                          size: 18,
+                          color: AppColors.slate400,
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppText(
-                    isDesktop ? 'Saldo do dia: ' : 'S. Dia: ',
-                    variant: AppTextVariant.caption,
-                    color: AppColors.slate400,
-                    fontWeight: FontWeight.w900,
-                  ),
-                  AppText(
-                    balance,
-                    variant: AppTextVariant.caption,
-                    color: positive ? AppColors.primary : AppColors.danger,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppText(
-                    isDesktop ? 'Saldo Extrato: ' : 'S. Extrato: ',
-                    variant: AppTextVariant.caption,
-                    color: AppColors.slate400,
-                    fontWeight: FontWeight.w900,
-                  ),
-                  AppText(
-                    extractBalance,
-                    variant: AppTextVariant.caption,
-                    color: positiveExtract
-                        ? AppColors.primary
-                        : AppColors.danger,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ],
-              ),
-            ],
           ),
         ],
       ),

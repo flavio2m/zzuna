@@ -49,6 +49,14 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
     state = state.copyWith(incluirSaldoInicial: !state.incluirSaldoInicial);
   }
 
+  void setOcultarLancamentos(bool value) {
+    state = state.copyWith(ocultarLancamentos: value);
+  }
+
+  void toggleOcultarLancamentos() {
+    state = state.copyWith(ocultarLancamentos: !state.ocultarLancamentos);
+  }
+
   void toggleConta(String id) {
     final current = {...state.contasSelecionadas};
     if (current.contains(id)) {

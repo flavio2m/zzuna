@@ -10,6 +10,7 @@ import 'package:zzuna/ui/lancamentos/update/por_selecao/update_data/widgets/lanc
 import 'package:zzuna/ui/lancamentos/update/por_selecao/update_data/widgets/lancamentos_update_data_modal.dart';
 import 'package:zzuna/ui/lancamentos/shared/widgets/lancamentos_update_origem_button.dart';
 import 'package:zzuna/ui/lancamentos/update/por_selecao/update_origem/widgets/lancamentos_update_origem_modal.dart';
+import 'package:zzuna/ui/lancamentos/list/widgets/toggle_ocultar_lancamentos_button.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_selecionar_todos_button.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
@@ -74,6 +75,8 @@ class TransactionsActionsBar extends ConsumerWidget {
             const CreateDespesaButton(),
             _buildDivider(isDesktop, smallSpace: true),
             const CreateTransferenciaButton(),
+            _buildDivider(isDesktop, smallSpace: true),
+            const ToggleOcultarLancamentosButton(),
             if (hasSelection && !listViewModel.isMesFechado) ...[
               _buildDivider(isDesktop),
               const AppText('|'),

@@ -18,10 +18,23 @@ import 'package:zzuna/config/providers.dart';
 
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
 
-class TransactionDayCard extends StatelessWidget {
+class TransactionDayCard extends ConsumerStatefulWidget {
   const TransactionDayCard({super.key, required this.dia});
 
   final LancamentoResumoDia dia;
+
+  @override
+  ConsumerState<TransactionDayCard> createState() => _TransactionDayCardState();
+}
+
+class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
+  bool _isCollapsed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isCollapsed = ref.read(lancamentoFilterProvider).ocultarLancamentos;
+  }
 
   String _categoryPath(CategoriaDetails cat) {
     if (cat.categoriaPai != null) {
@@ -56,61 +69,66 @@ class TransactionDayCard extends StatelessWidget {
           })
         : 'Sem categoria';
 
-    return Consumer(
-      builder: (context, ref, child) {
-        final selected = ref.watch(
-          lancamentosListViewModelProvider.select(
-            (vm) => vm.selectedLancamentoIds.contains(l.id), //
-          ),
-        );
+    final selected = ref.watch(
+      lancamentosListViewModelProvider.select(
+        (vm) => vm.selectedLancamentoIds.contains(l.id), //
+      ),
+    );
 
-        return TransactionRow(
-          lancamentoId: l.id,
-          description: l.descricao,
-          category: categoryPath,
-          origem: l.origem,
-          value: formattedValue,
-          tipo: l.tipo,
-          costCenter: costCenter,
-          badge: badge,
-          grupo: l.grupo,
-          conciliado: l.conciliado,
-          selected: selected,
-          lancamento: l,
-          reconcileButton: LancamentoReconcileButton(
-            lancamentoId: l.id,
-            conciliado: l.conciliado,
-          ),
-          onTap: () {
-            if (l.conciliado) {
-              AppDialog.show(
-                context: context,
-                child: LancamentoDetailsModal(lancamento: l),
-              );
-            } else {
-              if (l.tipo == LancamentoTipo.transferencia && l.grupo != null) {
-                TransferenciaUpdateModal.show(
-                  context,
-                  grupoId: l.grupo!.grupoId,
-                );
-              } else {
-                AppDialog.show(
-                  context: context,
-                  child: LancamentoUpdateModal(lancamento: l),
-                );
-              }
-            }
-          },
-          onSelect: (_) {
-            ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
-          },
-        );
+    return TransactionRow(
+      lancamentoId: l.id,
+      description: l.descricao,
+      category: categoryPath,
+      origem: l.origem,
+      value: formattedValue,
+      tipo: l.tipo,
+      costCenter: costCenter,
+      badge: badge,
+      grupo: l.grupo,
+      conciliado: l.conciliado,
+      selected: selected,
+      lancamento: l,
+      reconcileButton: LancamentoReconcileButton(
+        lancamentoId: l.id,
+        conciliado: l.conciliado,
+      ),
+      onTap: () {
+        if (l.conciliado) {
+          AppDialog.show(
+            context: context,
+            child: LancamentoDetailsModal(lancamento: l),
+          );
+        } else {
+          if (l.tipo == LancamentoTipo.transferencia && l.grupo != null) {
+            TransferenciaUpdateModal.show(context, grupoId: l.grupo!.grupoId);
+          } else {
+            AppDialog.show(
+              context: context,
+              child: LancamentoUpdateModal(lancamento: l),
+            );
+          }
+        }
+      },
+      onSelect: (_) {
+        ref.read(lancamentosListViewModelProvider).toggleSelection(l.id);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(lancamentoFilterProvider.select((s) => s.ocultarLancamentos), (
+      previous,
+      next,
+    ) {
+      if (_isCollapsed != next) {
+        setState(() {
+          _isCollapsed = next;
+        });
+      }
+    });
+
+    final dia = widget.dia;
     final dateKey = DateFormatter.fullDate(dia.data);
     final shortDateKey = DateFormatter.shortDate(dia.data);
 
@@ -146,6 +164,7 @@ class TransactionDayCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Consumer(
               builder: (context, ref, child) {
@@ -162,6 +181,12 @@ class TransactionDayCard extends StatelessWidget {
                   positive: isPositive,
                   positiveExtract: isExtractPositive,
                   selected: allSelected,
+                  isCollapsed: _isCollapsed,
+                  onToggleCollapse: () {
+                    setState(() {
+                      _isCollapsed = !_isCollapsed;
+                    });
+                  },
                   onSelectAll: () {
                     final ids = dia.lancamentos.map((l) => l.id).toList();
                     viewModel.toggleSelectionForList(ids, !allSelected);
@@ -169,14 +194,15 @@ class TransactionDayCard extends StatelessWidget {
                 );
               },
             ),
-            for (var index = 0; index < rows.length; index++) ...[
-              rows[index],
-              if (index != rows.length - 1)
-                const Divider(
-                  height: 1,
-                  color: AppColors.slate100, //
-                ),
-            ],
+            if (!_isCollapsed)
+              for (var index = 0; index < rows.length; index++) ...[
+                rows[index],
+                if (index != rows.length - 1)
+                  const Divider(
+                    height: 1,
+                    color: AppColors.slate100, //
+                  ),
+              ],
           ],
         ),
       ),
