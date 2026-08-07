@@ -260,6 +260,7 @@ class LancamentosListViewModel extends ChangeNotifier {
     final newFilter = LancamentoFilterDto(
       descricao: filterState.descricao,
       tipo: filterState.tipo,
+      modo: filterState.modo,
       conciliado: filterState.conciliado,
       mes: filterState.mes,
       ano: filterState.ano,

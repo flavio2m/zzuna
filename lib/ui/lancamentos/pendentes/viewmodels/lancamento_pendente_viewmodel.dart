@@ -9,6 +9,7 @@ import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dar
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/centro_custo_entity.dart';
@@ -149,6 +150,8 @@ class LancamentoPendenteViewModel extends ChangeNotifier {
     String? descricao,
     LancamentoTipo? tipo,
     bool clearTipo = false,
+    LancamentoModo? modo,
+    bool clearModo = false,
     Set<String>? contasSelecionadas,
     Set<String>? cartoesSelecionados,
     Set<String>? centrosSelecionados,
@@ -157,6 +160,7 @@ class LancamentoPendenteViewModel extends ChangeNotifier {
     _currentFilter = LancamentoFilterDto(
       descricao: descricao ?? _currentFilter.descricao,
       tipo: clearTipo ? null : (tipo ?? _currentFilter.tipo),
+      modo: clearModo ? null : (modo ?? _currentFilter.modo),
       conciliado: false, // Sempre filtrar não conciliados
       contasSelecionadas:
           contasSelecionadas ?? _currentFilter.contasSelecionadas,

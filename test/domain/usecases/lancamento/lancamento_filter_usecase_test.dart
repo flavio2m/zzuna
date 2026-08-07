@@ -4,9 +4,11 @@ import 'package:zzuna/domain/entities/cartao_entity.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
 import 'package:zzuna/domain/statics/banco/banco_regiao.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
 
@@ -74,6 +76,7 @@ void main() {
     LancamentoDetails buildLancamento({
       required String id,
       required LancamentoOrigemDetail origem,
+      LancamentoGrupo? grupo,
     }) {
       return LancamentoDetails(
         id: id,
@@ -82,6 +85,7 @@ void main() {
         descricao: 'Lancamento $id',
         extratoFatura: extratoFake,
         origem: origem,
+        grupo: grupo,
         itens: const [],
         conciliado: true,
         anoMes: 202606,
@@ -176,6 +180,85 @@ void main() {
         expect(result.any((item) => item.id == '1'), isTrue);
         expect(result.any((item) => item.id == '3'), isTrue);
         expect(result.any((item) => item.id == '2'), isFalse);
+      },
+    );
+
+    test(
+      'should filter by modo (parcelado, replicado, recorrencia, simples)',
+      () {
+        final lSimples = buildLancamento(
+          id: 'simples',
+          origem: LancamentoOrigemContaDetail(conta: conta1),
+          grupo: null,
+        );
+        final lParcelado = buildLancamento(
+          id: 'parcelado',
+          origem: LancamentoOrigemContaDetail(conta: conta1),
+          grupo: const LancamentoGrupo.parcelamento(
+            grupoId: 'g1',
+            parcela: 1,
+            totalParcelas: 3,
+          ),
+        );
+        final lReplicado = buildLancamento(
+          id: 'replicado',
+          origem: LancamentoOrigemContaDetail(conta: conta1),
+          grupo: const LancamentoGrupo.replicacao(
+            grupoId: 'g2',
+            parcela: 1,
+            totalParcelas: 2,
+          ),
+        );
+        final lRecorrente = buildLancamento(
+          id: 'recorrente',
+          origem: LancamentoOrigemContaDetail(conta: conta1),
+          grupo: const LancamentoGrupo.recorrencia(
+            grupoId: 'g3',
+            ativo: true,
+            diaDoMes: 10,
+            tipo: TipoRecorrencia.mensal,
+            sequencia: 1,
+          ),
+        );
+
+        final list = [lSimples, lParcelado, lReplicado, lRecorrente];
+
+        expect(
+          filterUseCase
+              .execute(
+                list,
+                const LancamentoFilterDto(modo: LancamentoModo.simples),
+              )
+              .map((e) => e.id),
+          ['simples'],
+        );
+        expect(
+          filterUseCase
+              .execute(
+                list,
+                const LancamentoFilterDto(modo: LancamentoModo.parcelado),
+              )
+              .map((e) => e.id),
+          ['parcelado'],
+        );
+        expect(
+          filterUseCase
+              .execute(
+                list,
+                const LancamentoFilterDto(modo: LancamentoModo.replicado),
+              )
+              .map((e) => e.id),
+          ['replicado'],
+        );
+        expect(
+          filterUseCase
+              .execute(
+                list,
+                const LancamentoFilterDto(modo: LancamentoModo.recorrencia),
+              )
+              .map((e) => e.id),
+          ['recorrente'],
+        );
       },
     );
   });

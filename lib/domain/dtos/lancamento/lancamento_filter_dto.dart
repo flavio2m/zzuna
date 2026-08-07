@@ -1,9 +1,11 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
 class LancamentoFilterDto {
   final String descricao;
   final LancamentoTipo? tipo;
+  final LancamentoModo? modo;
   final bool? conciliado;
   final Mes? mes;
   final int? ano;
@@ -15,6 +17,7 @@ class LancamentoFilterDto {
   const LancamentoFilterDto({
     this.descricao = '',
     this.tipo,
+    this.modo,
     this.conciliado,
     this.mes,
     this.ano,

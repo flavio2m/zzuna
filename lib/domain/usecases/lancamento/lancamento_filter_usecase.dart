@@ -1,5 +1,7 @@
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 
@@ -24,14 +26,32 @@ class LancamentoFilterUseCase {
         }
       }
 
-      // 3. Conciliado
+      // 3. Modo
+      if (filter.modo != null) {
+        switch (filter.modo!) {
+          case LancamentoModo.parcelado:
+            if (item.grupo is! LancamentoGrupoParcelamento) return false;
+            break;
+          case LancamentoModo.replicado:
+            if (item.grupo is! LancamentoGrupoReplicacao) return false;
+            break;
+          case LancamentoModo.recorrencia:
+            if (item.grupo is! LancamentoGrupoRecorrencia) return false;
+            break;
+          case LancamentoModo.simples:
+            if (item.grupo != null) return false;
+            break;
+        }
+      }
+
+      // 4. Conciliado
       if (filter.conciliado != null) {
         if (item.conciliado != filter.conciliado) {
           return false;
         }
       }
 
-      // 4. Contas e Cartões (Filtro aditivo/OU entre eles se ambos ou algum estiver selecionado)
+      // 5. Contas e Cartões (Filtro aditivo/OU entre eles se ambos ou algum estiver selecionado)
       final temContasFiltro = filter.contasSelecionadas.isNotEmpty;
       final temCartoesFiltro = filter.cartoesSelecionados.isNotEmpty;
 

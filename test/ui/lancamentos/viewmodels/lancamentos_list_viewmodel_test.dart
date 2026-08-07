@@ -5,6 +5,7 @@ import 'package:zzuna/domain/dtos/lancamento/extrato_fatura_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/extrato_fatura_entity.dart';
 import 'package:zzuna/domain/dtos/lancamento/lancamento_filter_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
@@ -194,6 +195,14 @@ void main() {
 
       notifier.setTipo(null);
       expect(notifier.state.tipo, isNull);
+    });
+
+    test('setModo updates mode and allows resetting to null', () {
+      notifier.setModo(LancamentoModo.parcelado);
+      expect(notifier.state.modo, LancamentoModo.parcelado);
+
+      notifier.setModo(null);
+      expect(notifier.state.modo, isNull);
     });
 
     test('setConciliado updates conciliated and allows resetting to null', () {

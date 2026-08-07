@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
@@ -103,6 +104,39 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
               ],
               onChanged: (value) {
                 ref.read(lancamentoFilterProvider.notifier).setTipo(value);
+              },
+            ),
+          ),
+          // 5. Modo
+          SizedBox(
+            width: 135,
+            child: AppDropdownFormField<LancamentoModo?>(
+              label: 'Modo',
+              value: filterState.modo,
+              items: [
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: null,
+                  label: 'Todos',
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.parcelado,
+                  label: LancamentoModo.parcelado.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.replicado,
+                  label: LancamentoModo.replicado.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.recorrencia,
+                  label: LancamentoModo.recorrencia.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.simples,
+                  label: LancamentoModo.simples.descricao,
+                ),
+              ],
+              onChanged: (value) {
+                ref.read(lancamentoFilterProvider.notifier).setModo(value);
               },
             ),
           ),

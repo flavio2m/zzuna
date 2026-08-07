@@ -1,4 +1,5 @@
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
 class LancamentoFilterState {
@@ -6,6 +7,7 @@ class LancamentoFilterState {
   final Mes mes;
   final int ano;
   final LancamentoTipo? tipo;
+  final LancamentoModo? modo;
   final bool? conciliado;
   final Set<String> contasSelecionadas;
   final Set<String> cartoesSelecionados;
@@ -17,6 +19,7 @@ class LancamentoFilterState {
     required this.mes,
     required this.ano,
     this.tipo,
+    this.modo,
     this.conciliado,
     this.contasSelecionadas = const {},
     this.cartoesSelecionados = const {},
@@ -29,8 +32,10 @@ class LancamentoFilterState {
     Mes? mes,
     int? ano,
     LancamentoTipo? tipo,
+    LancamentoModo? modo,
     bool? conciliado,
     bool clearTipo = false,
+    bool clearModo = false,
     bool clearConciliado = false,
     Set<String>? contasSelecionadas,
     Set<String>? cartoesSelecionados,
@@ -42,6 +47,7 @@ class LancamentoFilterState {
       mes: mes ?? this.mes,
       ano: ano ?? this.ano,
       tipo: clearTipo ? null : (tipo ?? this.tipo),
+      modo: clearModo ? null : (modo ?? this.modo),
       conciliado: clearConciliado ? null : (conciliado ?? this.conciliado),
       contasSelecionadas: contasSelecionadas ?? this.contasSelecionadas,
       cartoesSelecionados: cartoesSelecionados ?? this.cartoesSelecionados,

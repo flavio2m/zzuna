@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/categoria_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/centro_custo_field.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/lancamento_origem_field.dart';
@@ -27,7 +28,10 @@ class _LancamentoPendenteFilterBarState
   @override
   void initState() {
     super.initState();
-    _descricaoController = TextEditingController();
+    final viewModel = ref.read(lancamentoPendenteViewModelProvider);
+    _descricaoController = TextEditingController(
+      text: viewModel.currentFilter.descricao,
+    );
     _descricaoFocusNode = FocusNode();
   }
 
@@ -50,9 +54,9 @@ class _LancamentoPendenteFilterBarState
         runSpacing: 8,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          // 1. Descrição (pesquisa ao pressionar Enter)
+          // 1. Descrição
           SizedBox(
-            width: 220,
+            width: 250,
             child: AppTextFormField(
               controller: _descricaoController,
               focusNode: _descricaoFocusNode,
@@ -60,9 +64,6 @@ class _LancamentoPendenteFilterBarState
               label: 'Descrição',
               onFieldSubmitted: (value) {
                 viewModel.updateFilter(descricao: value);
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) _descricaoFocusNode.requestFocus();
-                });
               },
             ),
           ),
@@ -92,6 +93,39 @@ class _LancamentoPendenteFilterBarState
               ],
               onChanged: (value) {
                 viewModel.updateFilter(tipo: value, clearTipo: value == null);
+              },
+            ),
+          ),
+          // 2.1. Modo
+          SizedBox(
+            width: 135,
+            child: AppDropdownFormField<LancamentoModo?>(
+              label: 'Modo',
+              value: viewModel.currentFilter.modo,
+              items: [
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: null,
+                  label: 'Todos',
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.parcelado,
+                  label: LancamentoModo.parcelado.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.replicado,
+                  label: LancamentoModo.replicado.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.recorrencia,
+                  label: LancamentoModo.recorrencia.descricao,
+                ),
+                AppDropdownMenuItem<LancamentoModo?>(
+                  value: LancamentoModo.simples,
+                  label: LancamentoModo.simples.descricao,
+                ),
+              ],
+              onChanged: (value) {
+                viewModel.updateFilter(modo: value, clearModo: value == null);
               },
             ),
           ),

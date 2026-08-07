@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
+import 'package:zzuna/domain/enums/lancamento_modo.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 
@@ -30,6 +31,10 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
 
   void setTipo(LancamentoTipo? value) {
     state = state.copyWith(tipo: value, clearTipo: value == null);
+  }
+
+  void setModo(LancamentoModo? value) {
+    state = state.copyWith(modo: value, clearModo: value == null);
   }
 
   void setConciliado(bool? value) {
@@ -83,8 +88,10 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
     state = state.copyWith(
       descricao: '',
       tipo: null,
+      modo: null,
       conciliado: null,
       clearTipo: true,
+      clearModo: true,
       clearConciliado: true,
       contasSelecionadas: const {},
       cartoesSelecionados: const {},
