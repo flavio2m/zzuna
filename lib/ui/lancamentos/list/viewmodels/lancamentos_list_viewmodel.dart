@@ -275,6 +275,7 @@ class LancamentosListViewModel extends ChangeNotifier {
       mes: _currentFilter.mes ?? Mes.fromDate(DateTime.now()),
       ano: _currentFilter.ano ?? DateTime.now().year,
       incluirSaldoInicial: _currentFilter.incluirSaldoInicial,
+      lancamentosDesconsiderados: _currentFilter.lancamentosDesconsiderados,
     );
     notifyListeners();
   }
@@ -286,6 +287,7 @@ class LancamentosListViewModel extends ChangeNotifier {
       modo: filterState.modo,
       conciliado: filterState.conciliado,
       incluirSaldoInicial: filterState.incluirSaldoInicial,
+      lancamentosDesconsiderados: filterState.lancamentosDesconsiderados,
       mes: filterState.mes,
       ano: filterState.ano,
       contasSelecionadas: filterState.contasSelecionadas,

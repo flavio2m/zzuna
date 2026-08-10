@@ -26,6 +26,9 @@ abstract final class AppColors {
   static const orange200 = Color(0xFFFED7AA);
   static const orange800 = Color(0xFF9A3412);
 
+  static const amber50 = Color(0xFFFFFBEB);
+  static const amber700 = Color(0xFFB45309);
+
   static const slate50 = Color(0xFFF8FAFC);
   static const slate100 = Color(0xFFF1F5F9);
   static const slate200 = Color(0xFFE2E8F0);

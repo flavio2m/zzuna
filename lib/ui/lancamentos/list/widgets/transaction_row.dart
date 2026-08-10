@@ -21,6 +21,7 @@ class TransactionRow extends StatelessWidget {
     this.grupo,
     this.conciliado = false,
     this.selected = false,
+    this.desconsiderado = false,
     required this.reconcileButton,
     required this.lancamento,
     this.onTap,
@@ -38,6 +39,7 @@ class TransactionRow extends StatelessWidget {
   final LancamentoGrupo? grupo;
   final bool conciliado;
   final bool selected;
+  final bool desconsiderado;
   final Widget reconcileButton;
   final LancamentoDetails lancamento;
   final VoidCallback? onTap;
@@ -90,7 +92,9 @@ class TransactionRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-        color: selected
+        color: desconsiderado
+            ? AppColors.amber50
+            : selected
             ? AppColors.emerald50.withValues(alpha: 0.35)
             : AppColors.surface,
         child: Row(

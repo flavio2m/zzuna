@@ -344,5 +344,57 @@ void main() {
         expect(result.ano, currentAno);
       },
     );
+
+    test(
+      'omits lancamentosDesconsiderados from totals and daily balance calculations while retaining them in day items',
+      () {
+        final list = [
+          buildLancamento(
+            id: '1',
+            tipo: LancamentoTipo.receita,
+            data: DateTime(2026, 6, 10),
+            valor: 1050.0,
+          ),
+          buildLancamento(
+            id: '2',
+            tipo: LancamentoTipo.despesa,
+            data: DateTime(2026, 6, 10),
+            valor: 122.20,
+          ),
+        ];
+
+        final resultWithBoth = useCase.execute(
+          list,
+          extratos: [],
+          contasSelecionadas: {},
+          cartoesSelecionados: {},
+          temFiltroRestritivo: false,
+          mes: Mes.junho,
+          ano: 2026,
+        );
+
+        expect(resultWithBoth.receitas, 1050.0);
+        expect(resultWithBoth.despesas, 122.20);
+        expect(resultWithBoth.dias.first.saldo, 927.80);
+        expect(resultWithBoth.dias.first.lancamentos.length, 2);
+
+        final resultIgnoringReceita = useCase.execute(
+          list,
+          extratos: [],
+          contasSelecionadas: {},
+          cartoesSelecionados: {},
+          temFiltroRestritivo: false,
+          mes: Mes.junho,
+          ano: 2026,
+          lancamentosDesconsiderados: {'1'},
+        );
+
+        expect(resultIgnoringReceita.receitas, 0.0);
+        expect(resultIgnoringReceita.despesas, 122.20);
+        expect(resultIgnoringReceita.dias.first.saldo, -122.20);
+        // The day card still includes both items in its list
+        expect(resultIgnoringReceita.dias.first.lancamentos.length, 2);
+      },
+    );
   });
 }

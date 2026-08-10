@@ -17,6 +17,7 @@ class LancamentoResumoMensalUseCase {
     required Mes mes,
     required int ano,
     bool incluirSaldoInicial = true,
+    Set<String> lancamentosDesconsiderados = const {},
   }) {
     double saldoInicial = 0;
     double saldoFinal = 0;
@@ -50,17 +51,26 @@ class LancamentoResumoMensalUseCase {
       }
     }
 
-    final totals = _calcularTotais(lancamentos);
+    final totals = _calcularTotais(lancamentos, lancamentosDesconsiderados);
 
     final saldoInicialReal = saldoInicial;
     final saldoFinalReal = saldoFinal;
 
     final saldoInicialExibicao = incluirSaldoInicial ? saldoInicialReal : 0.0;
-    final saldoFinalExibicao = incluirSaldoInicial
-        ? saldoFinalReal
-        : (saldoFinalReal - saldoInicialReal);
+    final saldoFinalExibicao = lancamentosDesconsiderados.isEmpty
+        ? (incluirSaldoInicial
+              ? saldoFinalReal
+              : (saldoFinalReal - saldoInicialReal))
+        : (saldoInicialExibicao +
+              totals.receitas -
+              totals.despesas +
+              totals.netTransferencias);
 
-    final dias = _agruparPorDia(lancamentos, saldoInicialExibicao);
+    final dias = _agruparPorDia(
+      lancamentos,
+      saldoInicialExibicao,
+      lancamentosDesconsiderados,
+    );
 
     return LancamentoResumoMensal(
       mes: mes,
@@ -78,12 +88,19 @@ class LancamentoResumoMensalUseCase {
     );
   }
 
-  _Totais _calcularTotais(List<LancamentoDetails> lancamentos) {
+  _Totais _calcularTotais(
+    List<LancamentoDetails> lancamentos,
+    Set<String> lancamentosDesconsiderados,
+  ) {
     double receitas = 0;
     double despesas = 0;
     double transferencias = 0;
+    double netTransferencias = 0;
 
     for (final l in lancamentos) {
+      if (lancamentosDesconsiderados.contains(l.id)) {
+        continue;
+      }
       switch (l.tipo) {
         case LancamentoTipo.receita:
           receitas += l.valor;
@@ -93,6 +110,26 @@ class LancamentoResumoMensalUseCase {
           break;
         case LancamentoTipo.transferencia:
           transferencias += l.valor;
+          final firstItem = l.itens.isNotEmpty ? l.itens.first : null;
+          if (firstItem is LancamentoItemDetailsTransferencia) {
+            final currentOrigem = l.origem.map(
+              conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+              cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+            );
+            final entryOrigem = firstItem.origemEntrada.map(
+              conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+              cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+            );
+            final exitOrigem = firstItem.origemSaida.map(
+              conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
+              cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
+            );
+            if (currentOrigem == entryOrigem) {
+              netTransferencias += l.valor;
+            } else if (currentOrigem == exitOrigem) {
+              netTransferencias -= l.valor;
+            }
+          }
           break;
       }
     }
@@ -101,12 +138,14 @@ class LancamentoResumoMensalUseCase {
       receitas: receitas,
       despesas: despesas,
       transferencias: transferencias,
+      netTransferencias: netTransferencias,
     );
   }
 
   List<LancamentoResumoDia> _agruparPorDia(
     List<LancamentoDetails> lancamentos,
-    double saldoInicialExtrato, //
+    double saldoInicialExtrato,
+    Set<String> lancamentosDesconsiderados,
   ) {
     final Map<DateTime, List<LancamentoDetails>> grouped = {};
     for (final l in lancamentos) {
@@ -125,6 +164,9 @@ class LancamentoResumoMensalUseCase {
 
       double saldoDia = 0;
       for (final l in items) {
+        if (lancamentosDesconsiderados.contains(l.id)) {
+          continue;
+        }
         if (l.tipo == LancamentoTipo.receita) {
           saldoDia += l.valor;
         } else if (l.tipo == LancamentoTipo.despesa) {
@@ -180,10 +222,12 @@ class _Totais {
   final double receitas;
   final double despesas;
   final double transferencias;
+  final double netTransferencias;
 
   const _Totais({
     required this.receitas,
     required this.despesas,
     required this.transferencias,
+    this.netTransferencias = 0.0,
   });
 }

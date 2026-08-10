@@ -75,6 +75,12 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
       ),
     );
 
+    final desconsiderado = ref.watch(
+      lancamentoFilterProvider.select(
+        (s) => s.lancamentosDesconsiderados.contains(l.id),
+      ),
+    );
+
     return TransactionRow(
       lancamentoId: l.id,
       description: l.descricao,
@@ -87,6 +93,7 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
       grupo: l.grupo,
       conciliado: l.conciliado,
       selected: selected,
+      desconsiderado: desconsiderado,
       lancamento: l,
       reconcileButton: LancamentoReconcileButton(
         lancamentoId: l.id,

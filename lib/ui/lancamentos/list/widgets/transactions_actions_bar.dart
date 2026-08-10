@@ -81,7 +81,7 @@ class TransactionsActionsBar extends ConsumerWidget {
               _buildDivider(isDesktop),
               const AppText('|'),
               _buildDivider(isDesktop),
-              ..._buildDesktopActions(context),
+              ..._buildDesktopActions(context, ref),
             ],
           ],
         ),
@@ -152,7 +152,7 @@ class TransactionsActionsBar extends ConsumerWidget {
     );
   }
 
-  List<Widget> _buildDesktopActions(BuildContext context) {
+  List<Widget> _buildDesktopActions(BuildContext context, WidgetRef ref) {
     return [
       LancamentosReconcileButton(
         conciliado: true,
@@ -184,6 +184,36 @@ class TransactionsActionsBar extends ConsumerWidget {
             onSuccess: onClearSelection,
           );
         },
+      ),
+      const SizedBox(width: 8),
+      IconButton(
+        icon: const Icon(Icons.visibility_off_outlined, size: 20),
+        color: AppColors.amber700,
+        tooltip: 'Desconsiderar selecionado(s)',
+        onPressed: () {
+          ref
+              .read(lancamentoFilterProvider.notifier)
+              .desconsiderarLancamentos(selectedIds);
+          onClearSelection();
+        },
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 20,
+      ),
+      const SizedBox(width: 8),
+      IconButton(
+        icon: const Icon(Icons.visibility_outlined, size: 20),
+        color: AppColors.slate600,
+        tooltip: 'Considerar selecionado(s)',
+        onPressed: () {
+          ref
+              .read(lancamentoFilterProvider.notifier)
+              .considerarLancamentos(selectedIds);
+          onClearSelection();
+        },
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 20,
       ),
     ];
   }

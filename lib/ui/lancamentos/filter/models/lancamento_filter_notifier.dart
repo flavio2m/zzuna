@@ -57,6 +57,16 @@ class LancamentoFilterNotifier extends StateNotifier<LancamentoFilterState> {
     state = state.copyWith(ocultarLancamentos: !state.ocultarLancamentos);
   }
 
+  void desconsiderarLancamentos(List<String> ids) {
+    final current = {...state.lancamentosDesconsiderados, ...ids};
+    state = state.copyWith(lancamentosDesconsiderados: current);
+  }
+
+  void considerarLancamentos(List<String> ids) {
+    final current = {...state.lancamentosDesconsiderados}..removeAll(ids);
+    state = state.copyWith(lancamentosDesconsiderados: current);
+  }
+
   void toggleConta(String id) {
     final current = {...state.contasSelecionadas};
     if (current.contains(id)) {

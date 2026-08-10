@@ -11,6 +11,7 @@ class LancamentoFilterState {
   final bool? conciliado;
   final bool incluirSaldoInicial;
   final bool ocultarLancamentos;
+  final Set<String> lancamentosDesconsiderados;
   final Set<String> contasSelecionadas;
   final Set<String> cartoesSelecionados;
   final Set<String> centrosSelecionados;
@@ -25,6 +26,7 @@ class LancamentoFilterState {
     this.conciliado,
     this.incluirSaldoInicial = true,
     this.ocultarLancamentos = false,
+    this.lancamentosDesconsiderados = const {},
     this.contasSelecionadas = const {},
     this.cartoesSelecionados = const {},
     this.centrosSelecionados = const {},
@@ -40,6 +42,7 @@ class LancamentoFilterState {
     bool? conciliado,
     bool? incluirSaldoInicial,
     bool? ocultarLancamentos,
+    Set<String>? lancamentosDesconsiderados,
     bool clearTipo = false,
     bool clearModo = false,
     bool clearConciliado = false,
@@ -57,6 +60,8 @@ class LancamentoFilterState {
       conciliado: clearConciliado ? null : (conciliado ?? this.conciliado),
       incluirSaldoInicial: incluirSaldoInicial ?? this.incluirSaldoInicial,
       ocultarLancamentos: ocultarLancamentos ?? this.ocultarLancamentos,
+      lancamentosDesconsiderados:
+          lancamentosDesconsiderados ?? this.lancamentosDesconsiderados,
       contasSelecionadas: contasSelecionadas ?? this.contasSelecionadas,
       cartoesSelecionados: cartoesSelecionados ?? this.cartoesSelecionados,
       centrosSelecionados: centrosSelecionados ?? this.centrosSelecionados,
