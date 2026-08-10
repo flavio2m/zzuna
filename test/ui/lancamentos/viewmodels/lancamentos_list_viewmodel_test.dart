@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
@@ -10,6 +11,7 @@ import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/statics/banco/banco.dart';
 import 'package:zzuna/domain/statics/banco/banco_regiao.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_details_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_filter_usecase.dart';
@@ -81,8 +83,10 @@ class FakeLancamentoFilterUseCase implements LancamentoFilterUseCase {
 }
 
 class FakeLancamentoRepository implements LancamentoRepository {
+  final controller = StreamController<RepositoryEvent<Lancamento>>.broadcast();
+
   @override
-  Stream<RepositoryEvent<Lancamento>> observer() => const Stream.empty();
+  Stream<RepositoryEvent<Lancamento>> observer() => controller.stream;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -390,6 +394,65 @@ void main() {
         viewModel.toggleSelectAll();
         expect(viewModel.allSelected, isTrue);
         expect(viewModel.selectedLancamentoIds, containsAll(['1', '2']));
+      },
+    );
+
+    test(
+      'updates item in-place when RepositoryUpdated is emitted for existing item',
+      () async {
+        final fakeRepo = FakeLancamentoRepository();
+        final vm = LancamentosListViewModel(
+          detailsUseCase,
+          FakeLancamentoFilterUseCase(),
+          LancamentoResumoMensalUseCase(),
+          fakeRepo,
+          FakeExtratoFaturaRepository(),
+          FakeContaRepository(),
+          FakeCartaoRepository(),
+          FakeSyncRecorrenciasMesUseCase(),
+          FakeFecharMesUseCase(),
+          FakeReabrirMesUseCase(),
+        );
+
+        detailsUseCase.returnList = [buildLancamento('1')];
+
+        vm.updateFilter(
+          const LancamentoFilterState(
+            mes: Mes.janeiro,
+            ano: 2026,
+            descricao: '',
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        final initialCallCount = detailsUseCase.executeCallCount;
+        expect(
+          vm.resumoMensal?.dias.first.lancamentos.first.conciliado,
+          isTrue,
+        );
+
+        final updatedModel = Lancamento(
+          id: '1',
+          tipo: LancamentoTipo.despesa,
+          data: DateTime(2026, 1, 15),
+          descricao: 'Lancamento 1',
+          origem: const LancamentoOrigem.conta(contaId: 'c-1'),
+          extratoFaturaId: 'ef-1',
+          itens: const [],
+          conciliado: false,
+          anoMes: 202601,
+        );
+
+        fakeRepo.controller.add(RepositoryUpdated(updatedModel));
+        await Future<void>.delayed(Duration.zero);
+
+        // Should not call detailsUseCase again (no full database reload)
+        expect(detailsUseCase.executeCallCount, initialCallCount);
+        // Item in memory should be updated to conciliado = false
+        expect(
+          vm.resumoMensal?.dias.first.lancamentos.first.conciliado,
+          isFalse,
+        );
       },
     );
   });

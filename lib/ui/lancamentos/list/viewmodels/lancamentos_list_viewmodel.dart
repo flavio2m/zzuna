@@ -153,20 +153,42 @@ class LancamentosListViewModel extends ChangeNotifier {
     this._reabrirMesUseCase,
   ) {
     _repositorySubscription = _repository.observer().listen((event) {
-      bool shouldReload = true;
-
       if (event is RepositoryCreated<Lancamento>) {
-        shouldReload = _affectsCurrentOrPastMonth(event.model);
-      } else if (event is RepositoryUpdated<Lancamento>) {
-        shouldReload = _affectsCurrentOrPastMonth(event.model);
-        if (!shouldReload &&
-            _allLancamentos.any((l) => l.id == event.model.id)) {
-          shouldReload = true;
+        if (_affectsCurrentOrPastMonth(event.model)) {
+          _triggerLoad();
         }
-      }
+      } else if (event is RepositoryUpdated<Lancamento>) {
+        final updated = event.model;
+        final index = _allLancamentos.indexWhere((l) => l.id == updated.id);
 
-      if (shouldReload) {
-        _triggerLoad();
+        if (index != -1) {
+          final existing = _allLancamentos[index];
+          final updatedValor = updated.itens.fold<double>(
+            0.0,
+            (total, item) => total + item.valor,
+          );
+
+          final isStructuralChanged =
+              existing.anoMes != updated.anoMes ||
+              existing.tipo != updated.tipo ||
+              existing.valor != updatedValor ||
+              existing.descricao != updated.descricao;
+
+          if (isStructuralChanged) {
+            _triggerLoad();
+          } else {
+            _allLancamentos[index] = existing.copyWith(
+              conciliado: updated.conciliado,
+            );
+            _applyFilter();
+          }
+        } else if (_affectsCurrentOrPastMonth(updated)) {
+          _triggerLoad();
+        }
+      } else if (event is RepositoryDeleted<Lancamento>) {
+        if (_allLancamentos.any((l) => l.id == event.id)) {
+          _triggerLoad();
+        }
       }
     });
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
@@ -59,8 +60,38 @@ class LancamentoPendenteViewModel extends ChangeNotifier {
     this._centroCustoRepository,
     this._categoriaTreeUseCase,
   ) {
-    _repositorySubscription = _repository.observer().listen((_) {
-      _triggerLoad();
+    _repositorySubscription = _repository.observer().listen((event) {
+      if (event is RepositoryUpdated<Lancamento>) {
+        final updated = event.model;
+        final index = _allLancamentos.indexWhere((l) => l.id == updated.id);
+
+        if (index != -1) {
+          final existing = _allLancamentos[index];
+          final updatedValor = updated.itens.fold<double>(
+            0.0,
+            (total, item) => total + item.valor,
+          );
+
+          final isStructuralChanged =
+              existing.anoMes != updated.anoMes ||
+              existing.tipo != updated.tipo ||
+              existing.valor != updatedValor ||
+              existing.descricao != updated.descricao;
+
+          if (isStructuralChanged) {
+            _triggerLoad();
+          } else {
+            _allLancamentos[index] = existing.copyWith(
+              conciliado: updated.conciliado,
+            );
+            _applyFilter();
+          }
+        } else {
+          _triggerLoad();
+        }
+      } else {
+        _triggerLoad();
+      }
     });
 
     loadCommand.addListener(() {
