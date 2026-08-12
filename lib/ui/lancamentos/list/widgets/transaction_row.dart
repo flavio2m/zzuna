@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
@@ -112,196 +113,220 @@ class TransactionRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: iconBackground,
-                borderRadius: BorderRadius.circular(8), //
-              ),
-              child: Icon(icon, size: 17, color: iconColor),
-            ),
-            const SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+              child: ImageFiltered(
+                imageFilter: desconsiderado
+                    ? ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5)
+                    : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                child: Opacity(
+                  opacity: desconsiderado ? 0.45 : 1.0,
+                  child: Row(
                     children: [
-                      Flexible(
-                        child: Text(
-                          description,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.slate800,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800, //
-                          ),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: iconBackground,
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        child: Icon(icon, size: 17, color: iconColor),
                       ),
-                      if (badge != null) ...[
-                        const SizedBox(width: 6), _Badge(label: badge!), //
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 8,
-                    runSpacing: 5,
-                    children: [
-                      _MetaChip(
-                        icon: origem.map(
-                          conta: (_) => Icons.account_balance_wallet_outlined,
-                          cartao: (_) => Icons.credit_card,
-                        ),
-                        label: origem.map(
-                          conta: (c) => c.conta.descricao,
-                          cartao: (c) => c.cartao.descricao, //
-                        ),
-                      ),
-                      const Text(
-                        '•',
-                        style: TextStyle(
-                          color: AppColors.slate300,
-                          fontSize: 10,
-                        ), //
-                      ),
-                      Text(
-                        category,
-                        style: const TextStyle(
-                          color: AppColors.slate600,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700, //
-                        ),
-                      ),
-                      const Text(
-                        '•',
-                        style: TextStyle(
-                          color: AppColors.slate300,
-                          fontSize: 10,
-                        ), //
-                      ),
-                      Text(
-                        costCenter,
-                        style: const TextStyle(
-                          color: AppColors.slate500,
-                          fontSize: 10,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (grupo != null) ...[
-                        const Text(
-                          '•',
-                          style: TextStyle(
-                            color: AppColors.slate300,
-                            fontSize: 10,
-                          ),
-                        ),
-                        Tooltip(
-                          message: switch (grupo!) {
-                            LancamentoGrupoParcelamento(
-                              :final parcela,
-                              :final totalParcelas,
-                            ) =>
-                              'Parcelado ($parcela/$totalParcelas)',
-                            LancamentoGrupoReplicacao(
-                              :final parcela,
-                              :final totalParcelas,
-                            ) =>
-                              'Replicado ($parcela de $totalParcelas)',
-                            LancamentoGrupoTransferencia() => 'Transferência',
-                            LancamentoGrupoRecorrencia(:final ativo) =>
-                              ativo
-                                  ? 'Recorrente (Ativo)'
-                                  : 'Recorrência Inativa',
-                          },
-                          child: Icon(
-                            switch (grupo!) {
-                              LancamentoGrupoParcelamento() =>
-                                Icons.auto_awesome_motion_outlined,
-                              LancamentoGrupoReplicacao() =>
-                                Icons.repeat_outlined,
-                              LancamentoGrupoTransferencia() =>
-                                Icons.swap_horiz_outlined,
-                              LancamentoGrupoRecorrencia(:final ativo) =>
-                                ativo
-                                    ? Icons.repeat_rounded
-                                    : Icons.repeat_one_outlined,
-                            },
-                            size: 13,
-                            color:
-                                grupo is LancamentoGrupoRecorrencia &&
-                                    !(grupo as LancamentoGrupoRecorrencia).ativo
-                                ? AppColors.slate400
-                                : AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  if (!isDesktop) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          value,
-                          style: TextStyle(
-                            color: isSaida
-                                ? AppColors.danger
-                                : isEntrada
-                                ? AppColors.primary
-                                : AppColors.slate600,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            reconcileButton,
-                            const SizedBox(width: 4),
-                            CloneLancamentoButton(lancamento: lancamento),
-                            const SizedBox(width: 4),
-                            IconAcoesButton(lancamento: lancamento),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    description,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: AppColors.slate800,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                if (badge != null) ...[
+                                  const SizedBox(width: 6),
+                                  _Badge(label: badge!),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              runSpacing: 5,
+                              children: [
+                                _MetaChip(
+                                  icon: origem.map(
+                                    conta: (_) =>
+                                        Icons.account_balance_wallet_outlined,
+                                    cartao: (_) => Icons.credit_card,
+                                  ),
+                                  label: origem.map(
+                                    conta: (c) => c.conta.descricao,
+                                    cartao: (c) => c.cartao.descricao,
+                                  ),
+                                ),
+                                const Text(
+                                  '•',
+                                  style: TextStyle(
+                                    color: AppColors.slate300,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  category,
+                                  style: const TextStyle(
+                                    color: AppColors.slate600,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const Text(
+                                  '•',
+                                  style: TextStyle(
+                                    color: AppColors.slate300,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  costCenter,
+                                  style: const TextStyle(
+                                    color: AppColors.slate500,
+                                    fontSize: 10,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                if (grupo != null) ...[
+                                  const Text(
+                                    '•',
+                                    style: TextStyle(
+                                      color: AppColors.slate300,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                  Tooltip(
+                                    message: switch (grupo!) {
+                                      LancamentoGrupoParcelamento(
+                                        :final parcela,
+                                        :final totalParcelas,
+                                      ) =>
+                                        'Parcelado ($parcela/$totalParcelas)',
+                                      LancamentoGrupoReplicacao(
+                                        :final parcela,
+                                        :final totalParcelas,
+                                      ) =>
+                                        'Replicado ($parcela de $totalParcelas)',
+                                      LancamentoGrupoTransferencia() =>
+                                        'Transferência',
+                                      LancamentoGrupoRecorrencia(
+                                        :final ativo,
+                                      ) =>
+                                        ativo
+                                            ? 'Recorrente (Ativo)'
+                                            : 'Recorrência Inativa',
+                                    },
+                                    child: Icon(
+                                      switch (grupo!) {
+                                        LancamentoGrupoParcelamento() =>
+                                          Icons.auto_awesome_motion_outlined,
+                                        LancamentoGrupoReplicacao() =>
+                                          Icons.repeat_outlined,
+                                        LancamentoGrupoTransferencia() =>
+                                          Icons.swap_horiz_outlined,
+                                        LancamentoGrupoRecorrencia(
+                                          :final ativo,
+                                        ) =>
+                                          ativo
+                                              ? Icons.repeat_rounded
+                                              : Icons.repeat_one_outlined,
+                                      },
+                                      size: 13,
+                                      color:
+                                          grupo is LancamentoGrupoRecorrencia &&
+                                              !(grupo as LancamentoGrupoRecorrencia)
+                                                  .ativo
+                                          ? AppColors.slate400
+                                          : AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            if (!isDesktop) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    value,
+                                    style: TextStyle(
+                                      color: isSaida
+                                          ? AppColors.danger
+                                          : isEntrada
+                                          ? AppColors.primary
+                                          : AppColors.slate600,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      reconcileButton,
+                                      const SizedBox(width: 4),
+                                      CloneLancamentoButton(
+                                        lancamento: lancamento,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      IconAcoesButton(lancamento: lancamento),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
+                      ),
+                      if (isDesktop) ...[
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 104,
+                          child: Text(
+                            value,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              color: isSaida
+                                  ? AppColors.danger
+                                  : isEntrada
+                                  ? AppColors.primary
+                                  : AppColors.slate600,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        reconcileButton,
+                        const SizedBox(width: 4),
+                        CloneLancamentoButton(lancamento: lancamento),
+                        const SizedBox(width: 4),
+                        IconAcoesButton(lancamento: lancamento),
                       ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (isDesktop) ...[
-              const SizedBox(width: 16),
-              SizedBox(
-                width: 104,
-                child: Text(
-                  value,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: isSaida
-                        ? AppColors.danger
-                        : isEntrada
-                        ? AppColors.primary
-                        : AppColors.slate600,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 4),
-              reconcileButton,
-              const SizedBox(width: 4),
-              CloneLancamentoButton(lancamento: lancamento),
-              const SizedBox(width: 4),
-              IconAcoesButton(lancamento: lancamento),
-            ],
+            ),
           ],
         ),
       ),
