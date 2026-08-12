@@ -27,6 +27,8 @@ import 'package:zzuna/ui/lancamentos/sidebar/models/lancamentos_sidebar_state.da
 import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
+import 'package:zzuna/domain/usecases/lancamento/export_lancamentos_excel_usecase.dart';
+import 'package:zzuna/ui/lancamentos/export/viewmodels/export_lancamentos_viewmodel.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';

@@ -7,6 +7,7 @@ import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/lancamento_create_modal.dart';
 import 'package:zzuna/ui/lancamentos/list/viewmodels/lancamentos_list_viewmodel.dart';
 import 'package:zzuna/ui/lancamentos/transferencia/widgets/transferencia_create_modal.dart';
+import 'package:zzuna/ui/lancamentos/export/widgets/export_lancamentos_button.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_find.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -193,6 +194,7 @@ class _LancamentoFilterBarState extends ConsumerState<LancamentoFilterBar> {
             color: AppColors.indigo600,
             onPressed: () => TransferenciaCreateModal.show(context),
           ),
+          const ExportLancamentosButton(),
           _buildFechamentoButton(viewModel),
         ],
       ),

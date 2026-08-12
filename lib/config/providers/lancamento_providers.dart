@@ -460,3 +460,15 @@ final lancamentoPendenteViewModelProvider =
       );
       return vm;
     });
+
+final exportLancamentosExcelUseCaseProvider =
+    Provider<ExportLancamentosExcelUseCase>((ref) {
+      return ExportLancamentosExcelUseCase();
+    });
+
+final exportLancamentosViewModelProvider =
+    ChangeNotifierProvider<ExportLancamentosViewModel>((ref) {
+      return ExportLancamentosViewModel(
+        ref.watch(exportLancamentosExcelUseCaseProvider),
+      );
+    });
