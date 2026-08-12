@@ -446,13 +446,64 @@ void main() {
         fakeRepo.controller.add(RepositoryUpdated(updatedModel));
         await Future<void>.delayed(Duration.zero);
 
-        // Should not call detailsUseCase again (no full database reload)
         expect(detailsUseCase.executeCallCount, initialCallCount);
         // Item in memory should be updated to conciliado = false
         expect(
           vm.resumoMensal?.dias.first.lancamentos.first.conciliado,
           isFalse,
         );
+      },
+    );
+
+    test(
+      'updates date in-place when date changes within the same month',
+      () async {
+        final fakeRepo = FakeLancamentoRepository();
+        final vm = LancamentosListViewModel(
+          detailsUseCase,
+          FakeLancamentoFilterUseCase(),
+          LancamentoResumoMensalUseCase(),
+          fakeRepo,
+          FakeExtratoFaturaRepository(),
+          FakeContaRepository(),
+          FakeCartaoRepository(),
+          FakeSyncRecorrenciasMesUseCase(),
+          FakeFecharMesUseCase(),
+          FakeReabrirMesUseCase(),
+        );
+
+        detailsUseCase.returnList = [buildLancamento('1')]; // initial date: 2026-01-15
+
+        vm.updateFilter(
+          const LancamentoFilterState(
+            mes: Mes.janeiro,
+            ano: 2026,
+            descricao: '',
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        final initialCallCount = detailsUseCase.executeCallCount;
+        expect(vm.resumoMensal?.dias.first.data, DateTime(2026, 1, 15));
+
+        // Change date to 2026-01-18 (same month 202601)
+        final updatedModel = Lancamento(
+          id: '1',
+          tipo: LancamentoTipo.despesa,
+          data: DateTime(2026, 1, 18),
+          descricao: 'Lancamento 1',
+          origem: const LancamentoOrigem.conta(contaId: 'c-1'),
+          extratoFaturaId: 'ef-1',
+          itens: const [],
+          conciliado: true,
+          anoMes: 202601,
+        );
+
+        fakeRepo.controller.add(RepositoryUpdated(updatedModel));
+        await Future<void>.delayed(Duration.zero);
+
+        expect(detailsUseCase.executeCallCount, initialCallCount);
+        expect(vm.resumoMensal?.dias.first.data, DateTime(2026, 1, 18));
       },
     );
   });

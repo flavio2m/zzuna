@@ -67,22 +67,38 @@ class LancamentoPendenteViewModel extends ChangeNotifier {
 
         if (index != -1) {
           final existing = _allLancamentos[index];
-          final updatedValor = updated.itens.fold<double>(
-            0.0,
-            (total, item) => total + item.valor,
-          );
+
+          final isOrigemChanged = existing.origem.origem != updated.origem;
+
+          bool isItensChanged = existing.itens.length != updated.itens.length;
+          if (!isItensChanged) {
+            for (var i = 0; i < existing.itens.length; i++) {
+              final eItem = existing.itens[i];
+              final uItem = updated.itens[i];
+              if (eItem.valor != uItem.valor ||
+                  eItem.categoria?.id != uItem.categoriaId ||
+                  eItem.centroCusto?.id != uItem.centroCustoId) {
+                isItensChanged = true;
+                break;
+              }
+            }
+          }
 
           final isStructuralChanged =
               existing.anoMes != updated.anoMes ||
               existing.tipo != updated.tipo ||
-              existing.valor != updatedValor ||
-              existing.descricao != updated.descricao;
+              isOrigemChanged ||
+              isItensChanged;
 
           if (isStructuralChanged) {
             _triggerLoad();
           } else {
             _allLancamentos[index] = existing.copyWith(
+              data: updated.data,
+              descricao: updated.descricao,
               conciliado: updated.conciliado,
+              grupo: updated.grupo,
+              observacao: updated.observacao,
             );
             _applyFilter();
           }
