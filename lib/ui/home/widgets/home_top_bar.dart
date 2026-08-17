@@ -147,6 +147,10 @@ class HomeTopBar extends StatelessWidget {
                     child: const Text('Lançamentos Pendentes'),
                   ),
                   PopupMenuItem(
+                    value: HomePageTab.relatorios.index,
+                    child: const Text('Relatórios'),
+                  ),
+                  PopupMenuItem(
                     value: HomePageTab.contas.index,
                     child: const Text('Contas'),
                   ),
@@ -209,6 +213,12 @@ class HomeTopBar extends StatelessWidget {
                       selected: selectedTab == HomePageTab.lancamentosPendentes,
                       onPressed: () =>
                           onTabSelected(HomePageTab.lancamentosPendentes),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.pie_chart_outline,
+                      label: 'Relatórios',
+                      selected: selectedTab == HomePageTab.relatorios,
+                      onPressed: () => onTabSelected(HomePageTab.relatorios),
                     ),
                     _TopTabButton(
                       icon: Icons.bar_chart_outlined,

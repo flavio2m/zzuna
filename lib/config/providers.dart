@@ -28,6 +28,8 @@ import 'package:zzuna/ui/lancamentos/sidebar/viewmodels/lancamentos_sidebar_view
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_state.dart';
 import 'package:zzuna/ui/lancamentos/filter/models/lancamento_filter_notifier.dart';
 import 'package:zzuna/domain/usecases/lancamento/export_lancamentos_excel_usecase.dart';
+export 'package:zzuna/config/providers/relatorio_providers.dart';
+export 'package:zzuna/ui/relatorios/filter/providers/relatorio_filter_provider.dart';
 import 'package:zzuna/ui/lancamentos/export/viewmodels/export_lancamentos_viewmodel.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
