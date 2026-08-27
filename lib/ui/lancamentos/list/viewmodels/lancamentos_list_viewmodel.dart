@@ -292,6 +292,8 @@ class LancamentosListViewModel extends ChangeNotifier {
       ano: _currentFilter.ano ?? DateTime.now().year,
       incluirSaldoInicial: _currentFilter.incluirSaldoInicial,
       lancamentosDesconsiderados: _currentFilter.lancamentosDesconsiderados,
+      categoriasSelecionadas: _currentFilter.categoriasSelecionadas,
+      centrosSelecionados: _currentFilter.centrosSelecionados,
     );
     notifyListeners();
   }

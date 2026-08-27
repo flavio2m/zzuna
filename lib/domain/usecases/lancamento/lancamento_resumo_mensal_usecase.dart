@@ -18,6 +18,8 @@ class LancamentoResumoMensalUseCase {
     required int ano,
     bool incluirSaldoInicial = true,
     Set<String> lancamentosDesconsiderados = const {},
+    Set<String> categoriasSelecionadas = const {},
+    Set<String> centrosSelecionados = const {},
   }) {
     double saldoInicial = 0;
     double saldoFinal = 0;
@@ -51,7 +53,12 @@ class LancamentoResumoMensalUseCase {
       }
     }
 
-    final totals = _calcularTotais(lancamentos, lancamentosDesconsiderados);
+    final totals = _calcularTotais(
+      lancamentos,
+      lancamentosDesconsiderados,
+      categoriasSelecionadas,
+      centrosSelecionados,
+    );
 
     final saldoInicialReal = saldoInicial;
     final saldoFinalReal = saldoFinal;
@@ -70,6 +77,8 @@ class LancamentoResumoMensalUseCase {
       lancamentos,
       saldoInicialExibicao,
       lancamentosDesconsiderados,
+      categoriasSelecionadas,
+      centrosSelecionados,
     );
 
     return LancamentoResumoMensal(
@@ -88,9 +97,46 @@ class LancamentoResumoMensalUseCase {
     );
   }
 
+  double _calcValorCalculado(
+    LancamentoDetails l,
+    Set<String> categoriasSelecionadas,
+    Set<String> centrosSelecionados,
+  ) {
+    if (categoriasSelecionadas.isEmpty && centrosSelecionados.isEmpty) {
+      return l.valor;
+    }
+
+    double sum = 0;
+    for (final item in l.itens) {
+      if (item is LancamentoItemDetailsStandard) {
+        final matchesCategory =
+            categoriasSelecionadas.isEmpty ||
+            categoriasSelecionadas.contains(item.categoria.id) ||
+            (item.categoria.categoriaPai != null &&
+                categoriasSelecionadas.contains(
+                  item.categoria.categoriaPai!.id,
+                ));
+
+        final matchesCc =
+            centrosSelecionados.isEmpty ||
+            centrosSelecionados.contains(item.centroCusto.id);
+
+        if (matchesCategory && matchesCc) {
+          sum += item.valor;
+        }
+      } else {
+        sum += item.valor;
+      }
+    }
+
+    return sum;
+  }
+
   _Totais _calcularTotais(
     List<LancamentoDetails> lancamentos,
     Set<String> lancamentosDesconsiderados,
+    Set<String> categoriasSelecionadas,
+    Set<String> centrosSelecionados,
   ) {
     double receitas = 0;
     double despesas = 0;
@@ -101,15 +147,22 @@ class LancamentoResumoMensalUseCase {
       if (lancamentosDesconsiderados.contains(l.id)) {
         continue;
       }
+
+      final itemVal = _calcValorCalculado(
+        l,
+        categoriasSelecionadas,
+        centrosSelecionados,
+      );
+
       switch (l.tipo) {
         case LancamentoTipo.receita:
-          receitas += l.valor;
+          receitas += itemVal;
           break;
         case LancamentoTipo.despesa:
-          despesas += l.valor;
+          despesas += itemVal;
           break;
         case LancamentoTipo.transferencia:
-          transferencias += l.valor;
+          transferencias += itemVal;
           final firstItem = l.itens.isNotEmpty ? l.itens.first : null;
           if (firstItem is LancamentoItemDetailsTransferencia) {
             final currentOrigem = l.origem.map(
@@ -125,9 +178,9 @@ class LancamentoResumoMensalUseCase {
               cartao: (c) => LancamentoOrigem.cartao(cartaoId: c.cartao.id),
             );
             if (currentOrigem == entryOrigem) {
-              netTransferencias += l.valor;
+              netTransferencias += itemVal;
             } else if (currentOrigem == exitOrigem) {
-              netTransferencias -= l.valor;
+              netTransferencias -= itemVal;
             }
           }
           break;
@@ -146,6 +199,8 @@ class LancamentoResumoMensalUseCase {
     List<LancamentoDetails> lancamentos,
     double saldoInicialExtrato,
     Set<String> lancamentosDesconsiderados,
+    Set<String> categoriasSelecionadas,
+    Set<String> centrosSelecionados,
   ) {
     final Map<DateTime, List<LancamentoDetails>> grouped = {};
     for (final l in lancamentos) {
@@ -167,10 +222,17 @@ class LancamentoResumoMensalUseCase {
         if (lancamentosDesconsiderados.contains(l.id)) {
           continue;
         }
+
+        final itemVal = _calcValorCalculado(
+          l,
+          categoriasSelecionadas,
+          centrosSelecionados,
+        );
+
         if (l.tipo == LancamentoTipo.receita) {
-          saldoDia += l.valor;
+          saldoDia += itemVal;
         } else if (l.tipo == LancamentoTipo.despesa) {
-          saldoDia -= l.valor;
+          saldoDia -= itemVal;
         } else if (l.tipo == LancamentoTipo.transferencia) {
           final currentOrigem = l.origem.map(
             conta: (c) => LancamentoOrigem.conta(contaId: c.conta.id),
@@ -209,7 +271,7 @@ class LancamentoResumoMensalUseCase {
           data: date,
           saldo: saldoDia,
           saldoExtrato: saldoExtratoAcumulado,
-          lancamentos: items, //
+          lancamentos: items,
         ),
       );
     }
@@ -224,10 +286,10 @@ class _Totais {
   final double transferencias;
   final double netTransferencias;
 
-  const _Totais({
+  _Totais({
     required this.receitas,
     required this.despesas,
     required this.transferencias,
-    this.netTransferencias = 0.0,
+    required this.netTransferencias,
   });
 }

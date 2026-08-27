@@ -9,8 +9,8 @@ import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/domain/entities/conta_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem.dart';
 import 'package:zzuna/domain/usecases/lancamento/fechar_mes_usecase.dart';
-import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/domain/entities/cartao_entity.dart';
+import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';
 import 'package:zzuna/data/repositories/lancamento/lancamento_repository.dart';
@@ -24,20 +24,32 @@ class FakeContaRepository implements ContaRepository {
 }
 
 class FakeCartaoRepository implements CartaoRepository {
+  List<Cartao> cartoes = [];
   @override
-  AsyncResult<List<Cartao>> getAll() async => const Success([]);
+  AsyncResult<List<Cartao>> getAll() async => Success(cartoes);
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class FakeLancamentoRepository implements LancamentoRepository {
   List<Lancamento> lancamentos = [];
+
   @override
   AsyncResult<List<Lancamento>> search(LancamentoFilterDto filter) async {
     if (filter.conciliado == false) {
       return Success(lancamentos.where((l) => !l.conciliado).toList());
     }
     return Success(lancamentos);
+  }
+
+  @override
+  AsyncResult<List<Lancamento>> searchByExtratoFaturaId(
+    String extratoFaturaId, {
+    dynamic tipoGrupo,
+  }) async {
+    return Success(
+      lancamentos.where((l) => l.extratoFaturaId == extratoFaturaId).toList(),
+    );
   }
 
   @override
@@ -268,6 +280,63 @@ void main() {
         );
         expect(futuroDto.saldoInicial, 120.0);
         expect(futuroDto.saldoFinal, 170.0);
+      },
+    );
+
+    test(
+      'calculates balance correctly when month has transfer with card/account as destination',
+      () async {
+        final origemSaida = LancamentoOrigem.conta(contaId: 'c-1');
+        final origemEntrada = LancamentoOrigem.cartao(cartaoId: 'card-1');
+
+        contaRepo.contas = [conta];
+
+        final transferencia = Lancamento(
+          id: 'transf-1',
+          extratoFaturaId: 'ef-cartao',
+          data: DateTime(2026, 2, 15),
+          descricao: 'Pagamento de fatura',
+          origem: origemSaida,
+          tipo: LancamentoTipo.transferencia,
+          itens: [
+            LancamentoItemTransferencia(
+              numero: 1,
+              origemEntrada: origemEntrada,
+              origemSaida: origemSaida,
+              valor: 30.99,
+            ),
+          ],
+          conciliado: true,
+          anoMes: 202602,
+        );
+
+        lancamentoRepo.lancamentos = [transferencia];
+
+        final extratoCartao = ExtratoFatura(
+          id: 'ef-cartao',
+          origem: origemEntrada,
+          ano: 2026,
+          mes: Mes.fevereiro,
+          dataInicio: DateTime(2026, 2, 1),
+          dataFim: DateTime(2026, 2, 28),
+          saldoInicial: -940.34,
+          saldoFinal: -909.35,
+          fechado: false,
+          periodo: 202602,
+          origemKey: 'cartao_card-1',
+        );
+
+        extratoRepo.extratosAtuais = [extratoCartao];
+
+        final result = await useCase.execute(Mes.fevereiro, 2026);
+
+        expect(result.isSuccess(), isTrue);
+
+        final cartaoDto = extratoRepo.updatedDtos.firstWhere(
+          (e) => e.id == 'ef-cartao',
+        );
+        expect(cartaoDto.fechado, isTrue);
+        expect(cartaoDto.saldoFinal, -909.35);
       },
     );
   });

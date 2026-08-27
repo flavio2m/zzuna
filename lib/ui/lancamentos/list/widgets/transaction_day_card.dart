@@ -47,8 +47,49 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
     return UtilBrasilFields.obterReal(valor.abs(), moeda: false);
   }
 
+  double _calcCalculatedValue(
+    LancamentoDetails l,
+    Set<String> categoriasSelecionadas,
+    Set<String> centrosSelecionados,
+  ) {
+    if (categoriasSelecionadas.isEmpty && centrosSelecionados.isEmpty) {
+      return l.valor;
+    }
+
+    double sum = 0;
+    for (final item in l.itens) {
+      if (item is LancamentoItemDetailsStandard) {
+        final matchesCategory =
+            categoriasSelecionadas.isEmpty ||
+            categoriasSelecionadas.contains(item.categoria.id) ||
+            (item.categoria.categoriaPai != null &&
+                categoriasSelecionadas.contains(
+                  item.categoria.categoriaPai!.id,
+                ));
+
+        final matchesCc =
+            centrosSelecionados.isEmpty ||
+            centrosSelecionados.contains(item.centroCusto.id);
+
+        if (matchesCategory && matchesCc) {
+          sum += item.valor;
+        }
+      } else {
+        sum += item.valor;
+      }
+    }
+
+    return sum;
+  }
+
   Widget _buildTransactionRow(BuildContext context, LancamentoDetails l) {
-    final formattedValue = _formatValue(l.valor, l.tipo);
+    final filterState = ref.watch(lancamentoFilterProvider);
+    final valorExibicao = _calcCalculatedValue(
+      l,
+      filterState.categoriasSelecionadas,
+      filterState.centrosSelecionados,
+    );
+    final formattedValue = _formatValue(valorExibicao, l.tipo);
     const String? badge = null;
 
     final costCenter = //

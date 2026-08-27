@@ -70,17 +70,13 @@ class FecharMesUseCase {
     }
 
     final List<ExtratoFaturaDto> extratosParaAtualizar = [];
-    final lancamentosFilter = LancamentoFilterDto(ano: ano, mes: mes);
-    final lancamentosResult = await _lancamentoRepository.search(
-      lancamentosFilter,
-    );
-    if (lancamentosResult.isError()) return lancamentosResult.map((_) => unit);
-    final lancamentosMes = lancamentosResult.getOrThrow();
 
     for (final extrato in extratosAtuais) {
-      final lancamentosDaOrigem = lancamentosMes
-          .where((l) => l.origem == extrato.origem)
-          .toList();
+      final lancRes = await _lancamentoRepository.searchByExtratoFaturaId(
+        extrato.id,
+      );
+      if (lancRes.isError()) return Failure(lancRes.exceptionOrNull()!);
+      final lancamentosDaOrigem = lancRes.getOrThrow();
 
       // 2. RecalculateExtratoFaturaBalanceUseCase
       final saldoCalculado = _recalcularSaldoFinal(

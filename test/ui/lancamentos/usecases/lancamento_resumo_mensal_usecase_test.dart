@@ -396,5 +396,94 @@ void main() {
         expect(resultIgnoringReceita.dias.first.lancamentos.length, 2);
       },
     );
+
+    test(
+      'calculates totals by item when category filter is active in multi-item transaction',
+      () {
+        final catAlimentacao = const CategoriaDetails(
+          id: 'cat-alimentacao',
+          descricao: 'Alimentação',
+          ativo: true,
+          categoriaPai: null,
+          subcategorias: [],
+        );
+
+        final catHigiene = const CategoriaDetails(
+          id: 'cat-higiene',
+          descricao: 'Higiene e Beleza',
+          ativo: true,
+          categoriaPai: null,
+          subcategorias: [],
+        );
+
+        final ccGeral = const CentroCustoDetails(
+          id: 'cc-1',
+          descricao: 'CC 1',
+          ativo: true,
+        );
+
+        final multiItemLancamento = LancamentoDetails(
+          id: 'multi-1',
+          tipo: LancamentoTipo.despesa,
+          data: DateTime(2026, 6, 11),
+          descricao: 'Compra Mercadona diversos',
+          extratoFatura: ExtratoFaturaDetails(
+            id: 'ef-1',
+            origem: LancamentoOrigemContaDetail(conta: contaDetails),
+            ano: 2026,
+            mes: Mes.junho,
+            dataInicio: DateTime(2026, 6, 1),
+            dataFim: DateTime(2026, 6, 30),
+            saldoInicial: 0.0,
+            saldoFinal: 0.0,
+            fechado: false,
+          ),
+          origem: LancamentoOrigemContaDetail(conta: contaDetails),
+          itens: [
+            LancamentoItemDetails(
+              numero: 1,
+              centroCusto: ccGeral,
+              categoria: catAlimentacao,
+              valor: 10.45,
+            ),
+            LancamentoItemDetails(
+              numero: 2,
+              centroCusto: ccGeral,
+              categoria: catHigiene,
+              valor: 63.50,
+            ),
+          ],
+          conciliado: true,
+          anoMes: 202606,
+        );
+
+        final resultNoFilter = useCase.execute(
+          [multiItemLancamento],
+          extratos: [],
+          contasSelecionadas: {},
+          cartoesSelecionados: {},
+          temFiltroRestritivo: false,
+          mes: Mes.junho,
+          ano: 2026,
+        );
+
+        expect(resultNoFilter.despesas, 73.95);
+        expect(resultNoFilter.dias.first.saldo, -73.95);
+
+        final resultAlimentacaoFilter = useCase.execute(
+          [multiItemLancamento],
+          extratos: [],
+          contasSelecionadas: {},
+          cartoesSelecionados: {},
+          temFiltroRestritivo: true,
+          mes: Mes.junho,
+          ano: 2026,
+          categoriasSelecionadas: {'cat-alimentacao'},
+        );
+
+        expect(resultAlimentacaoFilter.despesas, 10.45);
+        expect(resultAlimentacaoFilter.dias.first.saldo, -10.45);
+      },
+    );
   });
 }
