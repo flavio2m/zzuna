@@ -3,13 +3,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:routefly/routefly.dart';
 
-import 'ui/auth/login/login_page.dart' as a4;
-import 'ui/cartao/list/cartao_list_page.dart' as a5;
-import 'ui/categoria/list/categoria_list_page.dart' as a6;
+import 'ui/auth/login/login_page.dart' as a5;
+import 'ui/cartao/list/cartao_list_page.dart' as a6;
+import 'ui/categoria/list/categoria_list_page.dart' as a7;
 import 'ui/centro_custo/list/centro_custo_list_page.dart' as a0;
-import 'ui/conta/list/conta_list_page.dart' as a3;
-import 'ui/home/home_page.dart' as a7;
+import 'ui/conta/list/conta_list_page.dart' as a4;
+import 'ui/home/home_page.dart' as a9;
+import 'ui/home/pages/sobre_page.dart' as a8;
 import 'ui/lancamentos/list/lancamentos_page.dart' as a2;
+import 'ui/lancamentos/pendentes/lancamento_pendente_page.dart' as a3;
+import 'ui/lista_compras/list/lista_compras_page.dart' as a10;
 import 'ui/relatorios/relatorios_page.dart' as a1;
 
 Route b0Builder(BuildContext ctx, RouteSettings settings) =>
@@ -19,12 +22,22 @@ Route b1Builder(BuildContext ctx, RouteSettings settings) =>
 Route b2Builder(BuildContext ctx, RouteSettings settings) =>
     Routefly.defaultRouteBuilder(ctx, settings, const a2.LancamentosPage());
 Route b3Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a3.ContaListPage());
+    Routefly.defaultRouteBuilder(
+      ctx,
+      settings,
+      const a3.LancamentoPendentePage(),
+    );
 Route b4Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a4.LoginPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a4.ContaListPage());
 Route b5Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a5.CartaoListPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a5.LoginPage());
 Route b6Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a6.CategoriaListPage());
+    Routefly.defaultRouteBuilder(ctx, settings, const a6.CartaoListPage());
 Route b7Builder(BuildContext ctx, RouteSettings settings) =>
-    Routefly.defaultRouteBuilder(ctx, settings, const a7.MyWidget());
+    Routefly.defaultRouteBuilder(ctx, settings, const a7.CategoriaListPage());
+Route b8Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a8.SobrePage());
+Route b9Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a9.MyWidget());
+Route b10Builder(BuildContext ctx, RouteSettings settings) =>
+    Routefly.defaultRouteBuilder(ctx, settings, const a10.ListaComprasPage());

@@ -67,7 +67,7 @@ class MainApp extends ConsumerWidget {
             db.ref(uid).child('categorias').keepSynced(true);
           }
 
-          Routefly.navigate(routePaths.home);
+          Routefly.navigate(routePaths.home.path);
         }
       });
     });

@@ -19,26 +19,41 @@ List<RouteEntity> get routes => [
     routeBuilder: b2Builder,
   ),
   RouteEntity(
+    key: 'lancamentos/pendentes/lancamento_pendente',
+    uri: Uri.parse('lancamentos/pendentes/lancamento_pendente'),
+    routeBuilder: b3Builder,
+  ),
+  RouteEntity(
     key: 'conta/list/conta_list',
     uri: Uri.parse('conta/list/conta_list'),
-    routeBuilder: b3Builder,
+    routeBuilder: b4Builder,
   ),
   RouteEntity(
     key: 'auth/login',
     uri: Uri.parse('auth/login'),
-    routeBuilder: b4Builder,
+    routeBuilder: b5Builder,
   ),
   RouteEntity(
     key: 'cartao/list/cartao_list',
     uri: Uri.parse('cartao/list/cartao_list'),
-    routeBuilder: b5Builder,
+    routeBuilder: b6Builder,
   ),
   RouteEntity(
     key: 'categoria/list/categoria_list',
     uri: Uri.parse('categoria/list/categoria_list'),
-    routeBuilder: b6Builder,
+    routeBuilder: b7Builder,
   ),
-  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b7Builder),
+  RouteEntity(
+    key: 'home/pages/sobre',
+    uri: Uri.parse('home/pages/sobre'),
+    routeBuilder: b8Builder,
+  ),
+  RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b9Builder),
+  RouteEntity(
+    key: 'lista_compras',
+    uri: Uri.parse('lista_compras'),
+    routeBuilder: b10Builder,
+  ),
 ];
 
 const routePaths = (
@@ -57,6 +72,10 @@ const routePaths = (
       path: '/lancamentos/list',
       lancamentos: '/lancamentos/list/lancamentos',
     ),
+    pendentes: (
+      path: '/lancamentos/pendentes',
+      lancamentoPendente: '/lancamentos/pendentes/lancamento_pendente',
+    ),
   ),
   conta: (
     path: '/conta',
@@ -74,5 +93,9 @@ const routePaths = (
       categoriaList: '/categoria/list/categoria_list',
     ),
   ),
-  home: '/home',
+  home: (
+    path: '/home',
+    pages: (path: '/home/pages', sobre: '/home/pages/sobre'),
+  ),
+  listaCompras: '/lista_compras',
 );

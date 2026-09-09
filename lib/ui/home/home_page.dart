@@ -12,6 +12,8 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:zzuna/ui/lista_compras/list/lista_compras_page.dart';
+
 class MyWidget extends ConsumerStatefulWidget {
   const MyWidget({super.key});
 
@@ -53,6 +55,7 @@ class _MyWidgetState extends ConsumerState<MyWidget> {
                 HomePageTab.lancamentosPendentes =>
                   const LancamentoPendentePage(),
                 HomePageTab.relatorios => const RelatoriosPage(),
+                HomePageTab.listaCompras => const ListaComprasPage(),
                 HomePageTab.contas => const ContaListPage(),
                 HomePageTab.cartoes => const CartaoListPage(),
                 HomePageTab.centroCustos => const CentroCustoListPage(),

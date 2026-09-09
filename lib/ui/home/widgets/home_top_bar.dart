@@ -6,6 +6,7 @@ enum HomePageTab {
   lancamentos,
   lancamentosPendentes,
   relatorios,
+  listaCompras,
   contas,
   cartoes,
   centroCustos,
@@ -33,6 +34,8 @@ class HomeTopBar extends StatelessWidget {
         return 'Lançamentos Pendentes';
       case HomePageTab.relatorios:
         return 'Relatórios';
+      case HomePageTab.listaCompras:
+        return 'Lista de Compras';
       case HomePageTab.contas:
         return 'Contas';
       case HomePageTab.cartoes:
@@ -151,6 +154,10 @@ class HomeTopBar extends StatelessWidget {
                     child: const Text('Relatórios'),
                   ),
                   PopupMenuItem(
+                    value: HomePageTab.listaCompras.index,
+                    child: const Text('Lista de Compras'),
+                  ),
+                  PopupMenuItem(
                     value: HomePageTab.contas.index,
                     child: const Text('Contas'),
                   ),
@@ -219,6 +226,12 @@ class HomeTopBar extends StatelessWidget {
                       label: 'Relatórios',
                       selected: selectedTab == HomePageTab.relatorios,
                       onPressed: () => onTabSelected(HomePageTab.relatorios),
+                    ),
+                    _TopTabButton(
+                      icon: Icons.shopping_cart_outlined,
+                      label: 'Lista de Compras',
+                      selected: selectedTab == HomePageTab.listaCompras,
+                      onPressed: () => onTabSelected(HomePageTab.listaCompras),
                     ),
                     _TopTabButton(
                       icon: Icons.bar_chart_outlined,

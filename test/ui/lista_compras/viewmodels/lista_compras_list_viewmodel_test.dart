@@ -1,0 +1,329 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/services/storage/base_storage.dart';
+import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.dart';
+import 'package:zzuna/domain/dtos/lista_compras/item_compra_dto.dart';
+import 'package:zzuna/domain/dtos/lista_compras/lista_compras_dto.dart';
+import 'package:zzuna/domain/dtos/lista_compras/lista_compras_filter_dto.dart';
+import 'package:zzuna/domain/entities/item_compra_entity.dart';
+import 'package:zzuna/domain/entities/lista_compras_entity.dart';
+import 'package:zzuna/domain/enums/item_compra_situacao.dart';
+import 'package:zzuna/domain/enums/mes.dart';
+import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/viewmodels/lista_compras_delete_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_comprar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_status_viewmodel.dart';
+import 'package:zzuna/utils/extensions/command_state_extension.dart';
+
+class FakeBaseStorage implements BaseStorage<ListaCompras> {
+  final Map<String, ListaCompras> storage = {};
+
+  @override
+  AsyncResult<ListaCompras> create(ListaCompras model) async {
+    storage[model.id] = model;
+    return Success(model);
+  }
+
+  @override
+  AsyncResult<Unit> createAll(List<ListaCompras> models) async {
+    for (final m in models) {
+      storage[m.id] = m;
+    }
+    return const Success(unit);
+  }
+
+  @override
+  AsyncResult<Unit> delete(String id) async {
+    storage.remove(id);
+    return const Success(unit);
+  }
+
+  @override
+  AsyncResult<List<ListaCompras>> getAll() async {
+    return Success(storage.values.toList());
+  }
+
+  @override
+  AsyncResult<ListaCompras> getById(String id) async {
+    if (storage.containsKey(id)) {
+      return Success(storage[id]!);
+    }
+    return Failure(Exception('Not found'));
+  }
+
+  @override
+  AsyncResult<ListaCompras> update(ListaCompras model) async {
+    storage[model.id] = model;
+    return Success(model);
+  }
+
+  @override
+  AsyncResult<Unit> updateAll(List<ListaCompras> models) async {
+    for (final m in models) {
+      storage[m.id] = m;
+    }
+    return const Success(unit);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+void main() {
+  group('ListaCompras Action ViewModels Tests', () {
+    late FakeBaseStorage fakeStorage;
+    late ListaComprasRepository repository;
+    late ListaComprasListViewModel listVm;
+    late ListaComprasCreateViewModel createVm;
+    late ListaComprasComprarViewModel comprarVm;
+    late ListaComprasStatusViewModel statusVm;
+    late ListaComprasDuplicarViewModel duplicarVm;
+    late ListaComprasDeleteViewModel deleteVm;
+
+    setUp(() {
+      fakeStorage = FakeBaseStorage();
+      repository = ListaComprasRepository(fakeStorage);
+      listVm = ListaComprasListViewModel(repository);
+      createVm = ListaComprasCreateViewModel(repository);
+      comprarVm = ListaComprasComprarViewModel(repository);
+      statusVm = ListaComprasStatusViewModel(repository);
+      duplicarVm = ListaComprasDuplicarViewModel(repository);
+      deleteVm = ListaComprasDeleteViewModel(repository);
+    });
+
+    test('creates empty list for current filter', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+
+      await createVm.criarListaVaziaCommand.execute(filter);
+      expect(createVm.criarListaVaziaCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(listVm.listaAtual, isNotNull);
+      expect(listVm.listaAtual!.mes, Mes.setembro);
+      expect(listVm.listaAtual!.ano, 2026);
+      expect(listVm.listaAtual!.itens, isEmpty);
+    });
+
+    test('salvarItem adds new item and updates item', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      final dto = ItemCompraDto(
+        produto: 'Arroz',
+        quantidadePlanejada: 5.0,
+        precoEstimado: 4.5,
+        supermercados: [const SupermercadoItem(nome: 'Mercadona')],
+      );
+
+      await createVm.salvarItemCommand.execute((
+        dto: dto,
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      expect(createVm.salvarItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(listVm.listaAtual!.itens.length, 1);
+
+      final item = listVm.listaAtual!.itens.first;
+      expect(item.produto, 'Arroz');
+      expect(item.supermercados.first.nome, 'Mercadona');
+    });
+
+    test('comprarItem marks last used supermarket and updates bought quantity', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          produto: 'Azeite',
+          quantidadePlanejada: 2.0,
+          precoEstimado: 7.0,
+          supermercados: [
+            const SupermercadoItem(nome: 'Lidl'),
+            const SupermercadoItem(nome: 'Continente'),
+          ],
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      final item = listVm.listaAtual!.itens.first;
+
+      await comprarVm.comprarItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: item.id,
+        quantidadeComprada: 2.0,
+        supermercadoNome: 'Continente',
+      ));
+
+      expect(comprarVm.comprarItemCommand.value.isSuccess, isTrue);
+      await listVm.loadCommand.execute();
+
+      final updatedItem = listVm.listaAtual!.itens.first;
+      expect(updatedItem.situacao, ItemCompraSituacao.comprado);
+      expect(updatedItem.quantidadeComprada, 2.0);
+
+      final continente = updatedItem.supermercados.firstWhere((s) => s.nome == 'Continente');
+      expect(continente.ultimoUtilizado, isTrue);
+
+      final lidl = updatedItem.supermercados.firstWhere((s) => s.nome == 'Lidl');
+      expect(lidl.ultimoUtilizado, isFalse);
+    });
+
+    test('duplicarListaCommand clones list, resetting bought items to pendente with qtd=0 and keeping cancelados', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'i1',
+          produto: 'Café',
+          quantidadePlanejada: 2.0,
+          quantidadeComprada: 2.0,
+          situacao: ItemCompraSituacao.comprado,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'i2',
+          produto: 'Leite',
+          quantidadePlanejada: 4.0,
+          quantidadeComprada: 1.0,
+          situacao: ItemCompraSituacao.pendente,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'i3',
+          produto: 'Chocolate',
+          quantidadePlanejada: 3.0,
+          situacao: ItemCompraSituacao.cancelado,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+
+      await listVm.loadCommand.execute();
+
+      await duplicarVm.duplicarListaCommand.execute((
+        listaOrigem: listVm.listaAtual!,
+        anoDestino: 2026,
+        mesDestino: Mes.outubro,
+      ));
+      expect(duplicarVm.duplicarListaCommand.value.isSuccess, isTrue);
+
+      final novaLista = duplicarVm.duplicarListaCommand.value.getValueOrNull()!;
+      expect(novaLista.ano, 2026);
+      expect(novaLista.mes, Mes.outubro);
+      expect(novaLista.itens.length, 3);
+
+      final cafeClonado = novaLista.itens.firstWhere((i) => i.produto == 'Café');
+      expect(cafeClonado.situacao, ItemCompraSituacao.pendente);
+      expect(cafeClonado.quantidadeComprada, 0.0);
+      expect(cafeClonado.quantidadePlanejada, 2.0);
+
+      final leiteClonado = novaLista.itens.firstWhere((i) => i.produto == 'Leite');
+      expect(leiteClonado.situacao, ItemCompraSituacao.pendente);
+      expect(leiteClonado.quantidadeComprada, 0.0);
+
+      final chocolateClonado = novaLista.itens.firstWhere((i) => i.produto == 'Chocolate');
+      expect(chocolateClonado.situacao, ItemCompraSituacao.cancelado);
+    });
+
+    test('duplicarListaCommand fails if target list already exists', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      // Create list in October first
+      await repository.create(ListaComprasDto(ano: 2026, mes: Mes.outubro));
+
+      await duplicarVm.duplicarListaCommand.execute((
+        listaOrigem: listVm.listaAtual!,
+        anoDestino: 2026,
+        mesDestino: Mes.outubro,
+      ));
+      expect(duplicarVm.duplicarListaCommand.value.isFailure, isTrue);
+    });
+
+    test('removerItemCommand removes item from list', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'item1',
+          produto: 'Sabão',
+          quantidadePlanejada: 1.0,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      expect(listVm.listaAtual!.itens.length, 1);
+
+      await deleteVm.removerItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+      ));
+      expect(deleteVm.removerItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(listVm.listaAtual!.itens, isEmpty);
+    });
+
+    test('alternarStatusItemCommand updates item status', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'item1',
+          produto: 'Detergente',
+          quantidadePlanejada: 2.0,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.comprado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(listVm.listaAtual!.itens.first.situacao, ItemCompraSituacao.comprado);
+      expect(listVm.listaAtual!.itens.first.quantidadeComprada, 2.0);
+    });
+  });
+}

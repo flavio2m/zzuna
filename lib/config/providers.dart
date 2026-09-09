@@ -101,12 +101,24 @@ import 'package:zzuna/ui/lancamentos/recorrencia/atualizar_data/viewmodels/lanca
 import 'package:zzuna/domain/usecases/lancamento/sync_recorrencias_mes_usecase.dart';
 import 'package:zzuna/ui/lancamentos/pendentes/viewmodels/lancamento_pendente_viewmodel.dart';
 
+import 'package:zzuna/data/services/storage/providers/lista_compras_storage_provider.dart';
+import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.dart';
+import 'package:zzuna/domain/dtos/lista_compras/lista_compras_filter_dto.dart';
+import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_comprar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_status_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/viewmodels/lista_compras_delete_viewmodel.dart';
+import 'package:zzuna/domain/enums/mes.dart';
+
 part 'providers/conta_providers.dart';
 part 'providers/cartao_providers.dart';
 part 'providers/categoria_providers.dart';
 part 'providers/centro_custo_providers.dart';
 part 'providers/extrato_fatura_providers.dart';
 part 'providers/lancamento_providers.dart';
+part 'providers/lista_compras_providers.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
