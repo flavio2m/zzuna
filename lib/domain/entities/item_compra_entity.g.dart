@@ -32,6 +32,7 @@ _ItemCompra _$ItemCompraFromJson(Map<String, dynamic> json) => _ItemCompra(
   situacao:
       $enumDecodeNullable(_$ItemCompraSituacaoEnumMap, json['situacao']) ??
       ItemCompraSituacao.pendente,
+  observacao: json['observacao'] as String? ?? '',
 );
 
 Map<String, dynamic> _$ItemCompraToJson(_ItemCompra instance) =>
@@ -43,6 +44,7 @@ Map<String, dynamic> _$ItemCompraToJson(_ItemCompra instance) =>
       'precoEstimado': instance.precoEstimado,
       'supermercados': instance.supermercados.map((e) => e.toJson()).toList(),
       'situacao': _$ItemCompraSituacaoEnumMap[instance.situacao]!,
+      'observacao': instance.observacao,
     };
 
 const _$ItemCompraSituacaoEnumMap = {

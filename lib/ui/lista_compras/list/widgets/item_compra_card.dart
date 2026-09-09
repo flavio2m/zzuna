@@ -14,22 +14,20 @@ class ItemCompraCard extends ConsumerWidget {
   final ItemCompra item;
   final ListaCompras lista;
 
-  const ItemCompraCard({
-    super.key,
-    required this.item,
-    required this.lista,
-  });
+  const ItemCompraCard({super.key, required this.item, required this.lista});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusVm = ref.watch(listaComprasStatusViewModelProvider);
     final deleteVm = ref.watch(listaComprasDeleteViewModelProvider);
-    final isRunning = statusVm.alternarStatusItemCommand.value.isRunning ||
+    final isRunning =
+        statusVm.alternarStatusItemCommand.value.isRunning ||
         deleteVm.removerItemCommand.value.isRunning;
 
     final isComprado = item.situacao == ItemCompraSituacao.comprado;
     final isCancelado = item.situacao == ItemCompraSituacao.cancelado;
-    final isParcial = !isComprado && !isCancelado && item.quantidadeComprada > 0;
+    final isParcial =
+        !isComprado && !isCancelado && item.quantidadeComprada > 0;
 
     final ultimoSupermercado = item.supermercados
         .where((s) => s.ultimoUtilizado)
@@ -66,7 +64,11 @@ class ItemCompraCard extends ConsumerWidget {
                             situacao: ItemCompraSituacao.pendente,
                           ));
                         } else {
-                          ComprarItemModal.show(context, item: item, lista: lista);
+                          ComprarItemModal.show(
+                            context,
+                            item: item,
+                            lista: lista,
+                          );
                         }
                       },
               ),
@@ -90,21 +92,30 @@ class ItemCompraCard extends ConsumerWidget {
                                   : null,
                               color: isCancelado
                                   ? AppColors.slate500
-                                  : Theme.of(context).textTheme.bodyLarge?.color,
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.color,
                             ),
                           ),
                         ),
                         if (isCancelado) ...[
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.slate500.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
                               'CANCELADO',
-                              style: TextStyle(fontSize: 10, color: AppColors.slate500, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.slate500,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -119,19 +130,30 @@ class ItemCompraCard extends ConsumerWidget {
                           'Qtd: ${_formatQtd(item.quantidadeComprada)} / ${_formatQtd(item.quantidadePlanejada)}',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isParcial ? Colors.orange.shade800 : AppColors.slate500,
-                            fontWeight: isParcial ? FontWeight.bold : FontWeight.normal,
+                            color: isParcial
+                                ? Colors.orange.shade800
+                                : AppColors.slate500,
+                            fontWeight: isParcial
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                         Text(
                           'Estimado: $precoFormatado',
-                          style: const TextStyle(fontSize: 12, color: AppColors.slate500),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.slate500,
+                          ),
                         ),
                         if (ultimoSupermercado != null)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.storefront, size: 12, color: AppColors.indigo600),
+                              const Icon(
+                                Icons.storefront,
+                                size: 12,
+                                color: AppColors.indigo600,
+                              ),
                               const SizedBox(width: 2),
                               Text(
                                 ultimoSupermercado.nome,
@@ -145,6 +167,19 @@ class ItemCompraCard extends ConsumerWidget {
                           ),
                       ],
                     ),
+                    if (item.observacao.trim().isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'Obs: ${item.observacao.trim()}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.slate500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -181,7 +216,11 @@ class ItemCompraCard extends ConsumerWidget {
                     value: 'comprar',
                     child: Row(
                       children: [
-                        Icon(Icons.shopping_cart_checkout, color: Colors.green.shade700, size: 18),
+                        Icon(
+                          Icons.shopping_cart_checkout,
+                          color: Colors.green.shade700,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Text(isComprado ? 'Editar Compra' : 'Comprar Item'),
                       ],
@@ -216,9 +255,16 @@ class ItemCompraCard extends ConsumerWidget {
                     value: 'excluir',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: AppColors.danger, size: 18),
+                        Icon(
+                          Icons.delete_outline,
+                          color: AppColors.danger,
+                          size: 18,
+                        ),
                         SizedBox(width: 8),
-                        Text('Excluir do Mês', style: TextStyle(color: AppColors.danger)),
+                        Text(
+                          'Excluir do Mês',
+                          style: TextStyle(color: AppColors.danger),
+                        ),
                       ],
                     ),
                   ),
@@ -233,7 +279,11 @@ class ItemCompraCard extends ConsumerWidget {
 
   Widget _buildStatusIcon(bool isComprado, bool isCancelado, bool isParcial) {
     if (isComprado) {
-      return const Icon(Icons.check_circle, color: AppColors.emerald800, size: 24);
+      return const Icon(
+        Icons.check_circle,
+        color: AppColors.emerald800,
+        size: 24,
+      );
     }
     if (isCancelado) {
       return const Icon(Icons.block, color: AppColors.slate500, size: 24);
@@ -241,7 +291,11 @@ class ItemCompraCard extends ConsumerWidget {
     if (isParcial) {
       return Icon(Icons.timelapse, color: Colors.orange.shade800, size: 24);
     }
-    return const Icon(Icons.radio_button_unchecked, color: AppColors.slate500, size: 24);
+    return const Icon(
+      Icons.radio_button_unchecked,
+      color: AppColors.slate500,
+      size: 24,
+    );
   }
 
   String _formatQtd(double val) {
@@ -256,20 +310,25 @@ class ItemCompraCard extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Excluir Produto'),
-        content: Text('Deseja remover "${item.produto}" definitivamente desta lista?'),
+        content: Text(
+          'Deseja remover "${item.produto}" definitivamente desta lista?',
+        ),
         actions: [
           TextButton(
             child: const Text('Cancelar'),
             onPressed: () => Navigator.pop(ctx),
           ),
           TextButton(
-            child: const Text('Excluir', style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'Excluir',
+              style: TextStyle(color: AppColors.danger),
+            ),
             onPressed: () {
               Navigator.pop(ctx);
-              ref.read(listaComprasDeleteViewModelProvider).removerItemCommand.execute((
-                lista: lista,
-                itemId: item.id,
-              ));
+              ref
+                  .read(listaComprasDeleteViewModelProvider)
+                  .removerItemCommand
+                  .execute((lista: lista, itemId: item.id));
             },
           ),
         ],

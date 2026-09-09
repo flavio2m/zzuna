@@ -9,6 +9,7 @@ class ItemCompraDto {
   double precoEstimado;
   List<SupermercadoItem> supermercados;
   ItemCompraSituacao situacao;
+  String observacao;
 
   ItemCompraDto({
     this.id,
@@ -18,6 +19,7 @@ class ItemCompraDto {
     this.precoEstimado = 0.0,
     List<SupermercadoItem>? supermercados,
     this.situacao = ItemCompraSituacao.pendente,
+    this.observacao = '',
   }) : supermercados = supermercados ?? [];
 
   void setProduto(String val) => produto = val;
@@ -26,4 +28,5 @@ class ItemCompraDto {
   void setPrecoEstimado(double val) => precoEstimado = val;
   void setSupermercados(List<SupermercadoItem> val) => supermercados = val;
   void setSituacao(ItemCompraSituacao val) => situacao = val;
+  void setObservacao(String val) => observacao = val;
 }

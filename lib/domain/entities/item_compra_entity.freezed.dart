@@ -275,7 +275,7 @@ as bool,
 /// @nodoc
 mixin _$ItemCompra {
 
- String get id; String get produto; double get quantidadePlanejada; double get quantidadeComprada; double get precoEstimado; List<SupermercadoItem> get supermercados; ItemCompraSituacao get situacao;
+ String get id; String get produto; double get quantidadePlanejada; double get quantidadeComprada; double get precoEstimado; List<SupermercadoItem> get supermercados; ItemCompraSituacao get situacao; String get observacao;
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -288,16 +288,16 @@ $ItemCompraCopyWith<ItemCompra> get copyWith => _$ItemCompraCopyWithImpl<ItemCom
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other.supermercados, supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other.supermercados, supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(supermercados),situacao);
+int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(supermercados),situacao,observacao);
 
 @override
 String toString() {
-  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao)';
+  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao)';
 }
 
 
@@ -308,7 +308,7 @@ abstract mixin class $ItemCompraCopyWith<$Res>  {
   factory $ItemCompraCopyWith(ItemCompra value, $Res Function(ItemCompra) _then) = _$ItemCompraCopyWithImpl;
 @useResult
 $Res call({
- String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao
+ String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao
 });
 
 
@@ -325,7 +325,7 @@ class _$ItemCompraCopyWithImpl<$Res>
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,produto: null == produto ? _self.produto : produto // ignore: cast_nullable_to_non_nullable
@@ -334,7 +334,8 @@ as double,quantidadeComprada: null == quantidadeComprada ? _self.quantidadeCompr
 as double,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
 as double,supermercados: null == supermercados ? _self.supermercados : supermercados // ignore: cast_nullable_to_non_nullable
 as List<SupermercadoItem>,situacao: null == situacao ? _self.situacao : situacao // ignore: cast_nullable_to_non_nullable
-as ItemCompraSituacao,
+as ItemCompraSituacao,observacao: null == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -416,10 +417,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ItemCompra() when $default != null:
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao);case _:
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);case _:
   return orElse();
 
 }
@@ -437,10 +438,10 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)  $default,) {final _that = this;
 switch (_that) {
 case _ItemCompra():
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao);}
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -454,10 +455,10 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)?  $default,) {final _that = this;
 switch (_that) {
 case _ItemCompra() when $default != null:
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao);case _:
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);case _:
   return null;
 
 }
@@ -469,7 +470,7 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 @JsonSerializable()
 
 class _ItemCompra implements ItemCompra {
-  const _ItemCompra({required this.id, required this.produto, this.quantidadePlanejada = 1.0, this.quantidadeComprada = 0.0, this.precoEstimado = 0.0, final  List<SupermercadoItem> supermercados = const [], this.situacao = ItemCompraSituacao.pendente}): _supermercados = supermercados;
+  const _ItemCompra({required this.id, required this.produto, this.quantidadePlanejada = 1.0, this.quantidadeComprada = 0.0, this.precoEstimado = 0.0, final  List<SupermercadoItem> supermercados = const [], this.situacao = ItemCompraSituacao.pendente, this.observacao = ''}): _supermercados = supermercados;
   factory _ItemCompra.fromJson(Map<String, dynamic> json) => _$ItemCompraFromJson(json);
 
 @override final  String id;
@@ -485,6 +486,7 @@ class _ItemCompra implements ItemCompra {
 }
 
 @override@JsonKey() final  ItemCompraSituacao situacao;
+@override@JsonKey() final  String observacao;
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
@@ -499,16 +501,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other._supermercados, _supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other._supermercados, _supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(_supermercados),situacao);
+int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(_supermercados),situacao,observacao);
 
 @override
 String toString() {
-  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao)';
+  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao)';
 }
 
 
@@ -519,7 +521,7 @@ abstract mixin class _$ItemCompraCopyWith<$Res> implements $ItemCompraCopyWith<$
   factory _$ItemCompraCopyWith(_ItemCompra value, $Res Function(_ItemCompra) _then) = __$ItemCompraCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao
+ String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao
 });
 
 
@@ -536,7 +538,7 @@ class __$ItemCompraCopyWithImpl<$Res>
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,}) {
   return _then(_ItemCompra(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,produto: null == produto ? _self.produto : produto // ignore: cast_nullable_to_non_nullable
@@ -545,7 +547,8 @@ as double,quantidadeComprada: null == quantidadeComprada ? _self.quantidadeCompr
 as double,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
 as double,supermercados: null == supermercados ? _self._supermercados : supermercados // ignore: cast_nullable_to_non_nullable
 as List<SupermercadoItem>,situacao: null == situacao ? _self.situacao : situacao // ignore: cast_nullable_to_non_nullable
-as ItemCompraSituacao,
+as ItemCompraSituacao,observacao: null == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

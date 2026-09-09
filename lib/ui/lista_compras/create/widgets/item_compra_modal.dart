@@ -1,11 +1,23 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lista_compras/item_compra_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
-import 'package:zzuna/domain/enums/item_compra_situacao.dart';
+import 'package:zzuna/domain/validators/item_compra_validator.dart';
 import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
+import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
+import 'package:zzuna/ui/shared/theme/app_colors.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_currency_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_text_area_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ItemCompraModal extends ConsumerStatefulWidget {
@@ -13,12 +25,10 @@ class ItemCompraModal extends ConsumerStatefulWidget {
 
   const ItemCompraModal({super.key, this.item});
 
-  static Future<void> show(BuildContext context, [ItemCompra? item]) {
-    return showModalBottomSheet(
+  static void show(BuildContext context, [ItemCompra? item]) {
+    AppDialog.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => ItemCompraModal(item: item),
+      child: ItemCompraModal(item: item),
     );
   }
 
@@ -27,254 +37,315 @@ class ItemCompraModal extends ConsumerStatefulWidget {
 }
 
 class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
-  late TextEditingController _produtoController;
-  late TextEditingController _qtdPlanejadaController;
-  late TextEditingController _precoEstimadoController;
+  late final ItemCompraDto dto;
+  final validator = ItemCompraValidator<ItemCompraDto>();
+  late final ListaComprasCreateViewModel viewModel;
+
   late TextEditingController _novoSupermercadoController;
 
-  late List<SupermercadoItem> _supermercados;
-  late ListaComprasCreateViewModel _viewModel;
+  final _produtoFocus = FocusNode();
+  final _qtdFocus = FocusNode();
+  final _precoFocus = FocusNode();
+  final _supermercadoFocus = FocusNode();
+  final _observacaoFocus = FocusNode();
+  final _saveFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _produtoController = TextEditingController(
-      text: widget.item?.produto ?? '',
+    viewModel = ref.read(listaComprasCreateViewModelProvider);
+    viewModel.salvarItemCommand.addListener(_commandListener);
+
+    if (widget.item != null) {
+      dto = ItemCompraDto(
+        id: widget.item!.id,
+        produto: widget.item!.produto,
+        quantidadePlanejada: widget.item!.quantidadePlanejada,
+        quantidadeComprada: widget.item!.quantidadeComprada,
+        precoEstimado: widget.item!.precoEstimado,
+        supermercados: List<SupermercadoItem>.from(widget.item!.supermercados),
+        situacao: widget.item!.situacao,
+        observacao: widget.item!.observacao,
+      );
+    } else {
+      dto = ItemCompraDto();
+    }
+
+    dto.supermercados.sort(
+      (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
     );
-    _qtdPlanejadaController = TextEditingController(
-      text: (widget.item?.quantidadePlanejada ?? 1.0).toString(),
-    );
-    _precoEstimadoController = TextEditingController(
-      text: (widget.item?.precoEstimado ?? 0.0).toString(),
-    );
+
     _novoSupermercadoController = TextEditingController();
-
-    _supermercados = List<SupermercadoItem>.from(
-      widget.item?.supermercados ?? [],
-    );
-
-    _viewModel = ref.read(listaComprasCreateViewModelProvider);
-    _viewModel.salvarItemCommand.addListener(_onCommandStateChanged);
   }
 
   @override
   void dispose() {
-    _viewModel.salvarItemCommand.removeListener(_onCommandStateChanged);
-    _produtoController.dispose();
-    _qtdPlanejadaController.dispose();
-    _precoEstimadoController.dispose();
+    viewModel.salvarItemCommand.removeListener(_commandListener);
+
     _novoSupermercadoController.dispose();
+
+    _produtoFocus.dispose();
+    _qtdFocus.dispose();
+    _precoFocus.dispose();
+    _supermercadoFocus.dispose();
+    _observacaoFocus.dispose();
+    _saveFocus.dispose();
+
     super.dispose();
   }
 
-  void _onCommandStateChanged() {
-    final commandValue = _viewModel.salvarItemCommand.value;
+  void _commandListener() {
+    final commandValue = viewModel.salvarItemCommand.value;
     commandValue.onSuccess((_) {
+      AppSnackBar.showSuccess(
+        context,
+        widget.item != null
+            ? 'Produto atualizado com sucesso.'
+            : 'Produto criado com sucesso.',
+      );
       if (mounted) Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(exception?.toString() ?? 'Erro ao salvar item'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppSnackBar.showError(
+          context,
+          exception?.toString() ?? 'Erro ao salvar produto.',
         );
       }
     });
   }
 
+  bool get _canSubmit {
+    return validator.validate(dto).isValid;
+  }
+
+  void _handleSubmit() {
+    if (_canSubmit) {
+      final listVm = ref.read(listaComprasListViewModelProvider);
+      viewModel.salvarItemCommand.execute((
+        dto: dto,
+        filter: listVm.filter,
+        listaAtual: listVm.listaAtual,
+      ));
+    }
+  }
+
   void _adicionarSupermercado() {
     final nome = _novoSupermercadoController.text.trim();
     if (nome.isNotEmpty &&
-        !_supermercados.any(
+        !dto.supermercados.any(
           (s) => s.nome.toLowerCase() == nome.toLowerCase(),
         )) {
-      setState(() {
-        _supermercados.add(SupermercadoItem(nome: nome));
-        _novoSupermercadoController.clear();
-      });
+      final isPrimeiro =
+          dto.supermercados.isEmpty ||
+          !dto.supermercados.any((s) => s.ultimoUtilizado);
+
+      final updated = List<SupermercadoItem>.from(dto.supermercados)
+        ..add(SupermercadoItem(nome: nome, ultimoUtilizado: isPrimeiro))
+        ..sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
+
+      dto.setSupermercados(updated);
+      _novoSupermercadoController.clear();
+      setState(() {});
+      _supermercadoFocus.requestFocus();
     }
   }
 
   void _removerSupermercado(String nome) {
-    setState(() {
-      _supermercados.removeWhere((s) => s.nome == nome);
-    });
+    final updated = List<SupermercadoItem>.from(dto.supermercados);
+    updated.removeWhere((s) => s.nome == nome);
+    if (updated.isNotEmpty && !updated.any((s) => s.ultimoUtilizado)) {
+      updated[0] = updated[0].copyWith(ultimoUtilizado: true);
+    }
+    dto.setSupermercados(updated);
+    setState(() {});
+  }
+
+  void _definirSupermercadoPadrao(String nome) {
+    final updated = dto.supermercados.map((s) {
+      return s.copyWith(ultimoUtilizado: s.nome == nome);
+    }).toList();
+    dto.setSupermercados(updated);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.item != null;
-    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final createVm = ref.watch(listaComprasCreateViewModelProvider);
-    final isLoading = createVm.salvarItemCommand.value.isRunning;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPadding),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isEditing ? 'Editar Produto' : 'Novo Produto',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: isLoading ? null : () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            AppTextFormField(
-              controller: _produtoController,
-              label: 'Nome do Produto',
-              autofocus: true,
-              readOnly: isLoading,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppTextFormField(
-                    controller: _qtdPlanejadaController,
-                    label: 'Qtd. Planejada',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    readOnly: isLoading,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppTextFormField(
-                    controller: _precoEstimadoController,
-                    label: 'Preço Estimado',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    readOnly: isLoading,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Supermercados onde encontrar:',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            if (_supermercados.isNotEmpty) ...[
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: _supermercados.map((s) {
-                  return Chip(
-                    label: Text(s.nome),
-                    deleteIcon: isLoading
-                        ? null
-                        : const Icon(Icons.close, size: 16),
-                    onDeleted: isLoading
-                        ? null
-                        : () => _removerSupermercado(s.nome),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Row(
-              children: [
-                Expanded(
-                  child: AppTextFormField(
-                    controller: _novoSupermercadoController,
-                    label: 'Adicionar Supermercado',
-                    readOnly: isLoading,
-                    onFieldSubmitted: (_) => _adicionarSupermercado(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  color: Theme.of(context).colorScheme.primary,
-                  onPressed: isLoading ? null : _adicionarSupermercado,
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                icon: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.save),
-                label: Text(
-                  isLoading
-                      ? 'Salvando...'
-                      : (isEditing ? 'Salvar Alterações' : 'Adicionar à Lista'),
-                ),
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        final produto = _produtoController.text.trim();
-                        final qtd =
-                            double.tryParse(
-                              _qtdPlanejadaController.text.replaceAll(',', '.'),
-                            ) ??
-                            1.0;
-                        final preco =
-                            double.tryParse(
-                              _precoEstimadoController.text.replaceAll(
-                                ',',
-                                '.',
-                              ),
-                            ) ??
-                            0.0;
-
-                        final dto = ItemCompraDto(
-                          id: widget.item?.id,
-                          produto: produto,
-                          quantidadePlanejada: qtd,
-                          quantidadeComprada:
-                              widget.item?.quantidadeComprada ?? 0.0,
-                          precoEstimado: preco,
-                          supermercados: _supermercados,
-                          situacao:
-                              widget.item?.situacao ??
-                              ItemCompraSituacao.pendente,
-                        );
-
-                        final listVm = ref.read(
-                          listaComprasListViewModelProvider,
-                        );
-                        _viewModel.salvarItemCommand.execute((
-                          dto: dto,
-                          filter: listVm.filter,
-                          listaAtual: listVm.listaAtual,
-                        ));
-                      },
-              ),
-            ),
-          ],
+    return AppForm(
+      title: isEditing ? 'Editar Produto' : 'Novo Produto',
+      type: AppFormType.modal,
+      actions: [
+        ButtonCancel(onPressed: () => Navigator.of(context).pop()),
+        ListenableBuilder(
+          listenable: createVm.salvarItemCommand,
+          builder: (_, _) {
+            return ButtonSave(
+              focusNode: _saveFocus,
+              loading: createVm.salvarItemCommand.value.isRunning,
+              onPressed:
+                  createVm.salvarItemCommand.value.isRunning || !_canSubmit
+                  ? null
+                  : _handleSubmit,
+            );
+          },
         ),
+      ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppTextFormField(
+            label: 'Nome do Produto',
+            autofocus: true,
+            focusNode: _produtoFocus,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _qtdFocus.requestFocus(),
+            initialValue: dto.produto,
+            onChanged: (value) {
+              dto.setProduto(value);
+              setState(() {});
+            },
+            validator: validator.byField(dto, 'produto'),
+          ),
+          const AppSpacing(size: AppSpacingSize.md),
+          Row(
+            children: [
+              Expanded(
+                child: AppIntegerFormField(
+                  label: 'Qtd. Planejada',
+                  focusNode: _qtdFocus,
+                  min: 1,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _precoFocus.requestFocus(),
+                  initialValue: dto.quantidadePlanejada.toInt().toString(),
+                  onChanged: (value) {
+                    dto.setQuantidadePlanejada(double.tryParse(value) ?? 1.0);
+                    setState(() {});
+                  },
+                  validator: validator.byField(dto, 'quantidadePlanejada'),
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.md, axis: Axis.horizontal),
+              Expanded(
+                child: AppCurrencyFormField(
+                  label: 'Preço Estimado',
+                  focusNode: _precoFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _supermercadoFocus.requestFocus(),
+                  initialValue: dto.precoEstimado > 0
+                      ? UtilBrasilFields.obterReal(
+                          dto.precoEstimado,
+                          moeda: true,
+                        )
+                      : '',
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      dto.setPrecoEstimado(
+                        UtilBrasilFields.converterMoedaParaDouble(value),
+                      );
+                    } else {
+                      dto.setPrecoEstimado(0.0);
+                    }
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
+          const AppSpacing(size: AppSpacingSize.md),
+          const AppText(
+            'Supermercados onde encontrar (clique para definir o padrão):',
+            variant: AppTextVariant.subtitle,
+          ),
+          const AppSpacing(size: AppSpacingSize.xs),
+          if (dto.supermercados.isNotEmpty) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: dto.supermercados.map((s) {
+                final isPadrao = s.ultimoUtilizado;
+                return FilterChip(
+                  selected: isPadrao,
+                  showCheckmark: false,
+                  avatar: isPadrao
+                      ? const Icon(
+                          Icons.star_rounded,
+                          size: 16,
+                          color: AppColors.indigo600,
+                        )
+                      : null,
+                  label: AppText(
+                    s.nome,
+                    variant: AppTextVariant.body,
+                    fontWeight: isPadrao ? FontWeight.bold : FontWeight.normal,
+                    color: isPadrao ? AppColors.indigo600 : null,
+                  ),
+                  selectedColor: AppColors.indigo600.withValues(alpha: 0.15),
+                  side: BorderSide(
+                    color: isPadrao
+                        ? AppColors.indigo600
+                        : Theme.of(context).dividerColor,
+                  ),
+                  deleteIcon: createVm.salvarItemCommand.value.isRunning
+                      ? null
+                      : const Icon(Icons.close, size: 16),
+                  onDeleted: createVm.salvarItemCommand.value.isRunning
+                      ? null
+                      : () => _removerSupermercado(s.nome),
+                  onSelected: createVm.salvarItemCommand.value.isRunning
+                      ? null
+                      : (_) => _definirSupermercadoPadrao(s.nome),
+                );
+              }).toList(),
+            ),
+            const AppSpacing(size: AppSpacingSize.xs),
+          ],
+          Row(
+            children: [
+              Expanded(
+                child: AppTextFormField(
+                  controller: _novoSupermercadoController,
+                  focusNode: _supermercadoFocus,
+                  label: 'Adicionar Supermercado',
+                  readOnly: createVm.salvarItemCommand.value.isRunning,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) {
+                    if (_novoSupermercadoController.text.trim().isNotEmpty) {
+                      _adicionarSupermercado();
+                    } else {
+                      _observacaoFocus.requestFocus();
+                    }
+                  },
+                ),
+              ),
+              const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: createVm.salvarItemCommand.value.isRunning
+                    ? null
+                    : _adicionarSupermercado,
+              ),
+            ],
+          ),
+          const AppSpacing(size: AppSpacingSize.md),
+          AppTextAreaFormField(
+            label: 'Observação',
+            focusNode: _observacaoFocus,
+            minLines: 1,
+            maxLines: 2,
+            initialValue: dto.observacao,
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (_) => _saveFocus.requestFocus(),
+            onChanged: (value) {
+              dto.setObservacao(value);
+              setState(() {});
+            },
+          ),
+        ],
       ),
     );
   }

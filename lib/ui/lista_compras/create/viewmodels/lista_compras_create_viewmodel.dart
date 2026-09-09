@@ -73,6 +73,7 @@ class ListaComprasCreateViewModel {
           precoEstimado: dto.precoEstimado,
           supermercados: dto.supermercados,
           situacao: dto.situacao,
+          observacao: dto.observacao.trim(),
         );
       } else {
         updatedItens.add(
@@ -84,6 +85,7 @@ class ListaComprasCreateViewModel {
             precoEstimado: dto.precoEstimado,
             supermercados: dto.supermercados,
             situacao: dto.situacao,
+            observacao: dto.observacao.trim(),
           ),
         );
       }
@@ -97,6 +99,7 @@ class ListaComprasCreateViewModel {
           precoEstimado: dto.precoEstimado,
           supermercados: dto.supermercados,
           situacao: dto.situacao,
+          observacao: dto.observacao.trim(),
         ),
       );
     }

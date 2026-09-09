@@ -25,6 +25,7 @@ sealed class ItemCompra with _$ItemCompra {
     @Default(0.0) double precoEstimado,
     @Default([]) List<SupermercadoItem> supermercados,
     @Default(ItemCompraSituacao.pendente) ItemCompraSituacao situacao,
+    @Default('') String observacao,
   }) = _ItemCompra;
 
   factory ItemCompra.fromJson(Map<String, dynamic> json) =>
