@@ -135,121 +135,144 @@ void main() {
       expect(item.supermercados.first.nome, 'Mercadona');
     });
 
-    test('comprarItem marks last used supermarket and updates bought quantity', () async {
-      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
-      listVm.setFilter(filter);
-      await createVm.criarListaVaziaCommand.execute(filter);
-      await listVm.loadCommand.execute();
+    test(
+      'comprarItem marks last used supermarket and updates bought quantity',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
 
-      await createVm.salvarItemCommand.execute((
-        dto: ItemCompraDto(
-          produto: 'Azeite',
-          quantidadePlanejada: 2.0,
-          precoEstimado: 7.0,
-          supermercados: [
-            const SupermercadoItem(nome: 'Lidl'),
-            const SupermercadoItem(nome: 'Continente'),
-          ],
-        ),
-        filter: filter,
-        listaAtual: listVm.listaAtual,
-      ));
-      await listVm.loadCommand.execute();
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            produto: 'Azeite',
+            quantidadePlanejada: 2.0,
+            precoEstimado: 7.0,
+            supermercados: [
+              const SupermercadoItem(nome: 'Lidl'),
+              const SupermercadoItem(nome: 'Continente'),
+            ],
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+        await listVm.loadCommand.execute();
 
-      final item = listVm.listaAtual!.itens.first;
+        final item = listVm.listaAtual!.itens.first;
 
-      await comprarVm.comprarItemCommand.execute((
-        lista: listVm.listaAtual!,
-        itemId: item.id,
-        quantidadeComprada: 2.0,
-        supermercadoNome: 'Continente',
-      ));
-
-      expect(comprarVm.comprarItemCommand.value.isSuccess, isTrue);
-      await listVm.loadCommand.execute();
-
-      final updatedItem = listVm.listaAtual!.itens.first;
-      expect(updatedItem.situacao, ItemCompraSituacao.comprado);
-      expect(updatedItem.quantidadeComprada, 2.0);
-
-      final continente = updatedItem.supermercados.firstWhere((s) => s.nome == 'Continente');
-      expect(continente.ultimoUtilizado, isTrue);
-
-      final lidl = updatedItem.supermercados.firstWhere((s) => s.nome == 'Lidl');
-      expect(lidl.ultimoUtilizado, isFalse);
-    });
-
-    test('duplicarListaCommand clones list, resetting bought items to pendente with qtd=0 and keeping cancelados', () async {
-      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
-      listVm.setFilter(filter);
-      await createVm.criarListaVaziaCommand.execute(filter);
-      await listVm.loadCommand.execute();
-
-      await createVm.salvarItemCommand.execute((
-        dto: ItemCompraDto(
-          id: 'i1',
-          produto: 'Café',
-          quantidadePlanejada: 2.0,
+        await comprarVm.comprarItemCommand.execute((
+          lista: listVm.listaAtual!,
+          itemId: item.id,
           quantidadeComprada: 2.0,
-          situacao: ItemCompraSituacao.comprado,
-        ),
-        filter: filter,
-        listaAtual: listVm.listaAtual,
-      ));
+          supermercadoNome: 'Continente',
+        ));
 
-      await listVm.loadCommand.execute();
+        expect(comprarVm.comprarItemCommand.value.isSuccess, isTrue);
+        await listVm.loadCommand.execute();
 
-      await createVm.salvarItemCommand.execute((
-        dto: ItemCompraDto(
-          id: 'i2',
-          produto: 'Leite',
-          quantidadePlanejada: 4.0,
-          quantidadeComprada: 1.0,
-          situacao: ItemCompraSituacao.pendente,
-        ),
-        filter: filter,
-        listaAtual: listVm.listaAtual,
-      ));
+        final updatedItem = listVm.listaAtual!.itens.first;
+        expect(updatedItem.situacao, ItemCompraSituacao.comprado);
+        expect(updatedItem.quantidadeComprada, 2.0);
 
-      await listVm.loadCommand.execute();
+        final continente = updatedItem.supermercados.firstWhere(
+          (s) => s.nome == 'Continente',
+        );
+        expect(continente.ultimoUtilizado, isTrue);
 
-      await createVm.salvarItemCommand.execute((
-        dto: ItemCompraDto(
-          id: 'i3',
-          produto: 'Chocolate',
-          quantidadePlanejada: 3.0,
-          situacao: ItemCompraSituacao.cancelado,
-        ),
-        filter: filter,
-        listaAtual: listVm.listaAtual,
-      ));
+        final lidl = updatedItem.supermercados.firstWhere(
+          (s) => s.nome == 'Lidl',
+        );
+        expect(lidl.ultimoUtilizado, isFalse);
+      },
+    );
 
-      await listVm.loadCommand.execute();
+    test(
+      'duplicarListaCommand clones list, resetting bought items to pendente with qtd=0 and keeping cancelados',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
 
-      await duplicarVm.duplicarListaCommand.execute((
-        listaOrigem: listVm.listaAtual!,
-        anoDestino: 2026,
-        mesDestino: Mes.outubro,
-      ));
-      expect(duplicarVm.duplicarListaCommand.value.isSuccess, isTrue);
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'i1',
+            produto: 'Café',
+            quantidadePlanejada: 2.0,
+            quantidadeComprada: 2.0,
+            situacao: ItemCompraSituacao.comprado,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
 
-      final novaLista = duplicarVm.duplicarListaCommand.value.getValueOrNull()!;
-      expect(novaLista.ano, 2026);
-      expect(novaLista.mes, Mes.outubro);
-      expect(novaLista.itens.length, 3);
+        await listVm.loadCommand.execute();
 
-      final cafeClonado = novaLista.itens.firstWhere((i) => i.produto == 'Café');
-      expect(cafeClonado.situacao, ItemCompraSituacao.pendente);
-      expect(cafeClonado.quantidadeComprada, 0.0);
-      expect(cafeClonado.quantidadePlanejada, 2.0);
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'i2',
+            produto: 'Leite',
+            quantidadePlanejada: 4.0,
+            quantidadeComprada: 1.0,
+            situacao: ItemCompraSituacao.pendente,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
 
-      final leiteClonado = novaLista.itens.firstWhere((i) => i.produto == 'Leite');
-      expect(leiteClonado.situacao, ItemCompraSituacao.pendente);
-      expect(leiteClonado.quantidadeComprada, 0.0);
+        await listVm.loadCommand.execute();
 
-      final chocolateClonado = novaLista.itens.firstWhere((i) => i.produto == 'Chocolate');
-      expect(chocolateClonado.situacao, ItemCompraSituacao.cancelado);
-    });
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'i3',
+            produto: 'Chocolate',
+            quantidadePlanejada: 3.0,
+            situacao: ItemCompraSituacao.cancelado,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+
+        await listVm.loadCommand.execute();
+
+        await duplicarVm.duplicarListaCommand.execute((
+          listaOrigem: listVm.listaAtual!,
+          anoDestino: 2026,
+          mesDestino: Mes.outubro,
+        ));
+        expect(duplicarVm.duplicarListaCommand.value.isSuccess, isTrue);
+
+        final novaLista = duplicarVm.duplicarListaCommand.value
+            .getValueOrNull()!;
+        expect(novaLista.ano, 2026);
+        expect(novaLista.mes, Mes.outubro);
+        expect(novaLista.itens.length, 3);
+
+        final cafeClonado = novaLista.itens.firstWhere(
+          (i) => i.produto == 'Café',
+        );
+        expect(cafeClonado.situacao, ItemCompraSituacao.pendente);
+        expect(cafeClonado.quantidadeComprada, 0.0);
+        expect(cafeClonado.quantidadePlanejada, 2.0);
+
+        final leiteClonado = novaLista.itens.firstWhere(
+          (i) => i.produto == 'Leite',
+        );
+        expect(leiteClonado.situacao, ItemCompraSituacao.pendente);
+        expect(leiteClonado.quantidadeComprada, 0.0);
+
+        final chocolateClonado = novaLista.itens.firstWhere(
+          (i) => i.produto == 'Chocolate',
+        );
+        expect(chocolateClonado.situacao, ItemCompraSituacao.cancelado);
+      },
+    );
 
     test('duplicarListaCommand fails if target list already exists', () async {
       final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
@@ -322,51 +345,84 @@ void main() {
       expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
 
       await listVm.loadCommand.execute();
-      expect(listVm.listaAtual!.itens.first.situacao, ItemCompraSituacao.comprado);
+      expect(
+        listVm.listaAtual!.itens.first.situacao,
+        ItemCompraSituacao.comprado,
+      );
       expect(listVm.listaAtual!.itens.first.quantidadeComprada, 2.0);
     });
 
-    test('cloning item creates a new item with pendente situation and zero bought quantity', () async {
-      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
-      listVm.setFilter(filter);
-      await createVm.criarListaVaziaCommand.execute(filter);
-      await listVm.loadCommand.execute();
+    test(
+      'cloning item creates a new item with pendente situation and zero bought quantity',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
 
-      final originalItem = const ItemCompra(
-        id: 'orig1',
-        produto: 'Banana',
-        quantidadePlanejada: 3.0,
-        quantidadeComprada: 3.0,
-        precoEstimado: 2.0,
-        situacao: ItemCompraSituacao.comprado,
-        observacao: 'Madura',
-      );
+        final originalItem = const ItemCompra(
+          id: 'orig1',
+          produto: 'Banana',
+          quantidadePlanejada: 3.0,
+          quantidadeComprada: 3.0,
+          precoEstimado: 2.0,
+          situacao: ItemCompraSituacao.comprado,
+          observacao: 'Madura',
+        );
 
-      final cloneDto = ItemCompraDto(
-        produto: originalItem.produto,
-        quantidadePlanejada: originalItem.quantidadePlanejada,
-        quantidadeComprada: 0.0,
-        precoEstimado: originalItem.precoEstimado,
-        supermercados: originalItem.supermercados,
-        situacao: ItemCompraSituacao.pendente,
-        observacao: originalItem.observacao,
-      );
+        final cloneDto = ItemCompraDto(
+          produto: originalItem.produto,
+          quantidadePlanejada: originalItem.quantidadePlanejada,
+          quantidadeComprada: 0.0,
+          precoEstimado: originalItem.precoEstimado,
+          supermercados: originalItem.supermercados,
+          situacao: ItemCompraSituacao.pendente,
+          observacao: originalItem.observacao,
+        );
 
-      await createVm.salvarItemCommand.execute((
-        dto: cloneDto,
-        filter: filter,
-        listaAtual: listVm.listaAtual,
-      ));
+        await createVm.salvarItemCommand.execute((
+          dto: cloneDto,
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
 
-      expect(createVm.salvarItemCommand.value.isSuccess, isTrue);
-      await listVm.loadCommand.execute();
+        expect(createVm.salvarItemCommand.value.isSuccess, isTrue);
+        await listVm.loadCommand.execute();
 
-      expect(listVm.listaAtual!.itens.length, 1);
-      final item = listVm.listaAtual!.itens.first;
-      expect(item.id, isNot('orig1'));
-      expect(item.produto, 'Banana');
-      expect(item.situacao, ItemCompraSituacao.pendente);
-      expect(item.quantidadeComprada, 0.0);
-    });
+        expect(listVm.listaAtual!.itens.length, 1);
+        final item = listVm.listaAtual!.itens.first;
+        expect(item.id, isNot('orig1'));
+        expect(item.produto, 'Banana');
+        expect(item.situacao, ItemCompraSituacao.pendente);
+        expect(item.quantidadeComprada, 0.0);
+      },
+    );
+
+    test(
+      'itensOrdenados returns items sorted alphabetically by product description',
+      () {
+        final lista = ListaCompras(
+          id: 'l1',
+          ano: 2026,
+          mes: Mes.setembro,
+          periodo: 202609,
+          itens: const [
+            ItemCompra(id: '1', produto: 'Arroz parborizado'),
+            ItemCompra(id: '2', produto: 'Arroz parborizado3'),
+            ItemCompra(id: '3', produto: 'Aa parborizado'),
+          ],
+        );
+
+        final ordenados = lista.itensOrdenados;
+        expect(ordenados.map((i) => i.produto).toList(), [
+          'Aa parborizado',
+          'Arroz parborizado',
+          'Arroz parborizado3',
+        ]);
+      },
+    );
   });
 }

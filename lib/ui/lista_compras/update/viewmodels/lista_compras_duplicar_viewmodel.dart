@@ -16,11 +16,7 @@ class ListaComprasDuplicarViewModel {
   late final duplicarListaCommand = Command1(_duplicarLista);
 
   AsyncResult<ListaCompras> _duplicarLista(
-    ({
-      ListaCompras listaOrigem,
-      int anoDestino,
-      Mes mesDestino,
-    }) params,
+    ({ListaCompras listaOrigem, int anoDestino, Mes mesDestino}) params,
   ) async {
     final listaOrigem = params.listaOrigem;
     final anoDestino = params.anoDestino;
@@ -43,17 +39,16 @@ class ListaComprasDuplicarViewModel {
           quantidadeComprada: 0.0,
         );
       } else if (item.situacao == ItemCompraSituacao.pendente) {
-        return item.copyWith(
-          id: const Uuid().v4(),
-          quantidadeComprada: 0.0,
-        );
+        return item.copyWith(id: const Uuid().v4(), quantidadeComprada: 0.0);
       } else {
         // Cancelado permanece cancelado
-        return item.copyWith(
-          id: const Uuid().v4(),
-        );
+        return item.copyWith(id: const Uuid().v4());
       }
     }).toList();
+
+    novosItens.sort(
+      (a, b) => a.produto.toLowerCase().compareTo(b.produto.toLowerCase()),
+    );
 
     final novaListaDto = ListaComprasDto(
       ano: anoDestino,

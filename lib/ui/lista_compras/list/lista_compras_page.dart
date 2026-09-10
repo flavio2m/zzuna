@@ -125,16 +125,18 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
       );
     }
 
+    final itens = lista.itensOrdenados;
+
     return Column(
       children: [
         ListaComprasSummaryCard(lista: lista),
         const SizedBox(height: 12),
         Expanded(
           child: ListView.separated(
-            itemCount: lista.itens.length,
+            itemCount: itens.length,
             separatorBuilder: (_, _) => const SizedBox(height: 6),
             itemBuilder: (context, index) {
-              final item = lista.itens[index];
+              final item = itens[index];
               return ItemCompraCard(item: item, lista: lista);
             },
           ),

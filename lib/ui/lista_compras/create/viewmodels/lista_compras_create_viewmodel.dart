@@ -104,6 +104,10 @@ class ListaComprasCreateViewModel {
       );
     }
 
+    updatedItens.sort(
+      (a, b) => a.produto.toLowerCase().compareTo(b.produto.toLowerCase()),
+    );
+
     final listaDto = ListaComprasDto(
       id: lista.id,
       ano: lista.ano,

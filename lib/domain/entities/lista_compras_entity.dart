@@ -23,25 +23,39 @@ sealed class ListaCompras with _$ListaCompras {
 
   int get totalItens => itens.length;
 
+  List<ItemCompra> get itensOrdenados {
+    final list = List<ItemCompra>.from(itens);
+    list.sort(
+      (a, b) => a.produto.toLowerCase().compareTo(b.produto.toLowerCase()),
+    );
+    return list;
+  }
+
   int get totalComprados => itens
-      .where((item) =>
-          item.situacao == ItemCompraSituacao.comprado ||
-          (item.situacao != ItemCompraSituacao.cancelado &&
-              item.quantidadeComprada >= item.quantidadePlanejada &&
-              item.quantidadePlanejada > 0))
+      .where(
+        (item) =>
+            item.situacao == ItemCompraSituacao.comprado ||
+            (item.situacao != ItemCompraSituacao.cancelado &&
+                item.quantidadeComprada >= item.quantidadePlanejada &&
+                item.quantidadePlanejada > 0),
+      )
       .length;
 
   int get totalParcialmenteComprados => itens
-      .where((item) =>
-          item.situacao != ItemCompraSituacao.cancelado &&
-          item.quantidadeComprada > 0 &&
-          item.quantidadeComprada < item.quantidadePlanejada)
+      .where(
+        (item) =>
+            item.situacao != ItemCompraSituacao.cancelado &&
+            item.quantidadeComprada > 0 &&
+            item.quantidadeComprada < item.quantidadePlanejada,
+      )
       .length;
 
   int get totalPendentes => itens
-      .where((item) =>
-          item.situacao == ItemCompraSituacao.pendente &&
-          item.quantidadeComprada == 0)
+      .where(
+        (item) =>
+            item.situacao == ItemCompraSituacao.pendente &&
+            item.quantidadeComprada == 0,
+      )
       .length;
 
   int get totalCancelados => itens
@@ -50,11 +64,17 @@ sealed class ListaCompras with _$ListaCompras {
 
   double get valorEstimadoTotal => itens
       .where((item) => item.situacao != ItemCompraSituacao.cancelado)
-      .fold(0.0, (sum, item) => sum + (item.quantidadePlanejada * item.precoEstimado));
+      .fold(
+        0.0,
+        (sum, item) => sum + (item.quantidadePlanejada * item.precoEstimado),
+      );
 
   double get valorEstimadoComprado => itens
       .where((item) => item.situacao != ItemCompraSituacao.cancelado)
-      .fold(0.0, (sum, item) => sum + (item.quantidadeComprada * item.precoEstimado));
+      .fold(
+        0.0,
+        (sum, item) => sum + (item.quantidadeComprada * item.precoEstimado),
+      );
 
   double get valorEstimadoPendente {
     final diff = valorEstimadoTotal - valorEstimadoComprado;
