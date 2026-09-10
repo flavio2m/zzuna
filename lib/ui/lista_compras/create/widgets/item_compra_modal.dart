@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/lista_compras/item_compra_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
+import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/validators/item_compra_validator.dart';
 import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
@@ -22,13 +23,18 @@ import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ItemCompraModal extends ConsumerStatefulWidget {
   final ItemCompra? item;
+  final ItemCompra? cloneItem;
 
-  const ItemCompraModal({super.key, this.item});
+  const ItemCompraModal({super.key, this.item, this.cloneItem});
 
-  static void show(BuildContext context, [ItemCompra? item]) {
+  static void show(
+    BuildContext context, {
+    ItemCompra? item,
+    ItemCompra? cloneItem,
+  }) {
     AppDialog.show(
       context: context,
-      child: ItemCompraModal(item: item),
+      child: ItemCompraModal(item: item, cloneItem: cloneItem),
     );
   }
 
@@ -66,6 +72,18 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
         supermercados: List<SupermercadoItem>.from(widget.item!.supermercados),
         situacao: widget.item!.situacao,
         observacao: widget.item!.observacao,
+      );
+    } else if (widget.cloneItem != null) {
+      dto = ItemCompraDto(
+        produto: widget.cloneItem!.produto,
+        quantidadePlanejada: widget.cloneItem!.quantidadePlanejada,
+        quantidadeComprada: 0.0,
+        precoEstimado: widget.cloneItem!.precoEstimado,
+        supermercados: List<SupermercadoItem>.from(
+          widget.cloneItem!.supermercados,
+        ),
+        situacao: ItemCompraSituacao.pendente,
+        observacao: widget.cloneItem!.observacao,
       );
     } else {
       dto = ItemCompraDto();

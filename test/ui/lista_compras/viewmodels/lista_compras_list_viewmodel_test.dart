@@ -325,5 +325,48 @@ void main() {
       expect(listVm.listaAtual!.itens.first.situacao, ItemCompraSituacao.comprado);
       expect(listVm.listaAtual!.itens.first.quantidadeComprada, 2.0);
     });
+
+    test('cloning item creates a new item with pendente situation and zero bought quantity', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      final originalItem = const ItemCompra(
+        id: 'orig1',
+        produto: 'Banana',
+        quantidadePlanejada: 3.0,
+        quantidadeComprada: 3.0,
+        precoEstimado: 2.0,
+        situacao: ItemCompraSituacao.comprado,
+        observacao: 'Madura',
+      );
+
+      final cloneDto = ItemCompraDto(
+        produto: originalItem.produto,
+        quantidadePlanejada: originalItem.quantidadePlanejada,
+        quantidadeComprada: 0.0,
+        precoEstimado: originalItem.precoEstimado,
+        supermercados: originalItem.supermercados,
+        situacao: ItemCompraSituacao.pendente,
+        observacao: originalItem.observacao,
+      );
+
+      await createVm.salvarItemCommand.execute((
+        dto: cloneDto,
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+
+      expect(createVm.salvarItemCommand.value.isSuccess, isTrue);
+      await listVm.loadCommand.execute();
+
+      expect(listVm.listaAtual!.itens.length, 1);
+      final item = listVm.listaAtual!.itens.first;
+      expect(item.id, isNot('orig1'));
+      expect(item.produto, 'Banana');
+      expect(item.situacao, ItemCompraSituacao.pendente);
+      expect(item.quantidadeComprada, 0.0);
+    });
   });
 }

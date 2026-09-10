@@ -31,7 +31,7 @@ class ItemCompraEditarMenuItem extends PopupMenuItem<void> {
           onTap: () {
             Future.delayed(Duration.zero, () {
               if (!context.mounted) return;
-              ItemCompraModal.show(context, item);
+              ItemCompraModal.show(context, item: item);
             });
           },
         );
