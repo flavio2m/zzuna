@@ -5,8 +5,11 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
-import 'package:zzuna/ui/lista_compras/create/widgets/item_compra_modal.dart';
+import 'package:zzuna/ui/lista_compras/delete/widgets/item_compra_delete_menu_item.dart';
 import 'package:zzuna/ui/lista_compras/update/widgets/comprar_item_modal.dart';
+import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_comprar_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_editar_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_status_menu_item.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
 
@@ -185,88 +188,39 @@ class ItemCompraCard extends ConsumerWidget {
               ),
 
               // Action Menu Popup
-              PopupMenuButton<String>(
+              PopupMenuButton<void>(
                 enabled: !isRunning,
-                icon: const Icon(Icons.more_vert, color: AppColors.slate500),
-                onSelected: (action) async {
-                  switch (action) {
-                    case 'comprar':
-                      ComprarItemModal.show(context, item: item, lista: lista);
-                      break;
-                    case 'editar':
-                      ItemCompraModal.show(context, item);
-                      break;
-                    case 'cancelar':
-                      final novoStatus = isCancelado
-                          ? ItemCompraSituacao.pendente
-                          : ItemCompraSituacao.cancelado;
-                      statusVm.alternarStatusItemCommand.execute((
-                        lista: lista,
-                        itemId: item.id,
-                        situacao: novoStatus,
-                      ));
-                      break;
-                    case 'excluir':
-                      _confirmarExclusao(context, ref);
-                      break;
-                  }
-                },
+                tooltip: 'Ações',
+                icon: const Icon(
+                  Icons.more_vert_rounded,
+                  color: AppColors.slate600,
+                  size: 20,
+                ),
+                color: AppColors.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                elevation: 3,
+                onSelected: (_) {},
                 itemBuilder: (ctx) => [
-                  PopupMenuItem(
-                    value: 'comprar',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.shopping_cart_checkout,
-                          color: Colors.green.shade700,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(isComprado ? 'Editar Compra' : 'Comprar Item'),
-                      ],
-                    ),
+                  ItemCompraComprarMenuItem(
+                    context: context,
+                    item: item,
+                    lista: lista,
                   ),
-                  const PopupMenuItem(
-                    value: 'editar',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit, color: AppColors.indigo600, size: 18),
-                        SizedBox(width: 8),
-                        Text('Editar Produto'),
-                      ],
-                    ),
+                  ItemCompraEditarMenuItem(context: context, item: item),
+                  ItemCompraStatusMenuItem(
+                    context: context,
+                    ref: ref,
+                    item: item,
+                    lista: lista,
                   ),
-                  PopupMenuItem(
-                    value: 'cancelar',
-                    child: Row(
-                      children: [
-                        Icon(
-                          isCancelado ? Icons.refresh : Icons.block,
-                          color: Colors.orange.shade800,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(isCancelado ? 'Reativar Item' : 'Cancelar Item'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: 'excluir',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.delete_outline,
-                          color: AppColors.danger,
-                          size: 18,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Excluir do Mês',
-                          style: TextStyle(color: AppColors.danger),
-                        ),
-                      ],
-                    ),
+                  ItemCompraDeleteMenuItem(
+                    context: context,
+                    ref: ref,
+                    item: item,
+                    lista: lista,
                   ),
                 ],
               ),
@@ -303,36 +257,5 @@ class ItemCompraCard extends ConsumerWidget {
       return val.toInt().toString();
     }
     return val.toString();
-  }
-
-  void _confirmarExclusao(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Produto'),
-        content: Text(
-          'Deseja remover "${item.produto}" definitivamente desta lista?',
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancelar'),
-            onPressed: () => Navigator.pop(ctx),
-          ),
-          TextButton(
-            child: const Text(
-              'Excluir',
-              style: TextStyle(color: AppColors.danger),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref
-                  .read(listaComprasDeleteViewModelProvider)
-                  .removerItemCommand
-                  .execute((lista: lista, itemId: item.id));
-            },
-          ),
-        ],
-      ),
-    );
   }
 }
