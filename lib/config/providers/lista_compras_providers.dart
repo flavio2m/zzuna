@@ -24,22 +24,48 @@ class ListaComprasFilterNotifier extends StateNotifier<ListaComprasFilterDto> {
   }
 
   void setMes(Mes mes) {
-    state = state.copyWith(mes: mes);
+    state = state.copyWith(mes: mes, situacao: null, supermercado: null);
+  }
+
+  void setSituacao(ItemCompraSituacao? situacao) {
+    state = state.copyWith(situacao: situacao);
+  }
+
+  void setSupermercado(String? supermercado) {
+    state = state.copyWith(supermercado: supermercado);
   }
 
   void mesAnterior() {
     if (state.mes == Mes.janeiro) {
-      state = state.copyWith(mes: Mes.dezembro, ano: state.ano - 1);
+      state = state.copyWith(
+        mes: Mes.dezembro,
+        ano: state.ano - 1,
+        situacao: null,
+        supermercado: null,
+      );
     } else {
-      state = state.copyWith(mes: state.mes.anterior);
+      state = state.copyWith(
+        mes: state.mes.anterior,
+        situacao: null,
+        supermercado: null,
+      );
     }
   }
 
   void proximoMes() {
     if (state.mes == Mes.dezembro) {
-      state = state.copyWith(mes: Mes.janeiro, ano: state.ano + 1);
+      state = state.copyWith(
+        mes: Mes.janeiro,
+        ano: state.ano + 1,
+        situacao: null,
+        supermercado: null,
+      );
     } else {
-      state = state.copyWith(mes: state.mes.proximo);
+      state = state.copyWith(
+        mes: state.mes.proximo,
+        situacao: null,
+        supermercado: null,
+      );
     }
   }
 }

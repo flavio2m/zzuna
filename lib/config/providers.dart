@@ -111,6 +111,7 @@ import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_status_vi
 import 'package:zzuna/ui/lista_compras/create/lista_compra/viewmodels/lista_compras_duplicar_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/delete/item_compra/viewmodels/item_compras_delete_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/delete/lista_compra/viewmodels/lista_compras_delete_lista_viewmodel.dart';
+import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
 part 'providers/conta_providers.dart';

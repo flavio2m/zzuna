@@ -330,6 +330,50 @@ void main() {
       },
     );
 
+    test('itensFiltrados filters items by situacao and supermercado', () async {
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          produto: 'Arroz',
+          situacao: ItemCompraSituacao.comprado,
+          supermercados: [const SupermercadoItem(nome: 'Mercadona')],
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          produto: 'Feijão',
+          situacao: ItemCompraSituacao.pendente,
+          supermercados: [const SupermercadoItem(nome: 'Continente')],
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      expect(
+        listVm.supermercadosDisponiveis,
+        containsAll(['Continente', 'Mercadona']),
+      );
+
+      expect(listVm.itensFiltrados.length, 2);
+
+      listVm.setFilter(filter.copyWith(situacao: ItemCompraSituacao.comprado));
+      expect(listVm.itensFiltrados.length, 1);
+      expect(listVm.itensFiltrados.first.produto, 'Arroz');
+
+      listVm.setFilter(filter.copyWith(supermercado: 'Continente'));
+      expect(listVm.itensFiltrados.length, 1);
+      expect(listVm.itensFiltrados.first.produto, 'Feijão');
+    });
+
     test('duplicarListaCommand fails if target list already exists', () async {
       final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
       listVm.setFilter(filter);

@@ -107,39 +107,34 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
       );
     }
 
-    if (lista.itens.isEmpty) {
-      return Column(
-        children: [
-          ListaComprasSummaryCard(lista: lista),
-          const SizedBox(height: 16),
-          const Expanded(
-            child: Center(
-              child: Text(
-                'A lista deste mês está vazia. Clique em "Adicionar Produto" '
-                'acima para começar.',
-                style: TextStyle(color: AppColors.slate500, fontSize: 14),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    final itens = lista.itensOrdenados;
+    final itens = listVm.itensFiltrados;
 
     return Column(
       children: [
         ListaComprasSummaryCard(lista: lista),
         const SizedBox(height: 12),
         Expanded(
-          child: ListView.separated(
-            itemCount: itens.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 6),
-            itemBuilder: (context, index) {
-              final item = itens[index];
-              return ItemCompraCard(item: item, lista: lista);
-            },
-          ),
+          child: itens.isEmpty
+              ? Center(
+                  child: Text(
+                    lista.itens.isEmpty
+                        ? 'A lista deste mês está vazia. Clique em "Adicionar Produto" '
+                              'acima para começar.'
+                        : 'Nenhum produto encontrado para os filtros selecionados.',
+                    style: const TextStyle(
+                      color: AppColors.slate500,
+                      fontSize: 14,
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  itemCount: itens.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 6),
+                  itemBuilder: (context, index) {
+                    final item = itens[index];
+                    return ItemCompraCard(item: item, lista: lista);
+                  },
+                ),
         ),
       ],
     );

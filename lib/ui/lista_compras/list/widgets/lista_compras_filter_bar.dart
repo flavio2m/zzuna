@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/item_compra_modal.dart';
 import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/clonar_lista_anterior_button.dart';
 import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/duplicar_lista_compra_modal.dart';
 import 'package:zzuna/ui/lista_compras/delete/lista_compra/widgets/excluir_lista_button.dart';
+import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -33,6 +35,8 @@ class ListaComprasFilterBar extends ConsumerWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           _buildPeriodNavigator(ref, filterState, maxYear),
+          _buildSituacaoDropdown(ref, filterState),
+          _buildSupermercadoDropdown(ref, filterState, listVm),
           if (temLista) ...[
             ButtonAdd(
               label: 'Adicionar Produto',
@@ -116,6 +120,58 @@ class ListaComprasFilterBar extends ConsumerWidget {
               : () => notifier.proximoMes(),
         ),
       ],
+    );
+  }
+
+  Widget _buildSituacaoDropdown(WidgetRef ref, dynamic filterState) {
+    final notifier = ref.read(listaComprasFilterProvider.notifier);
+
+    return SizedBox(
+      width: 140,
+      child: AppDropdownFormField<ItemCompraSituacao?>(
+        label: 'Situação',
+        value: filterState.situacao,
+        items: [
+          AppDropdownMenuItem<ItemCompraSituacao?>(value: null, label: 'Todas'),
+          ...ItemCompraSituacao.values.map(
+            (s) => AppDropdownMenuItem<ItemCompraSituacao?>(
+              value: s,
+              label: s.descricao,
+            ),
+          ),
+        ],
+        onChanged: (value) {
+          notifier.setSituacao(value);
+        },
+      ),
+    );
+  }
+
+  Widget _buildSupermercadoDropdown(
+    WidgetRef ref,
+    dynamic filterState,
+    ListaComprasListViewModel listVm,
+  ) {
+    final notifier = ref.read(listaComprasFilterProvider.notifier);
+    final supermercados = listVm.supermercadosDisponiveis;
+
+    return SizedBox(
+      width: 180,
+      child: AppDropdownFormField<String?>(
+        label: 'Supermercado',
+        value: filterState.supermercado,
+        items: [
+          AppDropdownMenuItem<String?>(value: null, label: 'Todos'),
+          ...supermercados.map(
+            (s) => AppDropdownMenuItem<String?>(value: s, label: s),
+          ),
+        ],
+        onChanged: supermercados.isEmpty
+            ? null
+            : (value) {
+                notifier.setSupermercado(value);
+              },
+      ),
     );
   }
 }
