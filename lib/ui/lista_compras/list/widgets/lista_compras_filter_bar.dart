@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/enums/mes.dart';
-import 'package:zzuna/ui/lista_compras/create/widgets/item_compra_modal.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/duplicar_lista_modal.dart';
+import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/item_compra_modal.dart';
+import 'package:zzuna/ui/lista_compras/delete/lista_compra/widgets/excluir_lista_button.dart';
+import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/duplicar_lista_compra_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -48,15 +49,16 @@ class ListaComprasFilterBar extends ConsumerWidget {
             ),
           if (temLista && (listVm.listaAtual?.itens.isNotEmpty ?? false))
             ButtonAdd(
-              label: 'Gerar Nova Lista',
+              label: 'Clonar esta Lista',
               icon: Icons.copy_rounded,
               color: AppColors.indigo600,
-              onPressed: () => DuplicarListaModal.show(
+              onPressed: () => DuplicarListaCompraModal.show(
                 context,
                 ref,
                 listVm.listaAtual!,
               ),
             ),
+          if (temLista) ExcluirListaButton(lista: listVm.listaAtual!),
         ],
       ),
     );
@@ -75,10 +77,9 @@ class ListaComprasFilterBar extends ConsumerWidget {
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed:
-              (filterState.mes == Mes.janeiro && filterState.ano == 2025)
-                  ? null
-                  : () => notifier.mesAnterior(),
+          onPressed: (filterState.mes == Mes.janeiro && filterState.ano == 2025)
+              ? null
+              : () => notifier.mesAnterior(),
         ),
         const SizedBox(width: 2),
         SizedBox(
@@ -111,8 +112,8 @@ class ListaComprasFilterBar extends ConsumerWidget {
           icon: const Icon(Icons.chevron_right),
           onPressed:
               (filterState.mes == Mes.dezembro && filterState.ano == maxYear)
-                  ? null
-                  : () => notifier.proximoMes(),
+              ? null
+              : () => notifier.proximoMes(),
         ),
       ],
     );

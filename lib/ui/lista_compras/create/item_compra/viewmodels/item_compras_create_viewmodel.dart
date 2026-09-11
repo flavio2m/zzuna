@@ -9,10 +9,10 @@ import 'package:zzuna/domain/dtos/lista_compras/lista_compras_filter_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 
-class ListaComprasCreateViewModel {
+class ItemComprasCreateViewModel {
   final ListaComprasRepository _repository;
 
-  ListaComprasCreateViewModel(this._repository);
+  ItemComprasCreateViewModel(this._repository);
 
   late final criarListaVaziaCommand = Command1(_criarListaVazia);
   late final salvarItemCommand = Command1(_salvarItem);

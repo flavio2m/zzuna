@@ -9,11 +9,12 @@ import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
-import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
-import 'package:zzuna/ui/lista_compras/delete/viewmodels/lista_compras_delete_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/item_compra/viewmodels/item_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/item_compra/viewmodels/item_compras_delete_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/lista_compra/viewmodels/lista_compras_delete_lista_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_comprar_viewmodel.dart';
-import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/lista_compra/viewmodels/lista_compras_duplicar_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_status_viewmodel.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -76,21 +77,21 @@ void main() {
     late FakeBaseStorage fakeStorage;
     late ListaComprasRepository repository;
     late ListaComprasListViewModel listVm;
-    late ListaComprasCreateViewModel createVm;
+    late ItemComprasCreateViewModel createVm;
     late ListaComprasComprarViewModel comprarVm;
     late ListaComprasStatusViewModel statusVm;
     late ListaComprasDuplicarViewModel duplicarVm;
-    late ListaComprasDeleteViewModel deleteVm;
+    late ItemComprasDeleteViewModel deleteVm;
 
     setUp(() {
       fakeStorage = FakeBaseStorage();
       repository = ListaComprasRepository(fakeStorage);
       listVm = ListaComprasListViewModel(repository);
-      createVm = ListaComprasCreateViewModel(repository);
+      createVm = ItemComprasCreateViewModel(repository);
       comprarVm = ListaComprasComprarViewModel(repository);
       statusVm = ListaComprasStatusViewModel(repository);
       duplicarVm = ListaComprasDuplicarViewModel(repository);
-      deleteVm = ListaComprasDeleteViewModel(repository);
+      deleteVm = ItemComprasDeleteViewModel(repository);
     });
 
     test('creates empty list for current filter', () async {
@@ -424,5 +425,21 @@ void main() {
         ]);
       },
     );
+
+    test('excluirListaCommand deletes entire list', () async {
+      final deleteListaVm = ListaComprasDeleteListaViewModel(repository);
+      final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
+      listVm.setFilter(filter);
+      await createVm.criarListaVaziaCommand.execute(filter);
+      await listVm.loadCommand.execute();
+
+      expect(listVm.listaAtual, isNotNull);
+
+      await deleteListaVm.excluirListaCommand.execute(listVm.listaAtual!);
+      expect(deleteListaVm.excluirListaCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(listVm.listaAtual, isNull);
+    });
   });
 }

@@ -105,11 +105,12 @@ import 'package:zzuna/data/services/storage/providers/lista_compras_storage_prov
 import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.dart';
 import 'package:zzuna/domain/dtos/lista_compras/lista_compras_filter_dto.dart';
 import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
-import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/item_compra/viewmodels/item_compras_create_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_comprar_viewmodel.dart';
 import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_status_viewmodel.dart';
-import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_duplicar_viewmodel.dart';
-import 'package:zzuna/ui/lista_compras/delete/viewmodels/lista_compras_delete_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/lista_compra/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/item_compra/viewmodels/item_compras_delete_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/delete/lista_compra/viewmodels/lista_compras_delete_lista_viewmodel.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 
 part 'providers/conta_providers.dart';

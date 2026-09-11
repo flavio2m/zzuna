@@ -6,7 +6,7 @@ import 'package:zzuna/domain/dtos/lista_compras/item_compra_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/validators/item_compra_validator.dart';
-import 'package:zzuna/ui/lista_compras/create/viewmodels/lista_compras_create_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/item_compra/viewmodels/item_compras_create_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
@@ -45,7 +45,7 @@ class ItemCompraModal extends ConsumerStatefulWidget {
 class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
   late final ItemCompraDto dto;
   final validator = ItemCompraValidator<ItemCompraDto>();
-  late final ListaComprasCreateViewModel viewModel;
+  late final ItemComprasCreateViewModel viewModel;
 
   late TextEditingController _novoSupermercadoController;
 

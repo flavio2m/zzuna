@@ -10,15 +10,14 @@ final listaComprasRepositoryProvider = Provider<ListaComprasRepository>((ref) {
   return repository;
 });
 
-class ListaComprasFilterNotifier
-    extends StateNotifier<ListaComprasFilterDto> {
+class ListaComprasFilterNotifier extends StateNotifier<ListaComprasFilterDto> {
   ListaComprasFilterNotifier()
-      : super(
-          ListaComprasFilterDto(
-            ano: DateTime.now().year,
-            mes: Mes.fromDate(DateTime.now()),
-          ),
-        );
+    : super(
+        ListaComprasFilterDto(
+          ano: DateTime.now().year,
+          mes: Mes.fromDate(DateTime.now()),
+        ),
+      );
 
   void setAno(int ano) {
     state = state.copyWith(ano: ano);
@@ -47,54 +46,61 @@ class ListaComprasFilterNotifier
 
 final listaComprasFilterProvider =
     StateNotifierProvider<ListaComprasFilterNotifier, ListaComprasFilterDto>((
-  ref,
-) {
-  return ListaComprasFilterNotifier();
-});
+      ref,
+    ) {
+      return ListaComprasFilterNotifier();
+    });
 
 final listaComprasListViewModelProvider =
     ChangeNotifierProvider.autoDispose<ListaComprasListViewModel>((ref) {
-  final vm = ListaComprasListViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-  ref.listen(listaComprasFilterProvider, (previous, next) {
-    vm.setFilter(next);
-  });
-  vm.setFilter(ref.read(listaComprasFilterProvider));
-  return vm;
-});
+      final vm = ListaComprasListViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+      ref.listen(listaComprasFilterProvider, (previous, next) {
+        vm.setFilter(next);
+      });
+      vm.setFilter(ref.read(listaComprasFilterProvider));
+      return vm;
+    });
 
 final listaComprasCreateViewModelProvider =
-    Provider<ListaComprasCreateViewModel>((ref) {
-  return ListaComprasCreateViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-});
+    Provider<ItemComprasCreateViewModel>((ref) {
+      return ItemComprasCreateViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });
 
 final listaComprasComprarViewModelProvider =
     Provider<ListaComprasComprarViewModel>((ref) {
-  return ListaComprasComprarViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-});
+      return ListaComprasComprarViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });
 
 final listaComprasStatusViewModelProvider =
     Provider<ListaComprasStatusViewModel>((ref) {
-  return ListaComprasStatusViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-});
+      return ListaComprasStatusViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });
 
 final listaComprasDuplicarViewModelProvider =
     Provider<ListaComprasDuplicarViewModel>((ref) {
-  return ListaComprasDuplicarViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-});
+      return ListaComprasDuplicarViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });
 
 final listaComprasDeleteViewModelProvider =
-    Provider<ListaComprasDeleteViewModel>((ref) {
-  return ListaComprasDeleteViewModel(
-    ref.watch(listaComprasRepositoryProvider),
-  );
-});
+    Provider<ItemComprasDeleteViewModel>((ref) {
+      return ItemComprasDeleteViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });
+
+final listaComprasDeleteListaViewModelProvider =
+    Provider<ListaComprasDeleteListaViewModel>((ref) {
+      return ListaComprasDeleteListaViewModel(
+        ref.watch(listaComprasRepositoryProvider),
+      );
+    });

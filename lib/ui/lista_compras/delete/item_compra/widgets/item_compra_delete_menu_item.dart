@@ -14,32 +14,32 @@ class ItemCompraDeleteMenuItem extends PopupMenuItem<void> {
     required ItemCompra item,
     required ListaCompras lista,
   }) : super(
-          height: 36,
-          child: const Row(
-            children: [
-              Icon(
-                Icons.delete_outline_rounded,
-                size: 16,
-                color: AppColors.danger,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Excluir do Mês',
-                style: TextStyle(
-                  color: AppColors.danger,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          onTap: () {
-            Future.delayed(Duration.zero, () {
-              if (!context.mounted) return;
-              _showDeleteDialog(context, ref, item, lista);
-            });
-          },
-        );
+         height: 36,
+         child: const Row(
+           children: [
+             Icon(
+               Icons.delete_outline_rounded,
+               size: 16,
+               color: AppColors.danger,
+             ),
+             SizedBox(width: 8),
+             Text(
+               'Excluir do Mês',
+               style: TextStyle(
+                 color: AppColors.danger,
+                 fontSize: 13,
+                 fontWeight: FontWeight.w600,
+               ),
+             ),
+           ],
+         ),
+         onTap: () {
+           Future.delayed(Duration.zero, () {
+             if (!context.mounted) return;
+             _showDeleteDialog(context, ref, item, lista);
+           });
+         },
+       );
 
   static Future<void> _showDeleteDialog(
     BuildContext context,
@@ -51,17 +51,14 @@ class ItemCompraDeleteMenuItem extends PopupMenuItem<void> {
       context: context,
       title: 'Excluir Produto',
       message: 'Deseja remover "${item.produto}" definitivamente desta lista?',
-      actions: const {
-        'cancel': 'Cancelar',
-        'confirm': 'Excluir',
-      },
+      actions: const {'cancel': 'Cancelar', 'confirm': 'Excluir'},
     );
 
     if (result == 'confirm') {
-      ref
-          .read(listaComprasDeleteViewModelProvider)
-          .removerItemCommand
-          .execute((lista: lista, itemId: item.id));
+      ref.read(listaComprasDeleteViewModelProvider).removerItemCommand.execute((
+        lista: lista,
+        itemId: item.id,
+      ));
     }
   }
 }

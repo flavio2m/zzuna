@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
-import 'package:zzuna/ui/lista_compras/create/widgets/item_compra_modal.dart';
+import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/item_compra_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class CloneItemCompraButton extends StatelessWidget {

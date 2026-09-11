@@ -4,18 +4,15 @@ import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.d
 import 'package:zzuna/domain/dtos/lista_compras/lista_compras_dto.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 
-class ListaComprasDeleteViewModel {
+class ItemComprasDeleteViewModel {
   final ListaComprasRepository _repository;
 
-  ListaComprasDeleteViewModel(this._repository);
+  ItemComprasDeleteViewModel(this._repository);
 
   late final removerItemCommand = Command1(_removerItem);
 
   AsyncResult<ListaCompras> _removerItem(
-    ({
-      ListaCompras lista,
-      String itemId,
-    }) params,
+    ({ListaCompras lista, String itemId}) params,
   ) async {
     final lista = params.lista;
     final itemId = params.itemId;

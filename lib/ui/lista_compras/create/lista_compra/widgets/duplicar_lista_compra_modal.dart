@@ -3,19 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
-import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/create/lista_compra/viewmodels/lista_compras_duplicar_viewmodel.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
-class DuplicarListaModal extends ConsumerStatefulWidget {
+class DuplicarListaCompraModal extends ConsumerStatefulWidget {
   final ListaCompras listaOrigem;
 
-  const DuplicarListaModal({
-    super.key,
-    required this.listaOrigem,
-  });
+  const DuplicarListaCompraModal({super.key, required this.listaOrigem});
 
   static Future<void> show(
     BuildContext context,
@@ -26,15 +23,17 @@ class DuplicarListaModal extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => DuplicarListaModal(listaOrigem: listaOrigem),
+      builder: (ctx) => DuplicarListaCompraModal(listaOrigem: listaOrigem),
     );
   }
 
   @override
-  ConsumerState<DuplicarListaModal> createState() => _DuplicarListaModalState();
+  ConsumerState<DuplicarListaCompraModal> createState() =>
+      _DuplicarListaCompraModalState();
 }
 
-class _DuplicarListaModalState extends ConsumerState<DuplicarListaModal> {
+class _DuplicarListaCompraModalState
+    extends ConsumerState<DuplicarListaCompraModal> {
   late Mes _mesDestino;
   late int _anoDestino;
   late ListaComprasDuplicarViewModel _viewModel;
@@ -111,9 +110,9 @@ class _DuplicarListaModalState extends ConsumerState<DuplicarListaModal> {
             children: [
               Text(
                 'Gerar Nova Lista de Compras',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -124,7 +123,9 @@ class _DuplicarListaModalState extends ConsumerState<DuplicarListaModal> {
           const SizedBox(height: 8),
           Text(
             'Copiar os itens da lista atual para um novo mês. Itens comprados serão resetados para pendente com quantidade 0, mantendo os itens cancelados como cancelados.',
-            style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -135,10 +136,8 @@ class _DuplicarListaModalState extends ConsumerState<DuplicarListaModal> {
                   value: _mesDestino,
                   items: Mes.values
                       .map(
-                        (m) => AppDropdownMenuItem(
-                          value: m,
-                          label: m.descricao,
-                        ),
+                        (m) =>
+                            AppDropdownMenuItem(value: m, label: m.descricao),
                       )
                       .toList(),
                   onChanged: isRunning
@@ -182,7 +181,9 @@ class _DuplicarListaModalState extends ConsumerState<DuplicarListaModal> {
                       ),
                     )
                   : const Icon(Icons.copy),
-              label: Text('Gerar Lista para ${_mesDestino.descricao}/$_anoDestino'),
+              label: Text(
+                'Gerar Lista para ${_mesDestino.descricao}/$_anoDestino',
+              ),
               onPressed: isRunning
                   ? null
                   : () {
