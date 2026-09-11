@@ -275,6 +275,61 @@ void main() {
       },
     );
 
+    test(
+      'duplicarListaAnteriorCommand clones the most recent prior list',
+      () async {
+        final filterMaio = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.maio,
+        );
+        listVm.setFilter(filterMaio);
+        await createVm.criarListaVaziaCommand.execute(filterMaio);
+        await listVm.loadCommand.execute();
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            produto: 'Feijão',
+            quantidadePlanejada: 3.0,
+            situacao: ItemCompraSituacao.comprado,
+          ),
+          filter: filterMaio,
+          listaAtual: listVm.listaAtual,
+        ));
+
+        final filterJulho = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.julho,
+        );
+        await duplicarVm.duplicarListaAnteriorCommand.execute((
+          anoDestino: filterJulho.ano,
+          mesDestino: filterJulho.mes,
+        ));
+        expect(duplicarVm.duplicarListaAnteriorCommand.value.isSuccess, isTrue);
+
+        final novaLista = duplicarVm.duplicarListaAnteriorCommand.value
+            .getValueOrNull()!;
+        expect(novaLista.ano, 2026);
+        expect(novaLista.mes, Mes.julho);
+        expect(novaLista.itens.length, 1);
+        expect(novaLista.itens.first.produto, 'Feijão');
+        expect(novaLista.itens.first.situacao, ItemCompraSituacao.pendente);
+      },
+    );
+
+    test(
+      'duplicarListaAnteriorCommand fails if no prior list exists',
+      () async {
+        final filterJulho = const ListaComprasFilterDto(
+          ano: 2030,
+          mes: Mes.julho,
+        );
+        await duplicarVm.duplicarListaAnteriorCommand.execute((
+          anoDestino: filterJulho.ano,
+          mesDestino: filterJulho.mes,
+        ));
+        expect(duplicarVm.duplicarListaAnteriorCommand.value.isFailure, isTrue);
+      },
+    );
+
     test('duplicarListaCommand fails if target list already exists', () async {
       final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
       listVm.setFilter(filter);

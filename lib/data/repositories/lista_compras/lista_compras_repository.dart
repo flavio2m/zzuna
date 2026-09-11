@@ -24,7 +24,7 @@ class ListaComprasRepository
       StreamController<RepositoryEvent<ListaCompras>>.broadcast();
 
   ListaComprasRepository(BaseStorage<ListaCompras> storage)
-      : _storage = storage;
+    : _storage = storage;
 
   AsyncResult<List<ListaCompras>> getAll() async {
     return _storage.getAll();
@@ -41,7 +41,9 @@ class ListaComprasRepository
     if (match != null) {
       return Success(match);
     }
-    return Failure(LocalStorageException('Nenhuma lista encontrada para o período.'));
+    return Failure(
+      LocalStorageException('Nenhuma lista encontrada para o período.'),
+    );
   }
 
   @override
@@ -93,7 +95,9 @@ class ListaComprasRepository
   @override
   AsyncResult<ListaCompras> update(ListaComprasDto dto) async {
     if (dto.id == null) {
-      return Failure(LocalStorageException('ID da lista é obrigatório para atualização.'));
+      return Failure(
+        LocalStorageException('ID da lista é obrigatório para atualização.'),
+      );
     }
 
     final entity = ListaCompras(

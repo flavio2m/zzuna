@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/item_compra_modal.dart';
-import 'package:zzuna/ui/lista_compras/delete/lista_compra/widgets/excluir_lista_button.dart';
+import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/clonar_lista_anterior_button.dart';
 import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/duplicar_lista_compra_modal.dart';
+import 'package:zzuna/ui/lista_compras/delete/lista_compra/widgets/excluir_lista_button.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -32,13 +33,22 @@ class ListaComprasFilterBar extends ConsumerWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           _buildPeriodNavigator(ref, filterState, maxYear),
-          if (temLista)
+          if (temLista) ...[
             ButtonAdd(
               label: 'Adicionar Produto',
               icon: Icons.add_shopping_cart,
               onPressed: () => ItemCompraModal.show(context),
-            )
-          else
+            ),
+            if (listVm.listaAtual?.itens.isNotEmpty ?? false)
+              ButtonAdd(
+                label: 'Clonar esta Lista',
+                icon: Icons.copy_rounded,
+                color: AppColors.indigo600,
+                onPressed: () =>
+                    DuplicarListaCompraModal.show(context, listVm.listaAtual!),
+              ),
+            ExcluirListaButton(lista: listVm.listaAtual!),
+          ] else ...[
             ButtonAdd(
               label: 'Criar Lista',
               icon: Icons.note_add_outlined,
@@ -47,18 +57,8 @@ class ListaComprasFilterBar extends ConsumerWidget {
                 createVm.criarListaVaziaCommand.execute(filterState);
               },
             ),
-          if (temLista && (listVm.listaAtual?.itens.isNotEmpty ?? false))
-            ButtonAdd(
-              label: 'Clonar esta Lista',
-              icon: Icons.copy_rounded,
-              color: AppColors.indigo600,
-              onPressed: () => DuplicarListaCompraModal.show(
-                context,
-                ref,
-                listVm.listaAtual!,
-              ),
-            ),
-          if (temLista) ExcluirListaButton(lista: listVm.listaAtual!),
+            const ClonarListaAnteriorButton(),
+          ],
         ],
       ),
     );

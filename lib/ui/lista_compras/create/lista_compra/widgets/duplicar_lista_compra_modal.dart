@@ -4,9 +4,16 @@ import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/create/lista_compra/viewmodels/lista_compras_duplicar_viewmodel.dart';
+import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
+import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
+import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class DuplicarListaCompraModal extends ConsumerStatefulWidget {
@@ -14,16 +21,10 @@ class DuplicarListaCompraModal extends ConsumerStatefulWidget {
 
   const DuplicarListaCompraModal({super.key, required this.listaOrigem});
 
-  static Future<void> show(
-    BuildContext context,
-    WidgetRef ref,
-    ListaCompras listaOrigem,
-  ) {
-    return showModalBottomSheet(
+  static void show(BuildContext context, ListaCompras listaOrigem) {
+    AppDialog.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => DuplicarListaCompraModal(listaOrigem: listaOrigem),
+      child: DuplicarListaCompraModal(listaOrigem: listaOrigem),
     );
   }
 
@@ -36,7 +37,7 @@ class _DuplicarListaCompraModalState
     extends ConsumerState<DuplicarListaCompraModal> {
   late Mes _mesDestino;
   late int _anoDestino;
-  late ListaComprasDuplicarViewModel _viewModel;
+  late final ListaComprasDuplicarViewModel _viewModel;
 
   @override
   void initState() {
@@ -66,68 +67,64 @@ class _DuplicarListaCompraModalState
         notifier.setAno(_anoDestino);
         notifier.setMes(_mesDestino);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Nova lista gerada com sucesso para ${_mesDestino.descricao}/$_anoDestino!',
-            ),
-            backgroundColor: Colors.green,
-          ),
+        AppSnackBar.showSuccess(
+          context,
+          'Nova lista gerada com sucesso para ${_mesDestino.descricao}/$_anoDestino!',
         );
       }
     });
     commandValue.onFailure((exception) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(exception?.toString() ?? 'Erro ao duplicar lista'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppSnackBar.showError(
+          context,
+          exception?.toString() ?? 'Erro ao duplicar lista.',
         );
       }
     });
   }
 
+  void _handleSubmit() {
+    _viewModel.duplicarListaCommand.execute((
+      listaOrigem: widget.listaOrigem,
+      anoDestino: _anoDestino,
+      mesDestino: _mesDestino,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final maxYear = DateTime.now().year + 2;
     final duplicarVm = ref.watch(listaComprasDuplicarViewModelProvider);
     final isRunning = duplicarVm.duplicarListaCommand.value.isRunning;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPadding),
+    return AppForm(
+      title: 'Gerar Nova Lista de Compras',
+      type: AppFormType.modal,
+      actions: [
+        ButtonCancel(onPressed: () => Navigator.of(context).pop()),
+        ListenableBuilder(
+          listenable: duplicarVm.duplicarListaCommand,
+          builder: (_, _) {
+            return ButtonSave(
+              label: 'Gerar Lista',
+              loading: isRunning,
+              onPressed: isRunning ? null : _handleSubmit,
+            );
+          },
+        ),
+      ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Gerar Nova Lista de Compras',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: isRunning ? null : () => Navigator.pop(context),
-              ),
-            ],
+          AppText(
+            'Copiar os itens da lista atual para um novo mês. Itens comprados '
+            'serão resetados para pendente com quantidade 0, mantendo os itens '
+            'cancelados como cancelados.',
+            variant: AppTextVariant.body,
+            color: Theme.of(context).textTheme.bodySmall?.color,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Copiar os itens da lista atual para um novo mês. Itens comprados serão resetados para pendente com quantidade 0, mantendo os itens cancelados como cancelados.',
-            style: TextStyle(
-              color: Theme.of(context).textTheme.bodySmall?.color,
-            ),
-          ),
-          const SizedBox(height: 20),
+          const AppSpacing(size: AppSpacingSize.md),
           Row(
             children: [
               Expanded(
@@ -151,7 +148,7 @@ class _DuplicarListaCompraModalState
                         },
                 ),
               ),
-              const SizedBox(width: 12),
+              const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
               AppYearStepper(
                 value: _anoDestino,
                 min: 2025,
@@ -165,35 +162,6 @@ class _DuplicarListaCompraModalState
                 },
               ),
             ],
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
-              icon: isRunning
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.copy),
-              label: Text(
-                'Gerar Lista para ${_mesDestino.descricao}/$_anoDestino',
-              ),
-              onPressed: isRunning
-                  ? null
-                  : () {
-                      _viewModel.duplicarListaCommand.execute((
-                        listaOrigem: widget.listaOrigem,
-                        anoDestino: _anoDestino,
-                        mesDestino: _mesDestino,
-                      ));
-                    },
-            ),
           ),
         ],
       ),

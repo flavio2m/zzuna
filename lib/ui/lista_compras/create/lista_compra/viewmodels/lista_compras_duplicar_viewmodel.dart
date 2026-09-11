@@ -14,6 +14,7 @@ class ListaComprasDuplicarViewModel {
   ListaComprasDuplicarViewModel(this._repository);
 
   late final duplicarListaCommand = Command1(_duplicarLista);
+  late final duplicarListaAnteriorCommand = Command1(_duplicarListaAnterior);
 
   AsyncResult<ListaCompras> _duplicarLista(
     ({ListaCompras listaOrigem, int anoDestino, Mes mesDestino}) params,
@@ -57,5 +58,48 @@ class ListaComprasDuplicarViewModel {
     );
 
     return _repository.create(novaListaDto);
+  }
+
+  AsyncResult<ListaCompras> _duplicarListaAnterior(
+    ({int anoDestino, Mes mesDestino}) params,
+  ) async {
+    final anoDestino = params.anoDestino;
+    final mesDestino = params.mesDestino;
+    final targetPeriodo = anoDestino * 100 + mesDestino.numero;
+
+    final existingRes = await _repository.getByPeriodo(anoDestino, mesDestino);
+    if (existingRes.isSuccess()) {
+      return Failure(
+        LocalStorageException(
+          'Já existe uma lista de compras para ${mesDestino.descricao}/$anoDestino.',
+        ),
+      );
+    }
+
+    final allRes = await _repository.getAll();
+    if (allRes.isError()) {
+      return Failure(allRes.exceptionOrNull()!);
+    }
+
+    final allListas = allRes.getOrThrow();
+    final listasAnteriores = allListas
+        .where((e) => e.periodo < targetPeriodo)
+        .toList();
+
+    if (listasAnteriores.isEmpty) {
+      return Failure(
+        LocalStorageException('Nenhuma lista anterior encontrada.'),
+      );
+    }
+
+    final listaOrigem = listasAnteriores.reduce(
+      (a, b) => a.periodo > b.periodo ? a : b,
+    );
+
+    return _duplicarLista((
+      listaOrigem: listaOrigem,
+      anoDestino: anoDestino,
+      mesDestino: mesDestino,
+    ));
   }
 }
