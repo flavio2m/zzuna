@@ -87,7 +87,7 @@ class ListaComprasFilterBar extends ConsumerWidget {
         ),
         const SizedBox(width: 2),
         SizedBox(
-          width: 110,
+          width: 140,
           child: AppDropdownFormField<Mes>(
             label: 'Mês',
             value: filterState.mes,

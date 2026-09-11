@@ -86,7 +86,17 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
         observacao: widget.cloneItem!.observacao,
       );
     } else {
-      dto = ItemCompraDto();
+      final listVm = ref.read(listaComprasListViewModelProvider);
+      final disponiveis = listVm.supermercadosDisponiveis;
+      final supers = <SupermercadoItem>[];
+
+      for (int i = 0; i < disponiveis.length; i++) {
+        supers.add(
+          SupermercadoItem(nome: disponiveis[i], ultimoUtilizado: i == 0),
+        );
+      }
+
+      dto = ItemCompraDto(supermercados: supers);
     }
 
     dto.supermercados.sort(
@@ -167,6 +177,35 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
       setState(() {});
       _supermercadoFocus.requestFocus();
     }
+  }
+
+  void _adicionarTodosSupermercados() {
+    final listVm = ref.read(listaComprasListViewModelProvider);
+    final disponiveis = listVm.supermercadosDisponiveis;
+
+    if (disponiveis.isEmpty) return;
+
+    final updated = List<SupermercadoItem>.from(dto.supermercados);
+    final temPadrao = updated.any((s) => s.ultimoUtilizado);
+
+    for (final nome in disponiveis) {
+      final jaExiste = updated.any(
+        (s) => s.nome.toLowerCase() == nome.trim().toLowerCase(),
+      );
+      if (!jaExiste) {
+        final isPrimeiro = updated.isEmpty && !temPadrao;
+        updated.add(
+          SupermercadoItem(nome: nome.trim(), ultimoUtilizado: isPrimeiro),
+        );
+      }
+    }
+
+    updated.sort(
+      (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()),
+    );
+
+    dto.setSupermercados(updated);
+    setState(() {});
   }
 
   void _removerSupermercado(String nome) {
@@ -341,11 +380,20 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
               ),
               const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
               IconButton(
+                tooltip: 'Adicionar',
                 icon: const Icon(Icons.add_circle_outline),
                 color: Theme.of(context).colorScheme.primary,
                 onPressed: createVm.salvarItemCommand.value.isRunning
                     ? null
                     : _adicionarSupermercado,
+              ),
+              IconButton(
+                tooltip: 'Adicionar todos os supermercados',
+                icon: const Icon(Icons.playlist_add),
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: createVm.salvarItemCommand.value.isRunning
+                    ? null
+                    : _adicionarTodosSupermercados,
               ),
             ],
           ),

@@ -207,11 +207,12 @@ class ItemCompraCard extends ConsumerWidget {
                 elevation: 3,
                 onSelected: (_) {},
                 itemBuilder: (ctx) => [
-                  ItemCompraComprarMenuItem(
-                    context: context,
-                    item: item,
-                    lista: lista,
-                  ),
+                  if (item.situacao == ItemCompraSituacao.pendente)
+                    ItemCompraComprarMenuItem(
+                      context: context,
+                      item: item,
+                      lista: lista,
+                    ),
                   ItemCompraEditarMenuItem(context: context, item: item),
                   ItemCompraStatusMenuItem(
                     context: context,
@@ -219,12 +220,13 @@ class ItemCompraCard extends ConsumerWidget {
                     item: item,
                     lista: lista,
                   ),
-                  ItemCompraDeleteMenuItem(
-                    context: context,
-                    ref: ref,
-                    item: item,
-                    lista: lista,
-                  ),
+                  if (item.situacao != ItemCompraSituacao.comprado)
+                    ItemCompraDeleteMenuItem(
+                      context: context,
+                      ref: ref,
+                      item: item,
+                      lista: lista,
+                    ),
                 ],
               ),
             ],

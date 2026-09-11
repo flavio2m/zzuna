@@ -525,20 +525,50 @@ void main() {
       },
     );
 
-    test('excluirListaCommand deletes entire list', () async {
+    test(
+      'excluirListaCommand deletes entire list when no items bought',
+      () async {
+        final deleteListaVm = ListaComprasDeleteListaViewModel(repository);
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
+
+        expect(listVm.listaAtual, isNotNull);
+
+        await deleteListaVm.excluirListaCommand.execute(listVm.listaAtual!);
+        expect(deleteListaVm.excluirListaCommand.value.isSuccess, isTrue);
+
+        await listVm.loadCommand.execute();
+        expect(listVm.listaAtual, isNull);
+      },
+    );
+
+    test('excluirListaCommand fails when list contains bought items', () async {
       final deleteListaVm = ListaComprasDeleteListaViewModel(repository);
       final filter = const ListaComprasFilterDto(ano: 2026, mes: Mes.setembro);
       listVm.setFilter(filter);
       await createVm.criarListaVaziaCommand.execute(filter);
       await listVm.loadCommand.execute();
 
-      expect(listVm.listaAtual, isNotNull);
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          produto: 'Leite',
+          situacao: ItemCompraSituacao.comprado,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
 
       await deleteListaVm.excluirListaCommand.execute(listVm.listaAtual!);
-      expect(deleteListaVm.excluirListaCommand.value.isSuccess, isTrue);
+      expect(deleteListaVm.excluirListaCommand.value.isFailure, isTrue);
 
       await listVm.loadCommand.execute();
-      expect(listVm.listaAtual, isNull);
+      expect(listVm.listaAtual, isNotNull);
     });
   });
 }

@@ -5,7 +5,6 @@ import 'package:zzuna/ui/lista_compras/list/widgets/item_compra_card.dart';
 import 'package:zzuna/ui/lista_compras/list/widgets/lista_compras_filter_bar.dart';
 import 'package:zzuna/ui/lista_compras/list/widgets/lista_compras_summary_card.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
-import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
 
@@ -71,9 +70,6 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
     }
 
     if (lista == null) {
-      final createVm = ref.watch(listaComprasCreateViewModelProvider);
-      final isCreating = createVm.criarListaVaziaCommand.value.isRunning;
-
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,15 +88,6 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
                 color: AppColors.slate500,
                 fontWeight: FontWeight.w500,
               ),
-            ),
-            const SizedBox(height: 16),
-            ButtonAdd(
-              label: 'Criar Lista para este Mês',
-              icon: Icons.add_circle_outline,
-              loading: isCreating,
-              onPressed: () {
-                createVm.criarListaVaziaCommand.execute(listVm.filter);
-              },
             ),
           ],
         ),
