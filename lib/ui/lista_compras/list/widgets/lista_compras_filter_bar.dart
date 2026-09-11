@@ -8,6 +8,7 @@ import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/clonar_lista_
 import 'package:zzuna/ui/lista_compras/create/lista_compra/widgets/duplicar_lista_compra_modal.dart';
 import 'package:zzuna/ui/lista_compras/delete/lista_compra/widgets/excluir_lista_button.dart';
 import 'package:zzuna/ui/lista_compras/list/viewmodels/lista_compras_list_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/list/widgets/lista_compras_actions_bar.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
@@ -28,7 +29,8 @@ class ListaComprasFilterBar extends ConsumerWidget {
     final isCreating = createVm.criarListaVaziaCommand.value.isRunning;
 
     return AppFilterCard(
-      initiallyExpanded: true,
+      initiallyExpanded: false,
+      collapsedHeaderAction: const ListaComprasActionsBar(),
       child: Wrap(
         spacing: 12,
         runSpacing: 8,

@@ -7,7 +7,9 @@ import 'package:zzuna/ui/shared/widgets/buttons/button_add.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class ClonarListaAnteriorButton extends ConsumerWidget {
-  const ClonarListaAnteriorButton({super.key});
+  final bool iconOnly;
+
+  const ClonarListaAnteriorButton({super.key, this.iconOnly = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,6 +40,31 @@ class ClonarListaAnteriorButton extends ConsumerWidget {
         });
       },
     );
+
+    if (iconOnly) {
+      return IconButton(
+        icon: isCloningAnterior
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.content_copy_rounded, size: 20),
+        color: AppColors.indigo600,
+        tooltip: 'Clonar Lista Anterior',
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 20,
+        onPressed: (isCloningAnterior || isCreating)
+            ? null
+            : () {
+                duplicarVm.duplicarListaAnteriorCommand.execute((
+                  anoDestino: filterState.ano,
+                  mesDestino: filterState.mes,
+                ));
+              },
+      );
+    }
 
     return ButtonAdd(
       label: 'Clonar Lista Anterior',
