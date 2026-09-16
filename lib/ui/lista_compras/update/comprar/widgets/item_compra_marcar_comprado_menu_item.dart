@@ -6,8 +6,8 @@ import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
-class ItemCompraStatusMenuItem extends PopupMenuItem<void> {
-  ItemCompraStatusMenuItem({
+class ItemCompraMarcarCompradoMenuItem extends PopupMenuItem<void> {
+  ItemCompraMarcarCompradoMenuItem({
     super.key,
     required BuildContext context,
     required WidgetRef ref,
@@ -18,17 +18,19 @@ class ItemCompraStatusMenuItem extends PopupMenuItem<void> {
          child: Row(
            children: [
              Icon(
-               item.situacao == ItemCompraSituacao.cancelado
-                   ? Icons.refresh_outlined
-                   : Icons.block_outlined,
+               item.situacao == ItemCompraSituacao.comprado
+                   ? Icons.remove_shopping_cart_outlined
+                   : Icons.check_circle_outline,
                size: 16,
-               color: AppColors.slate600,
+               color: item.situacao == ItemCompraSituacao.comprado
+                   ? AppColors.slate600
+                   : AppColors.emerald800,
              ),
              const SizedBox(width: 8),
              Text(
-               item.situacao == ItemCompraSituacao.cancelado
-                   ? 'Reativar Item'
-                   : 'Cancelar Item',
+               item.situacao == ItemCompraSituacao.comprado
+                   ? 'Desmarcar Compra'
+                   : 'Marcar como Comprado',
                style: const TextStyle(
                  color: AppColors.slate700,
                  fontSize: 13,
@@ -40,10 +42,10 @@ class ItemCompraStatusMenuItem extends PopupMenuItem<void> {
          onTap: () {
            Future.delayed(Duration.zero, () {
              if (!context.mounted) return;
-             if (item.situacao == ItemCompraSituacao.comprado) return;
-             final novoStatus = item.situacao == ItemCompraSituacao.cancelado
+             if (item.situacao == ItemCompraSituacao.cancelado) return;
+             final novoStatus = item.situacao == ItemCompraSituacao.comprado
                  ? ItemCompraSituacao.pendente
-                 : ItemCompraSituacao.cancelado;
+                 : ItemCompraSituacao.comprado;
              ref
                  .read(listaComprasStatusViewModelProvider)
                  .alternarStatusItemCommand

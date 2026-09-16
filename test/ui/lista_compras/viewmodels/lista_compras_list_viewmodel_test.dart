@@ -454,6 +454,118 @@ void main() {
         ItemCompraSituacao.comprado,
       );
       expect(listVm.listaAtual!.itens.first.quantidadeComprada, 2.0);
+
+      // Tentar cancelar item comprado deve falhar
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.comprado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.cancelado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isFailure, isTrue);
+
+      // Desmarcar comprado -> pendente
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.pendente,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      expect(
+        listVm.listaAtual!.itens.first.situacao,
+        ItemCompraSituacao.pendente,
+      );
+      expect(listVm.listaAtual!.itens.first.quantidadeComprada, 0.0);
+
+      // Item parcialmente comprado (5 de 10)
+      await createVm.salvarItemCommand.execute((
+        dto: ItemCompraDto(
+          id: 'item-parcial',
+          produto: 'Sabão em pó',
+          quantidadePlanejada: 10.0,
+          quantidadeComprada: 5.0,
+        ),
+        filter: filter,
+        listaAtual: listVm.listaAtual,
+      ));
+      await listVm.loadCommand.execute();
+
+      final itemParcial = listVm.listaAtual!.itens.firstWhere(
+        (i) => i.id == 'item-parcial',
+      );
+      expect(itemParcial.quantidadeComprada, 5.0);
+      expect(itemParcial.quantidadePlanejada, 10.0);
+
+      // Cancelar item parcialmente comprado
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item-parcial',
+        situacao: ItemCompraSituacao.cancelado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      final itemCancelado = listVm.listaAtual!.itens.firstWhere(
+        (i) => i.id == 'item-parcial',
+      );
+      expect(itemCancelado.situacao, ItemCompraSituacao.cancelado);
+      expect(itemCancelado.quantidadeComprada, 5.0);
+
+      // Reativar item parcialmente comprado deve manter 5.0 comprados
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item-parcial',
+        situacao: ItemCompraSituacao.pendente,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      final itemReativado = listVm.listaAtual!.itens.firstWhere(
+        (i) => i.id == 'item-parcial',
+      );
+      expect(itemReativado.situacao, ItemCompraSituacao.pendente);
+      expect(itemReativado.quantidadeComprada, 5.0);
+      expect(itemReativado.quantidadePlanejada, 10.0);
+
+      // Comprar item parcialmente comprado (5 de 10) deve alterar para 10 de 10
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item-parcial',
+        situacao: ItemCompraSituacao.comprado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+
+      await listVm.loadCommand.execute();
+      final itemTotalmenteComprado = listVm.listaAtual!.itens.firstWhere(
+        (i) => i.id == 'item-parcial',
+      );
+      expect(itemTotalmenteComprado.situacao, ItemCompraSituacao.comprado);
+      expect(itemTotalmenteComprado.quantidadeComprada, 10.0);
+
+      // Cancelar item item1 novamente para testar bloqueio de compra direta
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.cancelado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isSuccess, isTrue);
+      await listVm.loadCommand.execute();
+
+      // Tentar comprar item cancelado deve falhar
+      await statusVm.alternarStatusItemCommand.execute((
+        lista: listVm.listaAtual!,
+        itemId: 'item1',
+        situacao: ItemCompraSituacao.comprado,
+      ));
+      expect(statusVm.alternarStatusItemCommand.value.isFailure, isTrue);
     });
 
     test(

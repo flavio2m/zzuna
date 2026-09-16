@@ -314,7 +314,7 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
           ),
           const AppSpacing(size: AppSpacingSize.md),
           const AppText(
-            'Supermercados onde encontrar (clique para definir o padrão):',
+            'Supermercados onde encontrar:',
             variant: AppTextVariant.subtitle,
           ),
           const AppSpacing(size: AppSpacingSize.xs),

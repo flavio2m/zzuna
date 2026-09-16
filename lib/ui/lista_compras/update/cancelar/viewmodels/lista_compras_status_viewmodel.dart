@@ -15,11 +15,7 @@ class ListaComprasStatusViewModel {
   late final alternarStatusItemCommand = Command1(_alternarStatusItem);
 
   AsyncResult<ListaCompras> _alternarStatusItem(
-    ({
-      ListaCompras lista,
-      String itemId,
-      ItemCompraSituacao situacao,
-    }) params,
+    ({ListaCompras lista, String itemId, ItemCompraSituacao situacao}) params,
   ) async {
     final lista = params.lista;
     final itemId = params.itemId;
@@ -32,10 +28,28 @@ class ListaComprasStatusViewModel {
     }
 
     final item = updatedItens[index];
+
+    // Não é permitido cancelar item já comprado
+    if (situacao == ItemCompraSituacao.cancelado &&
+        item.situacao == ItemCompraSituacao.comprado) {
+      return Failure(
+        LocalStorageException('Não é permitido cancelar um item já comprado.'),
+      );
+    }
+
+    // Não é permitido marcar como comprado item cancelado
+    if (situacao == ItemCompraSituacao.comprado &&
+        item.situacao == ItemCompraSituacao.cancelado) {
+      return Failure(
+        LocalStorageException('Não é permitido comprar um item cancelado.'),
+      );
+    }
+
     double novaQtdComprada = item.quantidadeComprada;
-    if (situacao == ItemCompraSituacao.comprado && novaQtdComprada == 0) {
+    if (situacao == ItemCompraSituacao.comprado) {
       novaQtdComprada = item.quantidadePlanejada;
-    } else if (situacao == ItemCompraSituacao.pendente) {
+    } else if (situacao == ItemCompraSituacao.pendente &&
+        item.situacao == ItemCompraSituacao.comprado) {
       novaQtdComprada = 0.0;
     }
 

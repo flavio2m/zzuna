@@ -14,6 +14,7 @@ class AppCard extends StatelessWidget {
   final double? height;
   final double? minHeight;
   final Color? color;
+  final Clip? clipBehavior;
 
   const AppCard({
     super.key,
@@ -24,6 +25,7 @@ class AppCard extends StatelessWidget {
     this.height,
     this.minHeight,
     this.color,
+    this.clipBehavior,
   });
 
   @override
@@ -40,6 +42,7 @@ class AppCard extends StatelessWidget {
         color: color ?? Theme.of(context).cardColor,
         margin: EdgeInsets.zero,
         elevation: _elevation(),
+        clipBehavior: clipBehavior ?? Clip.antiAlias,
         child: Padding(padding: padding, child: child),
       ),
     );
