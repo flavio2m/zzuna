@@ -7,10 +7,10 @@ import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/clone_item_compra_button.dart';
 import 'package:zzuna/ui/lista_compras/delete/item_compra/widgets/item_compra_delete_menu_item.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/comprar_item_modal.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_comprar_menu_item.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_editar_menu_item.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/item_compra_status_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/update/cancelar/widgets/item_compra_status_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/update/comprar/widgets/comprar_item_modal.dart';
+import 'package:zzuna/ui/lista_compras/update/comprar/widgets/item_compra_comprar_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/update/editar/widgets/item_compra_editar_menu_item.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
 

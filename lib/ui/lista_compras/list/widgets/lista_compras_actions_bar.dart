@@ -12,10 +12,8 @@ class ListaComprasActionsBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listVm = ref.watch(listaComprasListViewModelProvider);
-    final createVm = ref.watch(listaComprasCreateViewModelProvider);
 
     final temLista = listVm.listaAtual != null;
-    final isCreating = createVm.criarListaVaziaCommand.value.isRunning;
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
     return SizedBox(
@@ -40,28 +38,6 @@ class ListaComprasActionsBar extends ConsumerWidget {
             ] else ...[
               const ClonarListaAnteriorButton(iconOnly: true),
               _buildDivider(isDesktop, smallSpace: true),
-              IconButton(
-                icon: isCreating
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.note_add_outlined, size: 20),
-                color: AppColors.primary,
-                tooltip: 'Criar Lista para este Mês',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                splashRadius: 20,
-                onPressed: isCreating
-                    ? null
-                    : () {
-                        final filterState = ref.read(
-                          listaComprasFilterProvider,
-                        );
-                        createVm.criarListaVaziaCommand.execute(filterState);
-                      },
-              ),
             ],
           ],
         ),

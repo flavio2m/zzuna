@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
-import 'package:zzuna/ui/lista_compras/update/viewmodels/lista_compras_comprar_viewmodel.dart';
+import 'package:zzuna/ui/lista_compras/update/comprar/viewmodels/lista_compras_comprar_viewmodel.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
@@ -12,11 +12,7 @@ class ComprarItemModal extends ConsumerStatefulWidget {
   final ItemCompra item;
   final ListaCompras lista;
 
-  const ComprarItemModal({
-    super.key,
-    required this.item,
-    required this.lista,
-  });
+  const ComprarItemModal({super.key, required this.item, required this.lista});
 
   static Future<void> show(
     BuildContext context, {
@@ -109,8 +105,8 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                   child: Text(
                     'Comprar: ${widget.item.produto}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -208,8 +204,8 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                             0;
                         final supermercado =
                             _supermercadoController.text.trim().isNotEmpty
-                                ? _supermercadoController.text.trim()
-                                : _supermercadoSelecionado;
+                            ? _supermercadoController.text.trim()
+                            : _supermercadoSelecionado;
 
                         _viewModel.comprarItemCommand.execute((
                           lista: widget.lista,

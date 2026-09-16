@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
-import 'package:zzuna/ui/lista_compras/update/widgets/comprar_item_modal.dart';
+import 'package:zzuna/ui/lista_compras/update/comprar/widgets/comprar_item_modal.dart';
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 
 class ItemCompraComprarMenuItem extends PopupMenuItem<void> {
