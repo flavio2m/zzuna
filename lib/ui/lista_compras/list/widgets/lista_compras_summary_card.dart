@@ -38,160 +38,157 @@ class _ListaComprasSummaryCardState extends State<ListaComprasSummaryCard> {
     final isExpanded = _isExpanded ?? (widget.initiallyExpanded ?? !isMobile);
 
     return AppCard(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header colapsável
-            InkWell(
-              onTap: () => _toggleExpanded(isExpanded),
-              borderRadius: BorderRadius.circular(6),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.analytics_outlined,
-                      size: 18,
-                      color: AppColors.slate600,
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header colapsável
+          InkWell(
+            onTap: () => _toggleExpanded(isExpanded),
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.analytics_outlined,
+                    size: 18,
+                    color: AppColors.slate600,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Resumo',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.slate700,
                     ),
+                  ),
+                  if (!isExpanded) ...[
                     const SizedBox(width: 8),
-                    const Text(
-                      'Resumo',
-                      style: TextStyle(
+                    Text(
+                      '•  ${widget.lista.totalItens} itens',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.slate500,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Total: ${_formatCurrency(widget.lista.valorEstimadoTotal)}',
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.slate700,
-                      ),
-                    ),
-                    if (!isExpanded) ...[
-                      const SizedBox(width: 8),
-                      Text(
-                        '•  ${widget.lista.totalItens} itens',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.slate500,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        'Total: ${_formatCurrency(widget.lista.valorEstimadoTotal)}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.indigo600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                    ] else
-                      const Spacer(),
-                    Icon(
-                      isExpanded ? Icons.expand_less : Icons.expand_more,
-                      size: 20,
-                      color: AppColors.slate600,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            AnimatedCrossFade(
-              duration: const Duration(milliseconds: 200),
-              crossFadeState: isExpanded
-                  ? CrossFadeState.showFirst
-                  : CrossFadeState.showSecond,
-              secondChild: const SizedBox.shrink(),
-              firstChild: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  // Row 1: Chips de Contadores
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      _buildChip(
-                        label: '${widget.lista.totalItens} Itens',
                         color: AppColors.indigo600,
-                        icon: Icons.format_list_bulleted,
-                        isMobile: isMobile,
                       ),
-                      _buildChip(
-                        label: '${widget.lista.totalComprados} Comprados',
-                        color: AppColors.emerald800,
-                        icon: Icons.check_circle_outline,
-                        isMobile: isMobile,
-                      ),
-                      if (widget.lista.totalParcialmenteComprados > 0)
-                        _buildChip(
-                          label:
-                              '${widget.lista.totalParcialmenteComprados} Parciais',
-                          color: Colors.orange.shade800,
-                          icon: Icons.timelapse,
-                          isMobile: isMobile,
-                        ),
-                      _buildChip(
-                        label: '${widget.lista.totalPendentes} Pendentes',
-                        color: Colors.blue.shade700,
-                        icon: Icons.pending_actions,
-                        isMobile: isMobile,
-                      ),
-                      if (widget.lista.totalCancelados > 0)
-                        _buildChip(
-                          label: '${widget.lista.totalCancelados} Cancelados',
-                          color: AppColors.slate500,
-                          icon: Icons.block,
-                          isMobile: isMobile,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Divider(height: 1, color: AppColors.border),
-                  const SizedBox(height: 10),
-                  // Row 2: Financeiro
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricTile(
-                          label: isMobile ? 'Pendente' : 'Estimado Pendente',
-                          value: _formatCurrency(
-                            widget.lista.valorEstimadoPendente,
-                          ),
-                          color: Colors.blue.shade800,
-                          isMobile: isMobile,
-                        ),
-                      ),
-                      Container(height: 32, width: 1, color: AppColors.border),
-                      Expanded(
-                        child: _buildMetricTile(
-                          label: isMobile ? 'Comprado' : 'Estimado Comprado',
-                          value: _formatCurrency(
-                            widget.lista.valorEstimadoComprado,
-                          ),
-                          color: AppColors.emerald800,
-                          isMobile: isMobile,
-                        ),
-                      ),
-                      Container(height: 32, width: 1, color: AppColors.border),
-                      Expanded(
-                        child: _buildMetricTile(
-                          label: isMobile ? 'Total' : 'Estimado Total',
-                          value: _formatCurrency(
-                            widget.lista.valorEstimadoTotal,
-                          ),
-                          color: AppColors.indigo600,
-                          isMobile: isMobile,
-                        ),
-                      ),
-                    ],
+                    ),
+                    const SizedBox(width: 4),
+                  ] else
+                    const Spacer(),
+                  Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: AppColors.slate600,
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: isExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            secondChild: const SizedBox.shrink(),
+            firstChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                // Row 1: Chips de Contadores
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    _buildChip(
+                      label: '${widget.lista.totalItens} Itens',
+                      color: AppColors.indigo600,
+                      icon: Icons.format_list_bulleted,
+                      isMobile: isMobile,
+                    ),
+                    _buildChip(
+                      label: '${widget.lista.totalComprados} Comprados',
+                      color: AppColors.emerald800,
+                      icon: Icons.check_circle_outline,
+                      isMobile: isMobile,
+                    ),
+                    if (widget.lista.totalParcialmenteComprados > 0)
+                      _buildChip(
+                        label:
+                            '${widget.lista.totalParcialmenteComprados} Parciais',
+                        color: Colors.orange.shade800,
+                        icon: Icons.timelapse,
+                        isMobile: isMobile,
+                      ),
+                    _buildChip(
+                      label: '${widget.lista.totalPendentes} Pendentes',
+                      color: Colors.blue.shade700,
+                      icon: Icons.pending_actions,
+                      isMobile: isMobile,
+                    ),
+                    if (widget.lista.totalCancelados > 0)
+                      _buildChip(
+                        label: '${widget.lista.totalCancelados} Cancelados',
+                        color: AppColors.slate500,
+                        icon: Icons.block,
+                        isMobile: isMobile,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Divider(height: 1, color: AppColors.border),
+                const SizedBox(height: 10),
+                // Row 2: Financeiro
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMetricTile(
+                        label: isMobile ? 'Pendente' : 'Estimado Pendente',
+                        value: _formatCurrency(
+                          widget.lista.valorEstimadoPendente,
+                        ),
+                        color: Colors.blue.shade800,
+                        isMobile: isMobile,
+                      ),
+                    ),
+                    Container(height: 32, width: 1, color: AppColors.border),
+                    Expanded(
+                      child: _buildMetricTile(
+                        label: isMobile ? 'Comprado' : 'Estimado Comprado',
+                        value: _formatCurrency(
+                          widget.lista.valorEstimadoComprado,
+                        ),
+                        color: AppColors.emerald800,
+                        isMobile: isMobile,
+                      ),
+                    ),
+                    Container(height: 32, width: 1, color: AppColors.border),
+                    Expanded(
+                      child: _buildMetricTile(
+                        label: isMobile ? 'Total' : 'Estimado Total',
+                        value: _formatCurrency(widget.lista.valorEstimadoTotal),
+                        color: AppColors.indigo600,
+                        isMobile: isMobile,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

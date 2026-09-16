@@ -52,7 +52,7 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
                       top: 2,
                       bottom: 8,
                     ),
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(6),
                     child: _buildBody(listVm, lista),
                   ),
                 ),
@@ -99,7 +99,7 @@ class _ListaComprasPageState extends ConsumerState<ListaComprasPage> {
     return Column(
       children: [
         ListaComprasSummaryCard(lista: lista),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
         Expanded(
           child: itens.isEmpty
               ? Center(

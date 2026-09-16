@@ -13,6 +13,7 @@ class AppCard extends StatelessWidget {
 
   final double? height;
   final double? minHeight;
+  final Color? color;
 
   const AppCard({
     super.key,
@@ -22,6 +23,7 @@ class AppCard extends StatelessWidget {
     this.margin = const EdgeInsets.all(4),
     this.height,
     this.minHeight,
+    this.color,
   });
 
   @override
@@ -35,7 +37,7 @@ class AppCard extends StatelessWidget {
               minHeight: minHeight ?? 0, //
             ),
       child: Card(
-        color: Theme.of(context).cardColor,
+        color: color ?? Theme.of(context).cardColor,
         margin: EdgeInsets.zero,
         elevation: _elevation(),
         child: Padding(padding: padding, child: child),
