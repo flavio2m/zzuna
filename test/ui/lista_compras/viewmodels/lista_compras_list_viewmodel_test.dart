@@ -169,6 +169,8 @@ void main() {
           itemId: item.id,
           quantidadeComprada: 2.0,
           supermercadoNome: 'Continente',
+          observacao: 'Comprado na promoção',
+          precoEstimado: 2.50,
         ));
 
         expect(comprarVm.comprarItemCommand.value.isSuccess, isTrue);
@@ -177,6 +179,8 @@ void main() {
         final updatedItem = listVm.listaAtual!.itens.first;
         expect(updatedItem.situacao, ItemCompraSituacao.comprado);
         expect(updatedItem.quantidadeComprada, 2.0);
+        expect(updatedItem.observacao, 'Comprado na promoção');
+        expect(updatedItem.precoEstimado, 2.50);
 
         final continente = updatedItem.supermercados.firstWhere(
           (s) => s.nome == 'Continente',

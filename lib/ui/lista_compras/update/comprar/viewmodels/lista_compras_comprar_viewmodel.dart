@@ -20,12 +20,17 @@ class ListaComprasComprarViewModel {
       String itemId,
       double quantidadeComprada,
       String? supermercadoNome,
-    }) params,
+      String? observacao,
+      double? precoEstimado,
+    })
+    params,
   ) async {
     final lista = params.lista;
     final itemId = params.itemId;
     final quantidadeComprada = params.quantidadeComprada;
     final supermercadoNome = params.supermercadoNome;
+    final observacao = params.observacao;
+    final precoEstimado = params.precoEstimado;
 
     if (quantidadeComprada < 0) {
       return Failure(
@@ -63,14 +68,16 @@ class ListaComprasComprarViewModel {
 
     final novaSituacao =
         (quantidadeComprada >= item.quantidadePlanejada &&
-                item.quantidadePlanejada > 0)
-            ? ItemCompraSituacao.comprado
-            : item.situacao;
+            item.quantidadePlanejada > 0)
+        ? ItemCompraSituacao.comprado
+        : item.situacao;
 
     updatedItens[index] = item.copyWith(
       quantidadeComprada: quantidadeComprada,
       supermercados: updatedSupermercados,
       situacao: novaSituacao,
+      observacao: observacao != null ? observacao.trim() : item.observacao,
+      precoEstimado: precoEstimado ?? item.precoEstimado,
     );
 
     final listaDto = ListaComprasDto(
