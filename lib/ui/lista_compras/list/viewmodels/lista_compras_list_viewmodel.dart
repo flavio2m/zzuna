@@ -52,7 +52,39 @@ class ListaComprasListViewModel extends ChangeNotifier {
       }).toList();
     }
 
+    if (filter.data != null) {
+      final dataFiltro = DateTime(
+        filter.data!.year,
+        filter.data!.month,
+        filter.data!.day,
+      );
+      itens = itens.where((i) {
+        return i.historicoCompras.any((registro) {
+          final dataReg = DateTime(
+            registro.data.year,
+            registro.data.month,
+            registro.data.day,
+          );
+          return dataReg.isAtSameMomentAs(dataFiltro);
+        });
+      }).toList();
+    }
+
     return itens;
+  }
+
+  List<DateTime> get datasDisponiveis {
+    if (listaAtual == null) return [];
+    final setDatas = <DateTime>{};
+    for (final item in listaAtual!.itens) {
+      for (final registro in item.historicoCompras) {
+        setDatas.add(
+          DateTime(registro.data.year, registro.data.month, registro.data.day),
+        );
+      }
+    }
+    final list = setDatas.toList()..sort((a, b) => b.compareTo(a));
+    return list;
   }
 
   AsyncResult<ListaCompras> _load() async {

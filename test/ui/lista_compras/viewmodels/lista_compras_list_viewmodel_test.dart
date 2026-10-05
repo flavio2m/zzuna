@@ -7,6 +7,7 @@ import 'package:zzuna/domain/dtos/lista_compras/lista_compras_dto.dart';
 import 'package:zzuna/domain/dtos/lista_compras/lista_compras_filter_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
+import 'package:zzuna/domain/entities/registro_compra_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/viewmodels/item_compras_create_viewmodel.dart';
@@ -168,6 +169,8 @@ void main() {
           lista: listVm.listaAtual!,
           itemId: item.id,
           quantidadeComprada: 2.0,
+          data: DateTime(2026, 9, 15),
+          precoReal: 2.50,
           supermercadoNome: 'Continente',
           observacao: 'Comprado na promoção',
           precoEstimado: 2.50,
@@ -579,11 +582,13 @@ void main() {
         await createVm.criarListaVaziaCommand.execute(filter);
         await listVm.loadCommand.execute();
 
-        final originalItem = const ItemCompra(
+        final originalItem = ItemCompra(
           id: 'orig1',
           produto: 'Banana',
           quantidadePlanejada: 3.0,
-          quantidadeComprada: 3.0,
+          historicoCompras: [
+            RegistroCompra(data: DateTime(2026, 9, 1), quantidade: 3.0),
+          ],
           precoEstimado: 2.0,
           situacao: ItemCompraSituacao.comprado,
           observacao: 'Madura',
@@ -686,5 +691,206 @@ void main() {
       await listVm.loadCommand.execute();
       expect(listVm.listaAtual, isNotNull);
     });
+
+    test(
+      'datasDisponiveis and date filter filters items by specific purchase date',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
+
+        // Item 1: comprado no dia 10
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'item-dia10',
+            produto: 'Queijo',
+            quantidadePlanejada: 2.0,
+            historicoCompras: [
+              RegistroCompra(
+                data: DateTime(2026, 9, 10),
+                quantidade: 2.0,
+                precoReal: 15.0,
+              ),
+            ],
+            situacao: ItemCompraSituacao.comprado,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+        await listVm.loadCommand.execute();
+
+        // Item 2: comprado no dia 15
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'item-dia15',
+            produto: 'Manteiga',
+            quantidadePlanejada: 1.0,
+            historicoCompras: [
+              RegistroCompra(
+                data: DateTime(2026, 9, 15),
+                quantidade: 1.0,
+                precoReal: 8.0,
+              ),
+            ],
+            situacao: ItemCompraSituacao.comprado,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+
+        await listVm.loadCommand.execute();
+        expect(listVm.datasDisponiveis.length, 2);
+        expect(listVm.datasDisponiveis.first, DateTime(2026, 9, 15));
+        expect(listVm.datasDisponiveis.last, DateTime(2026, 9, 10));
+
+        // Filtrar pelo dia 10
+        listVm.setFilter(filter.copyWith(data: DateTime(2026, 9, 10)));
+        expect(listVm.itensFiltrados.length, 1);
+        expect(listVm.itensFiltrados.first.produto, 'Queijo');
+
+        // Filtrar pelo dia 15
+        listVm.setFilter(filter.copyWith(data: DateTime(2026, 9, 15)));
+        expect(listVm.itensFiltrados.length, 1);
+        expect(listVm.itensFiltrados.first.produto, 'Manteiga');
+
+        // Limpar filtro de data
+        listVm.setFilter(filter.copyWith(data: null));
+        expect(listVm.itensFiltrados.length, 2);
+      },
+    );
+
+    test(
+      'removerRegistroCompraCommand removes purchase record and recalculates status',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
+
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'item-estorno',
+            produto: 'Iogurte',
+            quantidadePlanejada: 3.0,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+        await listVm.loadCommand.execute();
+
+        // Realizar compra de 3 unidades
+        await comprarVm.comprarItemCommand.execute((
+          lista: listVm.listaAtual!,
+          itemId: 'item-estorno',
+          quantidadeComprada: 3.0,
+          data: DateTime(2026, 9, 10),
+          precoReal: 4.0,
+          precoEstimado: 4.0,
+          supermercadoNome: 'Mercado',
+          observacao: '',
+        ));
+        await listVm.loadCommand.execute();
+
+        final comprado = listVm.listaAtual!.itens.firstWhere(
+          (i) => i.id == 'item-estorno',
+        );
+        expect(comprado.situacao, ItemCompraSituacao.comprado);
+        expect(comprado.quantidadeComprada, 3.0);
+        expect(comprado.historicoCompras.length, 1);
+
+        // Estornar o registro
+        await comprarVm.removerRegistroCompraCommand.execute((
+          lista: listVm.listaAtual!,
+          itemId: 'item-estorno',
+          registroIndex: 0,
+        ));
+        await listVm.loadCommand.execute();
+
+        final estornado = listVm.listaAtual!.itens.firstWhere(
+          (i) => i.id == 'item-estorno',
+        );
+        expect(estornado.situacao, ItemCompraSituacao.pendente);
+        expect(estornado.quantidadeComprada, 0.0);
+        expect(estornado.historicoCompras.isEmpty, isTrue);
+      },
+    );
+
+    test(
+      'editarRegistroCompraCommand edits purchase record and updates total quantity / status / supermarket',
+      () async {
+        final filter = const ListaComprasFilterDto(
+          ano: 2026,
+          mes: Mes.setembro,
+        );
+        listVm.setFilter(filter);
+        await createVm.criarListaVaziaCommand.execute(filter);
+        await listVm.loadCommand.execute();
+
+        await createVm.salvarItemCommand.execute((
+          dto: ItemCompraDto(
+            id: 'item-edit',
+            produto: 'Leite',
+            quantidadePlanejada: 5.0,
+          ),
+          filter: filter,
+          listaAtual: listVm.listaAtual,
+        ));
+        await listVm.loadCommand.execute();
+
+        // Realizar compra inicial de 2 unidades
+        await comprarVm.comprarItemCommand.execute((
+          lista: listVm.listaAtual!,
+          itemId: 'item-edit',
+          quantidadeComprada: 2.0,
+          data: DateTime(2026, 9, 10),
+          precoReal: 10.0,
+          precoEstimado: 10.0,
+          supermercadoNome: 'Mercado A',
+          observacao: '',
+        ));
+        await listVm.loadCommand.execute();
+
+        var item = listVm.listaAtual!.itens.firstWhere(
+          (i) => i.id == 'item-edit',
+        );
+        expect(item.situacao, ItemCompraSituacao.pendente);
+        expect(item.quantidadeComprada, 2.0);
+
+        // Editar compra para 5 unidades, outro mercado, preço e data
+        await comprarVm.editarRegistroCompraCommand.execute((
+          lista: listVm.listaAtual!,
+          itemId: 'item-edit',
+          registroIndex: 0,
+          data: DateTime(2026, 9, 12),
+          quantidade: 5.0,
+          precoReal: 12.5,
+          supermercadoNome: 'Mercado B',
+        ));
+        await listVm.loadCommand.execute();
+
+        item = listVm.listaAtual!.itens.firstWhere((i) => i.id == 'item-edit');
+        expect(item.situacao, ItemCompraSituacao.comprado);
+        expect(item.quantidadeComprada, 5.0);
+        expect(item.historicoCompras.length, 1);
+
+        final registro = item.historicoCompras.first;
+        expect(registro.quantidade, 5.0);
+        expect(registro.precoReal, 12.5);
+        expect(registro.data, DateTime(2026, 9, 12));
+        expect(registro.supermercadoNome, 'Mercado B');
+
+        final superB = item.supermercados.firstWhere(
+          (s) => s.nome == 'Mercado B',
+        );
+        expect(superB.ultimoUtilizado, isTrue);
+      },
+    );
   });
 }

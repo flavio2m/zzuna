@@ -8,6 +8,7 @@ import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/clone_item_compra_button.dart';
 import 'package:zzuna/ui/lista_compras/create/item_compra/widgets/item_compra_modal.dart';
 import 'package:zzuna/ui/lista_compras/delete/item_compra/widgets/item_compra_delete_menu_item.dart';
+import 'package:zzuna/ui/lista_compras/list/widgets/item_compra_historico_modal.dart';
 import 'package:zzuna/ui/lista_compras/update/cancelar/widgets/item_compra_status_menu_item.dart';
 import 'package:zzuna/ui/lista_compras/update/comprar/widgets/comprar_item_modal.dart';
 import 'package:zzuna/ui/lista_compras/update/comprar/widgets/item_compra_comprar_menu_item.dart';
@@ -114,7 +115,10 @@ class ItemCompraCard extends ConsumerWidget {
                     onPressed: isRunning
                         ? null
                         : () {
-                            if (isComprado || isCancelado) {
+                            if (isComprado) {
+                              return;
+                            }
+                            if (isCancelado) {
                               statusVm.alternarStatusItemCommand.execute((
                                 lista: lista,
                                 itemId: item.id,
@@ -198,6 +202,25 @@ class ItemCompraCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.receipt_long_outlined,
+                      color: AppColors.slate600,
+                      size: 20,
+                    ),
+                    tooltip: 'Histórico de Compras',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 26,
+                      minHeight: 26,
+                    ),
+                    onPressed: () => ItemCompraHistoricoModal.show(
+                      context,
+                      item: item,
+                      lista: lista,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
                   CloneItemCompraButton(item: item),
                   const SizedBox(width: 2),
                   PopupMenuButton<void>(

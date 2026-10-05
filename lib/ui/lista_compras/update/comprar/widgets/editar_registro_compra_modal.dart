@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
+import 'package:zzuna/domain/entities/registro_compra_entity.dart';
 import 'package:zzuna/ui/lista_compras/update/comprar/viewmodels/lista_compras_comprar_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
@@ -14,40 +15,55 @@ import 'package:zzuna/ui/shared/widgets/forms/app_currency_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_date_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
-import 'package:zzuna/ui/shared/widgets/forms/app_text_area_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 import 'package:zzuna/utils/formatters/date_formatter.dart';
 
-class ComprarItemModal extends ConsumerStatefulWidget {
-  final ItemCompra item;
+class EditarRegistroCompraModal extends ConsumerStatefulWidget {
   final ListaCompras lista;
+  final ItemCompra item;
+  final int registroIndex;
+  final RegistroCompra registro;
 
-  const ComprarItemModal({super.key, required this.item, required this.lista});
+  const EditarRegistroCompraModal({
+    super.key,
+    required this.lista,
+    required this.item,
+    required this.registroIndex,
+    required this.registro,
+  });
 
   static void show(
     BuildContext context, {
-    required ItemCompra item,
     required ListaCompras lista,
+    required ItemCompra item,
+    required int registroIndex,
+    required RegistroCompra registro,
   }) {
     AppDialog.show(
       context: context,
-      child: ComprarItemModal(item: item, lista: lista),
+      child: EditarRegistroCompraModal(
+        lista: lista,
+        item: item,
+        registroIndex: registroIndex,
+        registro: registro,
+      ),
     );
   }
 
   @override
-  ConsumerState<ComprarItemModal> createState() => _ComprarItemModalState();
+  ConsumerState<EditarRegistroCompraModal> createState() =>
+      _EditarRegistroCompraModalState();
 }
 
-class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
+class _EditarRegistroCompraModalState
+    extends ConsumerState<EditarRegistroCompraModal> {
   late final TextEditingController _qtdController;
   late final TextEditingController _supermercadoController;
   String? _supermercadoSelecionado;
-  late String _observacao;
-  late double _precoEstimado;
+  late double _precoReal;
   late DateTime _dataCompra;
   late final ListaComprasComprarViewModel _viewModel;
 
@@ -55,7 +71,6 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
   final _qtdFocus = FocusNode();
   final _precoFocus = FocusNode();
   final _supermercadoFocus = FocusNode();
-  final _observacaoFocus = FocusNode();
   final _saveFocus = FocusNode();
 
   String _formatNum(double num) {
@@ -65,32 +80,33 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
   @override
   void initState() {
     super.initState();
-    _dataCompra = DateTime.now();
+    _dataCompra = widget.registro.data;
 
-    final restante =
-        widget.item.quantidadePlanejada - widget.item.quantidadeComprada;
-    final initialQtd = restante > 0
-        ? restante
-        : (widget.item.quantidadePlanejada > 0
-              ? widget.item.quantidadePlanejada
-              : 1.0);
-
-    final formattedQtd = initialQtd % 1 == 0
-        ? initialQtd.toInt().toString()
-        : initialQtd.round().toString();
+    final qtd = widget.registro.quantidade;
+    final formattedQtd = qtd % 1 == 0
+        ? qtd.toInt().toString()
+        : qtd.round().toString();
     _qtdController = TextEditingController(text: formattedQtd);
 
-    final ultimo = widget.item.supermercados
-        .where((s) => s.ultimoUtilizado)
-        .firstOrNull;
+    _precoReal = widget.registro.precoReal;
 
-    _supermercadoSelecionado = ultimo?.nome;
+    _supermercadoSelecionado = widget.registro.supermercadoNome;
     _supermercadoController = TextEditingController();
-    _observacao = widget.item.observacao;
-    _precoEstimado = widget.item.precoEstimado;
+
+    // Se o supermercado do registro não estiver nos supermercados pré-cadastrados, preenche o controller
+    final existsInList = widget.item.supermercados.any(
+      (s) =>
+          s.nome.toLowerCase() ==
+          (widget.registro.supermercadoNome ?? '').toLowerCase(),
+    );
+    if (!existsInList &&
+        widget.registro.supermercadoNome != null &&
+        widget.registro.supermercadoNome!.isNotEmpty) {
+      _supermercadoController.text = widget.registro.supermercadoNome!;
+    }
 
     _viewModel = ref.read(listaComprasComprarViewModelProvider);
-    _viewModel.comprarItemCommand.addListener(_commandListener);
+    _viewModel.editarRegistroCompraCommand.addListener(_commandListener);
     _qtdFocus.addListener(_qtdFocusListener);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -111,7 +127,7 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
 
   @override
   void dispose() {
-    _viewModel.comprarItemCommand.removeListener(_commandListener);
+    _viewModel.editarRegistroCompraCommand.removeListener(_commandListener);
     _qtdFocus.removeListener(_qtdFocusListener);
     _qtdController.dispose();
     _supermercadoController.dispose();
@@ -120,23 +136,22 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
     _qtdFocus.dispose();
     _precoFocus.dispose();
     _supermercadoFocus.dispose();
-    _observacaoFocus.dispose();
     _saveFocus.dispose();
 
     super.dispose();
   }
 
   void _commandListener() {
-    final commandValue = _viewModel.comprarItemCommand.value;
+    final commandValue = _viewModel.editarRegistroCompraCommand.value;
     commandValue.onSuccess((_) {
-      AppSnackBar.showSuccess(context, 'Compra registrada com sucesso.');
+      AppSnackBar.showSuccess(context, 'Compra atualizada com sucesso.');
       if (mounted) Navigator.pop(context);
     });
     commandValue.onFailure((exception) {
       if (mounted) {
         AppSnackBar.showError(
           context,
-          exception?.toString() ?? 'Erro ao registrar compra.',
+          exception?.toString() ?? 'Erro ao atualizar compra.',
         );
       }
     });
@@ -156,15 +171,14 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
           ? _supermercadoController.text.trim()
           : _supermercadoSelecionado;
 
-      _viewModel.comprarItemCommand.execute((
+      _viewModel.editarRegistroCompraCommand.execute((
         lista: widget.lista,
         itemId: widget.item.id,
-        quantidadeComprada: qtd,
+        registroIndex: widget.registroIndex,
         data: _dataCompra,
-        precoReal: _precoEstimado,
+        quantidade: qtd,
+        precoReal: _precoReal,
         supermercadoNome: supermercado,
-        observacao: _observacao,
-        precoEstimado: _precoEstimado,
       ));
     }
   }
@@ -172,22 +186,19 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
   @override
   Widget build(BuildContext context) {
     final comprarVm = ref.watch(listaComprasComprarViewModelProvider);
-    final isLoading = comprarVm.comprarItemCommand.value.isRunning;
-    final restante =
-        widget.item.quantidadePlanejada - widget.item.quantidadeComprada;
-    final restanteDisplay = restante > 0 ? restante : 0.0;
+    final isLoading = comprarVm.editarRegistroCompraCommand.value.isRunning;
 
     return AppForm(
-      title: 'Comprar Item',
+      title: 'Editar Compra',
       type: AppFormType.modal,
       actions: [
         ButtonCancel(onPressed: () => Navigator.of(context).pop()),
         ListenableBuilder(
-          listenable: comprarVm.comprarItemCommand,
+          listenable: comprarVm.editarRegistroCompraCommand,
           builder: (_, _) {
             return ButtonSave(
               focusNode: _saveFocus,
-              label: 'Comprar',
+              label: 'Salvar',
               loading: isLoading,
               onPressed: isLoading || !_canSubmit ? null : _handleSubmit,
             );
@@ -219,37 +230,10 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                   fontWeight: FontWeight.bold,
                 ),
                 const AppSpacing(size: AppSpacingSize.xs),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: [
-                    AppText(
-                      'Planejado: ${_formatNum(widget.item.quantidadePlanejada)}',
-                      variant: AppTextVariant.caption,
-                      color: AppColors.slate600,
-                    ),
-                    const AppText(
-                      '•',
-                      variant: AppTextVariant.caption,
-                      color: AppColors.slate400,
-                    ),
-                    AppText(
-                      'Comprado: ${_formatNum(widget.item.quantidadeComprada)}',
-                      variant: AppTextVariant.caption,
-                      color: AppColors.emerald600,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    const AppText(
-                      '•',
-                      variant: AppTextVariant.caption,
-                      color: AppColors.slate400,
-                    ),
-                    AppText(
-                      'Restante: ${_formatNum(restanteDisplay)}',
-                      variant: AppTextVariant.caption,
-                      color: AppColors.slate600,
-                    ),
-                  ],
+                AppText(
+                  'Planejado: ${_formatNum(widget.item.quantidadePlanejada)}',
+                  variant: AppTextVariant.caption,
+                  color: AppColors.slate600,
                 ),
               ],
             ),
@@ -301,15 +285,16 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                   readOnly: isLoading,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _supermercadoFocus.requestFocus(),
-                  initialValue: _precoEstimado > 0
-                      ? UtilBrasilFields.obterReal(_precoEstimado, moeda: true)
+                  initialValue: _precoReal > 0
+                      ? UtilBrasilFields.obterReal(_precoReal, moeda: true)
                       : '',
                   onChanged: (value) {
                     if (value.isNotEmpty) {
-                      _precoEstimado =
-                          UtilBrasilFields.converterMoedaParaDouble(value);
+                      _precoReal = UtilBrasilFields.converterMoedaParaDouble(
+                        value,
+                      );
                     } else {
-                      _precoEstimado = 0.0;
+                      _precoReal = 0.0;
                     }
                     setState(() {});
                   },
@@ -374,7 +359,7 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                 : 'Ou digite outro supermercado',
             readOnly: isLoading,
             textInputAction: TextInputAction.next,
-            onFieldSubmitted: (_) => _observacaoFocus.requestFocus(),
+            onFieldSubmitted: (_) => _saveFocus.requestFocus(),
             onChanged: (val) {
               setState(() {
                 if (val.trim().isNotEmpty) {
@@ -383,20 +368,6 @@ class _ComprarItemModalState extends ConsumerState<ComprarItemModal> {
                   _supermercadoSelecionado = null;
                 }
               });
-            },
-          ),
-          const AppSpacing(size: AppSpacingSize.md),
-          AppTextAreaFormField(
-            label: 'Observação',
-            focusNode: _observacaoFocus,
-            minLines: 1,
-            maxLines: 2,
-            initialValue: _observacao,
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (_) => _saveFocus.requestFocus(),
-            onChanged: (value) {
-              _observacao = value;
-              setState(() {});
             },
           ),
         ],

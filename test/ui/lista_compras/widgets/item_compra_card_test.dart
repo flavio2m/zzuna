@@ -7,6 +7,7 @@ import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.d
 import 'package:zzuna/data/services/storage/base_storage.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
+import 'package:zzuna/domain/entities/registro_compra_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/list/widgets/item_compra_card.dart';
@@ -114,15 +115,17 @@ void main() {
   testWidgets('ItemCompraCard renders Comprado state styling and actions', (
     tester,
   ) async {
-    const itemComprado = ItemCompra(
+    final itemComprado = ItemCompra(
       id: 'item-2',
       produto: 'Arroz 5kg',
       quantidadePlanejada: 1.0,
-      quantidadeComprada: 1.0,
+      historicoCompras: [
+        RegistroCompra(data: DateTime(2026, 9, 10), quantidade: 1.0),
+      ],
       situacao: ItemCompraSituacao.comprado,
     );
 
-    const listaComprado = ListaCompras(
+    final listaComprado = ListaCompras(
       id: 'lista-1',
       ano: 2026,
       mes: Mes.setembro,
@@ -135,7 +138,7 @@ void main() {
         overrides: [
           listaComprasRepositoryProvider.overrideWithValue(repository),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
           home: Scaffold(
             body: ItemCompraCard(item: itemComprado, lista: listaComprado),
           ),
@@ -153,15 +156,17 @@ void main() {
   testWidgets(
     'ItemCompraCard renders Cancelado state and restricts to startToEnd swipe',
     (tester) async {
-      const itemCancelado = ItemCompra(
+      final itemCancelado = ItemCompra(
         id: 'item-3',
         produto: 'Feijão Preto',
         quantidadePlanejada: 2.0,
-        quantidadeComprada: 1.0,
+        historicoCompras: [
+          RegistroCompra(data: DateTime(2026, 9, 10), quantidade: 1.0),
+        ],
         situacao: ItemCompraSituacao.cancelado,
       );
 
-      const listaCancelado = ListaCompras(
+      final listaCancelado = ListaCompras(
         id: 'lista-1',
         ano: 2026,
         mes: Mes.setembro,
@@ -174,7 +179,7 @@ void main() {
           overrides: [
             listaComprasRepositoryProvider.overrideWithValue(repository),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
             home: Scaffold(
               body: ItemCompraCard(item: itemCancelado, lista: listaCancelado),
             ),

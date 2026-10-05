@@ -5,6 +5,7 @@ import 'package:zzuna/data/repositories/lista_compras/lista_compras_repository.d
 import 'package:zzuna/domain/dtos/lista_compras/lista_compras_dto.dart';
 import 'package:zzuna/domain/entities/item_compra_entity.dart';
 import 'package:zzuna/domain/entities/lista_compras_entity.dart';
+import 'package:zzuna/domain/entities/registro_compra_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 
 class ListaComprasStatusViewModel {
@@ -27,7 +28,7 @@ class ListaComprasStatusViewModel {
       return Failure(LocalStorageException('Item não encontrado.'));
     }
 
-    final item = updatedItens[index];
+    final item = updatedItens[index].migrarLegado(lista.ano, lista.mes);
 
     // Não é permitido cancelar item já comprado
     if (situacao == ItemCompraSituacao.cancelado &&
@@ -45,17 +46,46 @@ class ListaComprasStatusViewModel {
       );
     }
 
+    List<RegistroCompra> novosRegistros = item.historicoCompras;
     double novaQtdComprada = item.quantidadeComprada;
+
     if (situacao == ItemCompraSituacao.comprado) {
-      novaQtdComprada = item.quantidadePlanejada;
+      final restante = item.quantidadePlanejada - item.quantidadeComprada;
+      final qtdAdicionar = restante > 0
+          ? restante
+          : (item.quantidadePlanejada > 0 ? item.quantidadePlanejada : 1.0);
+
+      final ultimoMercado =
+          item.supermercados
+              .where((s) => s.ultimoUtilizado)
+              .firstOrNull
+              ?.nome ??
+          (item.supermercados.isNotEmpty
+              ? item.supermercados.first.nome
+              : null);
+
+      final novoRegistro = RegistroCompra(
+        data: RegistroCompra.truncateDate(DateTime.now()),
+        quantidade: qtdAdicionar,
+        precoReal: item.precoEstimado,
+        supermercadoId: ultimoMercado,
+      );
+
+      novosRegistros = [...item.historicoCompras, novoRegistro];
+      novaQtdComprada = novosRegistros.fold(
+        0.0,
+        (soma, r) => soma + r.quantidade,
+      );
     } else if (situacao == ItemCompraSituacao.pendente &&
         item.situacao == ItemCompraSituacao.comprado) {
+      novosRegistros = const [];
       novaQtdComprada = 0.0;
     }
 
     updatedItens[index] = item.copyWith(
       situacao: situacao,
-      quantidadeComprada: novaQtdComprada,
+      historicoCompras: novosRegistros,
+      quantidadeCompradaLegada: novaQtdComprada,
     );
 
     final listaDto = ListaComprasDto(

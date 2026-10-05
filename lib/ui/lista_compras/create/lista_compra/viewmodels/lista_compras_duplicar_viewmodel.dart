@@ -37,13 +37,22 @@ class ListaComprasDuplicarViewModel {
         return item.copyWith(
           id: const Uuid().v4(),
           situacao: ItemCompraSituacao.pendente,
-          quantidadeComprada: 0.0,
+          historicoCompras: const [],
+          quantidadeCompradaLegada: 0.0,
         );
       } else if (item.situacao == ItemCompraSituacao.pendente) {
-        return item.copyWith(id: const Uuid().v4(), quantidadeComprada: 0.0);
+        return item.copyWith(
+          id: const Uuid().v4(),
+          historicoCompras: const [],
+          quantidadeCompradaLegada: 0.0,
+        );
       } else {
         // Cancelado permanece cancelado
-        return item.copyWith(id: const Uuid().v4());
+        return item.copyWith(
+          id: const Uuid().v4(),
+          historicoCompras: const [],
+          quantidadeCompradaLegada: 0.0,
+        );
       }
     }).toList();
 

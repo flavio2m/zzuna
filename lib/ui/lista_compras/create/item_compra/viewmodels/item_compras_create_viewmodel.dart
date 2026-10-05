@@ -65,11 +65,15 @@ class ItemComprasCreateViewModel {
     if (dto.id != null) {
       final index = updatedItens.indexWhere((i) => i.id == dto.id);
       if (index != -1) {
+        final existingItem = updatedItens[index];
         updatedItens[index] = ItemCompra(
           id: dto.id!,
           produto: dto.produto.trim(),
           quantidadePlanejada: dto.quantidadePlanejada,
-          quantidadeComprada: dto.quantidadeComprada,
+          historicoCompras: dto.historicoCompras.isNotEmpty
+              ? dto.historicoCompras
+              : existingItem.historicoCompras,
+          quantidadeCompradaLegada: dto.quantidadeComprada,
           precoEstimado: dto.precoEstimado,
           supermercados: dto.supermercados,
           situacao: dto.situacao,
@@ -81,7 +85,8 @@ class ItemComprasCreateViewModel {
             id: dto.id!,
             produto: dto.produto.trim(),
             quantidadePlanejada: dto.quantidadePlanejada,
-            quantidadeComprada: dto.quantidadeComprada,
+            historicoCompras: dto.historicoCompras,
+            quantidadeCompradaLegada: dto.quantidadeComprada,
             precoEstimado: dto.precoEstimado,
             supermercados: dto.supermercados,
             situacao: dto.situacao,
@@ -95,7 +100,8 @@ class ItemComprasCreateViewModel {
           id: const Uuid().v4(),
           produto: dto.produto.trim(),
           quantidadePlanejada: dto.quantidadePlanejada,
-          quantidadeComprada: dto.quantidadeComprada,
+          historicoCompras: dto.historicoCompras,
+          quantidadeCompradaLegada: dto.quantidadeComprada,
           precoEstimado: dto.precoEstimado,
           supermercados: dto.supermercados,
           situacao: dto.situacao,

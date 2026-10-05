@@ -72,6 +72,7 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
         supermercados: List<SupermercadoItem>.from(widget.item!.supermercados),
         situacao: widget.item!.situacao,
         observacao: widget.item!.observacao,
+        historicoCompras: List.from(widget.item!.historicoCompras),
       );
     } else if (widget.cloneItem != null) {
       dto = ItemCompraDto(
@@ -84,6 +85,7 @@ class _ItemCompraModalState extends ConsumerState<ItemCompraModal> {
         ),
         situacao: ItemCompraSituacao.pendente,
         observacao: widget.cloneItem!.observacao,
+        historicoCompras: const [],
       );
     } else {
       final listVm = ref.read(listaComprasListViewModelProvider);

@@ -15,6 +15,7 @@ import 'package:zzuna/ui/shared/widgets/cards/app_filter_card.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_year_stepper.dart';
+import 'package:zzuna/utils/formatters/date_formatter.dart';
 
 class ListaComprasFilterBar extends ConsumerWidget {
   const ListaComprasFilterBar({super.key});
@@ -39,6 +40,7 @@ class ListaComprasFilterBar extends ConsumerWidget {
           _buildPeriodNavigator(ref, filterState, maxYear),
           _buildSituacaoDropdown(ref, filterState),
           _buildSupermercadoDropdown(ref, filterState, listVm),
+          _buildDataDropdown(ref, filterState, listVm),
           if (temLista) ...[
             ButtonAdd(
               label: 'Adicionar Produto',
@@ -173,6 +175,36 @@ class ListaComprasFilterBar extends ConsumerWidget {
             : (value) {
                 notifier.setSupermercado(value);
               },
+      ),
+    );
+  }
+
+  Widget _buildDataDropdown(
+    WidgetRef ref,
+    dynamic filterState,
+    ListaComprasListViewModel listVm,
+  ) {
+    final notifier = ref.read(listaComprasFilterProvider.notifier);
+    final datas = listVm.datasDisponiveis;
+    if (datas.isEmpty) return const SizedBox.shrink();
+
+    return SizedBox(
+      width: 150,
+      child: AppDropdownFormField<DateTime?>(
+        label: 'Data da Compra',
+        value: filterState.data,
+        items: [
+          AppDropdownMenuItem<DateTime?>(value: null, label: 'Todas'),
+          ...datas.map(
+            (d) => AppDropdownMenuItem<DateTime?>(
+              value: d,
+              label: DateFormatter.dma(d),
+            ),
+          ),
+        ],
+        onChanged: (value) {
+          notifier.setData(value);
+        },
       ),
     );
   }

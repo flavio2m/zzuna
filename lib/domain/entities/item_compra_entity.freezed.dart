@@ -275,7 +275,7 @@ as bool,
 /// @nodoc
 mixin _$ItemCompra {
 
- String get id; String get produto; double get quantidadePlanejada; double get quantidadeComprada; double get precoEstimado; List<SupermercadoItem> get supermercados; ItemCompraSituacao get situacao; String get observacao;
+ String get id; String get produto; double get quantidadePlanejada; List<RegistroCompra> get historicoCompras; double get precoEstimado; List<SupermercadoItem> get supermercados; ItemCompraSituacao get situacao; String get observacao;@JsonKey(name: 'quantidadeComprada') double get quantidadeCompradaLegada;
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -288,16 +288,16 @@ $ItemCompraCopyWith<ItemCompra> get copyWith => _$ItemCompraCopyWithImpl<ItemCom
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other.supermercados, supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&const DeepCollectionEquality().equals(other.historicoCompras, historicoCompras)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other.supermercados, supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao)&&(identical(other.quantidadeCompradaLegada, quantidadeCompradaLegada) || other.quantidadeCompradaLegada == quantidadeCompradaLegada));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(supermercados),situacao,observacao);
+int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,const DeepCollectionEquality().hash(historicoCompras),precoEstimado,const DeepCollectionEquality().hash(supermercados),situacao,observacao,quantidadeCompradaLegada);
 
 @override
 String toString() {
-  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao)';
+  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, historicoCompras: $historicoCompras, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao, quantidadeCompradaLegada: $quantidadeCompradaLegada)';
 }
 
 
@@ -308,7 +308,7 @@ abstract mixin class $ItemCompraCopyWith<$Res>  {
   factory $ItemCompraCopyWith(ItemCompra value, $Res Function(ItemCompra) _then) = _$ItemCompraCopyWithImpl;
 @useResult
 $Res call({
- String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao
+ String id, String produto, double quantidadePlanejada, List<RegistroCompra> historicoCompras, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao,@JsonKey(name: 'quantidadeComprada') double quantidadeCompradaLegada
 });
 
 
@@ -325,17 +325,18 @@ class _$ItemCompraCopyWithImpl<$Res>
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? historicoCompras = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,Object? quantidadeCompradaLegada = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,produto: null == produto ? _self.produto : produto // ignore: cast_nullable_to_non_nullable
 as String,quantidadePlanejada: null == quantidadePlanejada ? _self.quantidadePlanejada : quantidadePlanejada // ignore: cast_nullable_to_non_nullable
-as double,quantidadeComprada: null == quantidadeComprada ? _self.quantidadeComprada : quantidadeComprada // ignore: cast_nullable_to_non_nullable
-as double,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
+as double,historicoCompras: null == historicoCompras ? _self.historicoCompras : historicoCompras // ignore: cast_nullable_to_non_nullable
+as List<RegistroCompra>,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
 as double,supermercados: null == supermercados ? _self.supermercados : supermercados // ignore: cast_nullable_to_non_nullable
 as List<SupermercadoItem>,situacao: null == situacao ? _self.situacao : situacao // ignore: cast_nullable_to_non_nullable
 as ItemCompraSituacao,observacao: null == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
-as String,
+as String,quantidadeCompradaLegada: null == quantidadeCompradaLegada ? _self.quantidadeCompradaLegada : quantidadeCompradaLegada // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 
@@ -417,10 +418,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  List<RegistroCompra> historicoCompras,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao, @JsonKey(name: 'quantidadeComprada')  double quantidadeCompradaLegada)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ItemCompra() when $default != null:
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);case _:
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.historicoCompras,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao,_that.quantidadeCompradaLegada);case _:
   return orElse();
 
 }
@@ -438,10 +439,10 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String produto,  double quantidadePlanejada,  List<RegistroCompra> historicoCompras,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao, @JsonKey(name: 'quantidadeComprada')  double quantidadeCompradaLegada)  $default,) {final _that = this;
 switch (_that) {
 case _ItemCompra():
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);}
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.historicoCompras,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao,_that.quantidadeCompradaLegada);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -455,10 +456,10 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String produto,  double quantidadePlanejada,  double quantidadeComprada,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String produto,  double quantidadePlanejada,  List<RegistroCompra> historicoCompras,  double precoEstimado,  List<SupermercadoItem> supermercados,  ItemCompraSituacao situacao,  String observacao, @JsonKey(name: 'quantidadeComprada')  double quantidadeCompradaLegada)?  $default,) {final _that = this;
 switch (_that) {
 case _ItemCompra() when $default != null:
-return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidadeComprada,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao);case _:
+return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.historicoCompras,_that.precoEstimado,_that.supermercados,_that.situacao,_that.observacao,_that.quantidadeCompradaLegada);case _:
   return null;
 
 }
@@ -469,14 +470,20 @@ return $default(_that.id,_that.produto,_that.quantidadePlanejada,_that.quantidad
 /// @nodoc
 @JsonSerializable()
 
-class _ItemCompra implements ItemCompra {
-  const _ItemCompra({required this.id, required this.produto, this.quantidadePlanejada = 1.0, this.quantidadeComprada = 0.0, this.precoEstimado = 0.0, final  List<SupermercadoItem> supermercados = const [], this.situacao = ItemCompraSituacao.pendente, this.observacao = ''}): _supermercados = supermercados;
+class _ItemCompra extends ItemCompra {
+  const _ItemCompra({required this.id, required this.produto, this.quantidadePlanejada = 1.0, final  List<RegistroCompra> historicoCompras = const [], this.precoEstimado = 0.0, final  List<SupermercadoItem> supermercados = const [], this.situacao = ItemCompraSituacao.pendente, this.observacao = '', @JsonKey(name: 'quantidadeComprada') this.quantidadeCompradaLegada = 0.0}): _historicoCompras = historicoCompras,_supermercados = supermercados,super._();
   factory _ItemCompra.fromJson(Map<String, dynamic> json) => _$ItemCompraFromJson(json);
 
 @override final  String id;
 @override final  String produto;
 @override@JsonKey() final  double quantidadePlanejada;
-@override@JsonKey() final  double quantidadeComprada;
+ final  List<RegistroCompra> _historicoCompras;
+@override@JsonKey() List<RegistroCompra> get historicoCompras {
+  if (_historicoCompras is EqualUnmodifiableListView) return _historicoCompras;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_historicoCompras);
+}
+
 @override@JsonKey() final  double precoEstimado;
  final  List<SupermercadoItem> _supermercados;
 @override@JsonKey() List<SupermercadoItem> get supermercados {
@@ -487,6 +494,7 @@ class _ItemCompra implements ItemCompra {
 
 @override@JsonKey() final  ItemCompraSituacao situacao;
 @override@JsonKey() final  String observacao;
+@override@JsonKey(name: 'quantidadeComprada') final  double quantidadeCompradaLegada;
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
@@ -501,16 +509,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&(identical(other.quantidadeComprada, quantidadeComprada) || other.quantidadeComprada == quantidadeComprada)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other._supermercados, _supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemCompra&&(identical(other.id, id) || other.id == id)&&(identical(other.produto, produto) || other.produto == produto)&&(identical(other.quantidadePlanejada, quantidadePlanejada) || other.quantidadePlanejada == quantidadePlanejada)&&const DeepCollectionEquality().equals(other._historicoCompras, _historicoCompras)&&(identical(other.precoEstimado, precoEstimado) || other.precoEstimado == precoEstimado)&&const DeepCollectionEquality().equals(other._supermercados, _supermercados)&&(identical(other.situacao, situacao) || other.situacao == situacao)&&(identical(other.observacao, observacao) || other.observacao == observacao)&&(identical(other.quantidadeCompradaLegada, quantidadeCompradaLegada) || other.quantidadeCompradaLegada == quantidadeCompradaLegada));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,quantidadeComprada,precoEstimado,const DeepCollectionEquality().hash(_supermercados),situacao,observacao);
+int get hashCode => Object.hash(runtimeType,id,produto,quantidadePlanejada,const DeepCollectionEquality().hash(_historicoCompras),precoEstimado,const DeepCollectionEquality().hash(_supermercados),situacao,observacao,quantidadeCompradaLegada);
 
 @override
 String toString() {
-  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, quantidadeComprada: $quantidadeComprada, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao)';
+  return 'ItemCompra(id: $id, produto: $produto, quantidadePlanejada: $quantidadePlanejada, historicoCompras: $historicoCompras, precoEstimado: $precoEstimado, supermercados: $supermercados, situacao: $situacao, observacao: $observacao, quantidadeCompradaLegada: $quantidadeCompradaLegada)';
 }
 
 
@@ -521,7 +529,7 @@ abstract mixin class _$ItemCompraCopyWith<$Res> implements $ItemCompraCopyWith<$
   factory _$ItemCompraCopyWith(_ItemCompra value, $Res Function(_ItemCompra) _then) = __$ItemCompraCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String produto, double quantidadePlanejada, double quantidadeComprada, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao
+ String id, String produto, double quantidadePlanejada, List<RegistroCompra> historicoCompras, double precoEstimado, List<SupermercadoItem> supermercados, ItemCompraSituacao situacao, String observacao,@JsonKey(name: 'quantidadeComprada') double quantidadeCompradaLegada
 });
 
 
@@ -538,17 +546,18 @@ class __$ItemCompraCopyWithImpl<$Res>
 
 /// Create a copy of ItemCompra
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? quantidadeComprada = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? produto = null,Object? quantidadePlanejada = null,Object? historicoCompras = null,Object? precoEstimado = null,Object? supermercados = null,Object? situacao = null,Object? observacao = null,Object? quantidadeCompradaLegada = null,}) {
   return _then(_ItemCompra(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,produto: null == produto ? _self.produto : produto // ignore: cast_nullable_to_non_nullable
 as String,quantidadePlanejada: null == quantidadePlanejada ? _self.quantidadePlanejada : quantidadePlanejada // ignore: cast_nullable_to_non_nullable
-as double,quantidadeComprada: null == quantidadeComprada ? _self.quantidadeComprada : quantidadeComprada // ignore: cast_nullable_to_non_nullable
-as double,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
+as double,historicoCompras: null == historicoCompras ? _self._historicoCompras : historicoCompras // ignore: cast_nullable_to_non_nullable
+as List<RegistroCompra>,precoEstimado: null == precoEstimado ? _self.precoEstimado : precoEstimado // ignore: cast_nullable_to_non_nullable
 as double,supermercados: null == supermercados ? _self._supermercados : supermercados // ignore: cast_nullable_to_non_nullable
 as List<SupermercadoItem>,situacao: null == situacao ? _self.situacao : situacao // ignore: cast_nullable_to_non_nullable
 as ItemCompraSituacao,observacao: null == observacao ? _self.observacao : observacao // ignore: cast_nullable_to_non_nullable
-as String,
+as String,quantidadeCompradaLegada: null == quantidadeCompradaLegada ? _self.quantidadeCompradaLegada : quantidadeCompradaLegada // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 

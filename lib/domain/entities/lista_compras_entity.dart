@@ -21,6 +21,12 @@ sealed class ListaCompras with _$ListaCompras {
   factory ListaCompras.fromJson(Map<String, dynamic> json) =>
       _$ListaComprasFromJson(json);
 
+  ListaCompras migrarItensLegados() {
+    return copyWith(
+      itens: itens.map((item) => item.migrarLegado(ano, mes)).toList(),
+    );
+  }
+
   int get totalItens => itens.length;
 
   List<ItemCompra> get itensOrdenados {

@@ -10,7 +10,7 @@ final listaComprasStorageProvider = Provider<BaseStorage<ListaCompras>>((ref) {
   if (dotenv.env['USE_LOCAL_STORAGE'] == 'true') {
     return LocalStorage<ListaCompras>(
       collectionName: 'listas_compras',
-      fromJson: (json) => ListaCompras.fromJson(json),
+      fromJson: (json) => ListaCompras.fromJson(json).migrarItensLegados(),
       toJson: (lista) => lista.toJson(),
     );
   } else {
@@ -18,7 +18,7 @@ final listaComprasStorageProvider = Provider<BaseStorage<ListaCompras>>((ref) {
       collectionName: 'listas_compras',
       innerStorage: FirebaseRealtimeStorage<ListaCompras>(
         collectionName: 'listas_compras',
-        fromJson: (json) => ListaCompras.fromJson(json),
+        fromJson: (json) => ListaCompras.fromJson(json).migrarItensLegados(),
         toJson: (lista) => lista.toJson(),
       ),
     );
