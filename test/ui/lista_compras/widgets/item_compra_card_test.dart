@@ -194,4 +194,49 @@ void main() {
       expect(dismissible.direction, DismissDirection.startToEnd);
     },
   );
+
+  testWidgets(
+    'ItemCompraCard does nothing when tapping status icon on a comprado item',
+    (tester) async {
+      final itemComprado = ItemCompra(
+        id: 'item-2',
+        produto: 'Arroz 5kg',
+        quantidadePlanejada: 1.0,
+        historicoCompras: [
+          RegistroCompra(data: DateTime(2026, 9, 10), quantidade: 1.0),
+        ],
+        situacao: ItemCompraSituacao.comprado,
+      );
+
+      final listaComprado = ListaCompras(
+        id: 'lista-1',
+        ano: 2026,
+        mes: Mes.setembro,
+        periodo: 202609,
+        itens: [itemComprado],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            listaComprasRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: ItemCompraCard(item: itemComprado, lista: listaComprado),
+            ),
+          ),
+        ),
+      );
+
+      final statusIcon = find.byIcon(Icons.check_circle);
+      expect(statusIcon, findsOneWidget);
+
+      await tester.tap(statusIcon);
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      expect(find.text('Comprar Item'), findsNothing);
+    },
+  );
 }

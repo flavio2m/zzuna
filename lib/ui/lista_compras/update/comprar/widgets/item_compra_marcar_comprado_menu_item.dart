@@ -29,7 +29,7 @@ class ItemCompraMarcarCompradoMenuItem extends PopupMenuItem<void> {
              const SizedBox(width: 8),
              Text(
                item.situacao == ItemCompraSituacao.comprado
-                   ? 'Desmarcar Compra'
+                   ? 'Desfazer Compra'
                    : 'Marcar como Comprado',
                style: const TextStyle(
                  color: AppColors.slate700,
