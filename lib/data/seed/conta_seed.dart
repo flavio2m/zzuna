@@ -1,6 +1,5 @@
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
-import 'package:zzuna/domain/statics/banco/bancos.dart';
 
 class ContaSeed {
   final ContaRepository repository;
@@ -12,17 +11,20 @@ class ContaSeed {
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
-    final bancos = Bancos.items.take(10).toList();
-
-    final dtos = List.generate(
-      bancos.length,
-      (i) => CreateContaDto(
-        descricao: 'Conta ${bancos[i].descricao}',
-        bancoSigla: bancos[i].sigla,
+    final dtos = [
+      CreateContaDto(
+        descricao: 'BC Banco do Brasil',
+        bancoSigla: 'BB',
         dataInicial: DateTime(DateTime.now().year, 1, 1),
-        ativo: i != 9,
+        ativo: true,
       ),
-    );
+      CreateContaDto(
+        descricao: 'Minha Carteira',
+        bancoSigla: 'OUT',
+        dataInicial: DateTime(DateTime.now().year, 1, 1),
+        ativo: true,
+      ),
+    ];
 
     await repository.createAll(dtos);
   }

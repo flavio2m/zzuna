@@ -1,7 +1,6 @@
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
-import 'package:zzuna/domain/statics/banco/bancos.dart';
 
 class CartaoSeed {
   final CartaoRepository repository;
@@ -13,22 +12,17 @@ class CartaoSeed {
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
-    final bancos = Bancos.items.take(10).toList();
-
-    final dtos = List.generate(
-      bancos.length,
-      (i) => CartaoDto(
-        descricao: 'Cartão ${bancos[i].descricao}',
-        limite: (i + 1) * 1000.0,
-        bancoSigla: bancos[i].sigla,
+    final dtos = [
+      CartaoDto(
+        descricao: 'CC Visa Infinit',
+        limite: 10000.0,
+        bancoSigla: 'BB',
         dataInicial: DateTime(DateTime.now().year, 1, 1),
-        ativo: i != 9,
-        diaFechamento: 5 + i,
-        comportamentoFechamento: i % 2 == 0
-            ? CartaoComportamentoFechamento.migrarAnteriores
-            : CartaoComportamentoFechamento.migrarPosteriores,
+        ativo: true,
+        diaFechamento: 10,
+        comportamentoFechamento: CartaoComportamentoFechamento.migrarAnteriores,
       ),
-    );
+    ];
 
     await repository.createAll(dtos);
   }

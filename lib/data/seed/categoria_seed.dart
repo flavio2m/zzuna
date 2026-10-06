@@ -13,95 +13,147 @@ class CategoriaSeed {
     if (list.isNotEmpty) return;
 
     const uuid = Uuid();
-    final alimentacaoId = uuid.v4();
-    final transporteId = uuid.v4();
-    final investimentosId = uuid.v4();
-    final moradiaId = uuid.v4();
+    final custosFixosId = uuid.v4();
+    final liberdadeFinanceiraId = uuid.v4();
+    final confortoId = uuid.v4();
+    final metasId = uuid.v4();
+    final prazeresId = uuid.v4();
+    final conhecimentoId = uuid.v4();
     final receitasId = uuid.v4();
-    final saudeId = uuid.v4();
-    final terceirosId = uuid.v4();
-    final viagemId = uuid.v4();
 
     final dtos = <CategoriaDto>[
-      CategoriaDto(id: alimentacaoId, descricao: 'Alimentação', ativo: true),
-      CategoriaDto(id: transporteId, descricao: 'Transporte', ativo: true),
-      CategoriaDto(id: investimentosId, descricao: 'Investimentos', ativo: true),
-      CategoriaDto(id: moradiaId, descricao: 'Moradia', ativo: true),
+      // Categorias Pai
+      CategoriaDto(id: custosFixosId, descricao: 'Custos Fixos', ativo: true),
+      CategoriaDto(
+        id: liberdadeFinanceiraId,
+        descricao: 'Liberdade Financeira',
+        ativo: true,
+      ),
+      CategoriaDto(id: confortoId, descricao: 'Conforto', ativo: true),
+      CategoriaDto(id: metasId, descricao: 'Metas', ativo: true),
+      CategoriaDto(id: prazeresId, descricao: 'Prazeres', ativo: true),
+      CategoriaDto(id: conhecimentoId, descricao: 'Conhecimento', ativo: true),
       CategoriaDto(id: receitasId, descricao: 'Receitas', ativo: true),
-      CategoriaDto(id: saudeId, descricao: 'Saúde', ativo: true),
-      CategoriaDto(id: terceirosId, descricao: 'Terceiros', ativo: true),
-      CategoriaDto(id: viagemId, descricao: 'Viagem', ativo: true),
 
-      // 1) Alimentação
-      CategoriaDto(descricao: 'Feira', categoriaPaiId: alimentacaoId, ativo: true),
-      CategoriaDto(descricao: 'Horta', categoriaPaiId: alimentacaoId, ativo: true),
-      CategoriaDto(descricao: 'Lanche', categoriaPaiId: alimentacaoId, ativo: true),
-      CategoriaDto(descricao: 'Restaurantes', categoriaPaiId: alimentacaoId, ativo: true),
-      CategoriaDto(descricao: 'Supermercado', categoriaPaiId: alimentacaoId, ativo: true),
-      CategoriaDto(descricao: 'Outros', categoriaPaiId: alimentacaoId, ativo: true),
+      // 1) Custos Fixos (3 filhas)
+      CategoriaDto(
+        descricao: 'Moradia',
+        categoriaPaiId: custosFixosId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Alimentação',
+        categoriaPaiId: custosFixosId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Plano de Saúde',
+        categoriaPaiId: custosFixosId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Transporte',
+        categoriaPaiId: custosFixosId,
+        ativo: true,
+      ),
 
-      // 2) Transporte
-      CategoriaDto(descricao: 'Gadget', categoriaPaiId: transporteId, ativo: true),
-      CategoriaDto(descricao: 'IPVA, Taxas e Docs', categoriaPaiId: transporteId, ativo: true),
-      CategoriaDto(descricao: 'Limpeza', categoriaPaiId: transporteId, ativo: true),
-      CategoriaDto(descricao: 'Manutenção', categoriaPaiId: transporteId, ativo: true),
-      CategoriaDto(descricao: 'Combustível', categoriaPaiId: transporteId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Transportes', categoriaPaiId: transporteId, ativo: true),
+      // 2) Liberdade Financeira (3 filhas)
+      CategoriaDto(
+        descricao: 'Renda Fixa',
+        categoriaPaiId: liberdadeFinanceiraId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Ações',
+        categoriaPaiId: liberdadeFinanceiraId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'FII',
+        categoriaPaiId: liberdadeFinanceiraId,
+        ativo: true,
+      ),
 
-      // 3) Investimentos
-      CategoriaDto(descricao: 'Ações', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Cashback', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'FII', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Milhas/Pontos', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Natura', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Renda Fixa', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Reservas', categoriaPaiId: investimentosId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Investimentos', categoriaPaiId: investimentosId, ativo: true),
+      // 3) Conforto (3 filhas)
+      CategoriaDto(
+        descricao: 'Cuidados Pessoais',
+        categoriaPaiId: confortoId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Restaurantes',
+        categoriaPaiId: confortoId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Roupas e Acessórios',
+        categoriaPaiId: confortoId,
+        ativo: true,
+      ),
 
-      // 4) Moradia
-      CategoriaDto(descricao: 'Água', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Cama, Mesa e Banho', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Cozinha', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Moradia', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Financeiras', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Gás', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Internet', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Jardim', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Luz', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Manutenção e Reforma', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Móveis e Decoração', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Telefone e comunicação', categoriaPaiId: moradiaId, ativo: true),
-      CategoriaDto(descricao: 'Utensílios', categoriaPaiId: moradiaId, ativo: true),
+      // 4) Metas (3 filhas)
+      CategoriaDto(descricao: 'Viagem', categoriaPaiId: metasId, ativo: true),
+      CategoriaDto(
+        descricao: 'Comprar/Trocar Carro',
+        categoriaPaiId: metasId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Casa Reforma/Melhoria',
+        categoriaPaiId: metasId,
+        ativo: true,
+      ),
 
-      // 5) Receitas
-      CategoriaDto(descricao: 'Artezanato', categoriaPaiId: receitasId, ativo: true),
-      CategoriaDto(descricao: 'Descontos e outros', categoriaPaiId: receitasId, ativo: true),
-      CategoriaDto(descricao: 'Financeiras', categoriaPaiId: receitasId, ativo: true),
-      CategoriaDto(descricao: 'Salário', categoriaPaiId: receitasId, ativo: true),
-      CategoriaDto(descricao: 'Serviços Prestados', categoriaPaiId: receitasId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Receitas', categoriaPaiId: receitasId, ativo: true),
+      // 5) Prazeres (3 filhas)
+      CategoriaDto(
+        descricao: 'Churrasco/Festas',
+        categoriaPaiId: prazeresId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Lanches',
+        categoriaPaiId: prazeresId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Livros e Cursos',
+        categoriaPaiId: prazeresId,
+        ativo: true,
+      ),
 
-      // 6) Saúde
-      CategoriaDto(descricao: 'Dentista', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Exames', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Farmácia', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Médico', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Oftalmologista', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Plano de Saúde', categoriaPaiId: saudeId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Saúde', categoriaPaiId: saudeId, ativo: true),
+      // 6) Conhecimento (3 filhas)
+      CategoriaDto(
+        descricao: 'Cursos',
+        categoriaPaiId: conhecimentoId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Livros',
+        categoriaPaiId: conhecimentoId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Treinamentos',
+        categoriaPaiId: conhecimentoId,
+        ativo: true,
+      ),
 
-      // 7) Terceiros
-      CategoriaDto(descricao: 'Mãe', categoriaPaiId: terceirosId, ativo: true),
-      CategoriaDto(descricao: 'Pai', categoriaPaiId: terceirosId, ativo: true),
-      CategoriaDto(descricao: 'Fulano da Silva', categoriaPaiId: terceirosId, ativo: true),
-
-      // 8) Viagem
-      CategoriaDto(descricao: 'Alimentação Viagem', categoriaPaiId: viagemId, ativo: true),
-      CategoriaDto(descricao: 'Combustível Viagem', categoriaPaiId: viagemId, ativo: true),
-      CategoriaDto(descricao: 'Diversos Viagem', categoriaPaiId: viagemId, ativo: true),
-      CategoriaDto(descricao: 'Hospedagem', categoriaPaiId: viagemId, ativo: true),
-      CategoriaDto(descricao: 'Passagens', categoriaPaiId: viagemId, ativo: true),
-      CategoriaDto(descricao: 'Pedágios', categoriaPaiId: viagemId, ativo: true),
+      // 7) Receitas (3 filhas)
+      CategoriaDto(
+        descricao: 'Salário',
+        categoriaPaiId: receitasId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Rendimentos',
+        categoriaPaiId: receitasId,
+        ativo: true,
+      ),
+      CategoriaDto(
+        descricao: 'Outras Receitas',
+        categoriaPaiId: receitasId,
+        ativo: true,
+      ),
     ];
 
     await repository.createAll(dtos);

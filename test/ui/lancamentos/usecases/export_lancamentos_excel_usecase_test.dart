@@ -58,7 +58,7 @@ void main() {
             numero: 1,
             centroCusto: CentroCustoDetails(
               id: 'cc-1',
-              descricao: 'CC: Moradia',
+              descricao: 'CC: Geral',
               ativo: true,
             ),
             categoria: CategoriaDetails(

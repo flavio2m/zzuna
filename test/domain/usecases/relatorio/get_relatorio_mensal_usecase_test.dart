@@ -20,9 +20,9 @@ void main() {
   test(
     'GetRelatorioMensalUseCase groups income, expenses, categories and cost centers correctly',
     () {
-      const parentAlim = CategoriaDetails(
-        id: 'cat_alim',
-        descricao: 'Alimentação',
+      const parentCustosFixos = CategoriaDetails(
+        id: 'cat_custos_fixos',
+        descricao: 'Custos Fixos',
         ativo: true,
         categoriaPai: null,
         subcategorias: [],
@@ -32,34 +32,50 @@ void main() {
         id: 'cat_super',
         descricao: 'Supermercado',
         ativo: true,
-        categoriaPai: parentAlim,
+        categoriaPai: parentCustosFixos,
         subcategorias: [],
       );
 
-      const parentFin = CategoriaDetails(
-        id: 'cat_fin',
-        descricao: 'Financeira',
+      const parentConforto = CategoriaDetails(
+        id: 'cat_conforto',
+        descricao: 'Conforto',
         ativo: true,
         categoriaPai: null,
         subcategorias: [],
       );
 
-      const ccCasa = CentroCustoDetails(
-        id: 'cc_casa',
-        descricao: 'Casa',
+      const parentReceitas = CategoriaDetails(
+        id: 'cat_receitas',
+        descricao: 'Receitas',
+        ativo: true,
+        categoriaPai: null,
+        subcategorias: [],
+      );
+
+      const subSalario = CategoriaDetails(
+        id: 'cat_salario',
+        descricao: 'Salário',
+        ativo: true,
+        categoriaPai: parentReceitas,
+        subcategorias: [],
+      );
+
+      const ccGeral = CentroCustoDetails(
+        id: 'cc_geral',
+        descricao: 'Geral',
         ativo: true,
       );
 
-      const ccTrabalho = CentroCustoDetails(
-        id: 'cc_trabalho',
-        descricao: 'Trabalho',
+      const ccChacara = CentroCustoDetails(
+        id: 'cc_chacara',
+        descricao: 'Chácara',
         ativo: true,
       );
 
       final contaDetails = ContaDetails(
         id: 'c1',
-        descricao: 'Conta Itaú',
-        banco: Bancos.bancoOutros,
+        descricao: 'BC Banco do Brasil',
+        banco: Bancos.bySigla('BB').getOrThrow(),
         ativo: true,
         dataInicial: DateTime(2026, 1, 1),
       );
@@ -91,13 +107,13 @@ void main() {
           itens: [
             LancamentoItemDetailsStandard(
               numero: 1,
-              centroCusto: ccTrabalho,
-              categoria: parentFin,
+              centroCusto: ccGeral,
+              categoria: subSalario,
               valor: 8000.0,
             ),
           ],
         ),
-        // Expense 1 (Alimentação > Supermercado - Casa)
+        // Expense 1 (Custos Fixos > Supermercado - Geral)
         LancamentoDetails(
           id: '2',
           data: DateTime(2026, 8, 5),
@@ -111,17 +127,17 @@ void main() {
           itens: const [
             LancamentoItemDetailsStandard(
               numero: 1,
-              centroCusto: ccCasa,
+              centroCusto: ccGeral,
               categoria: subSuper,
               valor: 2100.0,
             ),
           ],
         ),
-        // Expense 2 (Financeira - Trabalho)
+        // Expense 2 (Conforto - Chácara)
         LancamentoDetails(
           id: '3',
           data: DateTime(2026, 8, 10),
-          descricao: 'Impostos',
+          descricao: 'Manutenção Chácara',
           tipo: LancamentoTipo.despesa,
           extratoFatura: extratoDetails,
           origem: LancamentoOrigemContaDetail(conta: contaDetails),
@@ -131,8 +147,8 @@ void main() {
           itens: const [
             LancamentoItemDetailsStandard(
               numero: 1,
-              centroCusto: ccTrabalho,
-              categoria: parentFin,
+              centroCusto: ccChacara,
+              categoria: parentConforto,
               valor: 1300.0,
             ),
           ],
@@ -148,7 +164,7 @@ void main() {
       expect(result.categoriasPai.length, equals(2));
       expect(
         result.categoriasPai[0].categoriaPai.descricao,
-        equals('Alimentação'),
+        equals('Custos Fixos'),
       );
       expect(result.categoriasPai[0].valorTotal, equals(2100.0));
       expect(result.categoriasPai[0].subcategorias.length, equals(1));
@@ -159,24 +175,24 @@ void main() {
 
       expect(
         result.categoriasPai[1].categoriaPai.descricao,
-        equals('Financeira'),
+        equals('Conforto'),
       );
       expect(result.categoriasPai[1].valorTotal, equals(1300.0));
 
       expect(result.categoriasPaiReceitas.length, equals(1));
       expect(
         result.categoriasPaiReceitas[0].categoriaPai.descricao,
-        equals('Financeira'),
+        equals('Receitas'),
       );
       expect(result.categoriasPaiReceitas[0].valorTotal, equals(8000.0));
 
       expect(result.centrosDeCusto.length, equals(2));
-      expect(result.centrosDeCusto[0].centroCusto.descricao, equals('Casa'));
+      expect(result.centrosDeCusto[0].centroCusto.descricao, equals('Geral'));
       expect(result.centrosDeCusto[0].valorTotal, equals(2100.0));
       expect(result.centrosDeCusto[0].categoriasPai.length, equals(1));
       expect(
         result.centrosDeCusto[0].categoriasPai[0].categoriaPai.descricao,
-        equals('Alimentação'),
+        equals('Custos Fixos'),
       );
       expect(
         result

@@ -16,8 +16,8 @@ class _SobrePageState extends State<SobrePage> with TickerProviderStateMixin {
   late Animation<Offset> _slideAnimation;
 
   // Variables to be replaced by deploy.sh
-  final _version = '1.3.1';
-  final _dataAtualizacao = '16/09/2026 12:04';
+  final _version = '1.3.2';
+  final _dataAtualizacao = '05/10/2026 23:18';
 
   @override
   void initState() {

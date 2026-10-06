@@ -159,19 +159,15 @@ class LancamentoSeed {
       efMay1Id: efMay1.id,
       efMay2Id: efMay2.id,
       efMayCardId: efMayCard.id,
-      catReceitas: findCat('Receitas'),
+      catReceitas: findCat('Salário'),
       catViagem: findCat('Viagem'),
       catSupermercado: findCat('Supermercado'),
       catRestaurantes: findCat('Restaurantes'),
-      catCombustivel: findCat('Combustível'),
+      catCombustivel: findCat('Transporte'),
       catSaude: findCat('Saúde'),
       catMoradia: findCat('Moradia'),
-      ccPessoaA: findCc('Pessoa A'),
-      ccPessoaB: findCc('Pessoa B'),
-      ccMoradia: findCc('Moradia'),
-      ccSaude: findCc('Saúde'),
-      ccLazer: findCc('Lazer'),
-      ccViagens: findCc('Viagens'),
+      ccGeral: findCc('Geral'),
+      ccChacara: findCc('Chácara'),
     );
   }
 
@@ -190,7 +186,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catReceitas,
             valor: 4800.00,
           ),
@@ -206,7 +202,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catSupermercado,
             valor: 524.15,
           ),
@@ -222,7 +218,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccLazer,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catRestaurantes,
             valor: 145.20,
           ),
@@ -238,7 +234,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catCombustivel,
             valor: 82.50,
           ),
@@ -254,7 +250,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccSaude,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catSaude,
             valor: 35.90,
           ),
@@ -270,7 +266,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catReceitas,
             valor: 1250.00,
           ),
@@ -286,13 +282,13 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 120.00,
           ),
           LancamentoItem(
             numero: 2,
-            centroCustoId: dep.ccPessoaB,
+            centroCustoId: dep.ccChacara,
             categoriaId: dep.catMoradia,
             valor: 120.00,
           ),
@@ -308,7 +304,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 650.00,
           ),
@@ -324,7 +320,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 99.90,
           ),
@@ -340,7 +336,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccViagens,
+            centroCustoId: dep.ccChacara,
             categoriaId: dep.catViagem,
             valor: 320.00,
           ),
@@ -365,7 +361,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catReceitas,
             valor: 4800.00,
           ),
@@ -381,7 +377,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catSupermercado,
             valor: 412.30,
           ),
@@ -397,7 +393,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccLazer,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catRestaurantes,
             valor: 189.50,
           ),
@@ -413,7 +409,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catCombustivel,
             valor: 90.00,
           ),
@@ -429,7 +425,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccSaude,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catSaude,
             valor: 45.20,
           ),
@@ -445,7 +441,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catReceitas,
             valor: 800.00,
           ),
@@ -461,13 +457,13 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccPessoaA,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 110.00,
           ),
           LancamentoItem(
             numero: 2,
-            centroCustoId: dep.ccPessoaB,
+            centroCustoId: dep.ccChacara,
             categoriaId: dep.catMoradia,
             valor: 110.00,
           ),
@@ -483,7 +479,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 650.00,
           ),
@@ -499,7 +495,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccMoradia,
+            centroCustoId: dep.ccGeral,
             categoriaId: dep.catMoradia,
             valor: 99.90,
           ),
@@ -515,7 +511,7 @@ class LancamentoSeed {
         itens: [
           LancamentoItem(
             numero: 1,
-            centroCustoId: dep.ccViagens,
+            centroCustoId: dep.ccChacara,
             categoriaId: dep.catViagem,
             valor: 75.00,
           ),
@@ -547,12 +543,8 @@ class _SeedDependencies {
   final String catSaude;
   final String catMoradia;
 
-  final String ccPessoaA;
-  final String ccPessoaB;
-  final String ccMoradia;
-  final String ccSaude;
-  final String ccLazer;
-  final String ccViagens;
+  final String ccGeral;
+  final String ccChacara;
 
   _SeedDependencies({
     required this.firstConta,
@@ -571,11 +563,7 @@ class _SeedDependencies {
     required this.catCombustivel,
     required this.catSaude,
     required this.catMoradia,
-    required this.ccPessoaA,
-    required this.ccPessoaB,
-    required this.ccMoradia,
-    required this.ccSaude,
-    required this.ccLazer,
-    required this.ccViagens,
+    required this.ccGeral,
+    required this.ccChacara,
   });
 }

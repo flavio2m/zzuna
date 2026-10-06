@@ -11,26 +11,17 @@ class CentroCustoSeed {
     final list = result.getOrElse((_) => []);
     if (list.isNotEmpty) return;
 
-    const descricoes = [
-      'Moradia',
-      'Viagens',
-      'Lazer',
-      'Educação',
-      'Saúde',
-      'Pessoa A',
-      'Pessoa B',
-      'Pessoa C',
-      'Jurídico',
-      'Terceiros',
-    ];
-
-    final dtos = List.generate(
-      descricoes.length,
-      (i) => CentroCustoDto(
-        descricao: descricoes[i],
-        ativo: i != 9,
+    final dtos = [
+      CentroCustoDto(
+        descricao: 'Geral',
+        ativo: true,
+        padrao: true,
       ),
-    );
+      CentroCustoDto(
+        descricao: 'Chácara',
+        ativo: true,
+      ),
+    ];
 
     await repository.createAll(dtos);
   }
