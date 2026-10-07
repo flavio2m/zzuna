@@ -77,8 +77,13 @@ class _LancamentosUpdateValorGrupoModalState
     super.initState();
     _viewModel = ref.read(lancamentosUpdateValorGrupoViewModelProvider);
     _viewModel.updateValorGrupoCommand.addListener(_commandListener);
+    final catIds = widget.initialItens.map((i) => i.categoriaId).toSet();
+    final ccIds = widget.initialItens.map((i) => i.centroCustoId).toSet();
     Future(() {
-      _viewModel.load();
+      _viewModel.load(
+        includeCategoriaIds: catIds,
+        includeCentroCustoIds: ccIds,
+      );
     });
 
     // Carregar itens originais

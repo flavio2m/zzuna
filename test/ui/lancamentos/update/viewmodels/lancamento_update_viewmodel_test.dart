@@ -5,6 +5,7 @@ import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/data/repositories/centro_custo/centro_custo_repository.dart';
 import 'package:zzuna/data/repositories/conta/conta_repository.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
+import 'package:zzuna/domain/dtos/centro_custo/centro_custo_dto.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/domain/usecases/lancamento/update_lancamento_usecase.dart';
 import 'package:zzuna/ui/lancamentos/update/individual/viewmodels/lancamento_update_viewmodel.dart';
@@ -50,8 +51,8 @@ void main() {
     centroCustoRepository.dispose();
   });
 
-  group('LancamentoUpdateViewModel - Filtro de Categorias Ativas', () {
-    test('load deve trazer apenas categorias ativas ao editar', () async {
+  group('LancamentoUpdateViewModel - Filtro de Categorias e Itens', () {
+    test('load deve trazer apenas categorias ativas por padrão', () async {
       // 1. Categoria pai ativa com filha ativa
       final catAlimentacao = await categoriaRepository.create(
         CategoriaDto(descricao: 'Alimentação', ativo: true),
@@ -114,14 +115,55 @@ void main() {
     });
 
     test(
-      'ao desativar uma categoria pai no repositório, ela é removida do viewModel de update',
+      'load com includeCategoriaIds deve incluir categoria inativa e sua hierarquia',
+      () async {
+        final catPai = await categoriaRepository.create(
+          CategoriaDto(descricao: 'Lazer Antigo', ativo: false),
+        );
+        final paiId = catPai.getOrThrow().id;
+
+        final catFilha = await categoriaRepository.create(
+          CategoriaDto(
+            descricao: 'Cinema',
+            categoriaPaiId: paiId,
+            ativo: false,
+          ),
+        );
+        final filhaId = catFilha.getOrThrow().id;
+
+        await viewModel.load(includeCategoriaIds: [filhaId]);
+
+        final lazerNode = viewModel.categorias.firstWhere((c) => c.id == paiId);
+        expect(lazerNode.ativo, isFalse);
+        expect(lazerNode.subcategorias.length, 1);
+        expect(lazerNode.subcategorias.first.id, filhaId);
+        expect(lazerNode.subcategorias.first.ativo, isFalse);
+      },
+    );
+
+    test(
+      'load com includeCentroCustoIds inclui centro de custo inativo',
+      () async {
+        final ccInativo = await centroCustoRepository.create(
+          CentroCustoDto(descricao: 'CC Desativado', ativo: false),
+        );
+        final ccId = ccInativo.getOrThrow().id;
+
+        await viewModel.load(includeCentroCustoIds: [ccId]);
+
+        expect(viewModel.centros.any((c) => c.id == ccId), isTrue);
+      },
+    );
+
+    test(
+      'ao desativar uma categoria pai no repositório, ela é mantida se estiver em includeCategoriaIds',
       () async {
         final catPai = await categoriaRepository.create(
           CategoriaDto(descricao: 'Investimentos', ativo: true),
         );
         final paiId = catPai.getOrThrow().id;
 
-        await viewModel.load();
+        await viewModel.load(includeCategoriaIds: [paiId]);
         expect(
           viewModel.categorias.any((c) => c.descricao == 'Investimentos'),
           isTrue,
@@ -134,10 +176,8 @@ void main() {
 
         await pumpEventQueue();
 
-        expect(
-          viewModel.categorias.any((c) => c.descricao == 'Investimentos'),
-          isFalse,
-        );
+        // Deve continuar presente porque está em includeCategoriaIds
+        expect(viewModel.categorias.any((c) => c.id == paiId), isTrue);
       },
     );
   });

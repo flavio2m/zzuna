@@ -3,15 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zzuna/config/providers.dart';
+import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/enums/categoria_natureza.dart';
 import 'package:zzuna/domain/models/orcamento/orcamento_comparativo_model.dart';
 import 'package:zzuna/ui/lancamentos/orcamento_comparativo/widgets/orcamento_comparativo_button.dart';
 import 'package:zzuna/ui/lancamentos/orcamento_comparativo/widgets/orcamento_comparativo_modal.dart';
 
+import '../../../../helpers/test_storage.dart';
+
 void main() {
+  late CategoriaRepository categoriaRepository;
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    categoriaRepository = CategoriaRepository(createTestCategoriaStorage());
+  });
+
+  tearDown(() {
+    categoriaRepository.dispose();
   });
 
   testWidgets('renders OrcamentoComparativoModal correctly with data', (
@@ -68,6 +78,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          categoriaRepositoryProvider.overrideWithValue(categoriaRepository),
           orcamentoComparativoModelProvider.overrideWithValue(mockComparativo),
         ],
         child: const MaterialApp(
@@ -114,6 +125,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          categoriaRepositoryProvider.overrideWithValue(categoriaRepository),
           orcamentoComparativoModelProvider.overrideWithValue(mockComparativo),
         ],
         child: const MaterialApp(

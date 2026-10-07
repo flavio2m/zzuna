@@ -6,6 +6,7 @@ import 'package:zzuna/domain/dtos/lancamento/lancamento_dto.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
+import 'package:zzuna/domain/value_objects/lancamento/lancamento_origem_detail.dart';
 import 'package:zzuna/domain/validators/lancamento_validator.dart';
 import 'package:zzuna/domain/usecases/lancamento/lancamento_item_distribution_usecase.dart';
 import 'package:zzuna/domain/exceptions/domain_exception.dart';
@@ -88,8 +89,26 @@ class _LancamentoUpdateModalState extends ConsumerState<LancamentoUpdateModal> {
       }
     });
 
+    final catIds = widget.lancamento.itens
+        .map((i) => i.categoria?.id)
+        .whereType<String>()
+        .toSet();
+    final ccIds = widget.lancamento.itens
+        .map((i) => i.centroCusto?.id)
+        .whereType<String>()
+        .toSet();
+    final (contaId, cartaoId) = switch (widget.lancamento.origem) {
+      LancamentoOrigemContaDetail(:final conta) => (conta.id, null),
+      LancamentoOrigemCartaoDetail(:final cartao) => (null, cartao.id),
+    };
+
     Future(() {
-      viewModel.load();
+      viewModel.load(
+        includeCategoriaIds: catIds,
+        includeCentroCustoIds: ccIds,
+        includeContaId: contaId,
+        includeCartaoId: cartaoId,
+      );
     });
 
     // Inicializar o DTO localmente a partir dos detalhes do lançamento

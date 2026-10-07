@@ -5,13 +5,12 @@ import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/categoria_field.dart';
 
 void main() {
-  group('CategoriaField - Filtro de Categorias Ativas', () {
+  group('CategoriaField - Exibição de Categorias', () {
     testWidgets(
-      'não deve exibir categorias inativas nem suas filhas no dropdown',
+      'deve exibir categorias ativas normalmente e categorias inativas com sufixo (Inativa)',
       (tester) async {
         final treeUseCase = CategoriaTreeUseCase();
 
-        // Lista com categorias ativas e inativas
         final rawCategorias = [
           const Categoria(id: 'c1', descricao: 'Alimentação', ativo: true),
           const Categoria(
@@ -26,23 +25,11 @@ void main() {
             categoriaPaiId: 'c1',
             ativo: false,
           ),
-          const Categoria(
-            id: 'c2',
-            descricao: 'Transporte (Inativo)',
-            ativo: false,
-          ),
-          const Categoria(
-            id: 'c2_1',
-            descricao: 'Combustível',
-            categoriaPaiId: 'c2',
-            ativo: false,
-          ),
         ];
 
-        // Constrói árvore
         final tree = treeUseCase.build(rawCategorias);
 
-        String? selectedValue;
+        String? selectedValue = 'c1_2';
 
         await tester.pumpWidget(
           MaterialApp(
@@ -73,13 +60,11 @@ void main() {
         expect(find.text('Alimentação'), findsWidgets);
         expect(find.text('Alimentação > Supermercado'), findsWidgets);
 
-        // NÃO deve exibir a filha inativa
-        expect(find.text('Alimentação > Doces (Antigo)'), findsNothing);
-
-        // NÃO deve exibir o pai inativo nem a filha do pai inativo
-        expect(find.text('Transporte (Inativo)'), findsNothing);
-        expect(find.text('Transporte (Inativo) > Combustível'), findsNothing);
-        expect(find.text('Combustível'), findsNothing);
+        // Deve exibir a categoria inativa com o sufixo (Inativa)
+        expect(
+          find.text('Alimentação > Doces (Antigo) (Inativa)'),
+          findsWidgets,
+        );
       },
     );
   });

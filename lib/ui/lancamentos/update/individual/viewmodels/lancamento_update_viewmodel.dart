@@ -26,6 +26,11 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
   final CategoriaTreeUseCase _categoriaTreeUseCase;
   StreamSubscription? _categoriaSubscription;
 
+  Set<String> _lastIncludeCategoriaIds = {};
+  Set<String> _lastIncludeCentroCustoIds = {};
+  String? _lastIncludeContaId;
+  String? _lastIncludeCartaoId;
+
   LancamentoUpdateViewModel(
     this._useCase,
     this._contaRepository,
@@ -35,7 +40,12 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
     this._categoriaTreeUseCase,
   ) {
     _categoriaSubscription = _categoriaRepository.observer().listen((_) {
-      load();
+      load(
+        includeCategoriaIds: _lastIncludeCategoriaIds,
+        includeCentroCustoIds: _lastIncludeCentroCustoIds,
+        includeContaId: _lastIncludeContaId,
+        includeCartaoId: _lastIncludeCartaoId,
+      );
     });
   }
 
@@ -61,7 +71,17 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
   );
 
   /// Carrega todas as listas necessárias para o formulário de atualização.
-  Future<void> load() async {
+  Future<void> load({
+    Iterable<String> includeCategoriaIds = const [],
+    Iterable<String> includeCentroCustoIds = const [],
+    String? includeContaId,
+    String? includeCartaoId,
+  }) async {
+    _lastIncludeCategoriaIds = includeCategoriaIds.toSet();
+    _lastIncludeCentroCustoIds = includeCentroCustoIds.toSet();
+    _lastIncludeContaId = includeContaId;
+    _lastIncludeCartaoId = includeCartaoId;
+
     isLoading = true;
     notifyListeners();
 
@@ -70,12 +90,13 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
     final categoriasResult = await _categoriaRepository.getAll();
     final centrosResult = await _centroCustoRepository.getAll();
 
-    // Monta a lista de origens: primeiro contas ativas, depois cartões ativos
+    // Monta a lista de origens: contas ativas (+ conta do lançamento se inativa),
+    // depois cartões ativos (+ cartão do lançamento se inativo)
     final novasOrigens = <LancamentoOrigemDetail>[];
 
     final contas = contasResult.getOrElse((_) => <Conta>[]);
     for (final conta in contas) {
-      if (!conta.ativo) continue;
+      if (!conta.ativo && conta.id != includeContaId) continue;
       final banco = Bancos.bySigla(conta.bancoSigla).getOrNull();
       if (banco == null) continue;
       novasOrigens.add(
@@ -93,7 +114,7 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
 
     final cartoes = cartoesResult.getOrElse((_) => <Cartao>[]);
     for (final cartao in cartoes) {
-      if (!cartao.ativo) continue;
+      if (!cartao.ativo && cartao.id != includeCartaoId) continue;
       final banco = Bancos.bySigla(cartao.bancoSigla).getOrNull();
       if (banco == null) continue;
       novasOrigens.add(
@@ -113,16 +134,36 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
 
     origens = novasOrigens;
 
-    final categoriasList = categoriasResult
-        .getOrElse((_) => <Categoria>[])
-        .onlyActive();
+    final allCategorias = categoriasResult.getOrElse((_) => <Categoria>[]);
+    final Map<String, Categoria> categoriaMap = {
+      for (final c in allCategorias) c.id: c,
+    };
+
+    final selectedCategoryIds = <String>{};
+    for (final c in allCategorias) {
+      if (c.ativo) {
+        selectedCategoryIds.add(c.id);
+      }
+    }
+
+    // Inclui as categorias especificadas do lançamento e seus ancestrais
+    for (final catId in includeCategoriaIds) {
+      String? currentId = catId;
+      while (currentId != null && !selectedCategoryIds.contains(currentId)) {
+        selectedCategoryIds.add(currentId);
+        currentId = categoriaMap[currentId]?.categoriaPaiId;
+      }
+    }
+
+    final categoriasList = allCategorias
+        .where((c) => selectedCategoryIds.contains(c.id))
+        .toList();
     categorias = _categoriaTreeUseCase.build(categoriasList);
 
-    centros =
-        centrosResult //
-            .getOrElse((_) => <CentroCusto>[])
-            .where((cc) => cc.ativo)
-            .toList();
+    centros = centrosResult
+        .getOrElse((_) => <CentroCusto>[])
+        .where((cc) => cc.ativo || _lastIncludeCentroCustoIds.contains(cc.id))
+        .toList();
 
     isLoading = false;
     notifyListeners();

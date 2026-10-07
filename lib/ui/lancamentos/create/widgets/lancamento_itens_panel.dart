@@ -42,23 +42,25 @@ class LancamentoItensPanel extends StatelessWidget {
   ) {
     final result = <String, String>{};
     for (final node in nodes) {
-      final label = prefix.isEmpty
+      final baseLabel = prefix.isEmpty
           ? node.descricao
           : '$prefix > ${node.descricao}';
+      final label = node.ativo ? baseLabel : '$baseLabel (Inativa)';
       result[node.id] = label;
       if (node.subcategorias.isNotEmpty) {
-        result.addAll(_getCategoriaLabels(node.subcategorias, label));
+        result.addAll(_getCategoriaLabels(node.subcategorias, baseLabel));
       }
     }
     return result;
   }
 
   String _getCentroCustoLabel(String id, List<CentroCusto> list) {
-    final cc =
-        list //
-            .cast<CentroCusto?>()
-            .firstWhere((e) => e?.id == id, orElse: () => null);
-    return cc?.descricao ?? '';
+    final cc = list.cast<CentroCusto?>().firstWhere(
+      (e) => e?.id == id,
+      orElse: () => null,
+    );
+    if (cc == null) return '';
+    return cc.ativo ? cc.descricao : '${cc.descricao} (Inativo)';
   }
 
   @override

@@ -9,7 +9,7 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/utils/extensions/num_extension.dart';
 import 'package:zzuna/utils/formatters/currency_formatter.dart';
 
-class OrcamentoComparativoModal extends ConsumerWidget {
+class OrcamentoComparativoModal extends ConsumerStatefulWidget {
   const OrcamentoComparativoModal({super.key});
 
   static void show(BuildContext context) {
@@ -22,7 +22,22 @@ class OrcamentoComparativoModal extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OrcamentoComparativoModal> createState() =>
+      _OrcamentoComparativoModalState();
+}
+
+class _OrcamentoComparativoModalState
+    extends ConsumerState<OrcamentoComparativoModal> {
+  @override
+  void initState() {
+    super.initState();
+    Future(() {
+      ref.read(orcamentoComparativoViewModelProvider).loadCategorias();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final comparativo = ref.watch(orcamentoComparativoModelProvider);
     final filterState = ref.watch(lancamentoFilterProvider);
     final isDesktop = MediaQuery.of(context).size.width >= 800;

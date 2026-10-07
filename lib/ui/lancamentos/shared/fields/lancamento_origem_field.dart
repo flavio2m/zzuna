@@ -31,9 +31,14 @@ class LancamentoOrigemField extends StatelessWidget {
 
   String _labelFor(LancamentoOrigemDetail detalhe) {
     return switch (detalhe) {
-      LancamentoOrigemContaDetail(:final conta) => 'Conta  ${conta.descricao}',
+      LancamentoOrigemContaDetail(:final conta) =>
+        conta.ativo
+            ? 'Conta  ${conta.descricao}'
+            : 'Conta  ${conta.descricao} (Inativa)',
       LancamentoOrigemCartaoDetail(:final cartao) =>
-        'Cartão  ${cartao.descricao}',
+        cartao.ativo
+            ? 'Cartão  ${cartao.descricao}'
+            : 'Cartão  ${cartao.descricao} (Inativo)',
     };
   }
 

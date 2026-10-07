@@ -40,21 +40,46 @@ class LancamentosUpdateValorGrupoViewModel extends ChangeNotifier {
     );
   }
 
-  Future<void> load() async {
+  Future<void> load({
+    Iterable<String> includeCategoriaIds = const [],
+    Iterable<String> includeCentroCustoIds = const [],
+  }) async {
     isLoading = true;
     notifyListeners();
 
     final categoriasResult = await _categoriaRepository.getAll();
     final centrosResult = await _centroCustoRepository.getAll();
 
-    final categoriasList = categoriasResult
-        .getOrElse((_) => <Categoria>[])
-        .onlyActive();
+    final allCategorias = categoriasResult.getOrElse((_) => <Categoria>[]);
+    final Map<String, Categoria> categoriaMap = {
+      for (final c in allCategorias) c.id: c,
+    };
+
+    final selectedCategoryIds = <String>{};
+    for (final c in allCategorias) {
+      if (c.ativo) {
+        selectedCategoryIds.add(c.id);
+      }
+    }
+
+    // Inclui as categorias especificadas e seus ancestrais
+    for (final catId in includeCategoriaIds) {
+      String? currentId = catId;
+      while (currentId != null && !selectedCategoryIds.contains(currentId)) {
+        selectedCategoryIds.add(currentId);
+        currentId = categoriaMap[currentId]?.categoriaPaiId;
+      }
+    }
+
+    final categoriasList = allCategorias
+        .where((c) => selectedCategoryIds.contains(c.id))
+        .toList();
     categorias = _categoriaTreeUseCase.build(categoriasList);
 
+    final includeCcSet = includeCentroCustoIds.toSet();
     centros = centrosResult
         .getOrElse((_) => <CentroCusto>[])
-        .where((cc) => cc.ativo)
+        .where((cc) => cc.ativo || includeCcSet.contains(cc.id))
         .toList();
 
     isLoading = false;

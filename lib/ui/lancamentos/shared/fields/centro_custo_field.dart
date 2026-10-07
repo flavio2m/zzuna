@@ -38,8 +38,10 @@ class CentroCustoField extends StatelessWidget {
         if (showAllOption)
           AppDropdownMenuItem<String?>(value: null, label: allOptionLabel),
         ...centros.map(
-          (cc) =>
-              AppDropdownMenuItem<String?>(value: cc.id, label: cc.descricao),
+          (cc) => AppDropdownMenuItem<String?>(
+            value: cc.id,
+            label: cc.ativo ? cc.descricao : '${cc.descricao} (Inativo)',
+          ),
         ),
       ],
       onChanged: onChanged,
