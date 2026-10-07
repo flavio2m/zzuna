@@ -30,6 +30,7 @@ class CategoriaField extends StatelessWidget {
   List<_FlatCategoria> _flatten(List<CategoriaDetails> nodes, String prefix) {
     final result = <_FlatCategoria>[];
     for (final node in nodes) {
+      if (!node.ativo) continue;
       final label = prefix.isEmpty
           ? node.descricao
           : '$prefix > ${node.descricao}';

@@ -11,7 +11,7 @@ _Categoria _$CategoriaFromJson(Map<String, dynamic> json) => _Categoria(
   descricao: json['descricao'] as String,
   categoriaPaiId: json['categoriaPaiId'] as String?,
   ativo: json['ativo'] as bool,
-  percentualOrcamento: (json['percentualOrcamento'] as num?)?.toInt(),
+  percentualOrcamento: (json['percentualOrcamento'] as num?)?.toDouble(),
   natureza:
       $enumDecodeNullable(_$CategoriaNaturezaEnumMap, json['natureza']) ??
       CategoriaNatureza.saida,

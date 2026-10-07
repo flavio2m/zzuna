@@ -12,6 +12,9 @@ final categoriaFilterUseCaseProvider = Provider<CategoriaFilterUseCase>(
 final categoriaTreeUseCaseProvider = Provider<CategoriaTreeUseCase>(
   (ref) => CategoriaTreeUseCase(), //
 );
+final categoriaSaveUseCaseProvider = Provider<CategoriaSaveUseCase>(
+  (ref) => CategoriaSaveUseCase(ref.watch(categoriaRepositoryProvider)),
+);
 
 // CATEGORIA
 final categoriaListViewModelProvider =
@@ -24,11 +27,11 @@ final categoriaListViewModelProvider =
     );
 
 final categoriaCreateViewModelProvider = Provider<CategoriaCreateViewModel>(
-  (ref) => CategoriaCreateViewModel(ref.watch(categoriaRepositoryProvider)),
+  (ref) => CategoriaCreateViewModel(ref.watch(categoriaSaveUseCaseProvider)),
 );
 
 final categoriaUpdateViewModelProvider = Provider<CategoriaUpdateViewModel>(
-  (ref) => CategoriaUpdateViewModel(ref.watch(categoriaRepositoryProvider)),
+  (ref) => CategoriaUpdateViewModel(ref.watch(categoriaSaveUseCaseProvider)),
 );
 
 final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(

@@ -9,6 +9,7 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/icons_buttons/icon_editar_button.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class CategoriaListItem extends StatelessWidget {
   final CategoriaDetails categoria;
@@ -123,7 +124,7 @@ class CategoriaListItem extends StatelessWidget {
                       size: AppSpacingSize.xs,
                       axis: Axis.horizontal,
                     ),
-                    AppTag('${categoria.percentualOrcamento}%'),
+                    AppTag(categoria.percentualOrcamento!.toPercentFormatted()),
                   ],
                 ],
 

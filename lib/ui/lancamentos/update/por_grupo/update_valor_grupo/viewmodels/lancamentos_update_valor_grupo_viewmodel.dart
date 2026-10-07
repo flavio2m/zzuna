@@ -47,7 +47,9 @@ class LancamentosUpdateValorGrupoViewModel extends ChangeNotifier {
     final categoriasResult = await _categoriaRepository.getAll();
     final centrosResult = await _centroCustoRepository.getAll();
 
-    final categoriasList = categoriasResult.getOrElse((_) => <Categoria>[]);
+    final categoriasList = categoriasResult
+        .getOrElse((_) => <Categoria>[])
+        .onlyActive();
     categorias = _categoriaTreeUseCase.build(categoriasList);
 
     centros = centrosResult

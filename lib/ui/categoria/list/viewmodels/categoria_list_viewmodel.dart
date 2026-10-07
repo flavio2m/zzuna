@@ -27,6 +27,10 @@ class CategoriaListViewModel extends ChangeNotifier {
   /// Todas as categorias raiz SEM filtro (usadas nos dropdowns dos modais)
   List<Categoria> categoriasPai = [];
 
+  /// Categorias raiz ativas (usadas no dropdown de seleção de categoria pai)
+  List<Categoria> get categoriasPaiAtivas =>
+      categoriasPai.where((c) => c.ativo).toList();
+
   /// Conjunto de IDs das categorias colapsadas na UI
   final Set<String> collapsedIds = {};
 
@@ -67,6 +71,7 @@ class CategoriaListViewModel extends ChangeNotifier {
     this._filterUseCase,
     this._treeUseCase,
   ) {
+    loadCommand.addListener(notifyListeners);
     _repositorySubscription = _repository.observer().listen((event) {
       if (event is RepositoryUpdated<Categoria>) {
         _handleRepositoryUpdated(event.model);
@@ -135,6 +140,14 @@ class CategoriaListViewModel extends ChangeNotifier {
   void _handleRepositoryUpdated(Categoria updated) {
     // Se a listagem ainda não foi carregada em memória, roda a carga completa
     if (categorias.isEmpty && categoriasPai.isEmpty) {
+      loadCommand.execute();
+      return;
+    }
+
+    // Se houver qualquer filtro ativo (ex: status ativo/inativo ou texto),
+    // recarrega para respeitar os critérios do filtro
+    if (statusSelecionado != null ||
+        (descricaoQuery != null && descricaoQuery!.isNotEmpty)) {
       loadCommand.execute();
       return;
     }
@@ -248,6 +261,7 @@ class CategoriaListViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    loadCommand.removeListener(notifyListeners);
     _repositorySubscription?.cancel();
     super.dispose();
   }

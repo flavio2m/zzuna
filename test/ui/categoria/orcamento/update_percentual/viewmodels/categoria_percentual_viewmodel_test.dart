@@ -57,5 +57,33 @@ void main() {
         expect(updatedCat.cor, CategoriaCores.azulCustosFixos);
       },
     );
+
+    test(
+      'updatePercentualCommand updates category percentage with decimal value',
+      () async {
+        final catResult = await categoriaRepository.create(
+          CategoriaDto(
+            descricao: 'Lazer',
+            natureza: CategoriaNatureza.saida,
+            percentualOrcamento: 15.0,
+            cor: CategoriaCores.amareloConhecimento,
+          ),
+        );
+        expect(catResult.isSuccess(), isTrue);
+        final cat = catResult.getOrThrow();
+
+        await viewModel.updatePercentualCommand.execute((
+          categoria: cat,
+          percentual: 12.75,
+        ));
+
+        expect(viewModel.updatePercentualCommand.value.isSuccess, isTrue);
+        final updatedCat =
+            (viewModel.updatePercentualCommand.value
+                    as SuccessCommand<Categoria>)
+                .value;
+        expect(updatedCat.percentualOrcamento, 12.75);
+      },
+    );
   });
 }

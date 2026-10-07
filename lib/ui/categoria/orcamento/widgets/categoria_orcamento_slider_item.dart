@@ -5,14 +5,15 @@ import 'package:zzuna/ui/categoria/orcamento/update_percentual/widgets/categoria
 import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class CategoriaOrcamentoSliderItem extends StatelessWidget {
   final Categoria categoria;
-  final int percentual;
+  final double percentual;
   final double orcamentoTotal;
-  final ValueChanged<int> onDragging;
-  final ValueChanged<int> onPercentualChanged;
-  final ValueChanged<int>? onSavedFromModal;
+  final ValueChanged<double> onDragging;
+  final ValueChanged<double> onPercentualChanged;
+  final ValueChanged<double>? onSavedFromModal;
 
   const CategoriaOrcamentoSliderItem({
     super.key,
@@ -31,6 +32,7 @@ class CategoriaOrcamentoSliderItem extends StatelessWidget {
     final valorFormatado = orcamentoTotal > 0
         ? '≈ ${UtilBrasilFields.obterReal(valorCalculado)} por mês'
         : '≈ R\$ •••,•• por mês';
+    final percentualFormatted = percentual.toCleanString(fractionDigits: 2);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -91,7 +93,7 @@ class CategoriaOrcamentoSliderItem extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppText(
-                        '$percentual',
+                        percentualFormatted,
                         variant: AppTextVariant.body,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -127,12 +129,12 @@ class CategoriaOrcamentoSliderItem extends StatelessWidget {
                 trackShape: const RoundedRectSliderTrackShape(),
               ),
               child: Slider(
-                value: percentual.toDouble().clamp(0, 100),
+                value: percentual.clamp(0.0, 100.0),
                 min: 0,
                 max: 100,
                 divisions: 100,
-                onChanged: (val) => onDragging(val.round()),
-                onChangeEnd: (val) => onPercentualChanged(val.round()),
+                onChanged: (val) => onDragging(val.roundToDouble()),
+                onChangeEnd: (val) => onPercentualChanged(val.roundToDouble()),
               ),
             ),
           ),

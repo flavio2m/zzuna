@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
@@ -14,10 +13,12 @@ import 'package:zzuna/ui/shared/widgets/forms/app_color_picker_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_percent_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class CategoriaUpdateModal extends ConsumerStatefulWidget {
   final CategoriaDto categoria;
@@ -83,7 +84,7 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
 
     _descController = TextEditingController(text: dto.descricao);
     _percentualController = TextEditingController(
-      text: dto.percentualOrcamento?.toString() ?? '',
+      text: dto.percentualOrcamento?.toCleanString() ?? '',
     );
 
     _descFocus.addListener(() {
@@ -139,9 +140,9 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
   Widget build(BuildContext context) {
     final updateVM = ref.watch(categoriaUpdateViewModelProvider);
     final listVM = ref.watch(categoriaListViewModelProvider);
-    // Exclui a própria categoria do dropdown para não criar ciclo
+    // Exclui a própria categoria do dropdown e categorias inativas (a menos que já seja o pai atual)
     final categoriasPai = listVM.categoriasPai
-        .where((c) => c.id != dto.id)
+        .where((c) => c.id != dto.id && (c.ativo || c.id == dto.categoriaPaiId))
         .toList();
     final isPai = dto.categoriaPaiId == null;
 
@@ -258,17 +259,21 @@ class _CategoriaUpdateModalState extends ConsumerState<CategoriaUpdateModal> {
                   axis: Axis.horizontal,
                 ),
                 Expanded(
-                  child: AppTextFormField(
+                  child: AppPercentFormField(
                     label: 'Percentual do Orçamento (% - Opcional)',
                     focusNode: _percentualFocus,
                     controller: _percentualController,
+                    decimalPlaces: 2,
                     textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onFieldSubmitted: (_) => _ativoFocus.requestFocus(),
                     onChanged: (value) {
-                      final parsed = int.tryParse(value);
-                      dto.setPercentualOrcamento(parsed);
+                      if (value.trim().isEmpty) {
+                        dto.setPercentualOrcamento(null);
+                      } else {
+                        final clean = value.replaceAll(',', '.');
+                        final parsed = double.tryParse(clean);
+                        dto.setPercentualOrcamento(parsed);
+                      }
                       setState(() {});
                     },
                     validator: validator.byField(dto, 'percentualOrcamento'),

@@ -2,9 +2,7 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
-import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
-import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/ui/lancamentos/list/widgets/transaction_row.dart';
 import 'package:zzuna/ui/lancamentos/reconcile/widgets/lancamento_reconcile_button.dart';
 import 'package:zzuna/ui/lancamentos/update/individual/widgets/lancamento_update_modal.dart';
@@ -19,32 +17,9 @@ class LancamentoPendenteRow extends ConsumerWidget {
 
   final LancamentoDetails lancamento;
 
-  String _categoryPath(CategoriaDetails cat) {
-    if (cat.categoriaPai != null) {
-      return '${_categoryPath(cat.categoriaPai!)} > ${cat.descricao}';
-    }
-    return cat.descricao;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = lancamento;
-
-    final costCenter = l.itens.isEmpty
-        ? 'CC: Geral'
-        : 'CC: ${l.itens.map((i) => switch (i) {
-            LancamentoItemDetailsStandard(:final centroCusto) => centroCusto.descricao,
-            LancamentoItemDetailsTransferencia() => 'Transferência',
-          }).join(', ')}';
-
-    final categoryPath = l.itens.isNotEmpty
-        ? (switch (l.itens.first) {
-            LancamentoItemDetailsStandard(:final categoria) => _categoryPath(
-              categoria,
-            ),
-            LancamentoItemDetailsTransferencia() => 'Transferência',
-          })
-        : 'Sem categoria';
 
     final formattedValue = UtilBrasilFields.obterReal(
       l.valor.abs(),
@@ -60,11 +35,9 @@ class LancamentoPendenteRow extends ConsumerWidget {
     return TransactionRow(
       lancamentoId: l.id,
       description: l.descricao,
-      category: categoryPath,
       origem: l.origem,
       value: formattedValue,
       tipo: l.tipo,
-      costCenter: costCenter,
       badge: null,
       grupo: l.grupo,
       conciliado: l.conciliado,

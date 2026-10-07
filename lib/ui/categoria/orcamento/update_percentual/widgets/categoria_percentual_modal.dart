@@ -9,18 +9,19 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
-import 'package:zzuna/ui/shared/widgets/forms/app_integer_form_field.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_percent_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class CategoriaPercentualModal extends ConsumerStatefulWidget {
   final Categoria categoria;
 
   const CategoriaPercentualModal({super.key, required this.categoria});
 
-  static Future<int?> show(BuildContext context, Categoria categoria) {
-    return AppDialog.show<int>(
+  static Future<double?> show(BuildContext context, Categoria categoria) {
+    return AppDialog.show<double>(
       context: context,
       child: CategoriaPercentualModal(categoria: categoria),
     );
@@ -40,9 +41,8 @@ class _CategoriaPercentualModalState
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: (widget.categoria.percentualOrcamento ?? 0).toString(),
-    );
+    final p = widget.categoria.percentualOrcamento;
+    _controller = TextEditingController(text: p?.toCleanString() ?? '0');
     viewModel = ref.read(categoriaPercentualViewModelProvider);
     viewModel.updatePercentualCommand.addListener(_commandListener);
   }
@@ -72,7 +72,8 @@ class _CategoriaPercentualModalState
   }
 
   void _handleSubmit() {
-    final parsed = int.tryParse(_controller.text);
+    final clean = _controller.text.replaceAll(',', '.');
+    final parsed = double.tryParse(clean);
     if (parsed != null && parsed >= 0 && parsed <= 100) {
       viewModel.updatePercentualCommand.execute((
         categoria: widget.categoria,
@@ -106,13 +107,14 @@ class _CategoriaPercentualModalState
             color: AppColors.slate600,
           ),
           const AppSpacing(size: AppSpacingSize.md),
-          AppIntegerFormField(
-            label: 'Percentual (%)',
+          AppPercentFormField(
+            label: 'Percentual',
             controller: _controller,
             focusNode: _focusNode,
             autofocus: true,
             min: 0,
             max: 100,
+            decimalPlaces: 2,
             onFieldSubmitted: (_) => _handleSubmit(),
           ),
         ],

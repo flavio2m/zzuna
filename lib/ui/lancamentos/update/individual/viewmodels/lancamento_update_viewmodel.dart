@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:zzuna/data/repositories/cartao/cartao_repository.dart';
@@ -22,6 +24,7 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
   final CategoriaRepository _categoriaRepository;
   final CentroCustoRepository _centroCustoRepository;
   final CategoriaTreeUseCase _categoriaTreeUseCase;
+  StreamSubscription? _categoriaSubscription;
 
   LancamentoUpdateViewModel(
     this._useCase,
@@ -30,7 +33,17 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
     this._categoriaRepository,
     this._centroCustoRepository,
     this._categoriaTreeUseCase,
-  );
+  ) {
+    _categoriaSubscription = _categoriaRepository.observer().listen((_) {
+      load();
+    });
+  }
+
+  @override
+  void dispose() {
+    _categoriaSubscription?.cancel();
+    super.dispose();
+  }
 
   /// Lista unificada de origens (contas ativas + cartões ativos), preparada para a UI.
   List<LancamentoOrigemDetail> origens = [];
@@ -100,7 +113,9 @@ class LancamentoUpdateViewModel extends ChangeNotifier {
 
     origens = novasOrigens;
 
-    final categoriasList = categoriasResult.getOrElse((_) => <Categoria>[]);
+    final categoriasList = categoriasResult
+        .getOrElse((_) => <Categoria>[])
+        .onlyActive();
     categorias = _categoriaTreeUseCase.build(categoriasList);
 
     centros =

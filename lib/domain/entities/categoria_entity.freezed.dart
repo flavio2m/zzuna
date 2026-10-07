@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Categoria {
 
- String get id; String get descricao; String? get categoriaPaiId; bool get ativo; int? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
+ String get id; String get descricao; String? get categoriaPaiId; bool get ativo; double? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
 /// Create a copy of Categoria
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $CategoriaCopyWith<$Res>  {
   factory $CategoriaCopyWith(Categoria value, $Res Function(Categoria) _then) = _$CategoriaCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, String? categoriaPaiId, bool ativo, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
+ String id, String descricao, String? categoriaPaiId, bool ativo, double? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -72,7 +72,7 @@ as String,descricao: null == descricao ? _self.descricao : descricao // ignore: 
 as String,categoriaPaiId: freezed == categoriaPaiId ? _self.categoriaPaiId : categoriaPaiId // ignore: cast_nullable_to_non_nullable
 as String?,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
-as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as double?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
 as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Categoria() when $default != null:
 return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
@@ -177,7 +177,7 @@ return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
 switch (_that) {
 case _Categoria():
 return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);}
@@ -194,7 +194,7 @@ return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
 switch (_that) {
 case _Categoria() when $default != null:
 return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
@@ -216,7 +216,7 @@ class _Categoria implements Categoria {
 @override final  String descricao;
 @override final  String? categoriaPaiId;
 @override final  bool ativo;
-@override final  int? percentualOrcamento;
+@override final  double? percentualOrcamento;
 @override@JsonKey() final  CategoriaNatureza natureza;
 @override final  String? cor;
 
@@ -253,7 +253,7 @@ abstract mixin class _$CategoriaCopyWith<$Res> implements $CategoriaCopyWith<$Re
   factory _$CategoriaCopyWith(_Categoria value, $Res Function(_Categoria) _then) = __$CategoriaCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, String? categoriaPaiId, bool ativo, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
+ String id, String descricao, String? categoriaPaiId, bool ativo, double? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -277,7 +277,7 @@ as String,descricao: null == descricao ? _self.descricao : descricao // ignore: 
 as String,categoriaPaiId: freezed == categoriaPaiId ? _self.categoriaPaiId : categoriaPaiId // ignore: cast_nullable_to_non_nullable
 as String?,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
-as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as double?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
 as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -289,7 +289,7 @@ as String?,
 /// @nodoc
 mixin _$CategoriaDetails {
 
- String get id; String get descricao; bool get ativo; CategoriaDetails? get categoriaPai; List<CategoriaDetails> get subcategorias; int? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
+ String get id; String get descricao; bool get ativo; CategoriaDetails? get categoriaPai; List<CategoriaDetails> get subcategorias; double? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
 /// Create a copy of CategoriaDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -320,7 +320,7 @@ abstract mixin class $CategoriaDetailsCopyWith<$Res>  {
   factory $CategoriaDetailsCopyWith(CategoriaDetails value, $Res Function(CategoriaDetails) _then) = _$CategoriaDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
+ String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, double? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -345,7 +345,7 @@ as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to
 as bool,categoriaPai: freezed == categoriaPai ? _self.categoriaPai : categoriaPai // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails?,subcategorias: null == subcategorias ? _self.subcategorias : subcategorias // ignore: cast_nullable_to_non_nullable
 as List<CategoriaDetails>,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
-as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as double?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
 as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -441,7 +441,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CategoriaDetails() when $default != null:
 return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
@@ -462,7 +462,7 @@ return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.su
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
 switch (_that) {
 case _CategoriaDetails():
 return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);}
@@ -479,7 +479,7 @@ return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.su
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  double? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
 switch (_that) {
 case _CategoriaDetails() when $default != null:
 return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
@@ -508,7 +508,7 @@ class _CategoriaDetails implements CategoriaDetails {
   return EqualUnmodifiableListView(_subcategorias);
 }
 
-@override final  int? percentualOrcamento;
+@override final  double? percentualOrcamento;
 @override@JsonKey() final  CategoriaNatureza natureza;
 @override final  String? cor;
 
@@ -542,7 +542,7 @@ abstract mixin class _$CategoriaDetailsCopyWith<$Res> implements $CategoriaDetai
   factory _$CategoriaDetailsCopyWith(_CategoriaDetails value, $Res Function(_CategoriaDetails) _then) = __$CategoriaDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
+ String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, double? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -567,7 +567,7 @@ as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to
 as bool,categoriaPai: freezed == categoriaPai ? _self.categoriaPai : categoriaPai // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails?,subcategorias: null == subcategorias ? _self._subcategorias : subcategorias // ignore: cast_nullable_to_non_nullable
 as List<CategoriaDetails>,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
-as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as double?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
 as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

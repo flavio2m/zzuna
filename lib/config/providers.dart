@@ -48,6 +48,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zzuna/ui/conta/update/viewmodels/conta_update_viewmodel.dart';
 
 import 'package:zzuna/domain/usecases/categoria/categoria_filter_usecase.dart';
+import 'package:zzuna/domain/usecases/categoria/categoria_save_usecase.dart';
 import 'package:zzuna/domain/usecases/categoria/categoria_tree_usecase.dart';
 
 import 'package:zzuna/data/repositories/lancamento/extrato_fatura_repository.dart';

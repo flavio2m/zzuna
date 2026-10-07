@@ -6,7 +6,7 @@ class CategoriaDto {
   String descricao;
   String? categoriaPaiId;
   bool ativo;
-  int? percentualOrcamento;
+  double? percentualOrcamento;
   CategoriaNatureza natureza;
   String? cor;
 
@@ -36,7 +36,7 @@ class CategoriaDto {
     this.ativo = ativo;
   }
 
-  void setPercentualOrcamento(int? percentualOrcamento) {
+  void setPercentualOrcamento(double? percentualOrcamento) {
     this.percentualOrcamento = percentualOrcamento;
   }
 
@@ -64,7 +64,7 @@ class CategoriaDto {
       descricao: json['descricao'] ?? '',
       categoriaPaiId: json['categoriaPaiId'],
       ativo: json['ativo'] ?? true,
-      percentualOrcamento: json['percentualOrcamento'] as int?,
+      percentualOrcamento: (json['percentualOrcamento'] as num?)?.toDouble(),
       natureza: json['natureza'] != null
           ? CategoriaNatureza.values.firstWhere(
               (e) => e.name == json['natureza'],

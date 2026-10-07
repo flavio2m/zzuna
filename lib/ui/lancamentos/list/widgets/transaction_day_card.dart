@@ -1,6 +1,5 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:zzuna/domain/entities/categoria_entity.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
 import 'package:zzuna/domain/models/lancamento_resumo_dia.dart';
@@ -34,13 +33,6 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
   void initState() {
     super.initState();
     _isCollapsed = ref.read(lancamentoFilterProvider).ocultarLancamentos;
-  }
-
-  String _categoryPath(CategoriaDetails cat) {
-    if (cat.categoriaPai != null) {
-      return '${_categoryPath(cat.categoriaPai!)} > ${cat.descricao}';
-    }
-    return cat.descricao;
   }
 
   String _formatValue(double valor, LancamentoTipo tipo) {
@@ -92,24 +84,6 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
     final formattedValue = _formatValue(valorExibicao, l.tipo);
     const String? badge = null;
 
-    final costCenter = //
-    l.itens.isEmpty
-        ? 'CC: Geral'
-        : 'CC: ${l.itens.map((i) => switch (i) {
-            LancamentoItemDetailsStandard(:final centroCusto) => centroCusto.descricao,
-            LancamentoItemDetailsTransferencia() => 'Transferência',
-          }).join(', ')}';
-
-    final categoryPath = //
-    l.itens.isNotEmpty
-        ? (switch (l.itens.first) {
-            LancamentoItemDetailsStandard(:final categoria) => _categoryPath(
-              categoria,
-            ),
-            LancamentoItemDetailsTransferencia() => 'Transferência',
-          })
-        : 'Sem categoria';
-
     final selected = ref.watch(
       lancamentosListViewModelProvider.select(
         (vm) => vm.selectedLancamentoIds.contains(l.id), //
@@ -125,11 +99,9 @@ class _TransactionDayCardState extends ConsumerState<TransactionDayCard> {
     return TransactionRow(
       lancamentoId: l.id,
       description: l.descricao,
-      category: categoryPath,
       origem: l.origem,
       value: formattedValue,
       tipo: l.tipo,
-      costCenter: costCenter,
       badge: badge,
       grupo: l.grupo,
       conciliado: l.conciliado,

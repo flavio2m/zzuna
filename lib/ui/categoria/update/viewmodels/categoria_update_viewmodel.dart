@@ -1,17 +1,17 @@
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
-import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
+import 'package:zzuna/domain/usecases/categoria/categoria_save_usecase.dart';
 
 class CategoriaUpdateViewModel {
-  final CategoriaRepository _repository;
+  final CategoriaSaveUseCase _saveUseCase;
 
-  CategoriaUpdateViewModel(this._repository);
+  CategoriaUpdateViewModel(this._saveUseCase);
 
   late final updateCommand = Command1(_update);
 
   AsyncResult<Categoria> _update(CategoriaDto dto) async {
-    return _repository.update(dto);
+    return _saveUseCase.update(dto);
   }
 }

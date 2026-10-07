@@ -13,7 +13,7 @@ sealed class Categoria with _$Categoria {
     required String descricao,
     String? categoriaPaiId,
     required bool ativo,
-    int? percentualOrcamento,
+    double? percentualOrcamento,
     @Default(CategoriaNatureza.saida) CategoriaNatureza natureza,
     String? cor,
   }) = _Categoria;
@@ -30,7 +30,7 @@ sealed class CategoriaDetails with _$CategoriaDetails {
     required bool ativo,
     required CategoriaDetails? categoriaPai,
     required List<CategoriaDetails> subcategorias,
-    int? percentualOrcamento,
+    double? percentualOrcamento,
     @Default(CategoriaNatureza.saida) CategoriaNatureza natureza,
     String? cor,
   }) = _CategoriaDetails;
@@ -42,4 +42,20 @@ extension CategoriaColorExtension on Categoria {
 
 extension CategoriaDetailsColorExtension on CategoriaDetails {
   Color get categoryColor => CategoriaCores.parseHex(cor ?? categoriaPai?.cor);
+}
+
+extension CategoriaListActiveExtension on Iterable<Categoria> {
+  /// Retorna apenas categorias ativas, garantindo que se o pai estiver inativo,
+  /// as filhas também são desconsideradas.
+  List<Categoria> onlyActive() {
+    final map = {for (final c in this) c.id: c};
+    return where((c) {
+      if (!c.ativo) return false;
+      if (c.categoriaPaiId != null) {
+        final parent = map[c.categoriaPaiId];
+        if (parent == null || !parent.ativo) return false;
+      }
+      return true;
+    }).toList();
+  }
 }

@@ -6,18 +6,18 @@ import 'package:zzuna/domain/value_objects/lancamento/lancamento_grupo.dart';
 import 'package:zzuna/domain/entities/lancamento/lancamento_entity.dart';
 import 'package:zzuna/ui/lancamentos/shared/fields/icon_acoes_button.dart';
 import 'package:zzuna/ui/lancamentos/create/widgets/clone_lancamento_button.dart';
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:zzuna/domain/value_objects/lancamento/lancamento_item.dart';
+import 'package:zzuna/domain/entities/categoria_entity.dart';
 
 class TransactionRow extends StatelessWidget {
   const TransactionRow({
     super.key,
     required this.lancamentoId,
     required this.description,
-    required this.category,
     required this.origem,
     required this.value,
     this.tipo = LancamentoTipo.despesa,
-    this.costCenter = 'CC: Geral',
     this.badge,
     this.grupo,
     this.conciliado = false,
@@ -31,11 +31,9 @@ class TransactionRow extends StatelessWidget {
 
   final String lancamentoId;
   final String description;
-  final String category;
   final LancamentoOrigemDetail origem;
   final String value;
   final LancamentoTipo tipo;
-  final String costCenter;
   final String? badge;
   final LancamentoGrupo? grupo;
   final bool conciliado;
@@ -45,6 +43,57 @@ class TransactionRow extends StatelessWidget {
   final LancamentoDetails lancamento;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onSelect;
+
+  /// Uma tag por categoria distinta dos itens do lançamento.
+  /// A cor vem da própria categoria, herdando a da categoria pai quando não
+  /// definida (e cinza neutro como último fallback).
+  List<Widget> _categoriaTags() {
+    if (lancamento.itens.isEmpty) {
+      return const [_CategoriaTag(label: 'Sem categoria')];
+    }
+
+    final tags = <Widget>[];
+    final categoryTotals = <String, double>{};
+    final categoryDetails = <String, CategoriaDetails>{};
+    var transferenciaTotal = 0.0;
+    var temTransferencia = false;
+
+    for (final item in lancamento.itens) {
+      switch (item) {
+        case LancamentoItemDetailsStandard(:final categoria, :final valor):
+          categoryTotals[categoria.id] =
+              (categoryTotals[categoria.id] ?? 0.0) + valor;
+          categoryDetails[categoria.id] = categoria;
+        case LancamentoItemDetailsTransferencia(:final valor):
+          transferenciaTotal += valor;
+          temTransferencia = true;
+      }
+    }
+
+    for (final entry in categoryTotals.entries) {
+      final categoria = categoryDetails[entry.key]!;
+      final formattedValor = UtilBrasilFields.obterReal(
+        entry.value.abs(),
+        moeda: true,
+      );
+      tags.add(
+        _CategoriaTag(
+          label: categoria.descricao,
+          color: categoria.categoryColor,
+          tooltip: formattedValor,
+        ),
+      );
+    }
+
+    if (temTransferencia && tags.isEmpty) {
+      final formattedValor = UtilBrasilFields.obterReal(
+        transferenciaTotal.abs(),
+        moeda: true,
+      );
+      tags.add(_CategoriaTag(label: 'Transferência', tooltip: formattedValor));
+    }
+    return tags;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,30 +229,27 @@ class TransactionRow extends StatelessWidget {
                                     fontSize: 10,
                                   ),
                                 ),
-                                Text(
-                                  category,
-                                  style: const TextStyle(
-                                    color: AppColors.slate600,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
+                                ..._categoriaTags(),
+                                if (lancamento.observacao != null &&
+                                    lancamento.observacao!
+                                        .trim()
+                                        .isNotEmpty) ...[
+                                  const Text(
+                                    '•',
+                                    style: TextStyle(
+                                      color: AppColors.slate300,
+                                      fontSize: 10,
+                                    ),
                                   ),
-                                ),
-                                const Text(
-                                  '•',
-                                  style: TextStyle(
-                                    color: AppColors.slate300,
-                                    fontSize: 10,
+                                  Tooltip(
+                                    message: lancamento.observacao!.trim(),
+                                    child: const Icon(
+                                      Icons.sticky_note_2_outlined,
+                                      size: 13,
+                                      color: AppColors.slate500,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  costCenter,
-                                  style: const TextStyle(
-                                    color: AppColors.slate500,
-                                    fontSize: 10,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                                ],
                                 if (grupo != null) ...[
                                   const Text(
                                     '•',
@@ -370,6 +416,53 @@ class _MetaChip extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _CategoriaTag extends StatelessWidget {
+  const _CategoriaTag({
+    required this.label,
+    this.color = AppColors.slate500,
+    this.tooltip,
+  });
+
+  final String label;
+  final Color color;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    // Escurece o texto para garantir legibilidade em cores claras (ex.: amarelo).
+    final hsl = HSLColor.fromColor(color);
+    final textColor = hsl
+        .withLightness(hsl.lightness > 0.35 ? 0.35 : hsl.lightness)
+        .toColor();
+
+    final tag = Container(
+      constraints: const BoxConstraints(maxWidth: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    if (tooltip != null) {
+      return Tooltip(message: tooltip!, child: tag);
+    }
+
+    return tag;
   }
 }
 

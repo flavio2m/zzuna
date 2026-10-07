@@ -50,8 +50,8 @@ List<RouteEntity> get routes => [
   ),
   RouteEntity(key: 'home', uri: Uri.parse('home'), routeBuilder: b9Builder),
   RouteEntity(
-    key: 'lista_compras',
-    uri: Uri.parse('lista_compras'),
+    key: 'lista_compras/list/lista_compras',
+    uri: Uri.parse('lista_compras/list/lista_compras'),
     routeBuilder: b10Builder,
   ),
 ];
@@ -97,5 +97,11 @@ const routePaths = (
     path: '/home',
     pages: (path: '/home/pages', sobre: '/home/pages/sobre'),
   ),
-  listaCompras: '/lista_compras',
+  listaCompras: (
+    path: '/lista_compras',
+    list: (
+      path: '/lista_compras/list',
+      listaCompras: '/lista_compras/list/lista_compras',
+    ),
+  ),
 );

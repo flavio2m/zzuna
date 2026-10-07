@@ -13,6 +13,7 @@ class AppPercentFormField extends StatelessWidget {
   final bool autofocus;
   final double min;
   final double max;
+  final int decimalPlaces;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
 
@@ -28,6 +29,7 @@ class AppPercentFormField extends StatelessWidget {
     this.autofocus = false,
     this.min = 0.0,
     this.max = 100.0,
+    this.decimalPlaces = 2,
     this.textInputAction,
     this.onFieldSubmitted,
   });
@@ -55,10 +57,10 @@ class AppPercentFormField extends StatelessWidget {
           if (parsed > max) {
             return 'Máximo de $max%';
           }
-          // Validar limite de 3 casas decimais
+          // Validar limite de casas decimais
           final parts = cleanVal.split('.');
-          if (parts.length > 1 && parts[1].length > 3) {
-            return 'Máximo de 3 casas decimais';
+          if (parts.length > 1 && parts[1].length > decimalPlaces) {
+            return 'Máximo de $decimalPlaces casas decimais';
           }
         }
         return null;

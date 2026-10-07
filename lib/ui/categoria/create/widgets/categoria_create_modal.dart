@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
@@ -14,9 +13,11 @@ import 'package:zzuna/ui/shared/widgets/forms/app_color_picker_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_percent_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class CategoriaCreateModal extends ConsumerStatefulWidget {
   const CategoriaCreateModal({super.key});
@@ -91,7 +92,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   Widget build(BuildContext context) {
     final createVM = ref.watch(categoriaCreateViewModelProvider);
     final listVM = ref.watch(categoriaListViewModelProvider);
-    final categoriasPai = listVM.categoriasPai;
+    final categoriasPai = listVM.categoriasPaiAtivas;
     final isPai = dto.categoriaPaiId == null;
 
     return AppForm(
@@ -200,17 +201,21 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
                   axis: Axis.horizontal,
                 ),
                 Expanded(
-                  child: AppTextFormField(
+                  child: AppPercentFormField(
                     label: 'Percentual do Orçamento (% - Opcional)',
                     focusNode: _percentualFocus,
+                    decimalPlaces: 2,
                     textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    initialValue: dto.percentualOrcamento?.toString() ?? '',
+                    initialValue: dto.percentualOrcamento?.toCleanString(),
                     onFieldSubmitted: (_) => _saveFocus.requestFocus(),
                     onChanged: (value) {
-                      final parsed = int.tryParse(value);
-                      dto.setPercentualOrcamento(parsed);
+                      if (value.trim().isEmpty) {
+                        dto.setPercentualOrcamento(null);
+                      } else {
+                        final clean = value.replaceAll(',', '.');
+                        final parsed = double.tryParse(clean);
+                        dto.setPercentualOrcamento(parsed);
+                      }
                       setState(() {});
                     },
                     validator: validator.byField(dto, 'percentualOrcamento'),

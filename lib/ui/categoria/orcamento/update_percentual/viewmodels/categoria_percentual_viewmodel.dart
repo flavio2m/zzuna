@@ -12,7 +12,7 @@ class CategoriaPercentualViewModel {
   late final updatePercentualCommand = Command1(_updatePercentual);
 
   AsyncResult<Categoria> _updatePercentual(
-    ({Categoria categoria, int percentual}) params,
+    ({Categoria categoria, double percentual}) params,
   ) async {
     final dto = CategoriaDto(
       id: params.categoria.id,

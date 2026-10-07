@@ -26,30 +26,6 @@ class CategoriaRepository
 
   @override
   AsyncResult<Categoria> create(CategoriaDto dto) async {
-    // Verifica se já existe categoria com a mesma descrição no mesmo nível
-    final exists = await _existsDuplicate(dto.descricao, dto.categoriaPaiId);
-    if (exists) {
-      return Failure(
-        RepositoryException(
-          'Já existe uma categoria com a descrição "${dto.descricao}" '
-          'neste nível.',
-        ),
-      );
-    }
-    // Verifica regra de hierarquia ao criar
-    if (dto.categoriaPaiId != null) {
-      final parentResult = await _storage.getById(dto.categoriaPaiId!);
-      if (parentResult.isSuccess()) {
-        final parent = parentResult.getOrThrow();
-        if (parent.categoriaPaiId != null) {
-          return Failure(
-            RepositoryException(
-              'Somente dois níveis são permitidos.', //
-            ),
-          );
-        }
-      }
-    }
     final categoria = Categoria(
       id: const Uuid().v4(),
       descricao: dto.descricao,
@@ -59,8 +35,8 @@ class CategoriaRepository
       natureza: dto.natureza,
       cor: dto.cor,
     );
-    return _storage.create(categoria).onSuccess((cat) {
-      _streamController.add(RepositoryCreated(cat));
+    return _storage.create(categoria).onSuccess((_) {
+      _streamController.add(RepositoryCreated(categoria));
     });
   }
 
@@ -97,33 +73,6 @@ class CategoriaRepository
         existingResult.exceptionOrNull()!, //
       );
     }
-    // Verifica se já existe categoria com a mesma descrição no mesmo nível
-    final exists = await _existsDuplicate(
-      dto.descricao,
-      dto.categoriaPaiId,
-      excludeId: dto.id,
-    );
-    if (exists) {
-      return Failure(
-        RepositoryException(
-          'Já existe uma categoria com a descrição "${dto.descricao}" neste nível.', //
-        ),
-      );
-    }
-    // Se estiver alterando para subcategoria, validar nível
-    if (dto.categoriaPaiId != null) {
-      final parentResult = await _storage.getById(dto.categoriaPaiId!);
-      if (parentResult.isSuccess()) {
-        final parent = parentResult.getOrThrow();
-        if (parent.categoriaPaiId != null) {
-          return Failure(
-            RepositoryException(
-              'Somente dois níveis são permitidos.', //
-            ),
-          );
-        }
-      }
-    }
     final categoria = Categoria(
       id: dto.id!,
       descricao: dto.descricao,
@@ -133,8 +82,8 @@ class CategoriaRepository
       natureza: dto.natureza,
       cor: dto.cor,
     );
-    return _storage.update(categoria).onSuccess((cat) {
-      _streamController.add(RepositoryUpdated(cat));
+    return _storage.update(categoria).onSuccess((_) {
+      _streamController.add(RepositoryUpdated(categoria));
     });
   }
 
@@ -176,23 +125,6 @@ class CategoriaRepository
   @override
   AsyncResult<Categoria> getById(String id) async {
     return _storage.getById(id);
-  }
-
-  Future<bool> _existsDuplicate(
-    String descricao,
-    String? categoriaPaiId, {
-    String? excludeId,
-  }) async {
-    final result = await getAll();
-    return result.fold((list) {
-      final filtered = list.where((c) {
-        if (c.categoriaPaiId != categoriaPaiId) return false;
-        if (excludeId != null && c.id == excludeId) return false;
-        return c.descricao.trim().toLowerCase() ==
-            descricao.trim().toLowerCase();
-      });
-      return filtered.isNotEmpty;
-    }, (error) => false);
   }
 
   @override

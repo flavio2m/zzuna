@@ -6,6 +6,7 @@ import 'package:zzuna/ui/shared/theme/app_colors.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
 
@@ -40,6 +41,13 @@ class AppColorPickerField extends StatelessWidget {
             } catch (_) {}
           }
 
+          void confirmar() {
+            if (previewColor != null) {
+              onChanged('#${hexDigitado.toUpperCase()}');
+              Navigator.pop(ctx);
+            }
+          }
+
           return AppForm(
             title: 'Cor Personalizada',
             type: AppFormType.modal,
@@ -47,12 +55,7 @@ class AppColorPickerField extends StatelessWidget {
               ButtonCancel(onPressed: () => Navigator.pop(ctx)),
               ButtonSave(
                 label: 'Selecionar',
-                onPressed: previewColor != null
-                    ? () {
-                        onChanged('#${hexDigitado.toUpperCase()}');
-                        Navigator.pop(ctx);
-                      }
-                    : null,
+                onPressed: previewColor != null ? confirmar : null,
               ),
             ],
             child: Column(
@@ -66,18 +69,19 @@ class AppColorPickerField extends StatelessWidget {
                 ),
                 const AppSpacing(size: AppSpacingSize.md),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: previewColor ?? AppColors.slate800,
+                        color: previewColor ?? AppColors.slate100,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: previewColor != null
-                              ? Colors.white.withValues(alpha: 0.3)
-                              : AppColors.slate700,
-                          width: 2,
+                              ? AppColors.border
+                              : AppColors.slate300,
+                          width: 1.5,
                         ),
                       ),
                       child: previewColor == null
@@ -90,7 +94,15 @@ class AppColorPickerField extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: TextField(
+                      child: AppTextFormField(
+                        label: 'Hexadecimal',
+                        hintText: 'FF5722',
+                        prefixText: '# ',
+                        prefixStyle: const TextStyle(
+                          color: AppColors.slate500,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                         controller: controller,
                         autofocus: true,
                         inputFormatters: [
@@ -99,41 +111,12 @@ class AppColorPickerField extends StatelessWidget {
                           ),
                           LengthLimitingTextInputFormatter(8),
                         ],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        decoration: InputDecoration(
-                          prefixText: '# ',
-                          prefixStyle: const TextStyle(
-                            color: AppColors.slate400,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          filled: true,
-                          fillColor: AppColors.slate800,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: AppColors.slate700,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                        ),
                         onChanged: (val) {
                           setDialogState(() {
                             hexDigitado = val;
                           });
                         },
+                        onFieldSubmitted: (_) => confirmar(),
                       ),
                     ),
                   ],
@@ -261,13 +244,13 @@ class AppColorPickerField extends StatelessWidget {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: AppColors.slate800,
+                        color: AppColors.slate100,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.slate700),
+                        border: Border.all(color: AppColors.border),
                       ),
                       child: const Icon(
                         Icons.colorize_outlined,
-                        color: AppColors.slate300,
+                        color: AppColors.slate600,
                         size: 16,
                       ),
                     ),

@@ -28,9 +28,7 @@ void main() {
     bool temSubcategorias = false,
   }) {
     return ProviderScope(
-      overrides: [
-        categoriaRepositoryProvider.overrideWithValue(repository),
-      ],
+      overrides: [categoriaRepositoryProvider.overrideWithValue(repository)],
       child: MaterialApp(
         home: Scaffold(
           body: CategoriaUpdateModal(
@@ -73,34 +71,33 @@ void main() {
       },
     );
 
-    testWidgets(
-      'não exibe Categoria Pai quando temSubcategorias é true',
-      (tester) async {
-        final cat = CategoriaDto(
-          id: 'cat-1',
-          descricao: 'Moradia',
-          natureza: CategoriaNatureza.saida,
-          percentualOrcamento: 30,
-          cor: '#0084FF',
-        );
+    testWidgets('não exibe Categoria Pai quando temSubcategorias é true', (
+      tester,
+    ) async {
+      final cat = CategoriaDto(
+        id: 'cat-1',
+        descricao: 'Moradia',
+        natureza: CategoriaNatureza.saida,
+        percentualOrcamento: 30,
+        cor: '#0084FF',
+      );
 
-        await tester.pumpWidget(
-          createWidgetUnderTest(categoria: cat, temSubcategorias: true),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        createWidgetUnderTest(categoria: cat, temSubcategorias: true),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Categoria Pai'), findsNothing);
-        expect(find.text('Natureza'), findsOneWidget);
-        expect(
-          find.widgetWithText(
-            TextFormField,
-            'Percentual do Orçamento (% - Opcional)',
-          ),
-          findsOneWidget,
-        );
-        expect(find.byType(AppColorPickerField), findsOneWidget);
-      },
-    );
+      expect(find.text('Categoria Pai'), findsNothing);
+      expect(find.text('Natureza'), findsOneWidget);
+      expect(
+        find.widgetWithText(
+          TextFormField,
+          'Percentual do Orçamento (% - Opcional)',
+        ),
+        findsOneWidget,
+      );
+      expect(find.byType(AppColorPickerField), findsOneWidget);
+    });
 
     testWidgets(
       'não exibe Natureza, Percentual e Cor para subcategoria (categoria filha)',
@@ -129,5 +126,60 @@ void main() {
         expect(find.byType(AppColorPickerField), findsNothing);
       },
     );
+
+    testWidgets('não lista categorias inativas no dropdown Categoria Pai', (
+      tester,
+    ) async {
+      await repository.create(
+        CategoriaDto(
+          descricao: 'Pai Ativo',
+          natureza: CategoriaNatureza.saida,
+          ativo: true,
+        ),
+      );
+      await repository.create(
+        CategoriaDto(
+          descricao: 'Pai Inativo',
+          natureza: CategoriaNatureza.saida,
+          ativo: false,
+        ),
+      );
+
+      final cat = CategoriaDto(
+        id: 'cat-filha',
+        descricao: 'Filha',
+        natureza: CategoriaNatureza.saida,
+      );
+
+      final container = ProviderContainer(
+        overrides: [categoriaRepositoryProvider.overrideWithValue(repository)],
+      );
+      await container
+          .read(categoriaListViewModelProvider)
+          .loadCommand
+          .execute();
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: CategoriaUpdateModal(
+                categoria: cat,
+                temSubcategorias: false,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownMenu<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pai Ativo'), findsWidgets);
+      expect(find.text('Pai Inativo'), findsNothing);
+    });
   });
 }

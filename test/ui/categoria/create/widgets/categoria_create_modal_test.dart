@@ -121,5 +121,42 @@ void main() {
         expect(find.text('Ativo'), findsNothing);
       },
     );
+
+    testWidgets('dropdown Categoria Pai não deve listar categorias inativas', (
+      tester,
+    ) async {
+      await repository.create(
+        CategoriaDto(
+          descricao: 'Transporte Inativo',
+          natureza: CategoriaNatureza.saida,
+          ativo: false,
+        ),
+      );
+
+      final container = ProviderContainer(
+        overrides: [categoriaRepositoryProvider.overrideWithValue(repository)],
+      );
+      await container
+          .read(categoriaListViewModelProvider)
+          .loadCommand
+          .execute();
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            home: Scaffold(body: CategoriaCreateModal()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownMenu<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Moradia'), findsWidgets);
+      expect(find.text('Transporte Inativo'), findsNothing);
+    });
   });
 }

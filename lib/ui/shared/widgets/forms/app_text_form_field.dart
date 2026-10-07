@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 
 class AppTextFormField extends StatelessWidget {
   final String label;
+  final String? hintText;
+  final String? prefixText;
+  final TextStyle? prefixStyle;
+  final Widget? prefix;
   final IconData? icon;
   final Widget? suffixIcon;
   final ValueChanged<String>? onChanged;
@@ -18,10 +22,15 @@ class AppTextFormField extends StatelessWidget {
   final bool autofocus;
   final VoidCallback? onTap;
   final bool readOnly;
+  final TextStyle? style;
 
   const AppTextFormField({
     super.key,
     required this.label,
+    this.hintText,
+    this.prefixText,
+    this.prefixStyle,
+    this.prefix,
     this.icon,
     this.suffixIcon,
     this.onChanged,
@@ -37,6 +46,7 @@ class AppTextFormField extends StatelessWidget {
     this.autofocus = false,
     this.onTap,
     this.readOnly = false,
+    this.style,
   });
 
   @override
@@ -48,7 +58,7 @@ class AppTextFormField extends StatelessWidget {
       textInputAction: textInputAction,
       onTap: onTap,
       readOnly: readOnly,
-      style: const TextStyle(fontSize: 14),
+      style: style ?? const TextStyle(fontSize: 14),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: validator,
       obscureText: obscureText,
@@ -56,7 +66,11 @@ class AppTextFormField extends StatelessWidget {
       inputFormatters: inputFormatters,
       initialValue: controller == null ? initialValue : null,
       decoration: InputDecoration(
-        labelText: label,
+        labelText: label.isNotEmpty ? label : null,
+        hintText: hintText,
+        prefixText: prefixText,
+        prefixStyle: prefixStyle,
+        prefix: prefix,
         border: const OutlineInputBorder(),
         prefixIcon: icon != null ? Icon(icon) : null,
         suffixIcon: suffixIcon,

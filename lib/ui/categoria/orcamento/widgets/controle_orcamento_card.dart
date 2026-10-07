@@ -12,6 +12,7 @@ import 'package:zzuna/ui/shared/widgets/cards/app_card.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/ui/shared/widgets/texts/app_text.dart';
+import 'package:zzuna/utils/extensions/num_extension.dart';
 
 class ControleOrcamentoCard extends ConsumerStatefulWidget {
   final EdgeInsetsGeometry? margin;
@@ -30,7 +31,7 @@ class ControleOrcamentoCard extends ConsumerStatefulWidget {
 
 class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
   // Cache temporário para valores enquanto o slider é arrastado
-  final Map<String, int> _tempPercentages = {};
+  final Map<String, double> _tempPercentages = {};
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +43,7 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
     final categoriasOrcamento = listVM.categoriasPai
         .where(
           (c) =>
+              c.ativo &&
               c.natureza == CategoriaNatureza.saida &&
               c.percentualOrcamento != null,
         )
@@ -56,8 +58,8 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
     }
 
     // Calcula o percentual total alocado
-    final totalAlocado = categoriasOrcamento.fold<int>(0, (sum, cat) {
-      final p = _tempPercentages[cat.id] ?? cat.percentualOrcamento ?? 0;
+    final totalAlocado = categoriasOrcamento.fold<double>(0.0, (sum, cat) {
+      final p = _tempPercentages[cat.id] ?? cat.percentualOrcamento ?? 0.0;
       return sum + p;
     });
 
@@ -150,12 +152,23 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
 
           const AppSpacing(size: AppSpacingSize.sm),
 
-          if (categoriasOrcamento.isEmpty) ...[
+          if (listVM.loadCommand.value.isRunning &&
+              listVM.categoriasPai.isEmpty) ...[
+            widget.isExpanded
+                ? const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+          ] else if (categoriasOrcamento.isEmpty) ...[
             widget.isExpanded
                 ? const Expanded(
                     child: Center(
                       child: AppText(
-                        'Nenhuma categoria pai de despesa com percentual de orçamento configurado.',
+                        'Nenhuma categoria pai de despesa com percentual de '
+                        'orçamento configurado.',
                         variant: AppTextVariant.body,
                         color: AppColors.slate400,
                         textAlign: TextAlign.center,
@@ -166,7 +179,8 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Center(
                       child: AppText(
-                        'Nenhuma categoria pai de despesa com percentual de orçamento configurado.',
+                        'Nenhuma categoria pai de despesa com percentual de '
+                        'orçamento configurado.',
                         variant: AppTextVariant.body,
                         color: AppColors.slate400,
                         textAlign: TextAlign.center,
@@ -201,14 +215,10 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
                   color: AppColors.slate400,
                 ),
                 AppText(
-                  '$totalAlocado% / 100%',
+                  '${totalAlocado.toPercentFormatted()} / 100%',
                   variant: AppTextVariant.subtitle,
                   fontWeight: FontWeight.bold,
-                  color: totalAlocado == 100
-                      ? const Color(0xFFFF6B00)
-                      : (totalAlocado > 100
-                            ? AppColors.danger
-                            : const Color(0xFFEAB308)),
+                  color: _getTotalColor(totalAlocado),
                 ),
               ],
             ),
@@ -218,13 +228,29 @@ class _ControleOrcamentoCardState extends ConsumerState<ControleOrcamentoCard> {
     );
   }
 
+  Color _getTotalColor(double totalAlocado) {
+    if (totalAlocado > 100) {
+      return AppColors.danger;
+    }
+    final t = (totalAlocado / 100).clamp(0.0, 1.0);
+    if (t < 0.5) {
+      return Color.lerp(AppColors.danger, const Color(0xFFEAB308), t * 2)!;
+    } else {
+      return Color.lerp(
+        const Color(0xFFEAB308),
+        AppColors.emerald800,
+        (t - 0.5) * 2,
+      )!;
+    }
+  }
+
   List<Widget> _buildSliderItems(
     List<Categoria> categoriasOrcamento,
     double orcamento,
   ) {
     return categoriasOrcamento.map((cat) {
       final percentual =
-          _tempPercentages[cat.id] ?? cat.percentualOrcamento ?? 0;
+          _tempPercentages[cat.id] ?? cat.percentualOrcamento ?? 0.0;
 
       return CategoriaOrcamentoSliderItem(
         key: ValueKey(cat.id),
