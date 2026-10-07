@@ -35,3 +35,12 @@ final categoriaDeleteViewModelProvider = Provider<CategoriaDeleteViewModel>(
   (ref) => CategoriaDeleteViewModel(ref.watch(categoriaRepositoryProvider)),
 );
 
+final definirOrcamentoViewModelProvider = Provider<DefinirOrcamentoViewModel>(
+  (ref) => DefinirOrcamentoViewModel(ref.watch(authRepositoryProvider)),
+);
+
+final categoriaPercentualViewModelProvider =
+    Provider<CategoriaPercentualViewModel>(
+      (ref) =>
+          CategoriaPercentualViewModel(ref.watch(categoriaRepositoryProvider)),
+    );

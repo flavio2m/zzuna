@@ -9,7 +9,10 @@ import 'package:zzuna/ui/shared/widgets/layout/app_divider.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
 
 class CategoriaListView extends ConsumerStatefulWidget {
-  const CategoriaListView({super.key});
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
+
+  const CategoriaListView({super.key, this.shrinkWrap = false, this.physics});
 
   @override
   ConsumerState<CategoriaListView> createState() => _CategoriaListViewState();
@@ -24,24 +27,32 @@ class _CategoriaListViewState extends ConsumerState<CategoriaListView> {
       listenable: viewModel.loadCommand,
       builder: (context, _) {
         final state = viewModel.loadCommand.value;
+        final categorias = viewModel.categorias;
 
-        if (state.isRunning) {
-          return const Center(child: CircularProgressIndicator());
+        if (state.isRunning && categorias.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (state.isFailure) {
-          return Center(
-            child: AppText(
-              'Erro ao carregar categorias: ${state.getExceptionOrNull()}',
-              color: AppColors.danger,
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: AppText(
+                'Erro ao carregar categorias: ${state.getExceptionOrNull()}',
+                color: AppColors.danger,
+              ),
             ),
           );
         }
 
-        final categorias = viewModel.categorias;
-
         if (categorias.isEmpty) {
-          return const Center(child: AppText('Nenhuma categoria encontrada.'));
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: AppText('Nenhuma categoria encontrada.')),
+          );
         }
 
         // Monta a lista visível com suporte a múltiplos níveis de hierarquia
@@ -50,6 +61,8 @@ class _CategoriaListViewState extends ConsumerState<CategoriaListView> {
         return Stack(
           children: [
             ListView.separated(
+              shrinkWrap: widget.shrinkWrap,
+              physics: widget.physics,
               itemCount: visiveis.length,
               separatorBuilder: (_, _) => const AppDivider(),
               itemBuilder: (context, index) {
@@ -59,8 +72,12 @@ class _CategoriaListViewState extends ConsumerState<CategoriaListView> {
                 return CategoriaListItem(
                   categoria: item.categoria,
                   nomePai: item.nomePai,
-                  isColapsada: viewModel.collapsedIds.contains(item.categoria.id),
-                  onToggle: temSubs ? () => viewModel.toggleCollapsed(item.categoria.id) : null,
+                  isColapsada: viewModel.collapsedIds.contains(
+                    item.categoria.id,
+                  ),
+                  onToggle: temSubs
+                      ? () => viewModel.toggleCollapsed(item.categoria.id)
+                      : null,
                   profundidade: item.profundidade,
                 );
               },
@@ -78,15 +95,24 @@ class _CategoriaListViewState extends ConsumerState<CategoriaListView> {
     );
   }
 
-  List<_VisibleItem> _buildVisiveis(List<CategoriaDetails> rootNodes, Set<String> collapsedIds) {
+  List<_VisibleItem> _buildVisiveis(
+    List<CategoriaDetails> rootNodes,
+    Set<String> collapsedIds,
+  ) {
     final resultado = <_VisibleItem>[];
 
-    void adicionarNode(CategoriaDetails node, int profundidade, String? nomePai) {
-      resultado.add(_VisibleItem(
-        categoria: node,
-        profundidade: profundidade,
-        nomePai: nomePai,
-      ));
+    void adicionarNode(
+      CategoriaDetails node,
+      int profundidade,
+      String? nomePai,
+    ) {
+      resultado.add(
+        _VisibleItem(
+          categoria: node,
+          profundidade: profundidade,
+          nomePai: nomePai,
+        ),
+      );
 
       if (!collapsedIds.contains(node.id)) {
         for (final child in node.subcategorias) {

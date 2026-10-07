@@ -83,6 +83,7 @@ class AuthRepository {
         email: savedUser.email,
         token: loggedUser.token,
         refreshToken: loggedUser.refreshToken,
+        orcamento: savedUser.orcamento,
       );
 
       _streamController.add(updatedLoggedUser);

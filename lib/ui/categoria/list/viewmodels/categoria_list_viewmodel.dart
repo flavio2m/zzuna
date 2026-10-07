@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:result_command/result_command.dart';
 import 'package:result_dart/result_dart.dart';
+import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_filter_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
@@ -61,9 +62,17 @@ class CategoriaListViewModel extends ChangeNotifier {
     }
   }
 
-  CategoriaListViewModel(this._repository, this._filterUseCase, this._treeUseCase) {
-    _repositorySubscription = _repository.observer().listen((_) {
-      loadCommand.execute();
+  CategoriaListViewModel(
+    this._repository,
+    this._filterUseCase,
+    this._treeUseCase,
+  ) {
+    _repositorySubscription = _repository.observer().listen((event) {
+      if (event is RepositoryUpdated<Categoria>) {
+        _handleRepositoryUpdated(event.model);
+      } else {
+        loadCommand.execute();
+      }
     });
   }
 
@@ -121,6 +130,120 @@ class CategoriaListViewModel extends ChangeNotifier {
 
   void pesquisar() {
     loadCommand.execute();
+  }
+
+  void _handleRepositoryUpdated(Categoria updated) {
+    // Se a listagem ainda não foi carregada em memória, roda a carga completa
+    if (categorias.isEmpty && categoriasPai.isEmpty) {
+      loadCommand.execute();
+      return;
+    }
+
+    final existingPaiId = _findCategoriaPaiId(updated.id);
+
+    // Se houve mudança de nível hierárquico (mudança de pai), é uma mudança estrutural na árvore
+    if (existingPaiId != updated.categoriaPaiId) {
+      loadCommand.execute();
+      return;
+    }
+
+    // Se a categoria não estiver em memória (ex: filtrada), recarrega
+    if (!_containsCategoria(updated.id)) {
+      loadCommand.execute();
+      return;
+    }
+
+    // Atualização pontual em memória (ex: percentual de orçamento, cor, descrição, ativo)
+    // Atualiza imediatamente sem disparar loadCommand nem exibir loading
+    _updateCategoriaPontual(updated);
+  }
+
+  bool _containsCategoria(String id) {
+    if (categoriasPai.any((c) => c.id == id)) return true;
+    for (final root in categorias) {
+      if (root.id == id) return true;
+      if (_hasInSubcategorias(root.subcategorias, id)) return true;
+    }
+    return false;
+  }
+
+  bool _hasInSubcategorias(List<CategoriaDetails> subs, String id) {
+    for (final s in subs) {
+      if (s.id == id) return true;
+      if (_hasInSubcategorias(s.subcategorias, id)) return true;
+    }
+    return false;
+  }
+
+  String? _findCategoriaPaiId(String id) {
+    for (final p in categoriasPai) {
+      if (p.id == id) return p.categoriaPaiId;
+    }
+    for (final root in categorias) {
+      if (root.id == id) return root.categoriaPai?.id;
+      final found = _findInSubcategorias(root.subcategorias, id);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  String? _findInSubcategorias(List<CategoriaDetails> subs, String id) {
+    for (final s in subs) {
+      if (s.id == id) return s.categoriaPai?.id;
+      final childFound = _findInSubcategorias(s.subcategorias, id);
+      if (childFound != null) return childFound;
+    }
+    return null;
+  }
+
+  void _updateCategoriaPontual(Categoria updated) {
+    // 1. Atualiza em categoriasPai se for categoria raiz
+    final paiIndex = categoriasPai.indexWhere((c) => c.id == updated.id);
+    if (paiIndex != -1) {
+      final updatedList = List<Categoria>.from(categoriasPai);
+      updatedList[paiIndex] = updated;
+      categoriasPai = updatedList;
+    }
+
+    // 2. Atualiza pontualmente na árvore de categorias mantendo a hierarquia intacta
+    categorias = categorias
+        .map((node) => _updateNodeDetails(node, updated))
+        .toList();
+
+    notifyListeners();
+  }
+
+  CategoriaDetails _updateNodeDetails(
+    CategoriaDetails node,
+    Categoria updated,
+  ) {
+    if (node.id == updated.id) {
+      final updatedNode = node.copyWith(
+        descricao: updated.descricao,
+        ativo: updated.ativo,
+        percentualOrcamento: updated.percentualOrcamento,
+        natureza: updated.natureza,
+        cor: updated.cor,
+      );
+      if (node.subcategorias.isNotEmpty) {
+        return updatedNode.copyWith(
+          subcategorias: updatedNode.subcategorias
+              .map((child) => child.copyWith(categoriaPai: updatedNode))
+              .toList(),
+        );
+      }
+      return updatedNode;
+    }
+
+    if (node.subcategorias.isEmpty) {
+      return node;
+    }
+
+    return node.copyWith(
+      subcategorias: node.subcategorias
+          .map((child) => _updateNodeDetails(child, updated))
+          .toList(),
+    );
   }
 
   @override

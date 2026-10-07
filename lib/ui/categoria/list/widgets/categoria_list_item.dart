@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
+import 'package:zzuna/domain/enums/categoria_natureza.dart';
 import 'package:zzuna/ui/categoria/delete/widgets/categoria_delete_button.dart';
 import 'package:zzuna/ui/categoria/update/widgets/categoria_update_modal.dart';
 import 'package:zzuna/ui/shared/widgets/tags/app_tag.dart';
@@ -34,11 +35,14 @@ class CategoriaListItem extends StatelessWidget {
       descricao: categoria.descricao,
       categoriaPaiId: categoria.categoriaPai?.id,
       ativo: categoria.ativo,
+      percentualOrcamento: categoria.percentualOrcamento,
+      natureza: categoria.natureza,
+      cor: categoria.cor,
     );
     CategoriaUpdateModal.show(
       context,
       dto,
-      temSubcategorias: categoria.subcategorias.isNotEmpty, //
+      temSubcategorias: categoria.subcategorias.isNotEmpty,
     );
   }
 
@@ -79,7 +83,9 @@ class CategoriaListItem extends StatelessWidget {
           Icon(
             isRaiz ? Icons.account_tree : Icons.subdirectory_arrow_right,
             size: 18,
-            color: categoria.ativo ? AppColors.primary : AppColors.slate400,
+            color: categoria.ativo
+                ? categoria.categoryColor
+                : AppColors.slate400,
           ),
 
           const AppSpacing(size: AppSpacingSize.xs, axis: Axis.horizontal),
@@ -87,16 +93,46 @@ class CategoriaListItem extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Flexible(child: AppText(categoria.descricao, overflow: TextOverflow.ellipsis)),
+                Flexible(
+                  child: AppText(
+                    categoria.descricao,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
 
                 if (nomePai != null) ...[
-                  const AppSpacing(size: AppSpacingSize.xs, axis: Axis.horizontal),
+                  const AppSpacing(
+                    size: AppSpacingSize.xs,
+                    axis: Axis.horizontal,
+                  ),
                   AppTag(nomePai!),
                 ],
 
+                if (isRaiz) ...[
+                  const AppSpacing(
+                    size: AppSpacingSize.xs,
+                    axis: Axis.horizontal,
+                  ),
+                  AppTag(
+                    categoria.natureza == CategoriaNatureza.entrada
+                        ? 'Entrada'
+                        : 'Saída',
+                  ),
+                  if (categoria.percentualOrcamento != null) ...[
+                    const AppSpacing(
+                      size: AppSpacingSize.xs,
+                      axis: Axis.horizontal,
+                    ),
+                    AppTag('${categoria.percentualOrcamento}%'),
+                  ],
+                ],
+
                 if (!categoria.ativo) ...[
-                  const AppSpacing(size: AppSpacingSize.xs, axis: Axis.horizontal),
-                  AppTag('Inativo'),
+                  const AppSpacing(
+                    size: AppSpacingSize.xs,
+                    axis: Axis.horizontal,
+                  ),
+                  const AppTag('Inativo'),
                 ],
               ],
             ),
@@ -104,7 +140,10 @@ class CategoriaListItem extends StatelessWidget {
 
           IconEditarButton(onPressed: () => _editarCategoria(context)),
 
-          CategoriaDeleteButton(categoriaId: categoria.id, categoriaDescricao: categoria.descricao),
+          CategoriaDeleteButton(
+            categoriaId: categoria.id,
+            categoriaDescricao: categoria.descricao,
+          ),
 
           const AppSpacing(size: AppSpacingSize.sm, axis: Axis.horizontal),
         ],

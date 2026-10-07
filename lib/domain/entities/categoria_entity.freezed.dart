@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Categoria {
 
- String get id; String get descricao; String? get categoriaPaiId; bool get ativo;
+ String get id; String get descricao; String? get categoriaPaiId; bool get ativo; int? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
 /// Create a copy of Categoria
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CategoriaCopyWith<Categoria> get copyWith => _$CategoriaCopyWithImpl<Categoria>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Categoria&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.categoriaPaiId, categoriaPaiId) || other.categoriaPaiId == categoriaPaiId)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Categoria&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.categoriaPaiId, categoriaPaiId) || other.categoriaPaiId == categoriaPaiId)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.percentualOrcamento, percentualOrcamento) || other.percentualOrcamento == percentualOrcamento)&&(identical(other.natureza, natureza) || other.natureza == natureza)&&(identical(other.cor, cor) || other.cor == cor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,categoriaPaiId,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,categoriaPaiId,ativo,percentualOrcamento,natureza,cor);
 
 @override
 String toString() {
-  return 'Categoria(id: $id, descricao: $descricao, categoriaPaiId: $categoriaPaiId, ativo: $ativo)';
+  return 'Categoria(id: $id, descricao: $descricao, categoriaPaiId: $categoriaPaiId, ativo: $ativo, percentualOrcamento: $percentualOrcamento, natureza: $natureza, cor: $cor)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CategoriaCopyWith<$Res>  {
   factory $CategoriaCopyWith(Categoria value, $Res Function(Categoria) _then) = _$CategoriaCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, String? categoriaPaiId, bool ativo
+ String id, String descricao, String? categoriaPaiId, bool ativo, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -65,13 +65,16 @@ class _$CategoriaCopyWithImpl<$Res>
 
 /// Create a copy of Categoria
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? categoriaPaiId = freezed,Object? ativo = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? categoriaPaiId = freezed,Object? ativo = null,Object? percentualOrcamento = freezed,Object? natureza = null,Object? cor = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,categoriaPaiId: freezed == categoriaPaiId ? _self.categoriaPaiId : categoriaPaiId // ignore: cast_nullable_to_non_nullable
 as String?,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
+as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -153,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Categoria() when $default != null:
-return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
   return orElse();
 
 }
@@ -174,10 +177,10 @@ return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
 switch (_that) {
 case _Categoria():
-return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);}
+return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +194,10 @@ return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  String? categoriaPaiId,  bool ativo,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
 switch (_that) {
 case _Categoria() when $default != null:
-return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);case _:
+return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
   return null;
 
 }
@@ -206,13 +209,16 @@ return $default(_that.id,_that.descricao,_that.categoriaPaiId,_that.ativo);case 
 @JsonSerializable()
 
 class _Categoria implements Categoria {
-  const _Categoria({required this.id, required this.descricao, this.categoriaPaiId, required this.ativo});
+  const _Categoria({required this.id, required this.descricao, this.categoriaPaiId, required this.ativo, this.percentualOrcamento, this.natureza = CategoriaNatureza.saida, this.cor});
   factory _Categoria.fromJson(Map<String, dynamic> json) => _$CategoriaFromJson(json);
 
 @override final  String id;
 @override final  String descricao;
 @override final  String? categoriaPaiId;
 @override final  bool ativo;
+@override final  int? percentualOrcamento;
+@override@JsonKey() final  CategoriaNatureza natureza;
+@override final  String? cor;
 
 /// Create a copy of Categoria
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Categoria&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.categoriaPaiId, categoriaPaiId) || other.categoriaPaiId == categoriaPaiId)&&(identical(other.ativo, ativo) || other.ativo == ativo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Categoria&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.categoriaPaiId, categoriaPaiId) || other.categoriaPaiId == categoriaPaiId)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.percentualOrcamento, percentualOrcamento) || other.percentualOrcamento == percentualOrcamento)&&(identical(other.natureza, natureza) || other.natureza == natureza)&&(identical(other.cor, cor) || other.cor == cor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,categoriaPaiId,ativo);
+int get hashCode => Object.hash(runtimeType,id,descricao,categoriaPaiId,ativo,percentualOrcamento,natureza,cor);
 
 @override
 String toString() {
-  return 'Categoria(id: $id, descricao: $descricao, categoriaPaiId: $categoriaPaiId, ativo: $ativo)';
+  return 'Categoria(id: $id, descricao: $descricao, categoriaPaiId: $categoriaPaiId, ativo: $ativo, percentualOrcamento: $percentualOrcamento, natureza: $natureza, cor: $cor)';
 }
 
 
@@ -247,7 +253,7 @@ abstract mixin class _$CategoriaCopyWith<$Res> implements $CategoriaCopyWith<$Re
   factory _$CategoriaCopyWith(_Categoria value, $Res Function(_Categoria) _then) = __$CategoriaCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, String? categoriaPaiId, bool ativo
+ String id, String descricao, String? categoriaPaiId, bool ativo, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -264,13 +270,16 @@ class __$CategoriaCopyWithImpl<$Res>
 
 /// Create a copy of Categoria
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? categoriaPaiId = freezed,Object? ativo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? categoriaPaiId = freezed,Object? ativo = null,Object? percentualOrcamento = freezed,Object? natureza = null,Object? cor = freezed,}) {
   return _then(_Categoria(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,categoriaPaiId: freezed == categoriaPaiId ? _self.categoriaPaiId : categoriaPaiId // ignore: cast_nullable_to_non_nullable
 as String?,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
+as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -280,7 +289,7 @@ as bool,
 /// @nodoc
 mixin _$CategoriaDetails {
 
- String get id; String get descricao; bool get ativo; CategoriaDetails? get categoriaPai; List<CategoriaDetails> get subcategorias;
+ String get id; String get descricao; bool get ativo; CategoriaDetails? get categoriaPai; List<CategoriaDetails> get subcategorias; int? get percentualOrcamento; CategoriaNatureza get natureza; String? get cor;
 /// Create a copy of CategoriaDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,16 +300,16 @@ $CategoriaDetailsCopyWith<CategoriaDetails> get copyWith => _$CategoriaDetailsCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoriaDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.categoriaPai, categoriaPai) || other.categoriaPai == categoriaPai)&&const DeepCollectionEquality().equals(other.subcategorias, subcategorias));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoriaDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.categoriaPai, categoriaPai) || other.categoriaPai == categoriaPai)&&const DeepCollectionEquality().equals(other.subcategorias, subcategorias)&&(identical(other.percentualOrcamento, percentualOrcamento) || other.percentualOrcamento == percentualOrcamento)&&(identical(other.natureza, natureza) || other.natureza == natureza)&&(identical(other.cor, cor) || other.cor == cor));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo,categoriaPai,const DeepCollectionEquality().hash(subcategorias));
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,categoriaPai,const DeepCollectionEquality().hash(subcategorias),percentualOrcamento,natureza,cor);
 
 @override
 String toString() {
-  return 'CategoriaDetails(id: $id, descricao: $descricao, ativo: $ativo, categoriaPai: $categoriaPai, subcategorias: $subcategorias)';
+  return 'CategoriaDetails(id: $id, descricao: $descricao, ativo: $ativo, categoriaPai: $categoriaPai, subcategorias: $subcategorias, percentualOrcamento: $percentualOrcamento, natureza: $natureza, cor: $cor)';
 }
 
 
@@ -311,7 +320,7 @@ abstract mixin class $CategoriaDetailsCopyWith<$Res>  {
   factory $CategoriaDetailsCopyWith(CategoriaDetails value, $Res Function(CategoriaDetails) _then) = _$CategoriaDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias
+ String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -328,14 +337,17 @@ class _$CategoriaDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CategoriaDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? categoriaPai = freezed,Object? subcategorias = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? categoriaPai = freezed,Object? subcategorias = null,Object? percentualOrcamento = freezed,Object? natureza = null,Object? cor = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,categoriaPai: freezed == categoriaPai ? _self.categoriaPai : categoriaPai // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails?,subcategorias: null == subcategorias ? _self.subcategorias : subcategorias // ignore: cast_nullable_to_non_nullable
-as List<CategoriaDetails>,
+as List<CategoriaDetails>,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
+as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of CategoriaDetails
@@ -429,10 +441,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CategoriaDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
   return orElse();
 
 }
@@ -450,10 +462,10 @@ return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.su
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)  $default,) {final _that = this;
 switch (_that) {
 case _CategoriaDetails():
-return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias);}
+return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -467,10 +479,10 @@ return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.su
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String descricao,  bool ativo,  CategoriaDetails? categoriaPai,  List<CategoriaDetails> subcategorias,  int? percentualOrcamento,  CategoriaNatureza natureza,  String? cor)?  $default,) {final _that = this;
 switch (_that) {
 case _CategoriaDetails() when $default != null:
-return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias);case _:
+return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.subcategorias,_that.percentualOrcamento,_that.natureza,_that.cor);case _:
   return null;
 
 }
@@ -482,7 +494,7 @@ return $default(_that.id,_that.descricao,_that.ativo,_that.categoriaPai,_that.su
 
 
 class _CategoriaDetails implements CategoriaDetails {
-  const _CategoriaDetails({required this.id, required this.descricao, required this.ativo, required this.categoriaPai, required final  List<CategoriaDetails> subcategorias}): _subcategorias = subcategorias;
+  const _CategoriaDetails({required this.id, required this.descricao, required this.ativo, required this.categoriaPai, required final  List<CategoriaDetails> subcategorias, this.percentualOrcamento, this.natureza = CategoriaNatureza.saida, this.cor}): _subcategorias = subcategorias;
   
 
 @override final  String id;
@@ -496,6 +508,9 @@ class _CategoriaDetails implements CategoriaDetails {
   return EqualUnmodifiableListView(_subcategorias);
 }
 
+@override final  int? percentualOrcamento;
+@override@JsonKey() final  CategoriaNatureza natureza;
+@override final  String? cor;
 
 /// Create a copy of CategoriaDetails
 /// with the given fields replaced by the non-null parameter values.
@@ -507,16 +522,16 @@ _$CategoriaDetailsCopyWith<_CategoriaDetails> get copyWith => __$CategoriaDetail
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoriaDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.categoriaPai, categoriaPai) || other.categoriaPai == categoriaPai)&&const DeepCollectionEquality().equals(other._subcategorias, _subcategorias));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoriaDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&(identical(other.ativo, ativo) || other.ativo == ativo)&&(identical(other.categoriaPai, categoriaPai) || other.categoriaPai == categoriaPai)&&const DeepCollectionEquality().equals(other._subcategorias, _subcategorias)&&(identical(other.percentualOrcamento, percentualOrcamento) || other.percentualOrcamento == percentualOrcamento)&&(identical(other.natureza, natureza) || other.natureza == natureza)&&(identical(other.cor, cor) || other.cor == cor));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,descricao,ativo,categoriaPai,const DeepCollectionEquality().hash(_subcategorias));
+int get hashCode => Object.hash(runtimeType,id,descricao,ativo,categoriaPai,const DeepCollectionEquality().hash(_subcategorias),percentualOrcamento,natureza,cor);
 
 @override
 String toString() {
-  return 'CategoriaDetails(id: $id, descricao: $descricao, ativo: $ativo, categoriaPai: $categoriaPai, subcategorias: $subcategorias)';
+  return 'CategoriaDetails(id: $id, descricao: $descricao, ativo: $ativo, categoriaPai: $categoriaPai, subcategorias: $subcategorias, percentualOrcamento: $percentualOrcamento, natureza: $natureza, cor: $cor)';
 }
 
 
@@ -527,7 +542,7 @@ abstract mixin class _$CategoriaDetailsCopyWith<$Res> implements $CategoriaDetai
   factory _$CategoriaDetailsCopyWith(_CategoriaDetails value, $Res Function(_CategoriaDetails) _then) = __$CategoriaDetailsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias
+ String id, String descricao, bool ativo, CategoriaDetails? categoriaPai, List<CategoriaDetails> subcategorias, int? percentualOrcamento, CategoriaNatureza natureza, String? cor
 });
 
 
@@ -544,14 +559,17 @@ class __$CategoriaDetailsCopyWithImpl<$Res>
 
 /// Create a copy of CategoriaDetails
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? categoriaPai = freezed,Object? subcategorias = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? descricao = null,Object? ativo = null,Object? categoriaPai = freezed,Object? subcategorias = null,Object? percentualOrcamento = freezed,Object? natureza = null,Object? cor = freezed,}) {
   return _then(_CategoriaDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
 as String,ativo: null == ativo ? _self.ativo : ativo // ignore: cast_nullable_to_non_nullable
 as bool,categoriaPai: freezed == categoriaPai ? _self.categoriaPai : categoriaPai // ignore: cast_nullable_to_non_nullable
 as CategoriaDetails?,subcategorias: null == subcategorias ? _self._subcategorias : subcategorias // ignore: cast_nullable_to_non_nullable
-as List<CategoriaDetails>,
+as List<CategoriaDetails>,percentualOrcamento: freezed == percentualOrcamento ? _self.percentualOrcamento : percentualOrcamento // ignore: cast_nullable_to_non_nullable
+as int?,natureza: null == natureza ? _self.natureza : natureza // ignore: cast_nullable_to_non_nullable
+as CategoriaNatureza,cor: freezed == cor ? _self.cor : cor // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

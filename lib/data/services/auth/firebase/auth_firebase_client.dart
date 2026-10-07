@@ -48,6 +48,7 @@ class AuthFirebaseClient implements AuthClientBase {
           email: loadedUser.email,
           token: token,
           refreshToken: firebaseUser.refreshToken ?? '',
+          orcamento: loadedUser.orcamento,
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -95,6 +96,7 @@ class AuthFirebaseClient implements AuthClientBase {
           email: dto.email,
           token: token,
           refreshToken: firebaseUser.refreshToken ?? '',
+          orcamento: dto.orcamento,
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -127,6 +129,7 @@ class AuthFirebaseClient implements AuthClientBase {
           email: dto.email,
           token: token,
           refreshToken: currentUser.refreshToken ?? '',
+          orcamento: dto.orcamento,
         ),
       );
     } catch (e) {
@@ -149,6 +152,7 @@ class AuthFirebaseClient implements AuthClientBase {
           email: loadedUser.email,
           token: token,
           refreshToken: firebaseUser.refreshToken ?? '',
+          orcamento: loadedUser.orcamento,
         );
       }
       return null;

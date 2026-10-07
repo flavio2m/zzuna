@@ -64,13 +64,25 @@ class AuthLocalClient implements AuthClientBase {
 
     // A criação do usuário no banco de dados é feita pelo UserRepository.
     // O AuthLocalClient apenas simula o provedor de auth e retorna o usuário logado.
-    return Success(_createLoggedUser(id: id, name: dto.name, email: dto.email));
+    return Success(
+      _createLoggedUser(
+        id: id,
+        name: dto.name,
+        email: dto.email,
+        orcamento: dto.orcamento,
+      ),
+    );
   }
 
   @override
   AsyncResult<LoggedUser> updateUser(LoadedUserDto dto) async {
     return Success(
-      _createLoggedUser(id: dto.id, name: dto.name, email: dto.email), //
+      _createLoggedUser(
+        id: dto.id,
+        name: dto.name,
+        email: dto.email,
+        orcamento: dto.orcamento,
+      ),
     );
   }
 
@@ -80,13 +92,19 @@ class AuthLocalClient implements AuthClientBase {
   }
 
   LoggedUser _toLoggedUser(LoadedUser user) {
-    return _createLoggedUser(id: user.id, name: user.name, email: user.email);
+    return _createLoggedUser(
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      orcamento: user.orcamento,
+    );
   }
 
   LoggedUser _createLoggedUser({
     required String id,
     required String name,
-    required String email, //
+    required String email,
+    double orcamento = 0.0,
   }) {
     return LoggedUser(
       id: id,
@@ -94,6 +112,7 @@ class AuthLocalClient implements AuthClientBase {
       email: email,
       token: 'local_token_$id',
       refreshToken: 'local_refresh_token_$id',
+      orcamento: orcamento,
     );
   }
 

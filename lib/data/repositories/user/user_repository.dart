@@ -43,7 +43,8 @@ class UserRepository
     final user = LoadedUser(
       id: dto.id!,
       email: dto.email,
-      name: dto.name, //
+      name: dto.name,
+      orcamento: dto.orcamento,
     );
     return _storage.create(user).onSuccess((user) {
       _streamController.add(RepositoryCreated(user));
@@ -53,7 +54,14 @@ class UserRepository
   @override
   AsyncResult<Unit> createAll(List<RegisterUserDto> dtos) async {
     final entities = dtos
-        .map((dto) => LoadedUser(id: dto.id!, email: dto.email, name: dto.name))
+        .map(
+          (dto) => LoadedUser(
+            id: dto.id!,
+            email: dto.email,
+            name: dto.name,
+            orcamento: dto.orcamento,
+          ),
+        )
         .toList();
 
     final result = await _storage.createAll(entities);
@@ -71,7 +79,12 @@ class UserRepository
 
   @override
   AsyncResult<LoadedUser> update(LoadedUserDto dto) async {
-    final loadedUser = LoadedUser(id: dto.id, email: dto.email, name: dto.name);
+    final loadedUser = LoadedUser(
+      id: dto.id,
+      email: dto.email,
+      name: dto.name,
+      orcamento: dto.orcamento,
+    );
     return _storage.update(loadedUser).onSuccess((user) {
       _streamController.add(RepositoryUpdated(user));
     });
@@ -80,7 +93,14 @@ class UserRepository
   @override
   AsyncResult<Unit> updateAll(List<LoadedUserDto> dtos) async {
     final entities = dtos
-        .map((dto) => LoadedUser(id: dto.id, email: dto.email, name: dto.name))
+        .map(
+          (dto) => LoadedUser(
+            id: dto.id,
+            email: dto.email,
+            name: dto.name,
+            orcamento: dto.orcamento,
+          ),
+        )
         .toList();
 
     final result = await _storage.updateAll(entities);

@@ -4,12 +4,14 @@ class RegisterUserDto {
   String name;
   String email;
   String password;
+  double orcamento;
 
   RegisterUserDto({
     this.id,
     required this.name,
     required this.email,
-    required this.password, //
+    required this.password,
+    this.orcamento = 0.0,
   });
 
   void setName(String name) {
@@ -24,7 +26,14 @@ class RegisterUserDto {
     this.password = password;
   }
 
+  void setOrcamento(double orcamento) {
+    this.orcamento = orcamento;
+  }
+
   Map<String, dynamic> toJson() => {
-    'name': name, 'email': email, 'password': password, //
+    'name': name,
+    'email': email,
+    'password': password,
+    'orcamento': orcamento,
   };
 }

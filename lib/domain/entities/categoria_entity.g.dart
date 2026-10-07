@@ -11,6 +11,11 @@ _Categoria _$CategoriaFromJson(Map<String, dynamic> json) => _Categoria(
   descricao: json['descricao'] as String,
   categoriaPaiId: json['categoriaPaiId'] as String?,
   ativo: json['ativo'] as bool,
+  percentualOrcamento: (json['percentualOrcamento'] as num?)?.toInt(),
+  natureza:
+      $enumDecodeNullable(_$CategoriaNaturezaEnumMap, json['natureza']) ??
+      CategoriaNatureza.saida,
+  cor: json['cor'] as String?,
 );
 
 Map<String, dynamic> _$CategoriaToJson(_Categoria instance) =>
@@ -19,4 +24,12 @@ Map<String, dynamic> _$CategoriaToJson(_Categoria instance) =>
       'descricao': instance.descricao,
       'categoriaPaiId': instance.categoriaPaiId,
       'ativo': instance.ativo,
+      'percentualOrcamento': instance.percentualOrcamento,
+      'natureza': _$CategoriaNaturezaEnumMap[instance.natureza]!,
+      'cor': instance.cor,
     };
+
+const _$CategoriaNaturezaEnumMap = {
+  CategoriaNatureza.entrada: 'entrada',
+  CategoriaNatureza.saida: 'saida',
+};

@@ -4,6 +4,7 @@ import 'package:zzuna/data/repositories/base_repository.dart';
 import 'package:zzuna/data/repositories/categoria/categoria_repository.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
 import 'package:zzuna/domain/entities/categoria_entity.dart';
+import 'package:zzuna/domain/enums/categoria_natureza.dart';
 
 import '../../../helpers/test_storage.dart';
 
@@ -196,5 +197,39 @@ void main() {
 
       await eventExpectation;
     });
+
+    test(
+      'create and update persist percentualOrcamento, natureza and cor correctly',
+      () async {
+        final dto = CategoriaDto(
+          descricao: 'Custos Fixos',
+          percentualOrcamento: 30,
+          natureza: CategoriaNatureza.saida,
+          cor: '#0084FF',
+        );
+
+        final result = await repository.create(dto);
+        expect(result.isSuccess(), isTrue);
+        final created = result.getOrThrow();
+        expect(created.percentualOrcamento, equals(30));
+        expect(created.natureza, equals(CategoriaNatureza.saida));
+        expect(created.cor, equals('#0084FF'));
+
+        final updateDto = CategoriaDto(
+          id: created.id,
+          descricao: 'Custos Fixos Atualizado',
+          percentualOrcamento: 35,
+          natureza: CategoriaNatureza.saida,
+          cor: '#7C6DF2',
+        );
+
+        final updateResult = await repository.update(updateDto);
+        expect(updateResult.isSuccess(), isTrue);
+        final updated = updateResult.getOrThrow();
+        expect(updated.percentualOrcamento, equals(35));
+        expect(updated.descricao, equals('Custos Fixos Atualizado'));
+        expect(updated.cor, equals('#7C6DF2'));
+      },
+    );
   });
 }

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zzuna/config/providers.dart';
 import 'package:zzuna/domain/dtos/categoria/categoria_dto.dart';
-
+import 'package:zzuna/domain/enums/categoria_natureza.dart';
 import 'package:zzuna/domain/validators/categoria_validator.dart';
 import 'package:zzuna/ui/categoria/create/viewModels/categoria_create_viewmodel.dart';
 import 'package:zzuna/ui/shared/feedback/app_dialog.dart';
 import 'package:zzuna/ui/shared/feedback/app_snackbar.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_cancel.dart';
 import 'package:zzuna/ui/shared/widgets/buttons/button_save.dart';
+import 'package:zzuna/ui/shared/widgets/forms/app_color_picker_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_dropdown_menu_item.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_form.dart';
-import 'package:zzuna/ui/shared/widgets/forms/app_switch_field.dart';
 import 'package:zzuna/ui/shared/widgets/forms/app_text_form_field.dart';
 import 'package:zzuna/ui/shared/widgets/layout/app_spacing.dart';
 import 'package:zzuna/utils/extensions/command_state_extension.dart';
@@ -37,8 +38,9 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
   late final CategoriaCreateViewModel viewModel;
 
   final _descFocus = FocusNode();
+  final _naturezaFocus = FocusNode();
   final _paiFocus = FocusNode();
-  final _ativoFocus = FocusNode();
+  final _percentualFocus = FocusNode();
   final _saveFocus = FocusNode();
 
   @override
@@ -46,7 +48,6 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
     super.initState();
 
     viewModel = ref.read(categoriaCreateViewModelProvider);
-
     viewModel.createCommand.addListener(_commandListener);
   }
 
@@ -55,8 +56,9 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
     viewModel.createCommand.removeListener(_commandListener);
 
     _descFocus.dispose();
+    _naturezaFocus.dispose();
     _paiFocus.dispose();
-    _ativoFocus.dispose();
+    _percentualFocus.dispose();
     _saveFocus.dispose();
 
     super.dispose();
@@ -67,7 +69,6 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
 
     commandValue.onSuccess((_) {
       AppSnackBar.showSuccess(context, 'Categoria criada com sucesso.');
-
       Navigator.pop(context);
     });
 
@@ -91,13 +92,13 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
     final createVM = ref.watch(categoriaCreateViewModelProvider);
     final listVM = ref.watch(categoriaListViewModelProvider);
     final categoriasPai = listVM.categoriasPai;
+    final isPai = dto.categoriaPaiId == null;
 
     return AppForm(
       title: 'Nova Categoria',
       type: AppFormType.modal,
       actions: [
         ButtonCancel(onPressed: () => Navigator.of(context).pop()),
-
         ListenableBuilder(
           listenable: createVM.createCommand,
           builder: (_, _) {
@@ -113,6 +114,7 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
       ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppTextFormField(
             label: 'Descrição',
@@ -132,10 +134,15 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
           AppDropdownFormField<String>(
             label: 'Categoria Pai',
             focusNode: _paiFocus,
-            onEnterPressed: () => _ativoFocus.requestFocus(),
+            onEnterPressed: () => isPai
+                ? _naturezaFocus.requestFocus()
+                : _saveFocus.requestFocus(),
             value: dto.categoriaPaiId,
             items: [
-              AppDropdownMenuItem<String>(value: '', label: 'Selecione...'),
+              AppDropdownMenuItem<String>(
+                value: '',
+                label: 'Nenhuma (Categoria Pai)',
+              ),
               ...categoriasPai.map(
                 (cat) => AppDropdownMenuItem<String>(
                   value: cat.id,
@@ -147,22 +154,79 @@ class _CategoriaCreateModalState extends ConsumerState<CategoriaCreateModal> {
               dto.setCategoriaPaiId(
                 value == null || value.isEmpty ? null : value,
               );
+              if (dto.categoriaPaiId != null) {
+                dto.setPercentualOrcamento(null);
+                dto.setCor(null);
+                // Se tem pai, sugere a mesma natureza do pai
+                final pai = categoriasPai
+                    .where((c) => c.id == dto.categoriaPaiId)
+                    .firstOrNull;
+                if (pai != null) {
+                  dto.setNatureza(pai.natureza);
+                }
+              }
               setState(() {});
             },
           ),
 
-          const AppSpacing(size: AppSpacingSize.md),
-
-          AppSwitchField(
-            label: 'Ativo',
-            focusNode: _ativoFocus,
-            onEnterPressed: () => _saveFocus.requestFocus(),
-            value: dto.ativo,
-            onChanged: (value) {
-              dto.setAtivo(value);
-              setState(() {});
-            },
-          ),
+          if (isPai) ...[
+            const AppSpacing(size: AppSpacingSize.md),
+            Row(
+              children: [
+                Expanded(
+                  child: AppDropdownFormField<CategoriaNatureza>(
+                    label: 'Natureza',
+                    focusNode: _naturezaFocus,
+                    value: dto.natureza,
+                    onEnterPressed: () => _percentualFocus.requestFocus(),
+                    items: CategoriaNatureza.values
+                        .map(
+                          (nat) => AppDropdownMenuItem<CategoriaNatureza>(
+                            value: nat,
+                            label: nat.descricao,
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        dto.setNatureza(value);
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ),
+                const AppSpacing(
+                  size: AppSpacingSize.md,
+                  axis: Axis.horizontal,
+                ),
+                Expanded(
+                  child: AppTextFormField(
+                    label: 'Percentual do Orçamento (% - Opcional)',
+                    focusNode: _percentualFocus,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    initialValue: dto.percentualOrcamento?.toString() ?? '',
+                    onFieldSubmitted: (_) => _saveFocus.requestFocus(),
+                    onChanged: (value) {
+                      final parsed = int.tryParse(value);
+                      dto.setPercentualOrcamento(parsed);
+                      setState(() {});
+                    },
+                    validator: validator.byField(dto, 'percentualOrcamento'),
+                  ),
+                ),
+              ],
+            ),
+            const AppSpacing(size: AppSpacingSize.md),
+            AppColorPickerField(
+              selectedColor: dto.cor,
+              onChanged: (cor) {
+                dto.setCor(cor);
+                setState(() {});
+              },
+            ),
+          ],
         ],
       ),
     );

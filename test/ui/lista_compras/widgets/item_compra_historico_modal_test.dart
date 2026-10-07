@@ -11,6 +11,7 @@ import 'package:zzuna/domain/entities/registro_compra_entity.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
 import 'package:zzuna/ui/lista_compras/list/widgets/item_compra_historico_modal.dart';
+import 'package:zzuna/ui/shared/widgets/buttons/app_button.dart';
 
 class _FakeBaseStorage implements BaseStorage<ListaCompras> {
   final Map<String, ListaCompras> storage = {};
@@ -215,9 +216,9 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.next);
     await tester.pumpAndSettle();
 
-    final saveButton = find.widgetWithText(ElevatedButton, 'Salvar');
+    final saveButton = find.widgetWithText(AppButton, 'Salvar');
     expect(saveButton, findsOneWidget);
-    final saveFocusNode = tester.widget<ElevatedButton>(saveButton).focusNode;
+    final saveFocusNode = tester.widget<AppButton>(saveButton).focusNode;
     expect(saveFocusNode?.hasFocus, isTrue);
   });
 }

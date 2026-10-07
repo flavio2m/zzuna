@@ -55,6 +55,9 @@ class CategoriaRepository
       descricao: dto.descricao,
       categoriaPaiId: dto.categoriaPaiId,
       ativo: dto.ativo,
+      percentualOrcamento: dto.percentualOrcamento,
+      natureza: dto.natureza,
+      cor: dto.cor,
     );
     return _storage.create(categoria).onSuccess((cat) {
       _streamController.add(RepositoryCreated(cat));
@@ -70,6 +73,9 @@ class CategoriaRepository
             descricao: dto.descricao,
             categoriaPaiId: dto.categoriaPaiId,
             ativo: dto.ativo,
+            percentualOrcamento: dto.percentualOrcamento,
+            natureza: dto.natureza,
+            cor: dto.cor,
           ),
         )
         .toList();
@@ -123,6 +129,9 @@ class CategoriaRepository
       descricao: dto.descricao,
       categoriaPaiId: dto.categoriaPaiId,
       ativo: dto.ativo,
+      percentualOrcamento: dto.percentualOrcamento,
+      natureza: dto.natureza,
+      cor: dto.cor,
     );
     return _storage.update(categoria).onSuccess((cat) {
       _streamController.add(RepositoryUpdated(cat));
@@ -138,6 +147,9 @@ class CategoriaRepository
             descricao: dto.descricao,
             categoriaPaiId: dto.categoriaPaiId,
             ativo: dto.ativo,
+            percentualOrcamento: dto.percentualOrcamento,
+            natureza: dto.natureza,
+            cor: dto.cor,
           ),
         )
         .toList();

@@ -10,6 +10,7 @@ LoadedUser _$LoadedUserFromJson(Map<String, dynamic> json) => LoadedUser(
   id: json['id'] as String,
   name: json['name'] as String,
   email: json['email'] as String,
+  orcamento: (json['orcamento'] as num?)?.toDouble() ?? 0.0,
   $type: json['runtimeType'] as String?,
 );
 
@@ -18,6 +19,7 @@ Map<String, dynamic> _$LoadedUserToJson(LoadedUser instance) =>
       'id': instance.id,
       'name': instance.name,
       'email': instance.email,
+      'orcamento': instance.orcamento,
       'runtimeType': instance.$type,
     };
 
@@ -33,6 +35,7 @@ LoggedUser _$LoggedUserFromJson(Map<String, dynamic> json) => LoggedUser(
   email: json['email'] as String,
   token: json['token'] as String,
   refreshToken: json['refreshToken'] as String,
+  orcamento: (json['orcamento'] as num?)?.toDouble() ?? 0.0,
   $type: json['runtimeType'] as String?,
 );
 
@@ -43,5 +46,6 @@ Map<String, dynamic> _$LoggedUserToJson(LoggedUser instance) =>
       'email': instance.email,
       'token': instance.token,
       'refreshToken': instance.refreshToken,
+      'orcamento': instance.orcamento,
       'runtimeType': instance.$type,
     };

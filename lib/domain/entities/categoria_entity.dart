@@ -1,5 +1,7 @@
-// lib/domain/entities/categoria_entity.dart
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:zzuna/domain/enums/categoria_natureza.dart';
+import 'package:zzuna/domain/statics/categoria/categoria_cores.dart';
 
 part 'categoria_entity.freezed.dart';
 part 'categoria_entity.g.dart';
@@ -11,9 +13,13 @@ sealed class Categoria with _$Categoria {
     required String descricao,
     String? categoriaPaiId,
     required bool ativo,
+    int? percentualOrcamento,
+    @Default(CategoriaNatureza.saida) CategoriaNatureza natureza,
+    String? cor,
   }) = _Categoria;
 
-  factory Categoria.fromJson(Map<String, dynamic> json) => _$CategoriaFromJson(json);
+  factory Categoria.fromJson(Map<String, dynamic> json) =>
+      _$CategoriaFromJson(json);
 }
 
 @freezed
@@ -24,5 +30,16 @@ sealed class CategoriaDetails with _$CategoriaDetails {
     required bool ativo,
     required CategoriaDetails? categoriaPai,
     required List<CategoriaDetails> subcategorias,
+    int? percentualOrcamento,
+    @Default(CategoriaNatureza.saida) CategoriaNatureza natureza,
+    String? cor,
   }) = _CategoriaDetails;
+}
+
+extension CategoriaColorExtension on Categoria {
+  Color get categoryColor => CategoriaCores.parseHex(cor);
+}
+
+extension CategoriaDetailsColorExtension on CategoriaDetails {
+  Color get categoryColor => CategoriaCores.parseHex(cor ?? categoriaPai?.cor);
 }

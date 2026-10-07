@@ -33,6 +33,7 @@ class AppDropdownFormField<T> extends StatefulWidget {
 class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
   final _controller = TextEditingController();
   late final FocusNode _focusNode;
+  late final FocusNode _trailingFocusNode = FocusNode(skipTraversal: true);
   bool _isSearching = false;
   String _lastSyncLabel = '';
 
@@ -114,6 +115,7 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
   @override
   void dispose() {
     _controller.dispose();
+    _trailingFocusNode.dispose();
     if (widget.focusNode == null) _focusNode.dispose();
     super.dispose();
   }
@@ -129,65 +131,60 @@ class _AppDropdownFormFieldState<T> extends State<AppDropdownFormField<T>> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            KeyboardListener(
-              focusNode: FocusNode(),
-              onKeyEvent: (event) {
-                // Allow Enter to confirm – handled internally by DropdownMenu
-              },
-              child: DropdownMenu<T>(
-                controller: _controller,
-                focusNode: _focusNode,
-                enabled: widget.enabled,
-                enableFilter: true,
-                enableSearch: true,
-                expandedInsets: EdgeInsets.zero,
-                menuHeight: 240,
-                menuStyle: MenuStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    Theme.of(context).cardColor,
-                  ),
-                  elevation: const WidgetStatePropertyAll(4),
-                  shape: WidgetStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6), //
-                    ),
+            DropdownMenu<T>(
+              controller: _controller,
+              focusNode: _focusNode,
+              trailingIconFocusNode: _trailingFocusNode,
+              enabled: widget.enabled,
+              enableFilter: true,
+              enableSearch: true,
+              expandedInsets: EdgeInsets.zero,
+              menuHeight: 240,
+              menuStyle: MenuStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).cardColor,
+                ),
+                elevation: const WidgetStatePropertyAll(4),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6), //
                   ),
                 ),
-                initialSelection: widget.value,
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.slate900, //
-                ),
-                label: Text(widget.label),
-                inputDecorationTheme: InputDecorationTheme(
-                  border: const OutlineInputBorder(),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.error, //
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                ),
-                dropdownMenuEntries: _entries,
-                onSelected: widget.enabled
-                    ? (value) {
-                        state.didChange(value);
-                        widget.onChanged?.call(value);
-                        _isSearching = false;
-                        _syncLabel();
-
-                        final focusScope = FocusScope.of(context);
-                        Future.delayed(Duration.zero, () {
-                          if (!mounted) return;
-                          if (widget.onEnterPressed != null) {
-                            widget.onEnterPressed!();
-                          } else {
-                            focusScope.nextFocus();
-                          }
-                        });
-                      }
-                    : null,
               ),
+              initialSelection: widget.value,
+              textStyle: const TextStyle(
+                fontSize: 14,
+                color: AppColors.slate900, //
+              ),
+              label: Text(widget.label),
+              inputDecorationTheme: InputDecorationTheme(
+                border: const OutlineInputBorder(),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.error, //
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              dropdownMenuEntries: _entries,
+              onSelected: widget.enabled
+                  ? (value) {
+                      state.didChange(value);
+                      widget.onChanged?.call(value);
+                      _isSearching = false;
+                      _syncLabel();
+
+                      final focusScope = FocusScope.of(context);
+                      Future.delayed(Duration.zero, () {
+                        if (!mounted) return;
+                        if (widget.onEnterPressed != null) {
+                          widget.onEnterPressed!();
+                        } else {
+                          focusScope.nextFocus();
+                        }
+                      });
+                    }
+                  : null,
             ),
             if (state.hasError) ...[
               const SizedBox(height: 4),

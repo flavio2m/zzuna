@@ -32,6 +32,8 @@ export 'package:zzuna/config/providers/relatorio_providers.dart';
 export 'package:zzuna/ui/relatorios/filter/providers/relatorio_filter_provider.dart';
 import 'package:zzuna/ui/lancamentos/export/viewmodels/export_lancamentos_viewmodel.dart';
 import 'package:zzuna/ui/categoria/update/viewmodels/categoria_update_viewmodel.dart';
+import 'package:zzuna/ui/categoria/orcamento/definir_orcamento/viewmodels/definir_orcamento_viewmodel.dart';
+import 'package:zzuna/ui/categoria/orcamento/update_percentual/viewmodels/categoria_percentual_viewmodel.dart';
 import 'package:zzuna/ui/conta/create/viewModels/conta_create_viewmodel.dart';
 import 'package:zzuna/ui/conta/delete/viewModel/conta_delete_viewmodel.dart';
 import 'package:zzuna/ui/centro_custo/create/viewmodels/centro_custo_create_viewmodel.dart';

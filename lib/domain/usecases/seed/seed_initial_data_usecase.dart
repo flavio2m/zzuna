@@ -9,6 +9,7 @@ import 'package:zzuna/domain/dtos/centro_custo/centro_custo_dto.dart';
 import 'package:zzuna/domain/dtos/conta/create_conta_dto.dart';
 import 'package:zzuna/domain/dtos/cartao/cartao_dto.dart';
 import 'package:zzuna/domain/enums/cartao_comportamento_fechamento.dart';
+import 'package:zzuna/domain/enums/categoria_natureza.dart';
 
 class SeedInitialDataUseCase {
   final ContaRepository _contaRepository;
@@ -73,36 +74,85 @@ class SeedInitialDataUseCase {
     final prazeresId = uuid.v4();
     final conhecimentoId = uuid.v4();
     final receitasId = uuid.v4();
+    final terceirosId = uuid.v4();
 
     final dtos = <CategoriaDto>[
       // Categorias Pai
-      CategoriaDto(id: custosFixosId, descricao: 'Custos Fixos', ativo: true),
+      CategoriaDto(
+        id: custosFixosId,
+        descricao: 'Custos Fixos',
+        ativo: true,
+        percentualOrcamento: 30,
+        natureza: CategoriaNatureza.saida,
+      ),
       CategoriaDto(
         id: liberdadeFinanceiraId,
         descricao: 'Liberdade Financeira',
         ativo: true,
+        percentualOrcamento: 25,
+        natureza: CategoriaNatureza.saida,
       ),
-      CategoriaDto(id: confortoId, descricao: 'Conforto', ativo: true),
-      CategoriaDto(id: metasId, descricao: 'Metas', ativo: true),
-      CategoriaDto(id: prazeresId, descricao: 'Prazeres', ativo: true),
-      CategoriaDto(id: conhecimentoId, descricao: 'Conhecimento', ativo: true),
-      CategoriaDto(id: receitasId, descricao: 'Receitas', ativo: true),
+      CategoriaDto(
+        id: confortoId,
+        descricao: 'Conforto',
+        ativo: true,
+        percentualOrcamento: 15,
+        natureza: CategoriaNatureza.saida,
+      ),
+      CategoriaDto(
+        id: metasId,
+        descricao: 'Metas',
+        ativo: true,
+        percentualOrcamento: 15,
+        natureza: CategoriaNatureza.saida,
+      ),
+      CategoriaDto(
+        id: prazeresId,
+        descricao: 'Prazeres',
+        ativo: true,
+        percentualOrcamento: 10,
+        natureza: CategoriaNatureza.saida,
+      ),
+      CategoriaDto(
+        id: conhecimentoId,
+        descricao: 'Conhecimento',
+        ativo: true,
+        percentualOrcamento: 5,
+        natureza: CategoriaNatureza.saida,
+      ),
+      CategoriaDto(
+        id: receitasId,
+        descricao: 'Receitas',
+        ativo: true,
+        percentualOrcamento: null,
+        natureza: CategoriaNatureza.entrada,
+      ),
+      CategoriaDto(
+        id: terceirosId,
+        descricao: 'Terceiros',
+        ativo: true,
+        percentualOrcamento: null,
+        natureza: CategoriaNatureza.saida,
+      ),
 
       // 1) Custos Fixos (3 filhas)
       CategoriaDto(
         descricao: 'Moradia',
         categoriaPaiId: custosFixosId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Supermercado',
         categoriaPaiId: custosFixosId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Transporte',
         categoriaPaiId: custosFixosId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 2) Liberdade Financeira (3 filhas)
@@ -110,42 +160,59 @@ class SeedInitialDataUseCase {
         descricao: 'Renda Fixa',
         categoriaPaiId: liberdadeFinanceiraId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Ações',
         categoriaPaiId: liberdadeFinanceiraId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'FII',
         categoriaPaiId: liberdadeFinanceiraId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 3) Conforto (3 filhas)
-      CategoriaDto(descricao: 'Saúde', categoriaPaiId: confortoId, ativo: true),
+      CategoriaDto(
+        descricao: 'Saúde',
+        categoriaPaiId: confortoId,
+        ativo: true,
+        natureza: CategoriaNatureza.saida,
+      ),
       CategoriaDto(
         descricao: 'Cuidados Pessoais',
         categoriaPaiId: confortoId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Manutenção e Reforma',
         categoriaPaiId: confortoId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 4) Metas (3 filhas)
-      CategoriaDto(descricao: 'Viagem', categoriaPaiId: metasId, ativo: true),
+      CategoriaDto(
+        descricao: 'Viagem',
+        categoriaPaiId: metasId,
+        ativo: true,
+        natureza: CategoriaNatureza.saida,
+      ),
       CategoriaDto(
         descricao: 'Reserva de Emergência',
         categoriaPaiId: metasId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Eletrônicos e Bens',
         categoriaPaiId: metasId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 5) Prazeres (3 filhas)
@@ -153,12 +220,19 @@ class SeedInitialDataUseCase {
         descricao: 'Restaurantes',
         categoriaPaiId: prazeresId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
-      CategoriaDto(descricao: 'Lazer', categoriaPaiId: prazeresId, ativo: true),
+      CategoriaDto(
+        descricao: 'Lazer',
+        categoriaPaiId: prazeresId,
+        ativo: true,
+        natureza: CategoriaNatureza.saida,
+      ),
       CategoriaDto(
         descricao: 'Lanches',
         categoriaPaiId: prazeresId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 6) Conhecimento (3 filhas)
@@ -166,16 +240,19 @@ class SeedInitialDataUseCase {
         descricao: 'Cursos',
         categoriaPaiId: conhecimentoId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Livros',
         categoriaPaiId: conhecimentoId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
       CategoriaDto(
         descricao: 'Treinamentos',
         categoriaPaiId: conhecimentoId,
         ativo: true,
+        natureza: CategoriaNatureza.saida,
       ),
 
       // 7) Receitas (3 filhas)
@@ -183,16 +260,19 @@ class SeedInitialDataUseCase {
         descricao: 'Salário',
         categoriaPaiId: receitasId,
         ativo: true,
+        natureza: CategoriaNatureza.entrada,
       ),
       CategoriaDto(
         descricao: 'Rendimentos',
         categoriaPaiId: receitasId,
         ativo: true,
+        natureza: CategoriaNatureza.entrada,
       ),
       CategoriaDto(
         descricao: 'Outras Receitas',
         categoriaPaiId: receitasId,
         ativo: true,
+        natureza: CategoriaNatureza.entrada,
       ),
     ];
 

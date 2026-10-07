@@ -21,6 +21,9 @@ class CategoriaTreeUseCase {
         ativo: parentCat.ativo,
         categoriaPai: parentOfParent,
         subcategorias: [],
+        percentualOrcamento: parentCat.percentualOrcamento,
+        natureza: parentCat.natureza,
+        cor: parentCat.cor,
       );
       partialNodes[parentId] = parentNode;
       return parentNode;
@@ -53,13 +56,17 @@ class CategoriaTreeUseCase {
         ativo: c.ativo,
         categoriaPai: parentNode,
         subcategorias: children.map(buildNode).toList(),
+        percentualOrcamento: c.percentualOrcamento,
+        natureza: c.natureza,
+        cor: c.cor,
       );
     }
 
     final allIds = categorias.map((c) => c.id).toSet();
     final rootNodes = categorias
         .where(
-          (c) => c.categoriaPaiId == null || !allIds.contains(c.categoriaPaiId), //
+          (c) =>
+              c.categoriaPaiId == null || !allIds.contains(c.categoriaPaiId), //
         )
         .toList();
     rootNodes.sort(
