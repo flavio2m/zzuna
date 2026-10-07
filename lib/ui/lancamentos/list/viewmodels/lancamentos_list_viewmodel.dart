@@ -46,6 +46,7 @@ class LancamentosListViewModel extends ChangeNotifier {
 
   final Set<String> _selectedLancamentoIds = {};
   Set<String> get selectedLancamentoIds => _selectedLancamentoIds;
+  List<LancamentoDetails> get lancamentos => _allLancamentos;
 
   bool get isMesFechado {
     if (_currentExtratos.isEmpty) return false;

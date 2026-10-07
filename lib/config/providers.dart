@@ -116,6 +116,9 @@ import 'package:zzuna/ui/lista_compras/delete/item_compra/viewmodels/item_compra
 import 'package:zzuna/ui/lista_compras/delete/lista_compra/viewmodels/lista_compras_delete_lista_viewmodel.dart';
 import 'package:zzuna/domain/enums/item_compra_situacao.dart';
 import 'package:zzuna/domain/enums/mes.dart';
+import 'package:zzuna/domain/models/orcamento/orcamento_comparativo_model.dart';
+import 'package:zzuna/domain/usecases/orcamento/get_orcamento_comparativo_usecase.dart';
+import 'package:zzuna/ui/lancamentos/orcamento_comparativo/viewmodels/orcamento_comparativo_viewmodel.dart';
 
 part 'providers/conta_providers.dart';
 part 'providers/cartao_providers.dart';
@@ -124,6 +127,7 @@ part 'providers/centro_custo_providers.dart';
 part 'providers/extrato_fatura_providers.dart';
 part 'providers/lancamento_providers.dart';
 part 'providers/lista_compras_providers.dart';
+part 'providers/orcamento_providers.dart';
 
 // ============================================================================
 // SERVICES - Camada de Infraestrutura
